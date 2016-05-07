@@ -65,12 +65,16 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     )
 
 idealFromSC = method()
-idealFromSC(List,Ring) := (P,S) -> (
-    numverts := #unique flatten P;
-    x := symbol x;
-    Delta := toList (0..numgens S -1);
+idealFromSC (List,Ring) := (P,S) -> (
+    Delta := toList (0..numgens S - 1);
     V := vars S;
     intersect apply(P, D -> ideal(V_(Delta - set D)))
+    )
+idealFromSC List := P -> (
+    n := (max flatten P)+1;
+    x := symbol x;
+    S := QQ[x_0..x_(n-1)];
+    idealFromSC(P,S)
     )
 
 isShelling = method()
