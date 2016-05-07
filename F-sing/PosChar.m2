@@ -424,6 +424,11 @@ genFrobeniusPower(Ideal, ZZ, ZZ) := (I, k, e) ->
 (
     ethRoot(genFrobeniusPower(I,k),e)
 )
+
+genFrobeniusPower(MonomialIdeal, ZZ, ZZ) := (I, k, e) ->
+(
+    ethRoot(genFrobeniusPower(I,k),e)
+)
 ---------------------------------------------------------------
 --***********************************************************--
 --
