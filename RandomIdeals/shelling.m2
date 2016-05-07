@@ -318,7 +318,7 @@ doc ///
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
      Description
           Text
-               
+            This function randomly chooses a facet of size m+1 and checks whether the facet can be shellably added to the shelling. If it can be shellably added to the shelling, it is added to the shelling and the new shelling is returned. Otherwise, the process repeats up to 20 times.  
           Example
             P={{1,2,3}}
 	    L=randomAddition(6,3,P)
