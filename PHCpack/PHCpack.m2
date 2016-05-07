@@ -54,6 +54,7 @@ export {
   "constructEmbedding",
   "gamma",
   "factorWitnessSet",
+  "interactive",
   "isCoordinateZero",
   "isWitnessSetMember",
   "mixedVolume",
@@ -963,7 +964,6 @@ solveSystem  List := List =>  o->system -> (
 
   -- writing data to the corresponding files:    
   systemToFile(system,infile);
-
   -- launching blackbox solver:
   execstr := PHCexe|" -b "
     |(if o.numThreads > 1 then ("-t"|o.numThreads|" ") else "")
@@ -1135,7 +1135,7 @@ topWitnessSet (List,ZZ) := o->(system,dimension) -> (
 -- TRACK PATHS --
 -----------------
 
-trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false})
+trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false, interactive => false})
 trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   -- IN: T, target system to be solved;
   --     S, start system with solutions in Ssols;
@@ -1178,7 +1178,18 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   if n> numgens R then error "the system is overdetermined"; 
   
   -- making batch file
-  bat := openOut batchfile;
+  if o.interactive then (
+    bat := openOut batchfile;
+    bat << targetfile << endl << outfile << endl <<"n"<< endl 
+    << startfile << endl << Ssolsfile << endl;
+    close bat;
+    << "running (cat "|batchfile|"; cat) | PHCexe -p "<< endl;
+    -- (cat batch; cat) | phc -p
+    run("(cat "|batchfile|"; cat) | "|PHCexe|" -p ");
+    run(PHCexe|" -z "|outfile|" "|Tsolsfile);
+      
+  ) else (
+    bat := openOut batchfile;
   if not (o.numThreads > 1) then (
     bat << targetfile << endl << outfile << endl <<"n"<< endl 
     << startfile << endl << Ssolsfile << endl;
@@ -1220,6 +1231,7 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
      ("-t"|o.numThreads) else "")|"<"|batchfile|" >phc_session.log");
   run(PHCexe|" -z "|outfile|" "|Tsolsfile);
   
+  );
   -- parse and output the solutions
   result := parseSolutions(Tsolsfile, R);
   if n > numgens R then (
@@ -1537,3 +1549,19 @@ w#IsIrreducible
 R = ring rationalSystem_0
 PD = primaryDecomposition ideal rationalSystem
 for I in PD list << "(dim=" << dim I << ", deg=" << degree I << ") " 
+
+restart
+loadPackage "PHCpack"
+r = CC[x,y]
+solveSystem({2*x+y+5,5*y^2+3*x}, Verbose => true, interactive => true)
+
+restart 
+loadPackage "PHCpack"
+R = CC[x,y]
+f =  { x^3*y^5 + y^2 + x^2*y, x*y + x^2 - 1};
+I = ideal f;
+m = mixedVolume(f);
+(mv,sv) = mixedVolume(f,StableMixedVolume => true);
+(mv,q,qsols) = mixedVolume(f,StartSystem => true);
+fsols = trackPaths(f,q,qsols);
+fsols = trackPaths(f,q,qsols, interactive=>true);
