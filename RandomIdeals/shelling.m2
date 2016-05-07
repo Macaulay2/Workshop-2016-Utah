@@ -4,7 +4,10 @@ newPackage ( "shelling",
     Version => "1.0",
     Date => "07 May 2016",
     Authors => {
-	{ Name => "David Eisenbud and ****"},
+	{Name => "David Eisenbud",
+         Email => "de@msri.org",
+         HomePage => "http://www.msri.org/~de"},
+     	 {Name => "Robert,Katy,Robert, Jay"}
 	},
     Headline => "Package for constructing random simplicial complex",
     Reload => true,
@@ -223,10 +226,16 @@ doc ///
      Headline
           produces a random chain of shellable complexes
      Usage
-          b=isShelling(P)
+          P=randomChain(n,m)
+	  P=randomChain(n,m,k)
      Inputs
-          P:List
+          n:ZZ
 	       the number of vertices
+	  m:ZZ
+	       the dimension of the facets
+	  k:ZZ
+	       the number of facets (if ommited, the number will be n choose m+1)
+	      
      Outputs
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
@@ -253,7 +262,7 @@ doc ///
      Headline
           determines whether a list represents a shelling of a simplicial complex.
      Usage
-          b = isShelling P
+          b = isShelling(P)
      Inputs
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a possible shelling.
@@ -267,6 +276,40 @@ doc ///
   
 ///
 
+
+------------------------------------------------------------
+-- DOCUMENTATION randomAddition
+------------------------------------------------------------
+doc ///
+     Key
+          randomAddition
+	  (randomAddition,ZZ,ZZ,List)
+     Headline
+          Adds a random facet to a shellable complex
+     Usage
+          p=randomAddition(n,m,P)
+     Inputs
+     	  n:ZZ
+	       the number of vertices
+	  m:ZZ
+	       the dimension of the new facet
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Outputs
+          p:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Description
+          Text
+               
+          Example
+            P={{1,2,3}}
+	    L=randomAddition(6,3,P)
+     Caveat
+	  If the input is not a shellable simplicial complex, the new complex will not be shellable.
+///
+
+
+
 TEST///
 assert(#randomChain(5,2,6)==6)
 assert(#randomChain(5,2)==binomial(5,3))
@@ -274,12 +317,26 @@ assert(#randomChain(5,2)==binomial(5,3))
 
 
 TEST///
+assert(isShelling({}))
+assert(isShelling({{1,2,3}}))
+assert(isShelling({{1,2,3},{2,3,4}}))
 assert(isShelling(randomChain(5,3,5)))
+--non pure shellings
+assert(isShelling({{1,2,3},{2,4}}))
+assert(isShelling({{1},{2}}))
+assert(not isShelling({{1,3},{2,4}}))
+assert(isShelling({{1,2},{3}}))
+assert(not isShelling({{3},{1,2}}))
 ///
 
 
-end--
+TEST///
+setRandomSeed(0);
+assert(#randomAddition(6,3,{{1,2,3}})==2)
+assert(#randomAddition(6,3,{{1,2,3,4}})==2)
+///
 
+end--
 
 restart
 installPackage "shelling"
