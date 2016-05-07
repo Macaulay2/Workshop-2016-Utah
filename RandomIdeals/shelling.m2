@@ -200,6 +200,17 @@ while numgens I > c and count < b list (
 ///
 
 
+TEST///
+assert(#randomChain(5,2,6)==6)
+assert(#randomChain(5,2)==binomial(5,3))
+///
+
+
+TEST///
+assert(isShelling(randomChain(5,3,5)))
+///
+
+
 end
 viewHelp
 
