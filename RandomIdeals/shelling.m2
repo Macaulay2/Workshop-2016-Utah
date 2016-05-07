@@ -85,6 +85,10 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     if count == 20 then return P;
     unique (P|{D'})
     )
+randomAddition(Ring,ZZ,List) := (R,m,L) -> (
+    P := monomialsToLists(L,R);
+    listsToMonomials(randomAddition(numgens R,m,P),R)
+    )
 
 idealFromSC = method()
 idealFromSC (List,Ring) := (P,S) -> (
@@ -112,8 +116,11 @@ randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
     while #P < k do P = randomAddition(n,m,P);
     P
     )
+randomChain(Ring,ZZ,ZZ) := (R,m,k) -> listsToMonomials(randomChain(numgens R,m,k),R)
+randomChain(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomChain(numgens R,m),R)
 
-
+listsToMonomials = (P,R) -> apply(P, D->product apply(D,d->R_d))
+monomialsToLists = (L,R) -> apply(L, m->select(numgens ring m, i->((listForm m)#0#0#i > 0)))
 
 ///
 Q = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}, {0, 3, 4}}
