@@ -15,7 +15,9 @@ export {
 	"randomAddition", 
 	"randomChain",
 	"randomLink",
-	"testNewSimplex"
+	"testNewSimplex",
+        "idealFromSC",
+        "isShelling"
         };
 
 testNewSimplex = method()
@@ -23,13 +25,28 @@ testNewSimplex(List, List) := (P, D) ->(
 --given a pure, d-dimensional simplicial complex (sc) as a list of ordered lists of d+1 vertices in [n], and
 --a simplex D as such a list, tests whether the intersection of D with P is a union of facets of D.
      d := #D-1; --dimension
-     ints := apply(P, D' -> intersectLists(D',D));
-     facets := unique select(ints, E -> #E==d);
-     if facets == {} then return false;
-     smalls := unique select(ints, E -> #E<d);
-     if sum apply(smalls, e ->product apply(facets, E ->  #(e-set E)))===0 then t=true else t=false;
---error();
-(t,smalls,facets)
+     ints := unique apply(P, D' -> intersectLists(D',D));
+     addSimplex := (L,S) -> (
+         if any(S,F -> subsetList(L,F))
+         then S
+         else select(S,F -> not (subsetList(F,L))) | {L}
+         );
+     ints = fold(ints,{}, addSimplex);
+     all(ints, L -> #L == d)
+)
+
+subsetList = (A,B) -> (
+    --checks if A\subset B. requires that both lists be sorted
+    lenA := #A;
+    lenB := #B;
+    a := 0;
+    b := 0;
+    while (lenA-a)<=(lenB-b) and a<lenA and b<lenB do (
+        if A_a<B_b then return false;
+        if A_a==B_b then a=a+1;
+        b = b+1;
+    );
+    a==lenA
 )
 
 intersectLists = (D',D) -> D - set(D-set D')
@@ -55,24 +72,29 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     count := 0;
     while not t and count < 20 do (
     	i := random (#compD);
-    	J := randomSubset(#D,#D-m+1);
-    	D' = sort(D - set apply(J,j->D_j) | {compD_i});
-    	t = (testNewSimplex(P,D'))_0;
+    	j := random (#D);
+    	D' = sort(D - set {D_j} | {compD_i});
+    	t = (testNewSimplex(P,D'));
 	count = count+1);
     if count == 20 then return P;
     unique (P|{D'})
     )
 
-idealFromSC = (P) ->(
-    numverts := #unique flatten P;
-    S := ZZ/101[x_0..x_(numverts-1)];
-    Delta := toList (0..numgens S -1);
-    V = vars S;
+idealFromSC = method()
+idealFromSC (List,Ring) := (P,S) -> (
+    Delta := toList (0..numgens S - 1);
+    V := vars S;
     intersect apply(P, D -> ideal(V_(Delta - set D)))
-	    )
+    )
+idealFromSC List := P -> (
+    n := (max flatten P)+1;
+    x := symbol x;
+    S := QQ[x_0..x_(n-1)];
+    idealFromSC(P,S)
+    )
 
 isShelling = method()
-isShelling(List) := P -> all apply(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
+isShelling(List) := P -> all(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
 
 randomChain = method()
 -- random chain of shellable complexes on n vertices, with pure dim m, up to the complete m skeleton
