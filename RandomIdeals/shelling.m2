@@ -88,6 +88,10 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     if count == 20 then return P;
     unique (P|{D'})
     )
+randomAddition(Ring,ZZ,List) := (R,m,L) -> (
+    P := monomialsToLists(L,R);
+    listsToMonomials(randomAddition(numgens R,m,P),R)
+    )
 
 idealFromSC = method()
 idealFromSC (List,Ring) := (P,S) -> (
@@ -115,8 +119,11 @@ randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
     while #P < k do P = randomAddition(n,m,P);
     P
     )
+randomChain(Ring,ZZ,ZZ) := (R,m,k) -> listsToMonomials(randomChain(numgens R,m,k),R)
+randomChain(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomChain(numgens R,m),R)
 
-
+listsToMonomials = (P,R) -> apply(P, D->product apply(D,d->R_d))
+monomialsToLists = (L,R) -> apply(L, m->select(numgens ring m, i->((listForm m)#0#0#i > 0)))
 
 ///
 Q = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}, {0, 3, 4}}
@@ -323,16 +330,28 @@ doc ///
           randomChain
 	  (randomChain,ZZ,ZZ)
 	  (randomChain,ZZ,ZZ,ZZ)
+	  (randomChain,Ring,ZZ)
+	  (randomChain,Ring,ZZ,ZZ)
      Headline
           produces a random chain of shellable complexes
      Usage
-          b=isShelling(P)
+          P=randomChain(n,m)
+	  P=randomChain(n,m,k)
+	  P=randomChain(R,m)
+	  P=randomChain(R,m,k)
      Inputs
-          P:List
+          n:ZZ
 	       the number of vertices
+	  R:Ring
+	       a polynomial ring with a variable for each vertex
+	  m:ZZ
+	       the dimension of the facets
+	  k:ZZ
+	       the number of facets (if ommited, the number will be {\tt n} choose {\tt m+1})
+	      
      Outputs
           P:List
-	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.  If called with a Ring {\tt R} instead of an integer {\tt n}, each facet is represented by a square-free monomial instead of a list.
      Description
           Text
                
@@ -356,33 +375,124 @@ doc ///
      Headline
           determines whether a list represents a shelling of a simplicial complex.
      Usage
-          b = isShelling P
+          b = isShelling(P)
      Inputs
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a possible shelling.
      Outputs
+          B:Boolean
+	       true if and only if P is a shelling.
+     Description
+          Text
+              Determines if a list of faces is a shelling order of the simplicial complex. 
+          Example
+	      P = {{1, 2, 3}, {1, 2, 5}};
+	      isShelling(P)
+	      Q = {{1,2,3},{3,4,5},{2,3,4}};
+	      isShelling(Q)
+	     
+      
+///
+
+
+------------------------------------------------------------
+-- DOCUMENTATION randomAddition
+------------------------------------------------------------
+doc ///
+     Key
+          randomAddition
+	  (randomAddition,ZZ,ZZ,List)
+     Headline
+          Adds a random facet to a shellable complex
+     Usage
+          p=randomAddition(n,m,P)
+     Inputs
+     	  n:ZZ
+	       the number of vertices
+	  m:ZZ
+	       the dimension of the new facet
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Outputs
+          p:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Description
+          Text
+            This function randomly chooses a facet of size m+1 and checks whether the facet can be shellably added to the shelling. If it can be shellably added to the shelling, it is added to the shelling and the new shelling is returned. Otherwise, the process repeats up to 20 times.  
+          Example
+            P={{1,2,3}}
+	    L=randomAddition(6,3,P)
+     Caveat
+	  If the input is not a shellable simplicial complex, the new complex will not be shellable.
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION testNewSimplex
+------------------------------------------------------------
+
+doc ///
+     Key
+          testNewSimplex
+	  (testNewSimplex,List,List)
+     Headline
+          Tests whether a facet can be shellably added to a shelling.
+     Usage
+          b=testNewSimplex(P,S)
+     Inputs
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+          S:List
+               A list of integers. This list is the new facet to add.
+     Outputs
           b:Boolean
-	       Returns true if the given list gives a shelling of the complex and false otherwise. 
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
      Description
           Text
                
           Example
-  
+            P={{1,2,3}}
+	    b=testNewSimplex(P,{2,3,4});
+     Caveat
+          We do not test if P is a shelling in the first place.
 ///
+         
 
 TEST///
 assert(#randomChain(5,2,6)==6)
 assert(#randomChain(5,2)==binomial(5,3))
+R=QQ[x1,x2,x3,x4,x5];
+assert(#randomChain(R,2,6)==6)
 ///
 
 
 TEST///
+assert(isShelling({}))
+assert(isShelling({{1,2,3}}))
+assert(isShelling({{1,2,3},{2,3,4}}))
 assert(isShelling(randomChain(5,3,5)))
+--non pure shellings
+assert(isShelling({{1,2,3},{2,4}}))
+assert(isShelling({{1},{2}}))
+assert(not isShelling({{1,3},{2,4}}))
+assert(isShelling({{1,2},{3}}))
+assert(not isShelling({{3},{1,2}}))
 ///
 
 
-end--
+TEST///
+setRandomSeed(0);
+assert(#randomAddition(6,3,{{1,2,3}})==2)
+assert(#randomAddition(6,3,{{1,2,3,4}})==2)
+///
 
+TEST///
+needsPackage "SimplicialComplexes"
+needsPackage "SimplicialDecomposability"
+R=QQ[x1,x2,x3,x4,x5];
+assert(isShellable simplicialComplex randomChain(R,2,6))
+///
+
+end--
 
 restart
 installPackage "shelling"
