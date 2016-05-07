@@ -4,7 +4,10 @@ newPackage ( "shelling",
     Version => "1.0",
     Date => "07 May 2016",
     Authors => {
-	{ Name => "later"},
+	{Name => "David Eisenbud",
+         Email => "de@msri.org",
+         HomePage => "http://www.msri.org/~de"},
+     	 {Name => "Robert,Katy,Robert, Jay"}
 	},
     Headline => "Package for constructing random simplicial complex",
     Reload => true,
@@ -18,7 +21,9 @@ export {
 	"randomLink",
 	"testNewSimplex",
         "idealFromSC",
-        "isShelling"
+        "isShelling",
+	"isLicci",
+	"minimalRegularSequence"
         };
 
 testNewSimplex = method()
@@ -120,6 +125,9 @@ apply(smalls, e ->apply(facets, E -> #(e-set E)))
 ///
 
 
+-----Toward the test for licci
+
+
 randomLink = method()
 randomLink (ZZ,Ideal) := (c,I) ->(
 {*
@@ -128,12 +136,13 @@ c:ZZ
 I:Ideal
  homogeneous
 *}
-if numgens I == c then return ideal(1_(ring I));
-sgens := sort gens I;
-n :=numcols sgens;
-rsgens  := sgens * random(source sgens, source sgens);
-regseq := rsgens_{n-c..n-1};
-trim(ideal regseq : I)
+if numgens I <= c then return ideal(1_(ring I));
+--sgens := sort gens I;
+--n :=numcols sgens;
+--rsgens  := sgens * random(source sgens, source sgens);
+--regseq := ideal rsgens_{n-c..n-1};
+regseq := minimalRegularSequence(c,I);
+trim(regseq : I)
 )
 
 linkageBound = method()
@@ -151,26 +160,58 @@ c:ZZ
  codim of I
 I:Ideal
  homogeneous
+Description
+ Text
+  finds a maximal regular sequence in I of minimal degree.
 *}
+if numgens I == c then return I;
+    --takes care of I = 0 and I principal;
+sgens := sort gens I;
+rsgens := sgens * random(source sgens, source sgens);
+n :=numcols sgens;
+J := ideal sgens_{0};
+K := J;
+count := 1; -- next element to add
+c' := 1; -- current codim J
+while c'<c do(
+    if codim (K = J + ideal sgens_{count}) > c' then (J = K; c' = c'+1)
+    else if codim (K = J + ideal rsgens_{count}) > c' then (J = K; c' = c'+1);
+    count = count+1;
+    );
+J
 )
 
+isLicci = method()
+isLicci(ZZ, ZZ, Ideal) := (b,c,I) -> (
+    --I homogeneous ideal
+    --b = linkageBound I
+    --c = codim I
+    --output is list of up to b integers, the numbers of generators of the
+    --successive random links
+    J := I;
+    p := numgens J;
+    <<p<<endl;flush;
+    apply(b, i -> (
+	    J = randomLink(c,J);
+	    <<numgens J<<endl;flush;
+	    numgens J))
+    )
+   
 ///
 restart
-load "shelling.m2"
+loadPackage("shelling", Reload =>true)
 S = ZZ/101[x_0..x_3]
 I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
-I = ideal(minors(2
-I = minors(2, random(S^2, S^{-2,-3,-4}));
-prune Hom(I, S^1/I)
+isLicci(3, codim I, I)
 
-randomLink(codim I, I)
+I = minors(3, random(S^3, S^{-2,-3,-4,-4}));
+isLicci(3, codim I, I)
 
-c = 2
-b = linkageBound I
-count = 0
-while numgens I > c and count < b list (
-    I = randomLink(c, I);
-    numgens I)
+I = minors(2, random(S^2, S^{4:-1}))
+isLicci(3, codim I, I)
+
+--b = linkageBound I
+b = 2*c
 ///
 
 ------------------------------------------------------------
@@ -276,63 +317,30 @@ assert(#randomChain(5,2)==binomial(5,3))
 
 
 TEST///
+assert(isShelling({}))
+assert(isShelling({{1,2,3}}))
+assert(isShelling({{1,2,3},{2,3,4}}))
 assert(isShelling(randomChain(5,3,5)))
+--non pure shellings
+assert(isShelling({{1,2,3},{2,4}}))
+assert(isShelling({{1},{2}}))
+assert(not isShelling({{1,3},{2,4}}))
+assert(isShelling({{1,2},{3}}))
+assert(not isShelling({{3},{1,2}}))
 ///
 
 
-end
-viewHelp
+TEST///
+setRandomSeed(0);
+assert(#randomAddition(6,3,{{1,2,3}})==2)
+assert(#randomAddition(6,3,{{1,2,3,4}})==2)
+///
+
+end--
 
 restart
-uninstallPackage "RandomIdeal"
-installPackage "RandomIdeal"
+installPackage "shelling"
 
 restart
-load "shelling.m2"
-P = {{1,2,3}}
-netList (L =  manyRandomAdditions(500,6,P))
-netList (L1 =  manyRandomAdditions(500,6,P))
-#L
-apply(19, i -> (
-    <<betti res idealFromSC(L_i)<< endl;
-    <<betti res idealFromSC(L1_i)<< endl;
-<<endl;<<endl;))
-#unique(L|L1)
-netList apply(L, P->betti res idealFromSC(P))
-
-degree I
-betti res I
-betti res (I^3)
-Q = subsets(5,3)
-betti res idealFromSC(Q)
-
-
-
---an apparently maximal shellable with non-linear resolution:
-P = {{1,2,3},
- {1,2,5},
- {2,3,7},
- {1,5,6},
- {0,2,3},
- {0,2,7},
- {1,4,5},
- {4,5,6}
- }
-I = idealFromSC(P)
-betti res I
-
-netList (L =  manyRandomAdditions(500,8,P))
-betti res idealFromSC(last L)
-
-M = apply(1000, i->(
-	L = {};
-	P = {{1,2,3}};
-	manyRandomAdditions(500,6,P)));
-#unique flatten M
-
-P = {{1,2,3}}
-# (L=manyRandomAdditions(500,6,P))
-L
-
-
-
+loadPackage("shelling", Reload=>true)
+check "shelling"

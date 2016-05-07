@@ -27,11 +27,18 @@ dimImage = method();
 dimImage(Ideal) := (I1) -> (
 );
 
+
 imageOfMap = method();
 imageOfMap(Matrix,Ideal,Ideal) := (f,a,b) -> (
-	h = map((ring a)/a,(ring b)/b,first entries f);
-	ker h);
-	
+	h = map((ring a)/a,(ring b)/b,f);
+	ker h
+	);
+
+dimImage = method();
+dimImage(Matrix,Ideal,Ideal) := (f,a,b) ->(
+	I = imageOfMap(f,a,b);
+	dim I - 1
+	);
 --****************************************************--
 --*****************Documentation**********************--
 --****************************************************--
