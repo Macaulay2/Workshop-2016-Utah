@@ -4,7 +4,10 @@ newPackage ( "shelling",
     Version => "1.0",
     Date => "07 May 2016",
     Authors => {
-	{ Name => "David Eisenbud and ****"},
+	{Name => "David Eisenbud",
+         Email => "de@msri.org",
+         HomePage => "http://www.msri.org/~de"},
+     	 {Name => "Robert,Katy,Robert, Jay"}
 	},
     Headline => "Package for constructing random simplicial complex",
     Reload => true,
