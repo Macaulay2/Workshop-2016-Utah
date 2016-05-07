@@ -25,7 +25,8 @@ randomSubset = (n,m) -> (
     sort toList L
     )
 
-randomAddition = (n,m,P) ->(
+randomAddition = method()
+randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     if #P == 0 then return {randomSubset(n,m)};
     Plarge := select(P, D-> #D >= m-1); -- the facets big enough to be glued to
     if #Plarge == 0 then error "m is too large";
@@ -64,6 +65,35 @@ randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
     while #P < k do P = randomAddition(n,m,P);
     P
     )
+
+doc ///
+     Key
+          randomChain
+	  (randomChain,ZZ,ZZ)
+	  (randomChain,ZZ,ZZ,ZZ)
+     Headline
+          produces a random chain of shellable complexes
+     Usage
+          P = randomChain(n,m)
+          P = randomChain(n,m,k)
+     Inputs
+          n:ZZ
+	       the number of vertices
+	  m:ZZ
+	       the dimension of the facets
+	  k:ZZ
+	       the number of facets (if omitted, the number will be n choose m)
+     Outputs
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Description
+          Text
+               
+          Example
+               P = randomChain(6,3,10)
+     Caveat
+	  No claim is made on the distribution of the random chain.
+///
 
 ///
 Q = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}, {0, 3, 4}}
