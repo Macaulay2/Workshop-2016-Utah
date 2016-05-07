@@ -253,8 +253,7 @@ doc ///
      Headline
           determines whether a list represents a shelling of a simplicial complex.
      Usage
-          P = randomChain(n,m)
-          P = randomChain(n,m,k)
+          b = isShelling P
      Inputs
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a possible shelling.
