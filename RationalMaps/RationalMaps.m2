@@ -88,6 +88,24 @@ doc ///
 			imageOfMap(f,a,b)
 ///
 
+doc ///
+        Key
+                dimImage
+        Headline
+                Computes dimension of image of rational map of projective varieties
+        Usage
+                dim = dimImage(f,a,b)
+        Inputs
+                f: matrix
+                        a rational map between 2 projective varieties, f: X -> Y
+                        assumed that f is given by a polynomial representation
+                a: ideal
+                        defining equations for X
+                b: ideal
+                        defining equations for Y
+        Outputs
+                dimension of image
+///
 TEST ///   
 	S = QQ[x,y,z]
         a = ideal(x^2+y^2+z^2)
