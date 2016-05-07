@@ -1,7 +1,7 @@
 newPackage(
 	"PolymakeInterface",
-    	Version => "0.3", 
-    	Date => "Aug 6, 2012",
+    	Version => "0.4", 
+    	Date => "May 7, 2016",
     	Authors => {{Name => "Josephine Yu", 
 		     Email => "josephine.yu@math.gatech.edu", 
 		     HomePage => "http://people.math.gatech.edu/~jyu67"},
@@ -10,18 +10,25 @@ newPackage(
 	             Email => "nilten@math.berkeley.edu"},
 	            {Name => "Qingchun Ren", 
 		    Email => "qingchun.ren@gmail.com", 
-		    HomePage => "http://math.berkeley.edu/~qingchun/"}},
+		    HomePage => "http://math.berkeley.edu/~qingchun/"},
+		    {Name => "David Swinarski",
+		     Email => "dswinarski@fordham.edu",
+		     HomePage => "http://faculty.fordham.edu/dswinarski/"},
+		    {Name => "Madeline Brandt",
+		     Email => "brandtm@berkeley.edu",
+		     HomePage => "http://math.berkeley.edu/~brandtm/"}
+		},
     	Headline => "a package for interfacing with polymake",
     	DebuggingMode => true
     	)
 
 export {
-     runPolymake,
-     ParseAllProperties,
-     hasProperty,
-     getProperty,
-     getPropertyNames,
-     parseAllAvailableProperties
+     "runPolymake",
+     "ParseAllProperties",
+     "hasProperty",
+     "getProperty",
+     "getPropertyNames",
+     "parseAllAvailableProperties"
      }
 
 
@@ -34,12 +41,18 @@ needsPackage "PolyhedralObjects"
 
 runPolymakePrefix = "polymake"
 
+-- May 6, 2016: polymake 3.0 on some Macs returns extra 
+-- characters with the output, ending in a bell (ascii 7).  
 runPolymake = method(Options => {ParseAllProperties => false})
 runPolymake(String) := o -> (script) -> (
      filename := temporaryFileName()|currentTime()|".poly";
      filename << script << endl << close;
-     get("!"|runPolymakePrefix|" "|filename)
-     )
+     s:=get("!"|runPolymakePrefix|" "|filename);
+     n:=regex(ascii(7),s);
+     if n === null then return s;
+     if #n > 1 then error "Parsing error; more than one bell";
+     return substring(s,n_0_0+1,#s-1)
+)
 
 ------------------------------------------------------------------------------
 --Types of properties in polymake (hard coded)
@@ -99,8 +112,18 @@ propertyTypes = {
 	  "ValueType" => "Matrix"
 	  },
      {    
-	  "M2PropertyName" => "LatticePoints",
-	  "PolymakePropertyName" => "LATTICE_POINTS",
+	  "M2PropertyName" => "LatticePointsGenerators",
+	  "PolymakePropertyName" => "LATTICE_POINTS_GENERATORS",
+	  "ValueType" => "Matrix"
+	  },
+     {    
+	  "M2PropertyName" => "InteriorLatticePoints",
+	  "PolymakePropertyName" => "INTERIOR_LATTICE_POINTS",
+	  "ValueType" => "Matrix"
+	  },
+    {    
+	  "M2PropertyName" => "BoundaryLatticePoints",
+	  "PolymakePropertyName" => "BOUNDARY_LATTICE_POINTS",
 	  "ValueType" => "Matrix"
 	  },
      {    
@@ -500,7 +523,7 @@ doc ///
 	    the result returned from Polymake
     Description
         Text
-	    Runs a Polymake script and returns whatever Polymake prints in its stardard output as a String.
+	    Runs a Polymake script and returns whatever Polymake prints in its standard output as a String.
 	Example
 	    script = "use application \"polytope\"; my $a = cube(2,2); print $a->F_VECTOR;";
 	    runPolymake(script)
@@ -549,7 +572,7 @@ doc ///
             runPolymake(P, "FVector")
 	    hasProperty(P, "Facets")
 ///
-
+-- May 6, 2016: the getProperty command below has not been working for a long time
 doc ///
     Key
         getProperty
@@ -570,7 +593,7 @@ doc ///
             needsPackage "PolyhedralObjects";
             P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,1},{1,1,0},{1,1,1}}};
             runPolymake(P, "FVector")
-	    getProperty(P, "Facets")
+--	    getProperty(P, "Facets")
 ///
 
 doc ///
@@ -764,6 +787,15 @@ TEST ///
     assert(not(result#?"F_VECTOR"));
     assert(not(result#?"PolymakeFile"));
     assert(not(result#?"blahblahblahblahblahblahblahblahblahblahblahblah"));
+///
+
+TEST ///
+    needsPackage "PolyhedralObjects";
+    P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,2},{1,2,0},{1,2,2}}};
+    runPolymake(P,"InteriorLatticePoints");
+    runPolymake(P,"LatticePointsGenerators");
+    runPolymake(P,"BoundaryLatticePoints");
+    result = getPropertyNames(P);
 ///
 
 TEST ///

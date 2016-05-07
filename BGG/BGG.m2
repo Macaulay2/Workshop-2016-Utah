@@ -1,7 +1,7 @@
 newPackage(
 	"BGG",
-    	Version => "1.4.1", 
-    	Date => "Jan 29, 2012",
+    	Version => "1.4.2", 
+    	Date => "May 7, 2016",
     	Authors => {
 	     {Name => "Hirotachi Abo", Email => "abo@uidaho.edu", HomePage => "http://www.webpages.uidaho.edu/~abo/"},
 	     {Name => "Wolfram Decker", Email => "decker@math.uni-sb.de", HomePage => "http://www.math.uni-sb.de/ag/decker/"},
@@ -23,7 +23,8 @@ export {
      "Regularity", 
      "Exterior",
      "universalExtension",
-     "projectiveProduct"
+     "projectiveProduct",
+     "bggComplex"
      }
 
 symExt = method()
@@ -48,6 +49,19 @@ bgg(ZZ,Module,PolynomialRing) := Matrix => (i,M,E) ->(
      b := (ev g)*((transpose vars E)**(ev source f0));
      --correct the degrees (which are otherwise wrong in the transpose)
      map(E^{(rank target b):i+1},E^{(rank source b):i}, b));
+
+bggComplex = method();
+--given a finite module P over the exterior algebra E, we construct the 
+--associated linear complex of S-modules L(P)
+bggComplex(Module,PolynomialRing) := ChainComplex => (P,S) -> (
+    degGensP := flatten degrees target generators P; 
+    n := numgens S;
+    minDeg := min degGensP;
+    maxDeg := max degGensP + n;
+    diffsInLP := reverse for i from minDeg-1 to maxDeg list bgg(i,P,S);
+    LP := chainComplex diffsInLP;
+    LP[-minDeg+1]
+    )
 
 tateResolution = method(TypicalValue => ChainComplex)
 tateResolution(Matrix, PolynomialRing, ZZ, ZZ) := ChainComplex => (m,E,loDeg,hiDeg)->(
@@ -711,19 +725,25 @@ document {
 
 document { 
      Key => {bgg,(bgg,ZZ,Module,PolynomialRing)}, 
-     Headline => "the ith differential of the complex R(M)",
-     Usage => "bgg(i,M,E)",
+     Headline => "the ith differential of the complex R(M) or L(P)",
+     Usage => "bgg(i,M,E) \n bgg(i,P,S)",
      Inputs => {
 	  "i" => ZZ => "the cohomological index",
-	  "M" => Module => {"graded ", TT "S", "-module"},  
+	  "M" => Module => {"graded ", TT "S", "-module"}, 
+	  "P" => Module => {"graded ", TT "E", "-module"},
+	  "S" => PolynomialRing,
 	  "E" => PolynomialRing => "exterior algebra"
 	  },
      Outputs => {
-	  Matrix => {"a matrix representing the ith differential"}  
+	  Matrix => {"a matrix representing the ith differential of R(M) or L(P)"}  
 	  },
-     "This function takes as input an integer ", TT "i", " and a finitely generated graded ", TT "S", 
-     "-module ", TT "M", ", and returns the ith map in ", TT "R(M)", ", which is an adjoint 
-     of the multiplication map between ", TT "M_i", " and ", TT "M_{i+1}", ".",    
+      PARA{ "This function can take as inputs a triple (i,M,E), where i is an integer, M is a graded module over
+      the polynomial ring S, and E is the exterior algebra in the same number of variables. It can also take
+      as input the triple (i,P,S) where i is an integer, P is a graded module over the exterior algebra E, and
+      S is a polynomial ring in the same number of variables."},
+      
+     PARA{"When the triple is (i,M,E), the function returns the ith map in the linear complex R(M),
+     which is an adjoint of the multiplication map between M_i and M_{i+1}."},    
      EXAMPLE lines ///
 	  S = ZZ/32003[x_0..x_2]; 
 	  E = ZZ/32003[e_0..e_2, SkewCommutative=>true];
@@ -731,8 +751,51 @@ document {
 	  bgg(1,M,E)
 	  bgg(2,M,E)
      	  ///,
+	  
+     PARA{"When the triple is (i,P,S), the function returns the ith map in the linear complex L(P), which
+     is an adjoint of the multiplication map between P_i and P_{i-1}."},
+     
+     EXAMPLE lines ///
+         S = ZZ/32003[x_0..x_2];
+	 E = ZZ/32003[e_0..e_2, SkewCommutative=>true];
+	 P = E^1;
+	 bgg(1,P,S)
+	 bgg(0,P,S)
+	 ///,
      SeeAlso => {symExt}
      }
+ 
+ document {
+     Key => {bggComplex,(bggComplex,Module,PolynomialRing)}, 
+     Headline => "the linear complex L(P)",
+     Usage => "bggComplex(P,S)",
+     Inputs => {
+	  "P" => Module => {"graded module over the exterior algebra in the same number of variables as S"},
+	  "S" => PolynomialRing
+	  },
+     Outputs => {
+	  ChainComplex => {"the linear chain complex L(P)"}  
+	  },
+     PARA{ "This function takes as input a graded module P over the exterior algebra E and produces
+	  the linear complex L(P). When P=E, we get the Koszul complex:"},         
+     EXAMPLE lines ///
+	  S = QQ[x_0..x_2]; 
+	  E = QQ[e_0..e_2, SkewCommutative=>true];
+	  P = E^1;
+          bggComplex(P,S)
+     	  ///,
+     PARA{"A more complicated example:"},	  
+     EXAMPLE lines ///
+          S = QQ[x_1..x_3];
+	  E = QQ[e_1..e_3,SkewCommutative => true];
+	  F1 = E^{0,-1,0};
+	  F2 = E^{1,1,2};
+	  f = map(F2,F1,matrix{{e_1,e_1*e_3,e_2},{e_3-e_1,e_1*e_2+e_2*e_3,e_1},{e_1*e_2,e_1*e_2*e_3,e_2*e_3}});
+          P = coker f;
+	  bggComplex(P,S)
+	  ///,
+      SeeAlso => {bgg}
+      }
 
 document { 
      Key => {tateResolution,(tateResolution, Matrix,PolynomialRing,ZZ,ZZ)}, 
@@ -1243,7 +1306,6 @@ doc ///
      pureResolution
 ///
 
-
 TEST///
           S = ZZ/32003[x_0..x_2]; 
 	  E = ZZ/32003[e_0..e_2, SkewCommutative=>true];
@@ -1367,6 +1429,41 @@ end
 
 restart
 uninstallPackage "BGG"
-notify=true
 installPackage "BGG"
-viewHelp BGG
+
+
+kk = ZZ/101
+S = kk[x_1..x_3]
+E = kk[e_1..e_3,SkewCommutative => true]
+
+--from P an E-module, to the linear complex L(P)
+F1 = E^{0,-1,0}
+F2 = E^{1,1,2}
+
+f = map(F2,F1,matrix{{e_1,e_1*e_3,e_2},{e_3-e_1,e_1*e_2+e_2*e_3,e_1},{e_1*e_2,e_1*e_2*e_3,e_2*e_3}})
+P = coker f
+
+degrees gens P
+degrees target gens P
+
+
+bggComplex(P,S)
+
+P = E^{-5}
+kosz = bggComplex(P,S)
+HH_1(kosz)
+
+prune oo
+
+
+
+
+f0 = bgg(0,P,S)
+f1 = bgg(1,P,S)
+f2 = bgg(2,P,S)
+f3 = bgg(3,P,S)
+
+C = chainComplex{f3,f2,f1,f0}
+HH_(-3)(C)
+prune oo
+minimalPresentation o35
