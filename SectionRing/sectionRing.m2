@@ -156,18 +156,19 @@ mRegular(Ideal) := (I) -> ( 					--Returns the number m for which O_X(D) is m-re
 sectionRing = method();
 sectionRing(Ideal) := (I) -> (
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
-	R := ring(I);
+	R := ring(I);						--To Apply the Regularity Theorem of Mumford, the sheaf needs to be Globally Generated Sheaf
 	l := globallyGenerated(I);
 	j := 0;
+	L := 0;
 	bound := l;
-	G = first entries gens I;
-	J_l = Hom(ideal(apply(G, z->z^l)),R);
-	while(j<l) do (
-		J_j = Hom(ideal(apply(G, z->z^j)),R);
+	G := first entries gens I;
+	J_l := Hom(ideal(apply(G, z->z^l)),R);
+	while(j<l) do (						--Calculate regularity of each of the sheaves OO_X(D), ... , OO_X(l*D)
+		J_j := Hom(ideal(apply(G, z->z^j)),R);
 		bound = max(bound,l*(mRegular(sheaf(J_j),sheaf(J_l)))+j);
 		j = j+1;
 	);
-	bound = bound + 1;
+	bound = bound + 1;					--Use < as opposed to <=
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 	KK:= coefficientRing(R);
 	Z := dualToIdeal(I);
@@ -295,6 +296,10 @@ sectionRing(Ideal) := (I) -> (
 	);
 	SectionRing = minimalPresentation Spar;
 	SectionRing
+)
+
+sectionRing(QDiv) =: (D) -> (
+	sectionRing(divisorToIdeal(D));
 );
 
 isVectScalar = L -> (
