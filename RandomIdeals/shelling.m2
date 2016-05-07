@@ -62,8 +62,8 @@ randomSubset = (n,m) -> (
 
 randomAddition = method()
 randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
-    if #P == 0 then return {randomSubset(n,m)};
-    Plarge := select(P, D-> #D >= m-1); -- the facets big enough to be glued to
+    if #P == 0 then return {randomSubset(n,m+1)};
+    Plarge := select(P, D-> #D >= m); -- the facets big enough to be glued to
     if #Plarge == 0 then error "m is too large";
     t := false;
     D' := {null};
@@ -72,8 +72,8 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     count := 0;
     while not t and count < 20 do (
     	i := random (#compD);
-    	j := random (#D);
-    	D' = sort(D - set {D_j} | {compD_i});
+    	J := randomSubset(n,#D-m);
+    	D' = sort(D - set apply(J, j->D_j) | {compD_i});
     	t = (testNewSimplex(P,D'));
 	count = count+1);
     if count == 20 then return P;
@@ -98,7 +98,7 @@ isShelling(List) := P -> all(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
 
 randomChain = method()
 -- random chain of shellable complexes on n vertices, with pure dim m, up to the complete m skeleton
-randomChain(ZZ,ZZ) := (n,m) -> randomChain(n,m,binomial(n,m))
+randomChain(ZZ,ZZ) := (n,m) -> randomChain(n,m,binomial(n,m+1))
 -- random chain of shellable complexes on n vertices, with pure dim m, and k facets
 randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
     P := {};
