@@ -43,8 +43,7 @@ idealFromSC = (P) ->(
     intersect apply(P, D -> ideal(V_(Delta - set D)))
 	    )
 
-manyRandomAdditions = (N,n,P) -> (
-    unique apply(N, i-> P = randomAddition(n,P)))
+        
 
 ///
 Q = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}, {0, 3, 4}}
@@ -53,6 +52,60 @@ P = {1,3,4}
 smalls
 facets
 apply(smalls, e ->apply(facets, E -> #(e-set E)))
+///
+
+
+randomLink = method()
+randomLink (ZZ,Ideal) := (c,I) ->(
+{*
+c:ZZ
+ codim of I
+I:Ideal
+ homogeneous
+*}
+if numgens I == c then return ideal(1_(ring I));
+sgens := sort gens I;
+n :=numcols sgens;
+rsgens  := sgens * random(source sgens, source sgens);
+regseq := rsgens_{n-c..n-1};
+trim(ideal regseq : I)
+)
+
+linkageBound = method()
+linkageBound Ideal := I ->(
+    --2(mu N(I) - (codim I +3))
+N := prune Hom(I, (ring I)^1/I);
+n := numgens N;
+2*(n-codim I)
+)
+
+minimalRegularSequence = method()
+minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
+{*
+c:ZZ
+ codim of I
+I:Ideal
+ homogeneous
+*}
+)
+
+///
+restart
+load "shelling.m2"
+S = ZZ/101[x_0..x_3]
+I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
+I = ideal(minors(2
+I = minors(2, random(S^2, S^{-2,-3,-4}));
+prune Hom(I, S^1/I)
+
+randomLink(codim I, I)
+
+c = 2
+b = linkageBound I
+count = 0
+while numgens I > c and count < b list (
+    I = randomLink(c, I);
+    numgens I)
 ///
 
 end
