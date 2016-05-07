@@ -15,7 +15,8 @@ export {
 	"randomAddition", 
 	"randomChain",
 	"randomLink",
-	"testNewSimplex"
+	"testNewSimplex",
+	"idealFromSC"
         };
 
 testNewSimplex = method()
@@ -23,6 +24,7 @@ testNewSimplex(List, List) := (P, D) ->(
 --given a pure, d-dimensional simplicial complex (sc) as a list of ordered lists of d+1 vertices in [n], and
 --a simplex D as such a list, tests whether the intersection of D with P is a union of facets of D.
      d := #D-1; --dimension
+<<<<<<< HEAD
      ints := unique apply(P, D' -> intersectLists(D',D));
      addSimplex := (L,S) -> (
          if any(S,F -> subsetList(L,F))
@@ -58,7 +60,8 @@ randomSubset = (n,m) -> (
     sort toList L
     )
 
-randomAddition = (n,m,P) ->(
+randomAddition = method()
+randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     if #P == 0 then return {randomSubset(n,m)};
     Plarge := select(P, D-> #D >= m-1); -- the facets big enough to be glued to
     if #Plarge == 0 then error "m is too large";
@@ -77,13 +80,14 @@ randomAddition = (n,m,P) ->(
     unique (P|{D'})
     )
 
-idealFromSC = (P) ->(
+idealFromSC = method()
+idealFromSC(List,Ring) := (P,S) -> (
     numverts := #unique flatten P;
-    S := ZZ/101[x_0..x_(numverts-1)];
+    x := symbol x;
     Delta := toList (0..numgens S -1);
-    V = vars S;
+    V := vars S;
     intersect apply(P, D -> ideal(V_(Delta - set D)))
-	    )
+    )
 
 isShelling = method()
 isShelling(List) := P -> all(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
@@ -97,6 +101,35 @@ randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
     while #P < k do P = randomAddition(n,m,P);
     P
     )
+
+doc ///
+     Key
+          randomChain
+	  (randomChain,ZZ,ZZ)
+	  (randomChain,ZZ,ZZ,ZZ)
+     Headline
+          produces a random chain of shellable complexes
+     Usage
+          P = randomChain(n,m)
+          P = randomChain(n,m,k)
+     Inputs
+          n:ZZ
+	       the number of vertices
+	  m:ZZ
+	       the dimension of the facets
+	  k:ZZ
+	       the number of facets (if omitted, the number will be n choose m)
+     Outputs
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Description
+          Text
+               
+          Example
+               P = randomChain(6,3,10)
+     Caveat
+	  No claim is made on the distribution of the random chain.
+///
 
 ///
 Q = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}, {0, 3, 4}}

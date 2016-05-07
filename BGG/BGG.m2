@@ -724,19 +724,25 @@ document {
 
 document { 
      Key => {bgg,(bgg,ZZ,Module,PolynomialRing)}, 
-     Headline => "the ith differential of the complex R(M)",
-     Usage => "bgg(i,M,E)",
+     Headline => "the ith differential of the complex R(M) or L(P)",
+     Usage => "bgg(i,M,E) \n bgg(i,P,S)",
      Inputs => {
 	  "i" => ZZ => "the cohomological index",
-	  "M" => Module => {"graded ", TT "S", "-module"},  
+	  "M" => Module => {"graded ", TT "S", "-module"}, 
+	  "P" => Module => {"graded ", TT "E", "-module"},
+	  "S" => PolynomialRing,
 	  "E" => PolynomialRing => "exterior algebra"
 	  },
      Outputs => {
-	  Matrix => {"a matrix representing the ith differential"}  
+	  Matrix => {"a matrix representing the ith differential of R(M) or L(P)"}  
 	  },
-     "This function takes as input an integer ", TT "i", " and a finitely generated graded ", TT "S", 
-     "-module ", TT "M", ", and returns the ith map in ", TT "R(M)", ", which is an adjoint 
-     of the multiplication map between ", TT "M_i", " and ", TT "M_{i+1}", ".",    
+      PARA{ "This function can take as inputs a triple (i,M,E), where i is an integer, M is a graded module over
+      the polynomial ring S, and E is the exterior algebra in the same number of variables. It can also take
+      as input the triple (i,P,S) where i is an integer, P is a graded module over the exterior algebra E, and
+      S is a polynomial ring in the same number of variables."},
+      
+     PARA{"When the triple is (i,M,E), the function returns the ith map in the linear complex R(M),
+     which is an adjoint of the multiplication map between M_i and M_{i+1}."},    
      EXAMPLE lines ///
 	  S = ZZ/32003[x_0..x_2]; 
 	  E = ZZ/32003[e_0..e_2, SkewCommutative=>true];
@@ -744,6 +750,17 @@ document {
 	  bgg(1,M,E)
 	  bgg(2,M,E)
      	  ///,
+	  
+     PARA{"When the triple is (i,P,S), the function returns the ith map in the linear complex L(P), which
+     is an adjoint of the multiplication map between P_i and P_{i-1}."},
+     
+     EXAMPLE lines ///
+         S = ZZ/32003[x_0..x_2];
+	 E = ZZ/32003[e_0..e_2, SkewCommutative=>true];
+	 P = E^1;
+	 bgg(1,P,S)
+	 bgg(0,P,S)
+	 ///,
      SeeAlso => {symExt}
      }
 
@@ -1256,7 +1273,6 @@ doc ///
      pureResolution
 ///
 
-
 TEST///
           S = ZZ/32003[x_0..x_2]; 
 	  E = ZZ/32003[e_0..e_2, SkewCommutative=>true];
@@ -1380,10 +1396,7 @@ end
 
 restart
 uninstallPackage "BGG"
-notify=true
 installPackage "BGG"
-check "BGG"
-viewHelp BGG
 
 
 kk = ZZ/101
