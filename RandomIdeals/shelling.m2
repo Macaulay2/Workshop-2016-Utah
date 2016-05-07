@@ -101,6 +101,7 @@ randomChain = method()
 randomChain(ZZ,ZZ) := (n,m) -> randomChain(n,m,binomial(n,m+1))
 -- random chain of shellable complexes on n vertices, with pure dim m, and k facets
 randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
+    if k > binomial(n,m+1) then error "k is too large";
     P := {};
     while #P < k do P = randomAddition(n,m,P);
     P
