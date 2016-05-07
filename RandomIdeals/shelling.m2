@@ -1,5 +1,23 @@
 --goal: construct shellable complexes at random
 
+newPackage ( "shelling",
+    Version => "1.0",
+    Date => "07 May 2016",
+    Authors => {
+	{ Name => "later"},
+	},
+    Headline => "Package for constructing random simplicial complex",
+    DebuggingMode => true
+    )
+
+
+export {
+	"randomAddition", 
+	"randomChain",
+	"randomLink",
+	"testNewSimplex"
+        };
+
 testNewSimplex = method()
 testNewSimplex(List, List) := (P, D) ->(
 --given a pure, d-dimensional simplicial complex (sc) as a list of ordered lists of d+1 vertices in [n], and
@@ -126,6 +144,7 @@ while numgens I > c and count < b list (
     I = randomLink(c, I);
     numgens I)
 ///
+
 
 end
 viewHelp
