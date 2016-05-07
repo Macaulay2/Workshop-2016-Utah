@@ -7,6 +7,7 @@ newPackage ( "shelling",
 	{ Name => "later"},
 	},
     Headline => "Package for constructing random simplicial complex",
+    Reload => true,
     DebuggingMode => true
     )
 
@@ -102,34 +103,7 @@ randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
     P
     )
 
-doc ///
-     Key
-          randomChain
-	  (randomChain,ZZ,ZZ)
-	  (randomChain,ZZ,ZZ,ZZ)
-     Headline
-          produces a random chain of shellable complexes
-     Usage
-          P = randomChain(n,m)
-          P = randomChain(n,m,k)
-     Inputs
-          n:ZZ
-	       the number of vertices
-	  m:ZZ
-	       the dimension of the facets
-	  k:ZZ
-	       the number of facets (if omitted, the number will be n choose m)
-     Outputs
-          P:List
-	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
-     Description
-          Text
-               
-          Example
-               P = randomChain(6,3,10)
-     Caveat
-	  No claim is made on the distribution of the random chain.
-///
+
 
 ///
 Q = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}, {0, 3, 4}}
@@ -194,6 +168,62 @@ while numgens I > c and count < b list (
     numgens I)
 ///
 
+------------------------------------------------------------
+-- DOCUMENTATION randomChain
+------------------------------------------------------------
+
+doc ///
+     Key
+          randomChain
+	  (randomChain,ZZ,ZZ)
+	  (randomChain,ZZ,ZZ,ZZ)
+     Headline
+          produces a random chain of shellable complexes
+     Usage
+          b=isShelling(P)
+     Inputs
+          P:List
+	       the number of vertices
+     Outputs
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Description
+          Text
+               
+          Example
+               P = randomChain(6,3,10)
+     Caveat
+	  No claim is made on the distribution of the random chain.
+///
+
+
+
+
+
+------------------------------------------------------------
+-- DOCUMENTATION isShelling
+------------------------------------------------------------
+doc ///
+     Key
+          isShelling
+	  (isShelling,List)
+     Headline
+          determines whether a list represents a shelling of a simplicial complex.
+     Usage
+          P = randomChain(n,m)
+          P = randomChain(n,m,k)
+     Inputs
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a possible shelling.
+     Outputs
+          b:Boolean
+	       Returns true if the given list gives a shelling of the complex and false otherwise. 
+     Description
+          Text
+               
+          Example
+  
+///
 
 end
 viewHelp
@@ -248,21 +278,6 @@ M = apply(1000, i->(
 P = {{1,2,3}}
 # (L=manyRandomAdditions(500,6,P))
 L
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
