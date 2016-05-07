@@ -87,12 +87,15 @@ doc ///
 			f = matrix{{x*y,y*z}}
 			imageOfMap(f,a,b)
 ///
-   
-TEST ///
-assert true
-///
 
-
-
+TEST ///   
+	S = QQ[x,y,z]
+        a = ideal(x^2+y^2+z^2)
+        T = QQ[u,v]
+        b = ideal(u^2+v^2)
+        f = matrix{{x*y,y*z}}
+        image = imageOfMap(f,a,b)  
+	assert(image == ideal(v^4,u*v^3))
+/// 
 ----FUTURE PLANS------
 

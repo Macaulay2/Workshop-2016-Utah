@@ -112,8 +112,18 @@ propertyTypes = {
 	  "ValueType" => "Matrix"
 	  },
      {    
-	  "M2PropertyName" => "LatticePoints",
-	  "PolymakePropertyName" => "LATTICE_POINTS",
+	  "M2PropertyName" => "LatticePointsGenerators",
+	  "PolymakePropertyName" => "LATTICE_POINTS_GENERATORS",
+	  "ValueType" => "Matrix"
+	  },
+     {    
+	  "M2PropertyName" => "InteriorLatticePoints",
+	  "PolymakePropertyName" => "INTERIOR_LATTICE_POINTS",
+	  "ValueType" => "Matrix"
+	  },
+    {    
+	  "M2PropertyName" => "BoundaryLatticePoints",
+	  "PolymakePropertyName" => "BOUNDARY_LATTICE_POINTS",
 	  "ValueType" => "Matrix"
 	  },
      {    
@@ -777,6 +787,15 @@ TEST ///
     assert(not(result#?"F_VECTOR"));
     assert(not(result#?"PolymakeFile"));
     assert(not(result#?"blahblahblahblahblahblahblahblahblahblahblahblah"));
+///
+
+TEST ///
+    needsPackage "PolyhedralObjects";
+    P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,2},{1,2,0},{1,2,2}}};
+    runPolymake(P,"InteriorLatticePoints");
+    runPolymake(P,"LatticePointsGenerators");
+    runPolymake(P,"BoundaryLatticePoints");
+    result = getPropertyNames(P);
 ///
 
 TEST ///
