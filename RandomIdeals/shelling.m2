@@ -74,6 +74,9 @@ apply(smalls, e ->apply(facets, E -> #(e-set E)))
 ///
 
 
+-----Toward the test for licci
+
+
 randomLink = method()
 randomLink (ZZ,Ideal) := (c,I) ->(
 {*
@@ -82,12 +85,13 @@ c:ZZ
 I:Ideal
  homogeneous
 *}
-if numgens I == c then return ideal(1_(ring I));
-sgens := sort gens I;
-n :=numcols sgens;
-rsgens  := sgens * random(source sgens, source sgens);
-regseq := rsgens_{n-c..n-1};
-trim(ideal regseq : I)
+if numgens I <= c then return ideal(1_(ring I));
+--sgens := sort gens I;
+--n :=numcols sgens;
+--rsgens  := sgens * random(source sgens, source sgens);
+--regseq := ideal rsgens_{n-c..n-1};
+regseq := minimalRegularSequence(c,I);
+trim(regseq : I)
 )
 
 linkageBound = method()
@@ -105,29 +109,70 @@ c:ZZ
  codim of I
 I:Ideal
  homogeneous
+Description
+ Text
+  finds a maximal regular sequence in I of minimal degree.
 *}
+if numgens I == c then return I;
+    --takes care of I = 0 and I principal;
+sgens := sort gens I;
+rsgens := sgens * random(source sgens, source sgens);
+n :=numcols sgens;
+J := ideal sgens_{0};
+K := J;
+count := 1; -- next element to add
+c' := 1; -- current codim J
+while c'<c do(
+    if codim (K = J + ideal sgens_{count}) > c' then (J = K; c' = c'+1)
+    else if codim (K = J + ideal rsgens_{count}) > c' then (J = K; c' = c'+1);
+    count = count+1;
+    );
+J
 )
 
+isLicci = method()
+isLicci(ZZ, ZZ, Ideal) := (b,c,I) -> (
+    --I homogeneous ideal
+    --b = linkageBound I
+    --c = codim I
+    --output is list of up to b integers, the numbers of generators of the
+    --successive random links
+    J := I;
+    p := numgens J;
+    <<p<<endl;flush;
+    apply(b, i -> (
+	    J = randomLink(c,J);
+	    <<numgens J<<endl;flush;
+	    numgens J))
+    )
+   
 ///
 restart
 load "shelling.m2"
 S = ZZ/101[x_0..x_3]
 I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
-I = ideal(minors(2
-I = minors(2, random(S^2, S^{-2,-3,-4}));
-prune Hom(I, S^1/I)
+isLicci(3, codim I, I)
 
-randomLink(codim I, I)
+I = minors(3, random(S^3, S^{-2,-3,-4,-4}));
+isLicci(3, codim I, I)
 
-c = 2
+I = minors(2, random(S^2, S^{4:-1}))
+isLicci(3, codim I, I)
+
+c = codim I
 b = linkageBound I
+b = 2*c
 count = 0
-while numgens I > c and count < b list (
+
+while(numgens I > c and count < b) list (
     I = randomLink(c, I);
-    numgens I)
+    count = count+1;
+    <<numgens I<<endl;
+    flush;)
+
 ///
 
-end
+end--
 viewHelp
 
 restart
