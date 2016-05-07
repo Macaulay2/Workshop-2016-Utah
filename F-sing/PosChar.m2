@@ -1543,6 +1543,14 @@ ethRoot(Ideal,ZZ) := (Im,e) -> (
      J
 )
 
+ethRoot(MonomialIdeal, ZZ ) := ( I, e ) ->
+(
+     R := ring I;
+     p := char R;
+     G := I_*;
+     if #G == 0 then ideal( 0_R ) else ideal( apply( G, j -> R_((exponents(j))#0//p^e )))
+)
+
 --This tries to compute (f^a*I)^{[1/p^e]} in such a way that we don't blow exponent buffers.  It can be much faster as well.
 --We should probably just use it.  It relies on the fact that (f^(ap+b))^{[1/p^2]} = (f^a(f^b)^{[1/p]})^{[1/p]}.
 ethRootSafe = method(); 
