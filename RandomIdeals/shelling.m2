@@ -344,7 +344,7 @@ doc ///
 	    b=testNewSimplex(P,{2,3,4});
      Caveat
           We do not test if P is a shelling in the first place.
-
+///
          
 
 TEST///
