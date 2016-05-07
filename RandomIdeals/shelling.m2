@@ -72,7 +72,7 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     count := 0;
     while not t and count < 20 do (
     	i := random (#compD);
-    	J := randomSubset(n,#D-m);
+    	J := randomSubset(#D,#D-m);
     	D' = sort(D - set apply(J, j->D_j) | {compD_i});
     	t = (testNewSimplex(P,D'));
 	count = count+1);
