@@ -23,7 +23,8 @@ export {
      "Regularity", 
      "Exterior",
      "universalExtension",
-     "projectiveProduct"
+     "projectiveProduct",
+     "bggComplex"
      }
 
 symExt = method()
@@ -763,6 +764,38 @@ document {
 	 ///,
      SeeAlso => {symExt}
      }
+ 
+ document {
+     Key => {bggComplex,(bggComplex,Module,PolynomialRing)}, 
+     Headline => "the linear complex L(P)",
+     Usage => "bggComplex(P,S)",
+     Inputs => {
+	  "P" => Module => {"graded module over the exterior algebra in the same number of variables as S"},
+	  "S" => PolynomialRing
+	  },
+     Outputs => {
+	  ChainComplex => {"the linear chain complex L(P)"}  
+	  },
+     PARA{ "This function takes as input a graded module P over the exterior algebra E and produces
+	  the linear complex L(P). When P=E, we get the Koszul complex:"},         
+     EXAMPLE lines ///
+	  S = QQ[x_0..x_2]; 
+	  E = QQ[e_0..e_2, SkewCommutative=>true];
+	  P = E^1;
+          bggComplex(P,S)
+     	  ///,
+     PARA{"A more complicated example:"},	  
+     EXAMPLE lines ///
+          S = QQ[x_1..x_3];
+	  E = QQ[e_1..e_3,SkewCommutative => true];
+	  F1 = E^{0,-1,0};
+	  F2 = E^{1,1,2};
+	  f = map(F2,F1,matrix{{e_1,e_1*e_3,e_2},{e_3-e_1,e_1*e_2+e_2*e_3,e_1},{e_1*e_2,e_1*e_2*e_3,e_2*e_3}});
+          P = coker f;
+	  bggComplex(P,S)
+	  ///,
+      SeeAlso => {bgg}
+      }
 
 document { 
      Key => {tateResolution,(tateResolution, Matrix,PolynomialRing,ZZ,ZZ)}, 
