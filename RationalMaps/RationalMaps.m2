@@ -4,6 +4,11 @@ Version => "0.1", Date => "May 7th, 2016", Authors => {
      Email=> "kschwede@gmail.com",
      HomePage=> "http://www.math.utah.edu/~schwede"
      },
+     {Name => "Daniel Smolkin",
+     Email=> "smolkin@math.utah.edu",
+     HomePage=> "http://www.math.utah.edu/~smolkin"
+     },
+
 }, --this file is in the public domain
 Headline => "A package for working with Weil divisors.", DebuggingMode => true, Reload=>true)
 export{
@@ -40,6 +45,15 @@ dimImage(Matrix,Ideal,Ideal) := (f,a,b) ->(
 	I = imageOfMap(f,a,b);
 	dim I - 1
 	);
+
+baseLocusOfMap = method();
+
+baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
+    M:= gens ker transpose presentation image L1;
+    L:= apply(entries M, ll->ideal(ll));
+    saturate fold(L, plus)
+);
+
 --****************************************************--
 --*****************Documentation**********************--
 --****************************************************--
@@ -88,6 +102,24 @@ doc ///
 			imageOfMap(f,a,b)
 ///
 
+doc ///
+        Key
+                dimImage
+        Headline
+                Computes dimension of image of rational map of projective varieties
+        Usage
+                dim = dimImage(f,a,b)
+        Inputs
+                f: matrix
+                        a rational map between 2 projective varieties, f: X -> Y
+                        assumed that f is given by a polynomial representation
+                a: ideal
+                        defining equations for X
+                b: ideal
+                        defining equations for Y
+        Outputs
+                dimension of image
+///
 TEST ///   
 	S = QQ[x,y,z]
         a = ideal(x^2+y^2+z^2)
