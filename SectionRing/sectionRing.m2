@@ -3,7 +3,7 @@ needsPackage "Divisor"
 dualToIdeal = method();
 dualToIdeal(Ideal) := (I) -> (
 	R := ring(I);
-	M :=module(I);
+	M := module(I);
 	moduleToIdeal(Hom(M,R),IsGraded=>true,ReturnMap=>true)
 );
 
@@ -72,20 +72,20 @@ isMRegular(CoherentSheaf,ZZ) := (F,m) ->(		--Outputs whether F is m-regular (rel
 	mRegularParticular(F,G,m)
 );
 
-isMRegularOO = method();
-isMRegularOO(CoherentSheaf,ZZ) := (F,m) -> (			--Tests if all higher cohomologies of F vanish
-	V := variety(F);
-	dV := dim(V);
-	j:=1;
-	bool = true;
-	while(j<(dV+1)) do (
-		if (bool == true) then(
-			bool = (HH^j(F) == 0);
-		);
-		j = j+1;
-	);
-	bool
-);
+--isMRegularOO = method();
+--isMRegularOO(CoherentSheaf,ZZ) := (F,m) -> (			--Tests if all higher cohomologies of F vanish
+--	V := variety(F);
+--	dV := dim(V);
+--	j:=1;
+--	bool = true;
+--	while(j<(dV+1)) do (
+--		if (bool == true) then(
+--			bool = (HH^j(F)) == 0);
+--		);
+--		j = j+1;
+--	);
+--	bool
+--);
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
@@ -162,9 +162,9 @@ sectionRing(Ideal) := (I) -> (
 	L := 0;
 	bound := l;
 	G := first entries gens I;
-	J_l := Hom(ideal(apply(G, z->z^l)),R);
+	J_l = Hom(ideal(apply(G, z->z^l)),R);
 	while(j<l) do (						--Calculate regularity of each of the sheaves OO_X(D), ... , OO_X(l*D)
-		J_j := Hom(ideal(apply(G, z->z^j)),R);
+		J_j = Hom(ideal(apply(G, z->z^j)),R);
 		bound = max(bound,l*(mRegular(sheaf(J_j),sheaf(J_l)))+j);
 		j = j+1;
 	);
@@ -181,7 +181,7 @@ sectionRing(Ideal) := (I) -> (
 	myVars = {};						--Begins to create a list for the necessary variables
 	DegreeList :={};					--and a list of their corresponding degrees.
 	i:=1;
-	while ( i < bound) do(
+	while (i < bound) do(
 		J_i = reflexivePower(i,J_1);
 		F_i = basis((Shift*i),J_i);
 		n_i = numColumns((F_i));			--Rank of H^0(O_X(iD))
@@ -198,7 +198,7 @@ sectionRing(Ideal) := (I) -> (
 	
 	Vars := flatten myVars;
 
-	S := KK [Vars,Degrees=>DegreeList];
+	S := KK [Vars,Degrees=>DegreeList];			--Create ring containing all of the generators, in the form Y_{ degree , numberOfAGivenDegree }
 	myVars = apply(myVars, z->apply(z,x->value(x)));
 	numDegs = #myVars;
 	myVarsData = {};
@@ -212,18 +212,27 @@ sectionRing(Ideal) := (I) -> (
 		i = i+1;
 	);
 
-	RelIdeal := ideal(0);
-	Spar = S;
+	RelIdeal := ideal(0);					--Starts the ideal of relations on the variables
+	Spar := S;						--Partial ring of relations
 
-	c=1;
-	while((c<bound) and (n_c>0)) do (
+	c:=1;
+	while((c<bound) and (n_c>0)) do (			--Creates a vector of variables to be multiplied by relation matrices
 		Vect_c = transpose matrix{myVars#(c-1)};
 		c=c+1;
 	);
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
-	b := 0;
-	LengPa := 0;
+	b := 0;							--zero-out internal variables
+	--LengPa := 0;
+	--LengP:=0;
+	--VectTot:=0;
+	--MapTot := 0;
+	--TotMap := 0;
+	--TotVect := 0;
+	--NumCols := 0;
+	--KerT:=0;
+	--Rel:=0;
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
 
 	j=2;
 	while ( (dim(Spar) >  dim(R)) or (isDomain(Spar) != true)) do ( --Create a list of relations
@@ -245,7 +254,7 @@ sectionRing(Ideal) := (I) -> (
 
 		a=0;
 
-		TotMap_a = Map_((AdmPart_j)#a#0);			--Starts to create the map O_X(a_1 D) ** ... ** O_X(a_n D) \oplus O_X(j D) -> R		
+		TotMap_a = Map_((AdmPart_j)#a#0);			--Creates the map O_X(a_1 D) ** ... ** O_X(a_n D) \oplus O_X(j D) -> R		
 		TotVect_a = Vect_((AdmPart_j)#a#0);
 		b=1;
 		LengPa = #((AdmPart_j)#a);
@@ -298,7 +307,7 @@ sectionRing(Ideal) := (I) -> (
 	SectionRing
 )
 
-sectionRing(QDiv) =: (D) -> (
+sectionRing(QDiv) := (D) -> (
 	sectionRing(divisorToIdeal(D));
 );
 
