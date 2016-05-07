@@ -267,13 +267,18 @@ doc ///
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a possible shelling.
      Outputs
-          b:Boolean
-	       Returns true if the given list gives a shelling of the complex and false otherwise. 
+          B:Boolean
+	       true if and only if P is a shelling.
      Description
           Text
-               
+              Determines if a list of faces is a shelling order of the simplicial complex. 
           Example
-  
+	      P = {{1, 2, 3}, {1, 2, 5}};
+	      isShelling(P)
+	      Q = {{1,2,3},{3,4,5},{2,3,4}};
+	      isShelling(Q)
+	     
+      
 ///
 
 
