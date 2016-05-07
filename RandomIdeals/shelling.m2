@@ -230,22 +230,28 @@ doc ///
           randomChain
 	  (randomChain,ZZ,ZZ)
 	  (randomChain,ZZ,ZZ,ZZ)
+	  (randomChain,Ring,ZZ)
+	  (randomChain,Ring,ZZ,ZZ)
      Headline
           produces a random chain of shellable complexes
      Usage
           P=randomChain(n,m)
 	  P=randomChain(n,m,k)
+	  P=randomChain(R,m)
+	  P=randomChain(R,m,k)
      Inputs
           n:ZZ
 	       the number of vertices
+	  R:Ring
+	       a polynomial ring with a variable for each vertex
 	  m:ZZ
 	       the dimension of the facets
 	  k:ZZ
-	       the number of facets (if ommited, the number will be n choose m+1)
+	       the number of facets (if ommited, the number will be {\tt n} choose {\tt m+1})
 	      
      Outputs
           P:List
-	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.  If called with a Ring {\tt R} instead of an integer {\tt n}, each facet is represented by a square-free monomial instead of a list.
      Description
           Text
                
