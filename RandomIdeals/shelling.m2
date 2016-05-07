@@ -86,7 +86,7 @@ idealFromSC = (P) ->(
 	    )
 
 isShelling = method()
-isShelling(List) := P -> all apply(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
+isShelling(List) := P -> all(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
 
 randomChain = method()
 -- random chain of shellable complexes on n vertices, with pure dim m, up to the complete m skeleton
