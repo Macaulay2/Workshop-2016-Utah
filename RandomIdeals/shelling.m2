@@ -360,6 +360,8 @@ doc ///
 TEST///
 assert(#randomChain(5,2,6)==6)
 assert(#randomChain(5,2)==binomial(5,3))
+R=QQ[x1,x2,x3,x4,x5];
+assert(#randomChain(R,2,6)==6)
 ///
 
 
@@ -381,6 +383,13 @@ TEST///
 setRandomSeed(0);
 assert(#randomAddition(6,3,{{1,2,3}})==2)
 assert(#randomAddition(6,3,{{1,2,3,4}})==2)
+///
+
+TEST///
+needsPackage "SimplicialComplexes"
+needsPackage "SimplicialDecomposability"
+R=QQ[x1,x2,x3,x4,x5];
+assert(isShellable simplicialComplex randomChain(R,2,6))
 ///
 
 end--
