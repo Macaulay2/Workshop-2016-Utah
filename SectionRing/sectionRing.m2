@@ -3,7 +3,7 @@ needsPackage "Divisor"
 dualToIdeal = method();
 dualToIdeal(Ideal) := (I) -> (
 	R := ring(I);
-	M :=module(I);
+	M := module(I);
 	moduleToIdeal(Hom(M,R),IsGraded=>true,ReturnMap=>true)
 );
 
@@ -162,9 +162,9 @@ sectionRing(Ideal) := (I) -> (
 	L := 0;
 	bound := l;
 	G := first entries gens I;
-	J_l := Hom(ideal(apply(G, z->z^l)),R);
+	J_l = Hom(ideal(apply(G, z->z^l)),R);
 	while(j<l) do (						--Calculate regularity of each of the sheaves OO_X(D), ... , OO_X(l*D)
-		J_j := Hom(ideal(apply(G, z->z^j)),R);
+		J_j = Hom(ideal(apply(G, z->z^j)),R);
 		bound = max(bound,l*(mRegular(sheaf(J_j),sheaf(J_l)))+j);
 		j = j+1;
 	);
@@ -174,10 +174,10 @@ sectionRing(Ideal) := (I) -> (
 	Z := dualToIdeal(I);
 	Shift := (Z#1)#0;
 	J_1 = reflexifyIdeal((Z#0));
-	F_1 := basis(Shift,J_1);
-	n_1 := numColumns(F_1);
-	F_1 := map(R^(numRows(F_1)),R^(n_1),F_1);
-	Map_1 := (gens J_1)*(F_1);				--Map_i Represents the map H^0(O_X(iD)) -> J^(i)
+	F_1 = basis(Shift,J_1);
+	n_1 = numColumns(F_1);
+	F_1 = map(R^(numRows(F_1)),R^(n_1),F_1);
+	Map_1 = (gens J_1)*(F_1);				--Map_i Represents the map H^0(O_X(iD)) -> J^(i)
 	myVars = {};						--Begins to create a list for the necessary variables
 	DegreeList :={};					--and a list of their corresponding degrees.
 	i:=1;
@@ -222,15 +222,15 @@ sectionRing(Ideal) := (I) -> (
 	);
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 	b := 0;							--zero-out internal variables
-	LengPa := 0;
-	LengP:=0;
-	VectTot:=0;
-	MapTot := 0;
-	TotMap := 0;
-	TotVect := 0;
-	NumCols := 0;
-	KerT:=0;
-	Rel:=0;
+	--LengPa := 0;
+	--LengP:=0;
+	--VectTot:=0;
+	--MapTot := 0;
+	--TotMap := 0;
+	--TotVect := 0;
+	--NumCols := 0;
+	--KerT:=0;
+	--Rel:=0;
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 
@@ -307,7 +307,7 @@ sectionRing(Ideal) := (I) -> (
 	SectionRing
 )
 
-sectionRing(QDiv) =: (D) -> (
+sectionRing(QDiv) := (D) -> (
 	sectionRing(divisorToIdeal(D));
 );
 
