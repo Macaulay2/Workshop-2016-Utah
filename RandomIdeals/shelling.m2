@@ -15,7 +15,8 @@ export {
 	"randomAddition", 
 	"randomChain",
 	"randomLink",
-	"testNewSimplex"
+	"testNewSimplex",
+	"idealFromSC"
         };
 
 testNewSimplex = method()
@@ -27,7 +28,7 @@ testNewSimplex(List, List) := (P, D) ->(
      facets := unique select(ints, E -> #E==d);
      if facets == {} then return false;
      smalls := unique select(ints, E -> #E<d);
-     if sum apply(smalls, e ->product apply(facets, E ->  #(e-set E)))===0 then t=true else t=false;
+     t := sum apply(smalls, e ->product apply(facets, E ->  #(e-set E)))===0;
 --error();
 (t,smalls,facets)
 )
@@ -63,13 +64,14 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     unique (P|{D'})
     )
 
-idealFromSC = (P) ->(
+idealFromSC = method()
+idealFromSC(List,Ring) := (P,S) -> (
     numverts := #unique flatten P;
-    S := ZZ/101[x_0..x_(numverts-1)];
+    x := symbol x;
     Delta := toList (0..numgens S -1);
-    V = vars S;
+    V := vars S;
     intersect apply(P, D -> ideal(V_(Delta - set D)))
-	    )
+    )
 
 isShelling = method()
 isShelling(List) := P -> all apply(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
