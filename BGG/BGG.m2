@@ -1,7 +1,7 @@
 newPackage(
 	"BGG",
-    	Version => "1.4.1", 
-    	Date => "Jan 29, 2012",
+    	Version => "1.4.2", 
+    	Date => "May 7, 2016",
     	Authors => {
 	     {Name => "Hirotachi Abo", Email => "abo@uidaho.edu", HomePage => "http://www.webpages.uidaho.edu/~abo/"},
 	     {Name => "Wolfram Decker", Email => "decker@math.uni-sb.de", HomePage => "http://www.math.uni-sb.de/ag/decker/"},
@@ -48,6 +48,19 @@ bgg(ZZ,Module,PolynomialRing) := Matrix => (i,M,E) ->(
      b := (ev g)*((transpose vars E)**(ev source f0));
      --correct the degrees (which are otherwise wrong in the transpose)
      map(E^{(rank target b):i+1},E^{(rank source b):i}, b));
+
+bggComplex = method();
+--given a finite module P over the exterior algebra E, we construct the 
+--associated linear complex of S-modules L(P)
+bggComplex(Module,PolynomialRing) := ChainComplex => (P,S) -> (
+    degGensP := flatten degrees target generators P; 
+    n := numgens S;
+    minDeg := min degGensP;
+    maxDeg := max degGensP + n;
+    diffsInLP := reverse for i from minDeg-1 to maxDeg list bgg(i,P,S);
+    LP := chainComplex diffsInLP;
+    LP[-minDeg+1]
+    )
 
 tateResolution = method(TypicalValue => ChainComplex)
 tateResolution(Matrix, PolynomialRing, ZZ, ZZ) := ChainComplex => (m,E,loDeg,hiDeg)->(
@@ -1369,4 +1382,42 @@ restart
 uninstallPackage "BGG"
 notify=true
 installPackage "BGG"
+check "BGG"
 viewHelp BGG
+
+
+kk = ZZ/101
+S = kk[x_1..x_3]
+E = kk[e_1..e_3,SkewCommutative => true]
+
+--from P an E-module, to the linear complex L(P)
+F1 = E^{0,-1,0}
+F2 = E^{1,1,2}
+
+f = map(F2,F1,matrix{{e_1,e_1*e_3,e_2},{e_3-e_1,e_1*e_2+e_2*e_3,e_1},{e_1*e_2,e_1*e_2*e_3,e_2*e_3}})
+P = coker f
+
+degrees gens P
+degrees target gens P
+
+
+bggComplex(P,S)
+
+P = E^{-5}
+kosz = bggComplex(P,S)
+HH_1(kosz)
+
+prune oo
+
+
+
+
+f0 = bgg(0,P,S)
+f1 = bgg(1,P,S)
+f2 = bgg(2,P,S)
+f3 = bgg(3,P,S)
+
+C = chainComplex{f3,f2,f1,f0}
+HH_(-3)(C)
+prune oo
+minimalPresentation o35

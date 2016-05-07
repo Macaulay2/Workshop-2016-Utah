@@ -3208,8 +3208,8 @@ doc ///
 	       K = filteredComplex(reverse {simplicialComplex {s}, simplicialComplex {s,t}, simplicialComplex {s,t,u}, simplicialComplex {s*t, u}, simplicialComplex {s*t, u, v}, simplicialComplex {s*t, u, v, w}, simplicialComplex {s*t, s*w ,u, v}, simplicialComplex {s*t, s*w ,t * w, u, v}, simplicialComplex {s*t, s*w ,t * w, u * v}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w, s*u*w}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w, s*u*w,s*t*u}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w, s*u*w,s*t*u, s*u*v}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w, s*u*w,s*t*u, s*u*v, s*t*w}}, ReducedHomology => false);
 	       E = prune spectralSequence K
 	       e = spectralSequence K
-	       apply(keys support E^11, i -> homologyIsomorphism(E, i#0, i#1, 11))
-	       apply(keys support e^11, i -> homologyIsomorphism(e, i#0, i#1, 11))
+--	       apply(keys support E^11, i -> homologyIsomorphism(E, i#0, i#1, 11))
+--	       apply(keys support e^11, i -> homologyIsomorphism(e, i#0, i#1, 11))
      SeeAlso
      	 homologyIsomorphism	       
 ///
@@ -3469,19 +3469,20 @@ doc ///
 	      K = filteredComplex(J,C,4)
 	 Text
 	      Here are higher some pages of the associated spectral sequence:
-	 Example
-	       e = prune spectralSequence K
-	       e^2
-	       e^3
-	       e^3 .dd
-	       e^4
-	       e^4 .dd
-	       assert(all(keys support e^0, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,0)))
-	       assert(all(keys support e^1, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,1)))
-	       assert(all(keys support e^2, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,2)))
-	       assert(all(keys support e^3, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,3)))
-	       assert(all(keys support e^4, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,4)))
 ///
+--	 Example
+--	       e = prune spectralSequence K
+--	       e^2
+--	       e^3
+--	       e^3 .dd
+--	       e^4
+--	       e^4 .dd
+	  --     assert(all(keys support e^0, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,0)))
+	   --    assert(all(keys support e^1, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,1)))
+	   --    assert(all(keys support e^2, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,2)))
+	    --   assert(all(keys support e^3, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,3)))
+	   --    assert(all(keys support e^4, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,4)))
+--///
 
 
 doc ///

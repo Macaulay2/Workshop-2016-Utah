@@ -1,7 +1,7 @@
 newPackage(
 	"PolymakeInterface",
-    	Version => "0.3", 
-    	Date => "Aug 6, 2012",
+    	Version => "0.4", 
+    	Date => "May 7, 2016",
     	Authors => {{Name => "Josephine Yu", 
 		     Email => "josephine.yu@math.gatech.edu", 
 		     HomePage => "http://people.math.gatech.edu/~jyu67"},
@@ -10,18 +10,21 @@ newPackage(
 	             Email => "nilten@math.berkeley.edu"},
 	            {Name => "Qingchun Ren", 
 		    Email => "qingchun.ren@gmail.com", 
-		    HomePage => "http://math.berkeley.edu/~qingchun/"}},
+		    HomePage => "http://math.berkeley.edu/~qingchun/"},
+		    {Name => "David Swinarski"},
+		    {Name => "Madeline Brandt"}
+		},
     	Headline => "a package for interfacing with polymake",
     	DebuggingMode => true
     	)
 
 export {
-     runPolymake,
-     ParseAllProperties,
-     hasProperty,
-     getProperty,
-     getPropertyNames,
-     parseAllAvailableProperties
+     "runPolymake",
+     "ParseAllProperties",
+     "hasProperty",
+     "getProperty",
+     "getPropertyNames",
+     "parseAllAvailableProperties"
      }
 
 

@@ -16,19 +16,28 @@ testNewSimplex(List, List) := (P, D) ->(
 
 intersectLists = (D',D) -> D - set(D-set D')
 
-randomAddition = (n,P) ->(
-    --P must be non-empty
-    d := #P_0 - 1;
+randomSubset = (n,m) -> (
+    L := new MutableList from toList (0..m-1);
+    for i from m to n-1 do (
+	j := random(i+1);
+    	if j < m then L#j = i;
+	);
+    sort toList L
+    )
+
+randomAddition = (n,m,P) ->(
+    if #P == 0 then return {randomSubset(n,m)};
+    Plarge := select(P, D-> #D >= m-1); -- the facets big enough to be glued to
+    if #Plarge == 0 then error "m is too large";
     t := false;
     D' := {null};
-    r := random (#P);
-    D := P_r;
+    D := Plarge#(random(#Plarge)); -- a random facet from Plarge
     compD := toList(0..n-1) - set D;
     count := 0;
     while not t and count < 20 do (
     	i := random (#compD);
-    	j := random (#D);
-    	D' = sort(D - set {D_j} | {compD_i});
+    	J := randomSubset(#D,#D-m+1);
+    	D' = sort(D - set apply(J,j->D_j) | {compD_i});
     	t = (testNewSimplex(P,D'))_0;
 	count = count+1);
     if count == 20 then return P;
@@ -43,8 +52,18 @@ idealFromSC = (P) ->(
     intersect apply(P, D -> ideal(V_(Delta - set D)))
 	    )
 
-manyRandomAdditions = (N,n,P) -> (
-    unique apply(N, i-> P = randomAddition(n,P)))
+isShelling = method()
+isShelling(List) := P -> all apply(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
+
+randomChain = method()
+-- random chain of shellable complexes on n vertices, with pure dim m, up to the complete m skeleton
+randomChain(ZZ,ZZ) := (n,m) -> randomChain(n,m,binomial(n,m))
+-- random chain of shellable complexes on n vertices, with pure dim m, and k facets
+randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
+    P := {};
+    while #P < k do P = randomAddition(n,m,P);
+    P
+    )
 
 ///
 Q = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}, {0, 3, 4}}
@@ -53,6 +72,60 @@ P = {1,3,4}
 smalls
 facets
 apply(smalls, e ->apply(facets, E -> #(e-set E)))
+///
+
+
+randomLink = method()
+randomLink (ZZ,Ideal) := (c,I) ->(
+{*
+c:ZZ
+ codim of I
+I:Ideal
+ homogeneous
+*}
+if numgens I == c then return ideal(1_(ring I));
+sgens := sort gens I;
+n :=numcols sgens;
+rsgens  := sgens * random(source sgens, source sgens);
+regseq := rsgens_{n-c..n-1};
+trim(ideal regseq : I)
+)
+
+linkageBound = method()
+linkageBound Ideal := I ->(
+    --2(mu N(I) - (codim I +3))
+N := prune Hom(I, (ring I)^1/I);
+n := numgens N;
+2*(n-codim I)
+)
+
+minimalRegularSequence = method()
+minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
+{*
+c:ZZ
+ codim of I
+I:Ideal
+ homogeneous
+*}
+)
+
+///
+restart
+load "shelling.m2"
+S = ZZ/101[x_0..x_3]
+I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
+I = ideal(minors(2
+I = minors(2, random(S^2, S^{-2,-3,-4}));
+prune Hom(I, S^1/I)
+
+randomLink(codim I, I)
+
+c = 2
+b = linkageBound I
+count = 0
+while numgens I > c and count < b list (
+    I = randomLink(c, I);
+    numgens I)
 ///
 
 end
