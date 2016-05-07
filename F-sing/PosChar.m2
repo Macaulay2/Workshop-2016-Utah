@@ -3000,6 +3000,18 @@ isFJumpingNumberPoly ={Verbose=> false}>> o -> (f1, t1) -> (
 
 
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
+
+
+--- Given matrices A, B with target R^alpha find all v\in R^alpha such that B v \in Image A
+--- by finding partial syzygies
+matrixColon= (A, B) ->(
+assert(target(A)==target(B));
+m:=rank source B;
+M:=B | A;
+S:=syz(M);
+S^(toList(0..m-1))
+)
+
 ---compute a generating morphism for H^(dim R -i)_I(R)
 ---the output is (A,U) where U:coker(A) -> F(coker A) is the generating morphism
 generatingMorphism= (I,i) ->(
