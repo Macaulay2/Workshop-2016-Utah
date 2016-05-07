@@ -404,13 +404,26 @@ frobeniusPower(Matrix,ZZ) := (M,e) ->
 -- The following raises an ideal to a generalized Frobenius power i.e. if N=n_0+n_1P+...+n_eP^e then
 -- I^N = I^n_0*(I^n_1)^[P]*...*(I^n_e)^[P^e].
 
-genFrobeniusPower = ( I, e ) ->
+genFrobeniusPower = method()
+
+genFrobeniusPower(Ideal, ZZ) := ( I, e ) ->
 (
      p := char ring I;
      E := basePExp( e, p );
      product( #E, q -> frobeniusPower( I^(E#q), q ) )
 )
 
+genFrobeniusPower(MonomialIdeal, ZZ) := ( I, e ) ->
+(
+     p := char ring I;
+     E := basePExp( e, p );
+     product( #E, q -> frobeniusPower( I^(E#q), q ) )
+)
+
+genFrobeniusPower(Ideal, ZZ, ZZ) := (I, k, e) ->
+(
+    ethRoot(genFrobeniusPower(I,k),e)
+)
 ---------------------------------------------------------------
 --***********************************************************--
 --
