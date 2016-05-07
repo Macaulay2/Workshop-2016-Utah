@@ -281,9 +281,24 @@ assert(#randomChain(5,2)==binomial(5,3))
 
 
 TEST///
+assert(isShelling({}))
+assert(isShelling({{1,2,3}}))
+assert(isShelling({{1,2,3},{2,3,4}}))
 assert(isShelling(randomChain(5,3,5)))
+--non pure shellings
+assert(isShelling({{1,2,3},{2,4}}))
+assert(isShelling({{1},{2}}))
+assert(not isShelling({{1,3},{2,4}}))
+assert(isShelling({{1,2},{3}}))
+assert(not isShelling({{3},{1,2}}))
 ///
 
+
+TEST///
+setRandomSeed(0);
+assert(#randomAddition(6,3,{{1,2,3}})==2)
+assert(#randomAddition(6,3,{{1,2,3,4}})==2)
+///
 
 end
 
