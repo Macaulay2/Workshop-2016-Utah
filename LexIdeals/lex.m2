@@ -1,4 +1,6 @@
-restart
+
+
+
 binomPoly = method()
 binomPoly (Ring, ZZ, ZZ) := RingElement => (R, a, b) -> (
 	product(toList(1..b)/(i -> (first gens R + a + 1 - i)/i))
