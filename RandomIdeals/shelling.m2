@@ -326,6 +326,11 @@ doc ///
 	  If the input is not a shellable simplicial complex, the new complex will not be shellable.
 ///
 
+<<<<<<< HEAD
+------------------------------------------------------------
+-- DOCUMENTATION testNewSimplex
+------------------------------------------------------------
+
 doc ///
      Key
           testNewSimplex
@@ -350,7 +355,7 @@ doc ///
 	    b=testNewSimplex(P,{2,3,4});
      Caveat
           We do not test if P is a shelling in the first place.
-
+///
          
 
 TEST///
