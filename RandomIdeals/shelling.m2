@@ -320,7 +320,6 @@ doc ///
 	  If the input is not a shellable simplicial complex, the new complex will not be shellable.
 ///
 
-<<<<<<< HEAD
 ------------------------------------------------------------
 -- DOCUMENTATION testNewSimplex
 ------------------------------------------------------------
