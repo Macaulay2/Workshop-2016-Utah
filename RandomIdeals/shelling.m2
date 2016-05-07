@@ -63,8 +63,8 @@ randomSubset = (n,m) -> (
 
 randomAddition = method()
 randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
-    if #P == 0 then return {randomSubset(n,m)};
-    Plarge := select(P, D-> #D >= m-1); -- the facets big enough to be glued to
+    if #P == 0 then return {randomSubset(n,m+1)};
+    Plarge := select(P, D-> #D >= m); -- the facets big enough to be glued to
     if #Plarge == 0 then error "m is too large";
     t := false;
     D' := {null};
@@ -73,8 +73,8 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     count := 0;
     while not t and count < 20 do (
     	i := random (#compD);
-    	j := random (#D);
-    	D' = sort(D - set {D_j} | {compD_i});
+    	J := randomSubset(#D,#D-m);
+    	D' = sort(D - set apply(J, j->D_j) | {compD_i});
     	t = (testNewSimplex(P,D'));
 	count = count+1);
     if count == 20 then return P;
@@ -82,12 +82,16 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     )
 
 idealFromSC = method()
-idealFromSC(List,Ring) := (P,S) -> (
-    numverts := #unique flatten P;
-    x := symbol x;
-    Delta := toList (0..numgens S -1);
+idealFromSC (List,Ring) := (P,S) -> (
+    Delta := toList (0..numgens S - 1);
     V := vars S;
     intersect apply(P, D -> ideal(V_(Delta - set D)))
+    )
+idealFromSC List := P -> (
+    n := (max flatten P)+1;
+    x := symbol x;
+    S := QQ[x_0..x_(n-1)];
+    idealFromSC(P,S)
     )
 
 isShelling = method()
@@ -95,9 +99,10 @@ isShelling(List) := P -> all(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
 
 randomChain = method()
 -- random chain of shellable complexes on n vertices, with pure dim m, up to the complete m skeleton
-randomChain(ZZ,ZZ) := (n,m) -> randomChain(n,m,binomial(n,m))
+randomChain(ZZ,ZZ) := (n,m) -> randomChain(n,m,binomial(n,m+1))
 -- random chain of shellable complexes on n vertices, with pure dim m, and k facets
 randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
+    if k > binomial(n,m+1) then error "k is too large";
     P := {};
     while #P < k do P = randomAddition(n,m,P);
     P
@@ -224,6 +229,17 @@ doc ///
           Example
   
 ///
+
+TEST///
+assert(#randomChain(5,2,6)==6)
+assert(#randomChain(5,2)==binomial(5,3))
+///
+
+
+TEST///
+assert(isShelling(randomChain(5,3,5)))
+///
+
 
 end
 viewHelp
