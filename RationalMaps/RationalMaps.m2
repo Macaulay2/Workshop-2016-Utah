@@ -50,8 +50,22 @@ baseLocusOfMap = method();
 
 baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     M:= gens ker transpose presentation image L1;
+    -- this matrix gives all the "equivalent"
+    -- ways to write the map in question (e.g. (xy : xz) is 
+    -- equivalent to (y : z) ). So we do this to get the 
+    -- representation of our map that's defined on the biggest
+    -- set of points (e.g. (y : z) extends (xy : xz) to the locus where
+    -- x is zero). To see why, see proposition x.xx of the following
+    -- paper: 
+    
+    
     L:= apply(entries M, ll->ideal(ll));
     saturate fold(L, plus)
+    -- these two commands create an ideal for the base 
+    -- locus from the information
+    -- given in the matrix above. We take the saturation to get
+    -- the biggest ideal that gives the same variety. 
+    
 );
 
 --****************************************************--
@@ -128,6 +142,13 @@ TEST ///
         f = matrix{{x*y,y*z}}
         image = imageOfMap(f,a,b)  
 	assert(image == ideal(v^4,u*v^3))
+	
+	-------------------------------------
+	-- Tests for baseLocusOfMap ---------
+	-------------------------------------
+	
+	I = ideal(x^2*y, x^2*z, x*y*z)
+	
 /// 
 ----FUTURE PLANS------
 
