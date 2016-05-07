@@ -34,6 +34,11 @@ imageOfMap(Matrix,Ideal,Ideal) := (f,a,b) -> (
 	ker h
 	);
 
+dimImage = method();
+dimImage(Matrix,Ideal,Ideal) := (f,a,b) ->(
+	I = imageOfMap(f,a,b);
+	dim I - 1
+	);
 --****************************************************--
 --*****************Documentation**********************--
 --****************************************************--
