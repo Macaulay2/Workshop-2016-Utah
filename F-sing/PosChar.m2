@@ -1543,6 +1543,14 @@ ethRoot(Ideal,ZZ) := (Im,e) -> (
      J
 )
 
+ethRoot(MonomialIdeal, ZZ ) := ( I, e ) ->
+(
+     R := ring I;
+     p := char R;
+     G := I_*;
+     if #G == 0 then ideal( 0_R ) else ideal( apply( G, j -> R_((exponents(j))#0//p^e )))
+)
+
 --This tries to compute (f^a*I)^{[1/p^e]} in such a way that we don't blow exponent buffers.  It can be much faster as well.
 --We should probably just use it.  It relies on the fact that (f^(ap+b))^{[1/p^2]} = (f^a(f^b)^{[1/p]})^{[1/p]}.
 ethRootSafe = method(); 
@@ -1881,52 +1889,74 @@ findAllCompatibleIdealsInnards = (u,L,P) ->(
 -----------------------------------------------------------------------------
 
 
-mEthRootOfOneElement = (v,e) ->(
-	local i;
+getExponents=(f)->(
+answer:={};
+t:=terms(f);
+apply(t, i->
+{
+	exps:=first exponents(i);
+	c:=(coefficients(i))#1;
+	c=first first entries c;
+	answer=append(answer,(c,exps));
+});
+answer
+)
+
+mEthRootOfOneElement= (v,e) ->(
+	local i; local j;
 	local d;
 	local w;
 	local m;
-	R:=ring(v); p:=char R;
+	local answer;
+	R:=ring(v); p:=char R; q:=p^e;
 	F:=coefficientRing(R);
 	n:=rank source vars(R);
 	V:=ideal vars(R);
 	vv:=first entries vars(R);
-	YY:=local YY;
-	R1:=F[vv, YY_1..YY_n, MonomialOrder=>ProductOrder{n,n},MonomialSize=>16];
-	V=substitute(V,R1);
-	---------------------------
-	M0:=set {1_R1};
-	apply(vv, w->
+	T:=new MutableHashTable;
+	alpha:=rank target matrix(v);
+	B:={};
+	for i from 1 to alpha do
 	{
-		ww:=substitute(w,R1);
-		M1:=set toList apply(0..p-1, i-> ww^i);
-		M0=M0**M1
-	});
-	M:=toList apply(elements(M0), w-> product toList deepSplice(w));
----------------------------
-	J0:=gens ideal apply(1..n, i->YY_i-substitute(vv#(i-1)^(p^e),R1));
-	S:=toList apply(1..n, i->YY_i=>substitute(vv#(i-1),R1));
-	Ie:=transpose matrix{{(rank target v):0_R1}}; 
-	ev:=entries substitute(v,R1);
-	apply(M, m->
-	{
-		L:={};
-		apply(ev, t->
+		vi:=v_(i-1);
+		C:=getExponents(vi);
+---print(vi,C);
+		apply(C, c->
 		{
-			tt:=((t#0)%J0);
-			q1:=coefficients( tt , Variables=>(first entries gens V), Monomials=>{m});
-			q2:=q1#1;
-			q3:=first first entries q2;
-			q3=substitute(q3,S);
-			L=append(L,q3);
-	---		print(m,tt,q3);
+			lambda:=c#0;
+			beta:=c#1;
+			gamma:=apply(beta, j-> (j%q));
+			B=append(B,gamma);
+			key:=(i,gamma);
+---print(beta, #beta,vv);
+			data:=apply(1..(#beta), j-> vv_(j-1)^((beta#(j-1))//q));
+			data=lambda*product(toList data);
+---print(beta, key, data);
+			if (T#?key) then
+			{
+				T#key=(T#key)+data;
+			}
+			else
+			{
+				T#key=data;
+			};
 		});
-	---	print(ev,L,m);
-		Ie=Ie | (transpose matrix {L});
+	};
+	B=unique(B);
+	TT:=new MutableHashTable;
+	apply(B, b->
+	{
+		ww:={};
+		for i from 1 to alpha do if T#?(i,b) then ww=append(ww,T#(i,b)) else ww=append(ww,0_R);
+		ww=transpose matrix {ww};
+		TT#b=ww;
 	});
----	use R;
-	compress(substitute(Ie,R))
+	KEYS:=keys(TT);
+	answer=TT#(KEYS#0);
+	for i from 1 to (#KEYS)-1 do answer=answer | TT#(KEYS#i);
+	answer
 )
+
 
 
 
@@ -1989,6 +2019,7 @@ Mstar = (A,U,e) ->(
 		};
 		answer=mingens (image A1);
 	};
+	use(R);
 	answer
 )
 
@@ -2987,10 +3018,9 @@ isFJumpingNumberPoly ={Verbose=> false}>> o -> (f1, t1) -> (
 findGeneratingMorphisms = (I) ->
 (
 	local i;
-	R1 := ring I;
 	Ip:=frobeniusPower(I,1);
-	M:=R1^1/I;
-	Mp:=R1^1/Ip;
+	M:=coker I;
+	Mp:=coker Ip;
 	resM:=res M;
 	resMp:=res Mp;
 	f:=inducedMap(M,Mp);
