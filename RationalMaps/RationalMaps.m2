@@ -4,6 +4,11 @@ Version => "0.1", Date => "May 7th, 2016", Authors => {
      Email=> "kschwede@gmail.com",
      HomePage=> "http://www.math.utah.edu/~schwede"
      },
+     {Name => "Daniel Smolkin",
+     Email=> "smolkin@math.utah.edu",
+     HomePage=> "http://www.math.utah.edu/~smolkin"
+     },
+
 }, --this file is in the public domain
 Headline => "A package for working with Weil divisors.", DebuggingMode => true, Reload=>true)
 export{
@@ -40,6 +45,15 @@ dimImage(Matrix,Ideal,Ideal) := (f,a,b) ->(
 	I = imageOfMap(f,a,b);
 	dim I - 1
 	);
+
+baseLocusOfMap = method();
+
+baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
+    M:= gens ker transpose presentation image L1;
+    L:= apply(entries M, ll->ideal(ll));
+    saturate fold(L, plus)
+);
+
 --****************************************************--
 --*****************Documentation**********************--
 --****************************************************--
