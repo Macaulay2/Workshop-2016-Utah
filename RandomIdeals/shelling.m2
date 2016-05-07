@@ -4,9 +4,13 @@ newPackage ( "shelling",
     Version => "1.0",
     Date => "07 May 2016",
     Authors => {
-	{ Name => "later"},
+	{Name => "David Eisenbud",
+         Email => "de@msri.org",
+         HomePage => "http://www.msri.org/~de"},
+     	 {Name => "Robert,Katy,Robert, Jay"}
 	},
     Headline => "Package for constructing random simplicial complex",
+    Reload => true,
     DebuggingMode => true
     )
 
@@ -17,7 +21,9 @@ export {
 	"randomLink",
 	"testNewSimplex",
         "idealFromSC",
-        "isShelling"
+        "isShelling",
+	"isLicci",
+	"minimalRegularSequence"
         };
 
 testNewSimplex = method()
@@ -79,6 +85,10 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     if count == 20 then return P;
     unique (P|{D'})
     )
+randomAddition(Ring,ZZ,List) := (R,m,L) -> (
+    P := monomialsToLists(L,R);
+    listsToMonomials(randomAddition(numgens R,m,P),R)
+    )
 
 idealFromSC = method()
 idealFromSC (List,Ring) := (P,S) -> (
@@ -106,35 +116,11 @@ randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
     while #P < k do P = randomAddition(n,m,P);
     P
     )
+randomChain(Ring,ZZ,ZZ) := (R,m,k) -> listsToMonomials(randomChain(numgens R,m,k),R)
+randomChain(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomChain(numgens R,m),R)
 
-doc ///
-     Key
-          randomChain
-	  (randomChain,ZZ,ZZ)
-	  (randomChain,ZZ,ZZ,ZZ)
-     Headline
-          produces a random chain of shellable complexes
-     Usage
-          P = randomChain(n,m)
-          P = randomChain(n,m,k)
-     Inputs
-          n:ZZ
-	       the number of vertices
-	  m:ZZ
-	       the dimension of the facets
-	  k:ZZ
-	       the number of facets (if omitted, the number will be n choose m)
-     Outputs
-          P:List
-	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
-     Description
-          Text
-               
-          Example
-               P = randomChain(6,3,10)
-     Caveat
-	  No claim is made on the distribution of the random chain.
-///
+listsToMonomials = (P,R) -> apply(P, D->product apply(D,d->R_d))
+monomialsToLists = (L,R) -> apply(L, m->select(numgens ring m, i->((listForm m)#0#0#i > 0)))
 
 ///
 Q = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}, {0, 3, 4}}
@@ -146,6 +132,9 @@ apply(smalls, e ->apply(facets, E -> #(e-set E)))
 ///
 
 
+-----Toward the test for licci
+
+
 randomLink = method()
 randomLink (ZZ,Ideal) := (c,I) ->(
 {*
@@ -154,12 +143,13 @@ c:ZZ
 I:Ideal
  homogeneous
 *}
-if numgens I == c then return ideal(1_(ring I));
-sgens := sort gens I;
-n :=numcols sgens;
-rsgens  := sgens * random(source sgens, source sgens);
-regseq := rsgens_{n-c..n-1};
-trim(ideal regseq : I)
+if numgens I <= c then return ideal(1_(ring I));
+--sgens := sort gens I;
+--n :=numcols sgens;
+--rsgens  := sgens * random(source sgens, source sgens);
+--regseq := ideal rsgens_{n-c..n-1};
+regseq := minimalRegularSequence(c,I);
+trim(regseq : I)
 )
 
 linkageBound = method()
@@ -177,97 +167,236 @@ c:ZZ
  codim of I
 I:Ideal
  homogeneous
+Description
+ Text
+  finds a maximal regular sequence in I of minimal degree.
 *}
+if numgens I == c then return I;
+    --takes care of I = 0 and I principal;
+sgens := sort gens I;
+rsgens := sgens * random(source sgens, source sgens);
+n :=numcols sgens;
+J := ideal sgens_{0};
+K := J;
+count := 1; -- next element to add
+c' := 1; -- current codim J
+while c'<c do(
+    if codim (K = J + ideal sgens_{count}) > c' then (J = K; c' = c'+1)
+    else if codim (K = J + ideal rsgens_{count}) > c' then (J = K; c' = c'+1);
+    count = count+1;
+    );
+J
 )
 
+isLicci = method()
+isLicci(ZZ, ZZ, Ideal) := (b,c,I) -> (
+    --I homogeneous ideal
+    --b = linkageBound I
+    --c = codim I
+    --output is list of up to b integers, the numbers of generators of the
+    --successive random links
+    J := I;
+    p := numgens J;
+    <<p<<endl;flush;
+    apply(b, i -> (
+	    J = randomLink(c,J);
+	    <<numgens J<<endl;flush;
+	    numgens J))
+    )
+   
 ///
 restart
-load "shelling.m2"
+loadPackage("shelling", Reload =>true)
 S = ZZ/101[x_0..x_3]
 I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
-I = ideal(minors(2
-I = minors(2, random(S^2, S^{-2,-3,-4}));
-prune Hom(I, S^1/I)
+isLicci(3, codim I, I)
 
-randomLink(codim I, I)
+I = minors(3, random(S^3, S^{-2,-3,-4,-4}));
+isLicci(3, codim I, I)
 
-c = 2
-b = linkageBound I
-count = 0
-while numgens I > c and count < b list (
-    I = randomLink(c, I);
-    numgens I)
+I = minors(2, random(S^2, S^{4:-1}))
+isLicci(3, codim I, I)
+
+--b = linkageBound I
+b = 2*c
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomChain
+------------------------------------------------------------
+
+doc ///
+     Key
+          randomChain
+	  (randomChain,ZZ,ZZ)
+	  (randomChain,ZZ,ZZ,ZZ)
+	  (randomChain,Ring,ZZ)
+	  (randomChain,Ring,ZZ,ZZ)
+     Headline
+          produces a random chain of shellable complexes
+     Usage
+          P=randomChain(n,m)
+	  P=randomChain(n,m,k)
+	  P=randomChain(R,m)
+	  P=randomChain(R,m,k)
+     Inputs
+          n:ZZ
+	       the number of vertices
+	  R:Ring
+	       a polynomial ring with a variable for each vertex
+	  m:ZZ
+	       the dimension of the facets
+	  k:ZZ
+	       the number of facets (if ommited, the number will be {\tt n} choose {\tt m+1})
+	      
+     Outputs
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.  If called with a Ring {\tt R} instead of an integer {\tt n}, each facet is represented by a square-free monomial instead of a list.
+     Description
+          Text
+               
+          Example
+               P = randomChain(6,3,10)
+     Caveat
+	  No claim is made on the distribution of the random chain.
 ///
 
 
-end
-viewHelp
+
+
+
+------------------------------------------------------------
+-- DOCUMENTATION isShelling
+------------------------------------------------------------
+doc ///
+     Key
+          isShelling
+	  (isShelling,List)
+     Headline
+          determines whether a list represents a shelling of a simplicial complex.
+     Usage
+          b = isShelling(P)
+     Inputs
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a possible shelling.
+     Outputs
+          B:Boolean
+	       true if and only if P is a shelling.
+     Description
+          Text
+              Determines if a list of faces is a shelling order of the simplicial complex. 
+          Example
+	      P = {{1, 2, 3}, {1, 2, 5}};
+	      isShelling(P)
+	      Q = {{1,2,3},{3,4,5},{2,3,4}};
+	      isShelling(Q)
+	     
+      
+///
+
+
+------------------------------------------------------------
+-- DOCUMENTATION randomAddition
+------------------------------------------------------------
+doc ///
+     Key
+          randomAddition
+	  (randomAddition,ZZ,ZZ,List)
+     Headline
+          Adds a random facet to a shellable complex
+     Usage
+          p=randomAddition(n,m,P)
+     Inputs
+     	  n:ZZ
+	       the number of vertices
+	  m:ZZ
+	       the dimension of the new facet
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Outputs
+          p:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Description
+          Text
+               
+          Example
+            P={{1,2,3}}
+	    L=randomAddition(6,3,P)
+     Caveat
+	  If the input is not a shellable simplicial complex, the new complex will not be shellable.
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION testNewSimplex
+------------------------------------------------------------
+
+doc ///
+     Key
+          testNewSimplex
+	  (testNewSimplex,List,List)
+     Headline
+          Tests whether a facet can be shellably added to a shelling.
+     Usage
+          b=testNewSimplex(P,S)
+     Inputs
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+          S:List
+               A list of integers. This list is the new facet to add.
+     Outputs
+          b:Boolean
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Description
+          Text
+               
+          Example
+            P={{1,2,3}}
+	    b=testNewSimplex(P,{2,3,4});
+     Caveat
+          We do not test if P is a shelling in the first place.
+///
+         
+
+TEST///
+assert(#randomChain(5,2,6)==6)
+assert(#randomChain(5,2)==binomial(5,3))
+R=QQ[x1,x2,x3,x4,x5];
+assert(#randomChain(R,2,6)==6)
+///
+
+
+TEST///
+assert(isShelling({}))
+assert(isShelling({{1,2,3}}))
+assert(isShelling({{1,2,3},{2,3,4}}))
+assert(isShelling(randomChain(5,3,5)))
+--non pure shellings
+assert(isShelling({{1,2,3},{2,4}}))
+assert(isShelling({{1},{2}}))
+assert(not isShelling({{1,3},{2,4}}))
+assert(isShelling({{1,2},{3}}))
+assert(not isShelling({{3},{1,2}}))
+///
+
+
+TEST///
+setRandomSeed(0);
+assert(#randomAddition(6,3,{{1,2,3}})==2)
+assert(#randomAddition(6,3,{{1,2,3,4}})==2)
+///
+
+TEST///
+needsPackage "SimplicialComplexes"
+needsPackage "SimplicialDecomposability"
+R=QQ[x1,x2,x3,x4,x5];
+assert(isShellable simplicialComplex randomChain(R,2,6))
+///
+
+end--
 
 restart
-uninstallPackage "RandomIdeal"
-installPackage "RandomIdeal"
+installPackage "shelling"
 
 restart
-load "shelling.m2"
-P = {{1,2,3}}
-netList (L =  manyRandomAdditions(500,6,P))
-netList (L1 =  manyRandomAdditions(500,6,P))
-#L
-apply(19, i -> (
-    <<betti res idealFromSC(L_i)<< endl;
-    <<betti res idealFromSC(L1_i)<< endl;
-<<endl;<<endl;))
-#unique(L|L1)
-netList apply(L, P->betti res idealFromSC(P))
-
-degree I
-betti res I
-betti res (I^3)
-Q = subsets(5,3)
-betti res idealFromSC(Q)
-
-
-
---an apparently maximal shellable with non-linear resolution:
-P = {{1,2,3},
- {1,2,5},
- {2,3,7},
- {1,5,6},
- {0,2,3},
- {0,2,7},
- {1,4,5},
- {4,5,6}
- }
-I = idealFromSC(P)
-betti res I
-
-netList (L =  manyRandomAdditions(500,8,P))
-betti res idealFromSC(last L)
-
-M = apply(1000, i->(
-	L = {};
-	P = {{1,2,3}};
-	manyRandomAdditions(500,6,P)));
-#unique flatten M
-
-P = {{1,2,3}}
-# (L=manyRandomAdditions(500,6,P))
-L
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+loadPackage("shelling", Reload=>true)
+check "shelling"
