@@ -16,7 +16,8 @@ export {
 	"randomChain",
 	"randomLink",
 	"testNewSimplex",
-	"idealFromSC"
+        "idealFromSC",
+        "isShelling"
         };
 
 testNewSimplex = method()
@@ -24,7 +25,6 @@ testNewSimplex(List, List) := (P, D) ->(
 --given a pure, d-dimensional simplicial complex (sc) as a list of ordered lists of d+1 vertices in [n], and
 --a simplex D as such a list, tests whether the intersection of D with P is a union of facets of D.
      d := #D-1; --dimension
-<<<<<<< HEAD
      ints := unique apply(P, D' -> intersectLists(D',D));
      addSimplex := (L,S) -> (
          if any(S,F -> subsetList(L,F))
