@@ -144,7 +144,8 @@ isLicci Ideal := opts -> I -> (
 isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
     ))
 
-depth Module := profondeur
+depth := profondeur;
+
 
 profondeur = method()
 profondeur(Ideal, Module) := (I,M) ->(
@@ -173,7 +174,7 @@ profondeur Ring := R -> profondeur R^1
 
 koszulDepth = method()
 koszulDepth(Ideal) := I -> (
-    C = koszul mingens I;
+    C := koszul mingens I;
     for i in 0..(numColumns(mingens I)-codim I) list depth HH_i(C)
     )
 
@@ -181,6 +182,7 @@ isStronglyCM = method()
 isStronglyCM(Ideal) := I -> (
     d := dim I;
     all(koszulDepth I,i -> i==d)
+    )
 
 -------------------------------------
 -- G_d Code
