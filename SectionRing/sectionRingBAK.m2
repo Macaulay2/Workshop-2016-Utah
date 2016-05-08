@@ -197,7 +197,6 @@ sectionRing(Ideal) := (I) -> (
 	);
 	
 	Vars := flatten myVars;
-	numVars:= #Vars;
 
 	S := KK [Vars,Degrees=>DegreeList];			--Create ring containing all of the generators, in the form Y_{ degree , numberOfAGivenDegree }
 	myVars = apply(myVars, z->apply(z,x->value(x)));
@@ -304,15 +303,12 @@ sectionRing(Ideal) := (I) -> (
 
 		j=j+1;
 	);
+	SectionRing = minimalPresentation Spar;
+	SectionRing
+)
 
-	BetterS := KK[A_1..A_numVars];
-	BetterMap := map(BetterS,S,toList(A_1..A_numVars));
-	BetterRelIdeal := BetterMap(RelIdeal);	
-	BestSR := minimalPresentation(BetterS/BetterRelIdeal)
-	
-
-	--SectionRing = minimalPresentation Spar;
-	--SectionRing
+sectionRing(QDiv) := (D) -> (
+	sectionRing(divisorToIdeal(D));
 );
 
 isVectScalar = L -> (

@@ -58,9 +58,13 @@ bggComplex(Module,PolynomialRing) := ChainComplex => (P,S) -> (
     n := numgens S;
     minDeg := min degGensP;
     maxDeg := max degGensP + n;
-    diffsInLP := for i from minDeg-1 to maxDeg list transpose bgg(i,P,S);
-    LP := chainComplex diffsInLP;
-    dual(LP[-minDeg+1])
+    bggComplex(minDeg-1, maxDeg,P,S)
+    )
+
+bggComplex(ZZ,ZZ,Module,PolynomialRing) := ChainComplex => (a,b,N,A) -> (
+    diffs := for i from a to b list transpose bgg(i,N,A);
+    LP := chainComplex diffs;
+    dual(LP[-a])
     )
 
 tateResolution = method(TypicalValue => ChainComplex)
@@ -767,33 +771,59 @@ document {
  
  document {
      Key => {bggComplex,(bggComplex,Module,PolynomialRing)}, 
-     Headline => "the linear complex L(P)",
-     Usage => "bggComplex(P,S)",
+     Headline => "the linear complexes R(M) or L(P)",
+     Usage => "bggComplex(a,b,M,E) \n bggComplex(a,b,P,S) \n bggComplex(P,S)",
      Inputs => {
-	  "P" => Module => {"graded module over the exterior algebra in the same number of variables as S"},
-	  "S" => PolynomialRing
-	  },
+	  "P" => Module => {"graded module over the exterior algebra"},
+	  "M" => Module => {"graded module over the polynomial ring"},
+	  "S" => PolynomialRing,
+	  "E" => PolynomialRing => {"the exterior algebra in the same number of variables as S"},
+	  "a" => ZZ,
+	  "b" => ZZ
+	   },
+	  	  
      Outputs => {
-	  ChainComplex => {"the linear chain complex L(P)"}  
+	  ChainComplex => {"a truncated version of the linear chain complex L(P) or R(M)"}  
 	  },
-     PARA{ "This function takes as input a graded module P over the exterior algebra E and produces
-	  the linear complex L(P). When P=E, we get the Koszul complex:"},         
+      PARA{ "Given a graded module P over the exterior algebra or a graded module M over the polynomial ring,
+	  this function creates truncated versions of the linear complexes L(P) or R(M) given an integral
+	  lower bound a and an integral upper bound b"},
+      
+      PARA{"If M is a graded module over the polynomial ring S, and E is the exterior algebra in the same
+	  number of variables, the linear complex R(M) is not necessarily finite. Given integral bounds, we may construct 
+	  a truncated version of R(M):"},
+	  
+      EXAMPLE lines ///
+          S = ZZ/32003[x_0..x_2]; 
+	  E = ZZ/32003[e_0..e_2, SkewCommutative=>true];
+	  M = coker matrix {{x_0*x_1, x_1*x_2}};
+	  a = -1;
+	  b = 4;
+	  bggComplex(a,b,M,E)
+          ///,    
+	  
+     PARA{"If P is a graded module over the exterior algebra E, this function will produce a truncated version of L(P) given bounds:"},	  
+     EXAMPLE lines ///
+          S = QQ[x_1..x_3];
+	  E = QQ[e_1..e_3,SkewCommutative => true];
+	  a = -1;
+	  b = 0;
+	  F1 = E^{0,-1,0};
+	  F2 = E^{1,1,2};
+	  f = map(F2,F1,matrix{{e_1,e_1*e_3,e_2},{e_3-e_1,e_1*e_2+e_2*e_3,e_1},{e_1*e_2,e_1*e_2*e_3,e_2*e_3}});
+          P = coker f;
+	  bggComplex(a,b,P,S)
+	  ///,  
+      
+     PARA{ "Since L(P) is a finite complex, omitting the bounds will cause the function to produce a truncated version
+	 of L(P) including all nonzero entries. When P=E, we get the Koszul complex:"},         
      EXAMPLE lines ///
 	  S = QQ[x_0..x_2]; 
 	  E = QQ[e_0..e_2, SkewCommutative=>true];
 	  P = E^1;
           bggComplex(P,S)
      	  ///,
-     PARA{"A more complicated example:"},	  
-     EXAMPLE lines ///
-          S = QQ[x_1..x_3];
-	  E = QQ[e_1..e_3,SkewCommutative => true];
-	  F1 = E^{0,-1,0};
-	  F2 = E^{1,1,2};
-	  f = map(F2,F1,matrix{{e_1,e_1*e_3,e_2},{e_3-e_1,e_1*e_2+e_2*e_3,e_1},{e_1*e_2,e_1*e_2*e_3,e_2*e_3}});
-          P = coker f;
-	  bggComplex(P,S)
-	  ///,
+    
       SeeAlso => {bgg, symExt}
       }
 

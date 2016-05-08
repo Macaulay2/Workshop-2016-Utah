@@ -7,11 +7,10 @@ newPackage ( "ResidualIntersections",
          HomePage => "http://www.msri.org/~de"},
      	 {Name => "Robert,Katy,Robert, Jay"}
 	},
-    Headline => "Package for studying conditions associated to Residual Intersection theory"
+    Headline => "Package for studying conditions associated to Residual Intersection theory",
     Reload => true,
     DebuggingMode => true
     )
-
 
 export {
 	"isLicci",
@@ -19,10 +18,55 @@ export {
 	"linkageBound",
 	"UseNormalModule",
 	"randomRegularSequence",
+	"genericResidual",
+	"genericArtinNagata",
+	"numgensByCodim",
+	"maxGd",
+	"residualCodims",
         "koszulDepth",
         "isStronglyCM"
         };
 
+--Generic Artin-Nagata Code
+genericArtinNagata = method()
+genericArtinNagata(ZZ,Ideal) := (s,I) -> (
+    needsPackage "MCMApproximations";
+    S := ring I;
+    K := genericResidual(s,I);
+    s' := codim K;
+    if s' === s then 
+      codepth := numgens (ring K) - depth ((ring K)^1/K)
+    else codepth = -1;
+    {s',codepth,K}
+    )
+    --tests whether the generic link is CM
+
+genericResidual = method()
+genericResidual(ZZ,Ideal):= (s,I) ->(
+    if s>= numgens I then return ideal(1_(ring I));
+    sgens := sort gens I;
+    rgens := (sgens)*random(source sgens, source sgens);
+    n := numcols rgens;
+    (ideal (rgens_{n-s..n-1})): I
+    )
+
+///
+restart
+loadPackage("RandomIdeal", Reload => true)
+loadPackage("ResidualIntersections", Reload =>true)
+S = ZZ/32003[x_0..x_5]
+--6 vars
+I = randomShellableIdeal(S,2,4)
+S = ZZ/32003[x_0..x_3]
+I = minors(3, random(S^3, S^{-2,-3,-4,-5}));
+--codim 3
+codim I
+s = 2;
+codim genericResidual(3,I)
+L = genericArtinNagata(s,I);
+L_{0,1}
+///
+---Licci code
 randomLink = method()
 randomLink (ZZ,Ideal) := (c,I) ->(
 {*
@@ -100,6 +144,7 @@ isLicci Ideal := opts -> I -> (
 isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
     ))
 
+<<<<<<< HEAD
 depth Module := profondeur
 
 profondeur = method()
@@ -137,6 +182,38 @@ isStronglyCM = method()
 isStronglyCM(Ideal) := I -> (
     d := dim I;
     all(koszulDepth I,i -> i==d)
+=======
+-------------------------------------
+-- G_d Code
+-------------------------------------
+
+numgensByCodim = method()	
+numgensByCodim (Ideal,ZZ) := (J,k) -> (
+    R := ring J;
+    n := numgens R;
+    max for A in subsets(n,k) list (
+	M := new MutableList from (n:1_R);
+	for a in A do M#a = R_a;
+	M = map(R,R,matrix{toList M});
+	numgens trim M J
+	)
+    )
+
+numgensByCodim Ideal := J -> (
+    n := numgens ring J;
+    toList apply(n, i->numgensByCodim(J,i+1))
+    )
+
+maxGd = method()
+maxGd Ideal := J -> (
+    for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i;
+    infinity
+    )
+
+residualCodims = method()
+residualCodims Ideal := J -> (
+    toList select((codim J + 1..numgens ring J + 1), i->numgensByCodim(J,i-1) <= i)
+>>>>>>> c8d830a78b2c1382141510c2b2910e194d2a170f
     )
 
 doc ///
@@ -244,5 +321,12 @@ time linkageBound (I, UseNormalModule => true)
 
 
 --b = linkageBound I
+
+restart
+loadPackage "ResidualIntersections"
+loadPackage "RandomIdeal"
+J = idealChainFromSC randomChain(10,5,20);
+J/maxGd
+J/residualCodims
 
 ///
