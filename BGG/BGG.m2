@@ -254,7 +254,8 @@ directImageComplex Module := opts -> (M) -> (
      phi := symmetricToExteriorOverA(N ** S^{xm});
      E := ring phi;
      F := complete res( image phi, LengthLimit => max(1,1+regM));
-     F = E^{-xm} ** F[regM];
+     em := regM * degree(E_0);
+     F = E^{em} ** F[regM]; --this used to be E^{-xm} instead of E^{em}
      F0 := degreeD(0, F);
      toA := map(coefficientRing E,E,DegreeMap=> i -> drop(i,1));
      --we should truncate away the terms that are 0, and (possibly) the terms above the (n+1)-st
@@ -393,9 +394,16 @@ regularityMultiGraded = method()
 regularityMultiGraded (Module) := (M) -> (
      S := ring M;
      (R,f) := flattenRing S;
-     deglen := #degree R_0;
+--     deglen := #degree R_0;
+--     w := flatten {1,toList(deglen-1:0)};
+--     regularity (coker f presentation M, Weights=>w)
+     I := ideal R;
+     T := ring I;
+     g := map(R,T);
+     deglen := #degree T_0;
      w := flatten {1,toList(deglen-1:0)};
-     regularity (coker f presentation M, Weights=>w)
+     prM := lift(f presentation M,T);     
+     regularity (coker(prM)/I, Weights=>w)
      )
 
 --FIX -- put in whatever you need on the command line.
@@ -1450,50 +1458,25 @@ A = ZZ/11[a,b]
 
 TEST///
 A = QQ[a,b]
-betti pureResolution(A,{0,2,4}) == new BettiTally from {(0,{0},0) => 3, (1,{2},2) => 6, (2,{4},4) => 3}
-betti pureResolution(11,{0,2,4})== new BettiTally from {(0,{0},0) => 3, (1,{2},2) => 6, (2,{4},4) => 3}
-betti pureResolution(2,{1,2,4})==new BettiTally from {(0,{1},1) => 2, (1,{2},2) => 3, (2,{4},4) => 1}
-betti pureResolution(2,3,{1,2,4})
+assert(betti pureResolution(A,{0,2,4}) == new BettiTally from {(0,{0},0) => 3, (1,{2},2) => 6, (2,{4},4) => 3})
+assert(betti pureResolution(11,{0,2,4})== new BettiTally from {(0,{0},0) => 3, (1,{2},2) => 6, (2,{4},4) => 3})
+assert(betti pureResolution(2,{1,2,4})==new BettiTally from {(0,{1},1) => 2, (1,{2},2) => 3, (2,{4},4) => 1})
+assert(betti pureResolution(2,3,{1,2,4})==new BettiTally from {(0,{1},1) => 2, (1,{2},2) => 3, (2,{4},4) => 1})
+///
+
+--Karl's integral closure example
+TEST/// 
+R = QQ[x,y];
+I = ideal(x^2,y^2);
+J = ideal(x^2, x*y, y^2);
+A = reesAlgebra J;
+M = sub(I, A)*A^1;
+O = HH_0(directImageComplex(M))
+assert(hilbertFunction(2,O) === 3)
 ///
 end
 
 restart
-uninstallPackage "BGG"
-installPackage "BGG"
-
-
-kk = ZZ/101
-S = kk[x_1..x_3]
-E = kk[e_1..e_3,SkewCommutative => true]
-
---from P an E-module, to the linear complex L(P)
-F1 = E^{0,-1,0}
-F2 = E^{1,1,2}
-
-f = map(F2,F1,matrix{{e_1,e_1*e_3,e_2},{e_3-e_1,e_1*e_2+e_2*e_3,e_1},{e_1*e_2,e_1*e_2*e_3,e_2*e_3}})
-P = coker f
-
-degrees gens P
-degrees target gens P
-
-
-bggComplex(P,S)
-
-P = E^{-5}
-kosz = bggComplex(P,S)
-HH_1(kosz)
-
-prune oo
-
-
-
-
-f0 = bgg(0,P,S)
-f1 = bgg(1,P,S)
-f2 = bgg(2,P,S)
-f3 = bgg(3,P,S)
-
-C = chainComplex{f3,f2,f1,f0}
-HH_(-3)(C)
-prune oo
-minimalPresentation o35
+uninstallPackage"BGG"
+installPackage"BGG"
+check"BGG"
