@@ -55,8 +55,9 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     -- equivalent to (y : z) ). So we do this to get the 
     -- representation of our map that's defined on the biggest
     -- set of points (e.g. (y : z) extends (xy : xz) to the locus where
-    -- x is zero). To see why, see proposition x.xx of the following
-    -- paper: 
+    -- x is zero). C.f. proposition 1.1 of the paper
+    -- "Cremona Transformations and some Related Algebras" by Aron Simis, 
+    -- J. Algebra 280 (2004)
     
     
     L:= apply(entries M, ll->ideal(ll));
@@ -133,6 +134,19 @@ doc ///
                         defining equations for Y
         Outputs
                 dimension of image
+
+
+        Key
+                baseLocusOfMap
+        Headline
+                Computes the defining ideal of the base locus of a rational map of projective varieties
+        Usage
+                I = baseLocusOfMap(L)
+        Inputs
+                L: matrix
+                        a row matrix whose entries give the coordinates of your map to projective space
+        Outputs
+                the (saturated) defining ideal of the base locus of the map to projective space
 ///
 TEST ///
 	------------------------------------
@@ -149,8 +163,11 @@ TEST ///
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
 	-------------------------------------
-	
-	I = ideal(x^2*y, x^2*z, x*y*z)
+    R = QQ[x,y,z]	
+	M = matrix{{x^2*y, x^2*z, x*y*z}}
+	I = ideal(x*y, y*z, x*z)
+	assert(I == baseLocusOfMap(M))
+
 	
 /// 
 ----FUTURE PLANS------
