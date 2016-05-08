@@ -28,12 +28,11 @@ export {
      "prepare",
         "randomAddition", 
 	"randomChain",
-	"randomLink",
 	"testNewSimplex",
         "idealFromSC",
 	"idealChainFromSC",
         "isShelling"
-     }
+    }
      
 
 randomMonomial = method(TypicalValue => RingElement)
@@ -476,6 +475,34 @@ doc ///
 	      S = QQ[x_0,x_1,x_2,x_3,x_4]
 	      P =  {{1, 2, 4}, {0, 1, 4}, {0, 2, 4}, {0, 3, 4}};
 	      idealFromSC(P,S)
+         
+     
+///
+
+
+------------------------------------------------------------
+-- DOCUMENTATION idealChainFromSC
+------------------------------------------------------------
+doc ///
+     Key
+          idealChainFromSC
+	  (idealChainFromSC,List)
+     Headline
+          Produces chains of ideals from a list of simplicial complexes.
+     Usage
+          L = idealChainFromSC(P)
+     Inputs
+          P:List
+	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+     Outputs
+          L:List
+	      a list of ideals
+     Description
+          Text  
+	     Outputs the Stanley-Reisner ideal for each successive simplicial complex formed by truncating the simplicial complex. 
+	  Example
+	      P =  {{1, 2, 4}, {0, 1, 4}, {0, 2, 4}, {0, 3, 4}};
+	      idealChainFromSC(P,S)
          
      
 ///
