@@ -174,6 +174,9 @@ residualCodims Ideal := J -> (
     toList select((codim J + 1..numgens ring J + 1), i->numgensByCodim(J,i-1) <= i)
     )
 
+------------------------------------------------------------
+-- DOCUMENTATION isLicci
+------------------------------------------------------------
 doc ///
    Key
     isLicci
@@ -211,6 +214,9 @@ doc ///
     randomRegularSequence
     randomLink
 ///
+------------------------------------------------------------
+-- DOCUMENTATION UseNormalModule
+------------------------------------------------------------
 doc ///
    Key
     UseNormalModule
@@ -229,7 +235,11 @@ doc ///
     isLicci
     linkageBound
 ///
-   
+
+------------------------------------------------------------
+-- DOCUMENTATION linkageBound
+------------------------------------------------------------
+
 doc ///
    Key
     linkageBound
@@ -250,6 +260,30 @@ doc ///
    SeeAlso
     isLicci
 ///
+
+------------------------------------------------------------
+-- DOCUMENTATION minimalRegularSequence
+------------------------------------------------------------
+doc ///
+   Key
+    minimalRegularSequence
+    (minimalRegularSequence,ZZ,Ideal)    
+   Headline
+    finds a maximal regular sequence of minimal degree in an ideal
+   Usage
+    J=minimalRegularSequence(n,I)
+   Inputs
+    n:ZZ
+    I:Ideal
+   Outputs
+    J:Ideal
+   Description
+    Text
+    Example
+   Caveat
+   SeeAlso
+///
+
 
 end--
    
