@@ -88,6 +88,7 @@ randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     if count == 20 then return P;
     unique (P|{D'})
     )
+
 randomAddition(Ring,ZZ,List) := (R,m,L) -> (
     P := monomialsToLists(L,R);
     listsToMonomials(randomAddition(numgens R,m,P),R)
@@ -99,6 +100,7 @@ idealFromSC (List,Ring) := (P,S) -> (
     V := vars S;
     intersect apply(P, D -> ideal(V_(Delta - set D)))
     )
+
 idealFromSC List := P -> (
     n := (max flatten P)+1;
     x := symbol x;
@@ -111,28 +113,24 @@ isShelling(List) := P -> all(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
 
 randomChain = method()
 -- random chain of shellable complexes on n vertices, with pure dim m, up to the complete m skeleton
+
 randomChain(ZZ,ZZ) := (n,m) -> randomChain(n,m,binomial(n,m+1))
 -- random chain of shellable complexes on n vertices, with pure dim m, and k facets
+
+--Should we change the following to start with {{0..m}, {0..m-1,m} to diminish autos?
 randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
     if k > binomial(n,m+1) then error "k is too large";
     P := {};
     while #P < k do P = randomAddition(n,m,P);
     P
     )
+
 randomChain(Ring,ZZ,ZZ) := (R,m,k) -> listsToMonomials(randomChain(numgens R,m,k),R)
 randomChain(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomChain(numgens R,m),R)
 
+--this is NOT the Reisner association
 listsToMonomials = (P,R) -> apply(P, D->product apply(D,d->R_d))
 monomialsToLists = (L,R) -> apply(L, m->select(numgens ring m, i->((listForm m)#0#0#i > 0)))
-
-///
-Q = {{1, 2, 3}, {0, 2, 3}, {0, 1, 3}, {0, 1, 2}, {0, 3, 4}}
-P = {1,3,4}
-(t,smalls, facets) = testNewSimplex(Q,P)
-smalls
-facets
-apply(smalls, e ->apply(facets, E -> #(e-set E)))
-///
 
 
 -----Test for licci
