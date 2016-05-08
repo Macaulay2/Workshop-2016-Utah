@@ -64,7 +64,7 @@ export{
     "ethRootSafeList", -- EthRoots.m2   
     "factorList", -- FThresholds.m2
     "fancyEthRoot", -- EthRoots.m2 
-    "fastExp",
+    "fastExp",  --frobeniousPowers.m2
     "findCPBelow", -- FThresholds.m2
     "findGeneratingMorphisms",     --MK
     "findHSLloci",                 --MK
@@ -79,13 +79,13 @@ export{
     "FPT2VarHomogInternal", -- FThresholds.m2
     "fracPart",
     "frobenius",
-    "frobeniusPower",
+    "frobeniusPower",  --frobeniousPowers.m2 
     "fSig",
     "FTApproxList",  -- FThresholds.m2
     "FTHatApproxList",  -- FThresholds.m2
     "FullMap",--specifies whether the full data should be returned
     "getNumAndDenom",
-    "genFrobeniusPower",
+    "genFrobeniusPower",   --frobeniousPowers.m2 
     "guessFPT",  -- FThresholds.m2
     "HSL",
     "imageOfRelativeCanonical",
