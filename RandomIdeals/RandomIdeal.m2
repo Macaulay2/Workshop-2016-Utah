@@ -313,6 +313,7 @@ idealFromSC List := P -> (
     )
 
 idealChainFromSC = method()
+idealChainFromSC(List,Ring) := (P,S) -> toList apply(#P,i->idealFromSC(take(P,i+1),S))
 idealChainFromSC List := P -> toList apply(#P,i->idealFromSC(take(P,i+1)))
 
 isShelling = method()
