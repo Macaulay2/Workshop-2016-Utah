@@ -2922,56 +2922,6 @@ isFJumpingNumberPoly ={Verbose=> false}>> o -> (f1, t1) -> (
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
 
 
---- Given matrices A, B with target R^alpha find all v\in R^alpha such that B v \in Image A
---- by finding partial syzygies
-matrixColon= (A, B) ->(
-assert(target(A)==target(B));
-m:=rank source B;
-M:=B | A;
-S:=syz(M);
-S^(toList(0..m-1))
-)
-
-
---- Given a generating morphism U:coker(A) -> F(coker A), compute a generating root U:coker(L) -> F(coker L)
-generatingRoot= (A,U) ->(
-	R:=ring(A);
-	L:=A;
-	alpha:=rank target A;
-	LL:=transpose matrix{toList(alpha:0_R)};
-	while ((( L)%( LL))!=0) do
-	{
-		LL=L;
-		L=L | matrixColon(frobeniusPower(L,1),U);
-		L=mingens image L;
----		print("=================================================================");
----		print(L);
-	};
-	L
-)
-
-
---- Given a generating morphism U:coker(A) -> F(coker A), compute the support of the F-module
-FFiniteSupport= (A,U) ->(
-	R:=ring(A);
-	alpha:=rank source U;
-	LL:=id_(R^alpha);
-	L:=ethRoot(U*LL,1);
-	while (((gens image LL) %( (gens image L)|A))!=0) do
-	{
-		LL=L;
----		L=mingens image U*L;
-		L=U*L;
-		L=ethRoot(L,1);
----?		L=mingens image L;
----		print("=================================================================");
----		print(L);
-	};
-	answer:=prune subquotient(A | L, A);
-	mingens radical annihilator answer
-)
-
-
 
 ----------------------------------------------------------------------------------------
 --- Given an Artinian module with Frobenius action F whose Delta functor (=the Matlis dual
@@ -3060,6 +3010,8 @@ doc ///
 	    Returns the largest exponent e such that p^e divides x.
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- START: Transfered to EthRootDoc
 doc ///
      Key
      	ascendIdeal
@@ -3096,6 +3048,8 @@ doc ///
 	Text
 	     Let phi be the p^(-e) linear map obtained by multiplying e-th Frobenius trace by h^a.  Then this function finds the smallest phi-stable ideal containing J.  The idea is to consider the ascending chain J, J+phi(J), J+phi(J)+phi^2(J), etc.  We return the stable value.  For instance, this can be used to compute the test ideal.  This method appared first in the work of Mordechai Katzman on star closure.  It differs from ascendIdeal in that it minimizes the exponents that h is raised to, this can make it faster or slower depending on the circumstances.
 ///
+--- END: Transfered to EthRootDoc
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 doc ///
      Key
@@ -3263,6 +3217,9 @@ doc ///
 	      This tries to find an exact value for the fpt.  If it can, it returns that value.  Otherwise it should return a range of possible values (eventually).  It first checks to see if the ring is binonmial or diagonal.  In either case it uses methods of D. Hernandez.  Next it tries to estimate the range of the FPT using nu's.  Finally, it tries to use this to deduce the actual FPT via taking advantage of convexity of the F-signature function and a secant line argument.  finalCheck is a Boolean with default value True that determines whether the last isFRegularPoly is run (it is possibly very slow).  If FinalCheck is false, then a last time consuming check won't be tried.  If it is true, it will be.  Verbose set to true displays verbose output.
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- START: Transfered to EthRootDoc
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 doc ///
      Key
      	 ethRoot
@@ -3298,6 +3255,9 @@ doc ///
 	Text
 	     Computes the 1/p^e-th root of (f^a*I).  It does it while trying to minimize the power that f gets raised to (in case a is a large number).  This can either be faster or slower than ethRoot.
 ///
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transfered to EthRootDoc
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 doc ///
      Key
