@@ -4,7 +4,7 @@ doc ///
      Headline
         Finds all ideals compatible with a given Frobenius near-splitting
      Usage
-     	 findAllCompatibleIdeals = (u)
+     	 findAllCompatibleIdeals (u)
      Inputs
 	u:RingElement
      Outputs
