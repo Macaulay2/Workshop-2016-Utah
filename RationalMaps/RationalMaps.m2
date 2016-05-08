@@ -7,7 +7,11 @@ Version => "0.1", Date => "May 7th, 2016", Authors => {
      {Name => "Daniel Smolkin",
      Email=> "smolkin@math.utah.edu",
      HomePage=> "http://www.math.utah.edu/~smolkin"
-     }
+     },
+     {Name => "S. Hamid Hassanzadeh",
+     Email => "hassanzadeh.ufrj@gmail.com"},
+     {Name => "C.J. Bott",
+     Email => "cjamesbott@gmail.com"}
 }, --this file is in the public domain
 Headline => "A package for working with Weil divisors.", DebuggingMode => true, Reload=>true)
 export{
