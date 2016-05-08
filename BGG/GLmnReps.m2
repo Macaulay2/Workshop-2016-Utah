@@ -3,7 +3,7 @@ newPackage(
     	Version => "1.0", 
     	Date => "May 8, 2016",
     	Authors => {
-	     {Name => "Michael Perlman", Email => "a", HomePage => "https://www3.nd.edu/~mperlman/"},
+	     {Name => "Michael Perlman", Email => "mperlman@nd.edu", HomePage => "https://www3.nd.edu/~mperlman/"},
 	     {Name => "Claudiu Raicu", Email => "craicu@nd.edu", HomePage => "https://www3.nd.edu/~craicu/"}
 	     },
     	Headline => "Representations of gl(mn) and syzygies",
@@ -11,7 +11,7 @@ newPackage(
     	DebuggingMode => false
     	)
     
-export{"charE", "charL", "charK"}
+export{"hhh","charL", "charK", "bettiPart"}
 
 charE = method()
 charE(ZZ,ZZ) := (m,n) -> (
@@ -71,12 +71,121 @@ charL(ZZ,ZZ,List) := (m,n,lam) -> (
     flatten apply(selsmall,x -> apply(listForm(x#1),ter -> {ter#0,x#0,ter#1}))
     )
 --charL = memoize charL
+
+bettiPart = method()
+bettiPart(ZZ,ZZ,ZZ,List) := (n,m,p,lam) -> (
+     r := local r;
+     s := local s;
+     x := local x;
+     R := schurRing(r,n);
+     T := schurRing(s,m);
+     conjlam := toList conjugate( new Partition from lam);
+     d := dim r_lam;
+     e := dim s_lam;
+     kk := ZZ/p;
+     S := kk[x_(1,1)..x_(n,m)];
+     M := genericMatrix(S,m,n);
+     lis := for i from 0 to d*e-1 list
+     (
+    A := random(kk^m,kk^m);
+    B := random(kk^n,kk^n);
+    N := A * M * B;
+    product for j from 0 to #conjlam-1 list det(N_{0..conjlam_j-1}^{0..conjlam_j-1})
+     );
+    J := ideal lis;
+    I := ideal mingens J;
+    if (numgens I != e*d) then error"wrong number of generators"
+    else betti res I --needs to be replaced by next two lines
+    --else F:= res(I, FastNonminimal => true);
+   -- betti(F, Minimize => true)
+    )
+
+bettiPart(ZZ,ZZ,List) := (n,m,lam) -> (
+    bettiPart(n,m,32003,lam)
+    )
+
+g = method()
+g(ZZ,ZZ,List,ZZ) := (n,m,lam,d) -> (
+    F:=select(charL(n,m,lam), x-> sum(x#0) === d);
+    t:= local t;
+    s:= local s;
+    T1:= schurRing(t,n);
+    T2:= schurRing(s,m);
+    tempList:=apply(F, x-> dim(T1_(x#0))*dim(T2_(x#1))*x#2);
+    sum tempList
+    )
+
+h = method()
+h(ZZ,ZZ,List) := (n,m,lam) -> (
+    G:= apply(charL(n,m,lam),x->sum(x#0));
+    hlist:= for i from sum lam to max G list
+    (
+    g(n,m,lam,i)
+    );
+    hlist
+    )
+
   
 end
 
 restart
 uninstallPackage"GLmnReps"
 installPackage"GLmnReps"
+debug needsPackage"GLmnReps"
+
 charL(3,2,{2,1})
 charK(3,2,{1})
 charE(4,3)
+h(3,3,{3,1})
+g(3,3,{3,1},5)
+
+N=matrix{{1,2,3},{4,5,6}}
+N_{0,1}^{0,1}
+
+
+
+
+g := method()
+g(ZZ,ZZ,List,ZZ) := (n,m,lam,d) -> (
+    F:=select(charL(n,m,lam), x-> sum(x#0) === d);
+    t:= local t;
+    s:= local s;
+    T1:= schurRing(t,n);
+    T2:= schurRing(s,m);
+    tempList:=apply(F, x-> dim(T1_(x#0))*dim(T2_(x#1))*x#2);
+    sum tempList
+    )
+
+h := method()
+h(ZZ,ZZ,List) := (n,m,lam) -> (
+    G:= apply(charL(n,m,lam),x->sum(x#0));
+    hlist:= for i from sum lam to max G list
+    (
+    g(n,m,lam,i)
+    );
+    hlist
+    )
+
+
+I = ideal mingens J;
+if (numgens I != d^2) then error"wrong number of generators"
+
+--F = resolution(I,DegreeLimit => 5)
+--F = resolution I
+F = res(I, FastNonminimal => true)
+betti(F, Minimize => true)
+end
+
+restart
+a = 4
+b = 2
+time load"syz12.m2"
+betti F
+
+select(charL(3,3,{3,1}), x -> sum(x#0) == 5)
+T = schurRing(t,3)
+sum apply(o22, x -> dim(T_(x#0)) * dim(T_(x#1)) * x#2)
+apply(charL(3,3,{3,1}),x-> sum(x#0))
+max oo
+min ooo
+viewHelp List
