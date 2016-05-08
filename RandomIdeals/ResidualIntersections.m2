@@ -7,7 +7,7 @@ newPackage ( "ResidualIntersections",
          HomePage => "http://www.msri.org/~de"},
      	 {Name => "Robert,Katy,Robert, Jay"}
 	},
-    Headline => "Package for studying conditions associated to Residual Intersection theory"
+    Headline => "Package for studying conditions associated to Residual Intersection theory",
     Reload => true,
     DebuggingMode => true
     )
@@ -18,7 +18,8 @@ export {
 	"minimalRegularSequence",
 	"linkageBound",
 	"UseNormalModule",
-	"randomRegularSequence"
+	"randomRegularSequence",
+	"numgensByCodim"
         };
 
 randomLink = method()
@@ -97,8 +98,18 @@ isLicci(ZZ,Ideal) := opts -> (b,I) -> isLicci(b,codim I, I)
 isLicci Ideal := opts -> I -> (
 isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
     ))
-	
 
+numgensByCodim = method()	
+numgensByCodim (Ideal,ZZ) := (J,k) -> (
+    R := ring J;
+    n := numgens R;
+    max for A in subsets(n,k) list (
+	M := new MutableList from (n:1_R);
+	for a in A do M#a = R_a;
+	M = map(R,R,matrix{toList M});
+	numgens trim M J
+	)
+    )
 
 doc ///
    Key
@@ -191,6 +202,7 @@ I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
 isLicci(3, codim I, I)
 linkageBound (I, UseNormalModule => false)
 linkageBound (I, UseNormalModule => true)
+apply(4,i->numgensByCodim(I,i))
 
 I = minors(2, random(S^2, S^{4:-1}))
 isLicci(3, codim I, I)
