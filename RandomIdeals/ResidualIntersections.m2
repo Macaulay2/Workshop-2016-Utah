@@ -316,39 +316,96 @@ doc ///
     J=minimalRegularSequence(n,I)
    Inputs
     n:ZZ
-    I:Ideal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION maxGd
+------------------------------------------------------------
+
+doc ///
+   Key
+      maxGd
+      (maxGd,Ideal)    
+   Headline
+      maximum G_d of a monomial ideal
+   Usage
+      d = maxGd I
+   Inputs
+      I:Ideal
+         A monomial ideal
    Outputs
-    J:Ideal
+      d:ZZ
+         The maximum value of d such that I has property G_d.
    Description
-    Text
-    Example
+      Text
+      Example
    Caveat
    SeeAlso
+      numgensByCodim
+      residualCodims
 ///
 
+------------------------------------------------------------
+-- DOCUMENTATION numgensByCodim
+------------------------------------------------------------
+
+doc ///
+   Key
+      numgensByCodim
+      (numgensByCodim,Ideal)
+      (numgensByCodim,Ideal,ZZ)
+   Headline
+      maximum number of generators of localizations of a monomial ideal
+   Usage
+      d = numgensByCodim(I,k)
+      L = numgensByCodim(I)
+   Inputs
+      I:Ideal
+         A monomial ideal
+      k:ZZ
+         An integer between 1 and the dimension of the ring
+   Outputs
+      d:ZZ
+         The maximum number of generators of {\tt I} localized at a prime {\tt P} of codimension {\tt k}.
+      L:List
+         A list of the numbers of generators for each codimension from 1 to the dimension of the ring
+   Description
+      Text
+      Example
+   Caveat
+   SeeAlso
+      residualCodims
+      maxGd
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION residualCodims
+------------------------------------------------------------
+
+doc ///
+   Key
+      residualCodims
+      (residualCodims,Ideal)
+   Headline
+      a list of possible codimensions where...
+   Usage
+      L = residualCodims I
+   Inputs
+      I:Ideal
+         A monomial ideal
+   Outputs
+      L:List
+         A list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
+   Description
+      Text
+      Example
+   Caveat
+   SeeAlso
+      numgensByCodim
+      maxGd
+///
 
 end--
-   
-///
-restart
-loadPackage("ResidualIntersections", Reload =>true)
-installPackage"ResidualIntersections"
-
-viewHelp isLicci
-S = ZZ/101[x_0..x_3]
-installPackage "MCMApproximations"
-I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
-isLicci(3, codim I, I)
-linkageBound (I, UseNormalModule => false)
-linkageBound (I, UseNormalModule => true)
-
-I = minors(2, random(S^2, S^{4:-1}))
-isLicci(3, codim I, I)
-linkageBound (I, UseNormalModule => false)
-linkageBound (I, UseNormalModule => true)
-
-I = minors(3, random(S^3, S^{-2,-3,-4,-4}));
-isLicci(3, codim I, I)
 
 linkageBound (I, UseNormalModule => false)
 time linkageBound (I, UseNormalModule => true)
@@ -362,5 +419,3 @@ loadPackage "RandomIdeal"
 J = idealChainFromSC randomChain(10,5,20);
 J/maxGd
 J/residualCodims
-
-///
