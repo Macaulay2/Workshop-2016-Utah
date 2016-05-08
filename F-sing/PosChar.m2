@@ -111,14 +111,14 @@ export{
     "MultiThread",
     "nonFInjectiveLocus",   --MK
     "Nontrivial",
-    "nu",
-    "nuAlt",
-    "NuCheck",
-    "nuHat",
-    "nuHatList",
-    "nuList",
-    "nuListAlt",
-    "nuListAlt1",
+    "nu", -- FThresholds.m2
+    "nuAlt", -- FThresholds.m2
+    "NuCheck", -- FThresholds.m2
+    "nuHat", -- FThresholds.m2
+    "nuHatList", -- FThresholds.m2
+    "nuList", -- FThresholds.m2
+    "nuListAlt", -- FThresholds.m2
+    "nuListAlt1", -- FThresholds.m2
     "num",
     "Origin",
     "OutputRange",
@@ -469,6 +469,9 @@ findQGorGen (Ring,ZZ) := (Rk,ek) -> (
 )
 findQGorGen(Ring) := (R2) -> ( findQGorGen(R2, 1) )
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 ---------------------------------------------------------------
 --***********************************************************--
@@ -642,10 +645,6 @@ nu(RingElement, Ideal, ZZ) := (f1, J1, e1) -> ( --this does a fast nu computatio
 
 nu( RingElement, ZZ ) := ( f, e ) -> nu( f, maxIdeal( ring f ), e )
 
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
---- BEGIN: Transfered to FThresholds
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 --Approximates the F-pure Threshold
 --Gives a list of nu_I(p^d)/p^d for d=1,...,e
 FPTApproxList = method();
@@ -673,10 +672,6 @@ FTApproxList (Ideal,Ideal,ZZ) := (I,J,e) ->
 )
 
 FTApproxList (RingElement,Ideal,ZZ) := (f1,J1,e1) -> FTApproxList(ideal(f1),J1,e1)
-
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
---- END: Transfered to FThresholds
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 --***********************************************************--
 --Some new functions for computing nus
@@ -860,10 +855,6 @@ nuHat( RingElement, Ideal, ZZ ) := ( f, J, e ) -> nu( f, J, e )
 -- and J=maximal ideal 
 
 nuHat( RingElement, ZZ ) := ( f, e ) -> nu( f, e )
-
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
---- BEGIN: Transferred to FThresholds
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 --Aproximates the F-Threshold with respects to an ideal J
 
@@ -3061,6 +3052,10 @@ doc ///
 	     This computes the base p expansion of N, from digits 0 to e-1.  The digits are given in a list, and come with leading zeros.  If fewer than e digits are required, the list is padded with zeros.  If more digits are required, the final digit lists them.  Little endian is first.  For example, if p=5 and N = 16, the basePExpMaxE(16,5,4) will return {1,3,0,0} (1 one, 3 fives, 0 twentyfives, 0 onehundred twentyfives).
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 doc ///
      Key
      	binomialFPT
@@ -3076,6 +3071,10 @@ doc ///
 	Text
 	    Returns the F-pure threshold of a binomial in a polynomial ring.  This is based on the work of Daniel Hernandez.
 ///
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 doc ///
      Key
@@ -3114,6 +3113,10 @@ doc ///
 	    Returns the denominator of a rational number or integer (in the latter case it returns 1).
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 doc ///
      Key
      	diagonalFPT
@@ -3129,6 +3132,10 @@ doc ///
 	Text
 	    Returns the F-pure threshold of a diagonal hypersurface in a polynomial ring.  This is based on the work of Daniel Hernandez.
 ///
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 doc ///
      Key
@@ -3172,6 +3179,10 @@ doc ///
 	     Given a rational number t and prime p, this function finds a list of integers {a,b,c} such that t= (a/(p^b p^(c-1)).
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 doc ///
      Key
      	 estFPT
@@ -3191,6 +3202,11 @@ doc ///
      	  Text 
 	      This tries to find an exact value for the fpt.  If it can, it returns that value.  Otherwise it should return a range of possible values (eventually).  It first checks to see if the ring is binonmial or diagonal.  In either case it uses methods of D. Hernandez.  Next it tries to estimate the range of the FPT using nu's.  Finally, it tries to use this to deduce the actual FPT via taking advantage of convexity of the F-signature function and a secant line argument.  finalCheck is a Boolean with default value True that determines whether the last isFRegularPoly is run (it is possibly very slow).  If FinalCheck is false, then a last time consuming check won't be tried.  If it is true, it will be.  Verbose set to true displays verbose output.
 ///
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 --- START: Transfered to EthRootDoc
@@ -3284,6 +3300,10 @@ doc ///
 	     Set w = {x,y} a list of rational numbers in [0,1].  Finds the first place where (the eth digit of x) + (the eth digit of y) >= p, in other words where the numbers add with carrying.
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 doc ///
      Key
      	 FPTApproxList
@@ -3332,6 +3352,10 @@ doc ///
 		performance: FPT2VarHomog({L1,...,Ln},{a1,...,an}).
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 doc ///
      Key
      	 frobeniusPower
@@ -3367,6 +3391,10 @@ doc ///
 	Text
 	     This computes the F-signature $s(R, f^{a/p^e})$ if R is a polynomial ring over a perfect field.
 ///
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 doc ///
      Key
@@ -3412,6 +3440,10 @@ doc ///
  	     This returns a list of nuHat_I^J(p^d)/p^d for d = 1, ..., e.  The {nuHat_I^J(p^d)/p^d} converge to the FHat-threshold.	     
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 doc ///
      Key
      	genFrobeniusPower 
@@ -3429,6 +3461,10 @@ doc ///
 	     Computes I^[N] for an ideal I and an integer N, where I^[N] is defined as follows. If N's base P-expansion is N=n_0+n_1P+...+n_eP^e then I^[N]=I^(n_0)*(I^(n_1))^[P]*...*(I^(n_e))^[P^e]. When P is prime I^[P^e] is the usual Frobenius power.
  ///
  
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 doc ///
      Key
      	guessFPT 
@@ -3516,6 +3552,10 @@ doc ///
 	     Returns true if t is the FPT, otherwise it returns false.  If Origin is true, it only checks it at ideal(vars ring f).
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 doc ///
      Key
      	 isFPure 
@@ -3597,6 +3637,10 @@ doc ///
 	Text
 	     This checks whether (R, f^(a/(p^e-1))) is F-pure at the prime ideal m at least in the case that R is a polynomial ring.
 ///
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 doc ///
      Key
@@ -3701,6 +3745,10 @@ doc ///
 	Text
 	     Given an ideal I in a polynomial ring k[x1,...,xn], this function computes nuHat(I,d) for d = 1,...,e. If a RingElement is passed, it computes nuHat of the principal ideal generated by this element for d=1,...,e
 ///
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 doc ///
      Key
@@ -3908,11 +3956,3 @@ doc ///
 ///
 
 end
-
---**********************************
---Changes in 0.2a
-----Fixed some typos in documentation and comments
-----Commented out moduleToIdeal, replaced with needsPackage "Divisor" which has a better version of moduleToIdeal
---- Fixed things
-
----Zhibek was here 
