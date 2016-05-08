@@ -857,7 +857,8 @@ nonZeroFilter (List,ZZ,RR) := (sols,k,tol) -> (
 -- NUMERICAL IRREDUCIBLE DECOMPOSITION --
 -----------------------------------------
 
-numericalIrreducibleDecomposition=method(TypicalValue=>NumericalVariety, Options=>{StartDimension=>-1})
+numericalIrreducibleDecomposition=method(TypicalValue=>NumericalVariety,
+  Options=>{StartDimension=>-1})
 numericalIrreducibleDecomposition (List) := o -> (L) -> (
   --IN: an ideal, top dimension
   --OUT: a NumericalVariety
@@ -1146,7 +1147,8 @@ topWitnessSet (List,ZZ) := o->(system,dimension) -> (
 -- TRACK PATHS --
 -----------------
 
-trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false, interactive => false})
+trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2,
+  Verbose => false, numThreads=>0, seeProgress=>false, interactive => false})
 trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   -- IN: T, target system to be solved;
   --     S, start system with solutions in Ssols;
@@ -1200,7 +1202,7 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
     run(PHCexe|" -z "|outfile|" "|Tsolsfile);
       
   ) else (
-    bat := openOut batchfile;
+    bat = openOut batchfile; -- complaint with :=
   if not (o.numThreads > 1) then (
     bat << targetfile << endl << outfile << endl <<"n"<< endl 
     << startfile << endl << Ssolsfile << endl;
