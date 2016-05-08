@@ -144,7 +144,6 @@ isLicci Ideal := opts -> I -> (
 isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
     ))
 
-<<<<<<< HEAD
 depth Module := profondeur
 
 profondeur = method()
@@ -182,7 +181,7 @@ isStronglyCM = method()
 isStronglyCM(Ideal) := I -> (
     d := dim I;
     all(koszulDepth I,i -> i==d)
-=======
+
 -------------------------------------
 -- G_d Code
 -------------------------------------
@@ -213,7 +212,6 @@ maxGd Ideal := J -> (
 residualCodims = method()
 residualCodims Ideal := J -> (
     toList select((codim J + 1..numgens ring J + 1), i->numgensByCodim(J,i-1) <= i)
->>>>>>> c8d830a78b2c1382141510c2b2910e194d2a170f
     )
 
 doc ///
