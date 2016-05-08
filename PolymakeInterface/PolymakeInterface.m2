@@ -19,6 +19,7 @@ newPackage(
 		     HomePage => "http://math.berkeley.edu/~brandtm/"}
 		},
     	Headline => "a package for interfacing with polymake",
+	PackageExports => {"PolyhedralObjects"},
     	DebuggingMode => true
     	)
 
@@ -35,9 +36,6 @@ export {
 ---------------------------------------------------------------------------
 -- Code
 ---------------------------------------------------------------------------
-
-needsPackage "SimpleDoc"
-needsPackage "PolyhedralObjects"
 
 runPolymakePrefix = "polymake"
 
@@ -64,46 +62,76 @@ emptyMatrixWithSource = (sourceDimensionPropertyName) -> (
           map(QQ^0,QQ^sourceDimension,0)
 	  )
      )
-
 propertyTypes = {
+     {    
+	  "M2PropertyName" => "AffineHull",
+	  "PolymakePropertyName" => "AFFINE_HULL",
+	  "ValueType" => "Matrix",
+	  "EmptyMatrixFallback" => emptyMatrixWithSource("ConeAmbientDim")
+	  },   
+     {    
+	  "M2PropertyName" => "AmbientDim",
+	  "PolymakePropertyName" => "AMBIENT_DIM",
+	  "ValueType" => "Integer"
+	  }, 
+    {    
+	  "M2PropertyName" => "BoundaryLatticePoints",
+	  "PolymakePropertyName" => "BOUNDARY_LATTICE_POINTS",
+	  "ValueType" => "Matrix"
+	  },
+     {    
+	  "M2PropertyName" => "Bounded",
+	  "PolymakePropertyName" => "BOUNDED",
+	  "ValueType" => "Boolean"
+	  },
+     {    
+	  "M2PropertyName" => "ConeAmbientDim",
+	  "PolymakePropertyName" => "CONE_AMBIENT_DIM",
+	  "ValueType" => "Integer"
+	  },
      {    
 	  "M2PropertyName" => "ConeDim",
 	  "PolymakePropertyName" => "CONE_DIM",
 	  "ValueType" => "Integer"
+	  },    
+     {    
+	  "M2PropertyName" => "EhrhartPolynomialCoeff",
+	  "PolymakePropertyName" => "EHRHART_POLYNOMIAL_COEFF",
+	  "ValueType" => "Array"
 	  },
-     {    
-	  "M2PropertyName" => "ConeAmbientDim",
-	  "PolymakePropertyName" => "CONE_AMBIENT_DIM",
-	  "ValueType" => "Integer"
-	  },
-     {    
-	  "M2PropertyName" => "ConeAmbientDim",
-	  "PolymakePropertyName" => "CONE_AMBIENT_DIM",
-	  "ValueType" => "Integer"
-	  },     
-     {    
-	  "M2PropertyName" => "LatticeVolume",
-	  "PolymakePropertyName" => "LATTICE_VOLUME",
-	  "ValueType" => "Integer"
-	  },     
      {   
-	  "M2PropertyName" => "InputLineality",
-	  "PolymakePropertyName" => "INPUT_LINEALITY",
+	  "M2PropertyName" => "Equations",
+	  "PolymakePropertyName" => "EQUATIONS",
+	  "ValueType" => "Matrix"
+	  }, 
+     {   
+	  "M2PropertyName" => "Facets",
+	  "PolymakePropertyName" => "FACETS",
 	  "ValueType" => "Matrix"
 	  },
-     {   
-	  "M2PropertyName" => "LinealitySpace",
-	  "PolymakePropertyName" => "LINEALITY_SPACE",
-	  "ValueType" => "Matrix",
-	  "EmptyMatrixFallback" => emptyMatrixWithSource("ConeAmbientDim")	  },     
+     {    
+	  "M2PropertyName" => "Feasible",
+	  "PolymakePropertyName" => "FEASIBLE",
+	  "ValueType" => "Boolean"
+	  },
      {    
 	  "M2PropertyName" => "FVector",
 	  "PolymakePropertyName" => "F_VECTOR",
 	  "ValueType" => "Vector"
 	  },
+     {    
+	  "M2PropertyName" => "HilbertBasis",
+	  "PolymakePropertyName" => "HILBERT_BASIS",
+	  "ValueType" => "Matrix"
+	  },  
      {   
-	  "M2PropertyName" => "Points",
-	  "PolymakePropertyName" => "POINTS",
+	  "M2PropertyName" => "Inequalities",
+	  "PolymakePropertyName" => "INEQUALITIES",
+	  "ValueType" => "Matrix"
+	  },
+     {   
+	  "M2PropertyName" => "InputLineality",
+	  "PolymakePropertyName" => "INPUT_LINEALITY",
 	  "ValueType" => "Matrix"
 	  },
      {    
@@ -112,78 +140,48 @@ propertyTypes = {
 	  "ValueType" => "Matrix"
 	  },
      {    
-	  "M2PropertyName" => "LatticePointsGenerators",
-	  "PolymakePropertyName" => "LATTICE_POINTS_GENERATORS",
-	  "ValueType" => "Matrix"
-	  },
-     {    
 	  "M2PropertyName" => "InteriorLatticePoints",
 	  "PolymakePropertyName" => "INTERIOR_LATTICE_POINTS",
 	  "ValueType" => "Matrix"
 	  },
-    {    
-	  "M2PropertyName" => "BoundaryLatticePoints",
-	  "PolymakePropertyName" => "BOUNDARY_LATTICE_POINTS",
-	  "ValueType" => "Matrix"
+     {    
+	  "M2PropertyName" => "LatticePointsGenerators",
+	  "PolymakePropertyName" => "LATTICE_POINTS_GENERATORS",
+	  "ValueType" => "LatticePointsGenerators"
 	  },
      {    
-	  "M2PropertyName" => "EhrhartPolynomialCoeff",
-	  "PolymakePropertyName" => "EHRHART_POLYNOMIAL_COEFF",
-	  "ValueType" => "Array"
-	  },
-     {    
-	  "M2PropertyName" => "HilbertBasis",
-	  "PolymakePropertyName" => "HILBERT_BASIS",
-	  "ValueType" => "Matrix"
-	  },          
-     {    
-	  "M2PropertyName" => "Rays",
-	  "PolymakePropertyName" => "RAYS",
-	  "ValueType" => "Matrix"
+	  "M2PropertyName" => "LatticeVolume",
+	  "PolymakePropertyName" => "LATTICE_VOLUME",
+	  "ValueType" => "Integer"
 	  },     
-     {    
-	  "M2PropertyName" => "Vertices",
-	  "PolymakePropertyName" => "VERTICES",
-	  "ValueType" => "Matrix"
-	  },
+     {   
+	  "M2PropertyName" => "LinealitySpace",
+	  "PolymakePropertyName" => "LINEALITY_SPACE",
+	  "ValueType" => "Matrix",
+	  "EmptyMatrixFallback" => emptyMatrixWithSource("ConeAmbientDim")	  },     
      {    
 	  "M2PropertyName" => "LinearSpan",
 	  "PolymakePropertyName" => "LINEAR_SPAN",
 	  "ValueType" => "Matrix",
 	  "EmptyMatrixFallback" => emptyMatrixWithSource("ConeAmbientDim")
 	  },
-     {    
-	  "M2PropertyName" => "AffineHull",
-	  "PolymakePropertyName" => "AFFINE_HULL",
-	  "ValueType" => "Matrix",
-	  "EmptyMatrixFallback" => emptyMatrixWithSource("ConeAmbientDim")
-	  },     
      {   
-	  "M2PropertyName" => "Facets",
-	  "PolymakePropertyName" => "FACETS",
+	  "M2PropertyName" => "Points",
+	  "PolymakePropertyName" => "POINTS",
 	  "ValueType" => "Matrix"
 	  },
-     {   
-	  "M2PropertyName" => "Inequalities",
-	  "PolymakePropertyName" => "INEQUALITIES",
-	  "ValueType" => "Matrix"
-	  },
-     {   
-	  "M2PropertyName" => "Equations",
-	  "PolymakePropertyName" => "EQUATIONS",
-	  "ValueType" => "Matrix"
-	  },          
      {    
-	  "M2PropertyName" => "Feasible",
-	  "PolymakePropertyName" => "FEASIBLE",
-	  "ValueType" => "Boolean"
-	  },
+	  "M2PropertyName" => "Rays",
+	  "PolymakePropertyName" => "RAYS",
+	  "ValueType" => "Matrix"
+	  },                  
      {    
-	  "M2PropertyName" => "Bounded",
-	  "PolymakePropertyName" => "BOUNDED",
-	  "ValueType" => "Boolean"
+	  "M2PropertyName" => "Vertices",
+	  "PolymakePropertyName" => "VERTICES",
+	  "ValueType" => "Matrix"
 	  }
-     };
+}
+            
 
 propertyTypes = apply(propertyTypes, x -> new HashTable from x);
 polymakePropertyNameToValueType = new HashTable from apply(propertyTypes, x -> (x#"PolymakePropertyName",x#"ValueType"));
@@ -257,6 +255,21 @@ parseMatrixProperty(PolyhedralObject,String) := (P, propertyName) -> (
           makeMatrix(result)
 	  )
      )
+-- For polymake functions that return a list of matrices
+-- e.g. LATTICE_POINTS_GENERATORS 
+parseLatticePointsGenerators = method(TypicalValue => List)
+parseLatticePointsGenerators(PolyhedralObject,String) := (P, propertyName) -> (
+     script := "use application \"polytope\";
+         my $object = load(\""|(P#cache#"PolymakeFile")|"\");
+	 print $object->"|propertyName|";";
+     results := runPolymake(script);
+     results = separate(">\n",results);
+     results=delete("",results);
+     results = apply(results, i -> substring(i,1,#i-1));  
+     for result in results list (  
+         if result=="" then map(QQ^0,QQ^0,0) else makeMatrix(result)
+     )
+)
 
 parseProperty = method()
 parseProperty(PolyhedralObject,String) := (P, propertyName) -> (
@@ -273,6 +286,9 @@ parseProperty(PolyhedralObject,String) := (P, propertyName) -> (
      else if (valueType=="Matrix") then (
 	  parseMatrixProperty(P,propertyName)
 	  )
+     else if (valueType=="LatticePointsGenerators") then (
+	  parseLatticePointsGenerators(P,propertyName)
+     )
      else (
 	  parseUnknownProperty(P,propertyName)
 	  )
@@ -792,10 +808,9 @@ TEST ///
 TEST ///
     needsPackage "PolyhedralObjects";
     P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,2},{1,2,0},{1,2,2}}};
-    runPolymake(P,"InteriorLatticePoints");
-    runPolymake(P,"LatticePointsGenerators");
-    runPolymake(P,"BoundaryLatticePoints");
-    result = getPropertyNames(P);
+    LPG=runPolymake(P,"LatticePointsGenerators");
+    assert( LPG ==
+{matrix {{1/1, 0, 0}, {1, 0, 1}, {1, 0, 2}, {1, 1, 0}, {1, 1, 1}, {1, 1, 2}, {1, 2, 0}, {1, 2, 1}, {1, 2, 2}}, map(QQ^0,QQ^0,0), map(QQ^0,QQ^0,0)})
 ///
 
 TEST ///
@@ -854,6 +869,8 @@ TEST ///
     result = runPolymake(P,"FVector");
     assert (result=={4,4});
 ///
+
+
 
 TEST ///
     needsPackage "PolyhedralObjects";
