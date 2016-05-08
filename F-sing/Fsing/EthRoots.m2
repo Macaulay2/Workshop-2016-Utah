@@ -243,3 +243,238 @@ ethRoot(Ideal,ZZ) := (Im,e) -> (
      );
      J
 )
+
+
+----------------------------------------------------------------
+--************************************************************--
+--Functions for computing test ideals, and related objects.   --
+--************************************************************--
+----------------------------------------------------------------
+
+
+--Finds the smallest phi-stable ideal containing the given ideal Jk
+--in a polynomial ring Sk
+--Jk is the given ideal, ek is the power of Frobenius to use, hk is the function to multiply 
+--trace by to give phi:  phi(_) = Tr^(ek)(hk._)
+--This is based on ideas of Moty Katzman, and his star closure
+ascendIdeal = (Jk, hk, ek) -> (
+     Sk := ring Jk;
+     pp := char Sk;
+     IN := Jk;
+     IP := ideal(0_Sk);
+     --we want to make the largest ideal that is phi-stable, following Moty Katzman's idea
+     --we do the following
+     while (isSubset(IN, IP) == false) do(
+     	  IP = IN;
+--	  error "help";
+	  IN = eR(ideal(hk)*IP, ek)+IP
+     );
+
+     --trim the output
+     trim IP
+)
+
+--Works like ascendIdeal but tries to minimize the exponents elements are taken to
+ascendIdealSafe = (Jk, hk, ak, ek) -> (
+	Sk := ring Jk;
+     pp := char Sk;
+     IN := Jk;
+     IP := ideal(0_Sk);
+     --we want to make the largest ideal that is phi-stable, following Moty Katzman's idea
+     --we do the following
+     while (isSubset(IN, IP) == false) do(
+     	  IP = IN;
+--	  error "help";
+	  	IN = ethRootSafe(hk, IP, ak, ek)+IP
+     );
+
+     --trim the output
+     trim IP
+)
+
+
+
+
+--works just like ascendIdealSafe but also handles lists of hk to powers...
+ascendIdealSafeList ={AscentCount=>false} >> o ->  (Jk, hkList, akList, ek) -> (
+	Sk := ring Jk;
+	pp := char Sk;
+	IN := Jk;
+	IP := ideal(0_Sk);
+	i1 := 0;
+	--we ascend the ideal as above
+	while (isSubset(IN, IP) == false) do(
+		i1 = i1 + 1; --
+		IP = IN;
+		IN = ethRootSafeList( hkList, IP, akList, ek) + IP
+	);
+	
+	--trim the output
+	if (o.AscentCount == false) then 
+		trim IP
+	else (trim IP, i1)
+)
+
+--MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
+-- minimalCompatible is a method which is implemented as:
+-- (1) the finding of the smallest ideal J which satisfies uJ\subset J^{[p^e]} 
+---    containg a given ideal for a given ring element u,
+-- (2) the finding of the smallest submodule V of a free module which satisfies UV\subset V^{[p^e]} 
+--     containg a given submodule for a given matrix U.
+minimalCompatible = method();
+minimalCompatible(Ideal,RingElement,ZZ) :=  (Jk, hk, ek) -> ascendIdeal (Jk, hk, ek)
+minimalCompatible(Ideal,RingElement,ZZ,ZZ) :=  (Jk, hk, ak, ek) -> ascendIdealSafe (Jk, hk, ak, ek)
+minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
+
+--MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
+
+
+
+-----------------------------------------------------------------------------
+--- Extend the Frobenius p^e th roots and star operations to submodules of
+--- free modules (over polynomial rings with *prime* coeeficient field)
+--- This implements the methods described in 
+--- Moty Katzman and Wenliang Zhang's paper
+--- "Annihilators of Artinian modules compatible with a Frobenius map"
+--- Journal of Symbolic computation, 2014
+
+-----------------------------------------------------------------------------
+
+
+getExponents=(f)->(
+answer:={};
+t:=terms(f);
+apply(t, i->
+{
+	exps:=first exponents(i);
+	c:=(coefficients(i))#1;
+	c=first first entries c;
+	answer=append(answer,(c,exps));
+});
+answer
+)
+
+mEthRootOfOneElement= (v,e) ->(
+	local i; local j;
+	local d;
+	local w;
+	local m;
+	local answer;
+	R:=ring(v); p:=char R; q:=p^e;
+	F:=coefficientRing(R);
+	n:=rank source vars(R);
+	V:=ideal vars(R);
+	vv:=first entries vars(R);
+	T:=new MutableHashTable;
+	alpha:=rank target matrix(v);
+	B:={};
+	for i from 1 to alpha do
+	{
+		vi:=v_(i-1);
+		C:=getExponents(vi);
+---print(vi,C);
+		apply(C, c->
+		{
+			lambda:=c#0;
+			beta:=c#1;
+			gamma:=apply(beta, j-> (j%q));
+			B=append(B,gamma);
+			key:=(i,gamma);
+---print(beta, #beta,vv);
+			data:=apply(1..(#beta), j-> vv_(j-1)^((beta#(j-1))//q));
+			data=lambda*product(toList data);
+---print(beta, key, data);
+			if (T#?key) then
+			{
+				T#key=(T#key)+data;
+			}
+			else
+			{
+				T#key=data;
+			};
+		});
+	};
+	B=unique(B);
+	TT:=new MutableHashTable;
+	apply(B, b->
+	{
+		ww:={};
+		for i from 1 to alpha do if T#?(i,b) then ww=append(ww,T#(i,b)) else ww=append(ww,0_R);
+		ww=transpose matrix {ww};
+		TT#b=ww;
+	});
+	KEYS:=keys(TT);
+	answer=TT#(KEYS#0);
+	for i from 1 to (#KEYS)-1 do answer=answer | TT#(KEYS#i);
+	answer
+)
+
+
+
+
+
+mEthRoot = (A,e) ->(
+	local i;
+	local answer;
+	answer1:=apply(1..(rank source A), i->mEthRootOfOneElement (A_{i-1},e));
+	if (#answer1==0) then 
+	{
+		answer=A;
+	}	
+	else
+	{
+		answer=answer1#0;
+		apply(2..(#answer1), i->answer=answer | answer1#(i-1));
+	};
+	mingens( image answer )
+)	
+
+
+ethRoot (Matrix, ZZ) := (A,e) -> mEthRoot (A,e)  --- MK
+
+
+
+
+
+
+--- Mstar is the implementaion of the star closure operation desribed in 
+--- M Katzman's "Parameter test ideals of Cohen Macaulay rings" 
+--- Input:
+---    ideals I and element u of the same polynomial ring R OVER A PRIME FIELD.
+---    a positive integer e
+---    a prime p which is the characteristic of R
+--- Output:
+---    the smallest ideal J of R containing I with the property that u^(1+p+...+p^(e-1)) J is in J^{[p^e]}
+Mstar = (A,U,e) ->(
+	local answer;
+	R:=ring(A); p:=char R;
+	if (A==0) then
+	{
+		answer=A;
+	}
+	else
+	{
+		f:=true;
+		Ne:=sum toList(apply(0..(e-1), i->p^i));
+		lastA:= A;
+		while (f) do
+		{
+			f=false;
+			A1:=mEthRoot(mingens image ((U^Ne)*lastA),e);
+			A1=A1 | lastA;
+			t1:=compress ((A1))%((lastA));
+			if (t1!=0) then 
+			{
+				f=true;
+				lastA=mingens image A1;
+			};
+		};
+		answer=mingens (image A1);
+	};
+	use(R);
+	answer
+)
+
+
+--- end of MK ---------------------------------------------------------------------------------------------------
+
