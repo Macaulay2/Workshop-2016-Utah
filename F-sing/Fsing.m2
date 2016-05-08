@@ -92,6 +92,10 @@ export{
     "minimalCompatible",
     "paraTestModule",
     "paraTestModuleAmbient",
+    "findAllCompatibleIdeals", ---MK	
+    "minimalCompatible",
+    "paraTestModule", ---MK
+    "paraTestModuleAmbient" ---MK
 }
 
 --*************************************************
