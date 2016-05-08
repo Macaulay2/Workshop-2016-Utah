@@ -31,9 +31,9 @@ export {
 	"testNewSimplex",
         "idealFromSC",
 	"idealChainFromSC",
-        "isShelling"
-    }
-     
+        "isShelling",
+	"randomShellableIdeal"
+     }
 
 randomMonomial = method(TypicalValue => RingElement)
 randomMonomial(ZZ,Ring) := RingElement => (d,S) -> (
@@ -312,6 +312,7 @@ idealFromSC List := P -> (
     )
 
 idealChainFromSC = method()
+idealChainFromSC(List,Ring) := (P,S) -> toList apply(#P,i->idealFromSC(take(P,i+1),S))
 idealChainFromSC List := P -> toList apply(#P,i->idealFromSC(take(P,i+1)))
 
 isShelling = method()
@@ -330,6 +331,16 @@ randomChain(ZZ,ZZ,ZZ) := (n,m,k) -> (
     while #P < k do P = randomAddition(n,m,P);
     P
     )
+randomShellableIdeal=method()
+randomShellableIdeal(Ring,ZZ,ZZ) := (R,dimProj,deg) -> (
+    idealFromSC randomChain(numgens R ,dimProj, deg))
+
+///
+S = ZZ/101[x_0..x_5]
+I = randomShellableIdeal(S,2,5)
+dim I == 3
+degree I == 5
+///
 
 randomChain(Ring,ZZ,ZZ) := (R,m,k) -> listsToMonomials(randomChain(numgens R,m,k),R)
 randomChain(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomChain(numgens R,m),R)
