@@ -419,17 +419,21 @@ doc ///
      Key
           randomAddition
 	  (randomAddition,ZZ,ZZ,List)
+	  (randomAddition,Ring,ZZ,List)
      Headline
           Adds a random facet to a shellable complex
      Usage
           p=randomAddition(n,m,P)
+	  p=randomAddition(R,m,P)
      Inputs
      	  n:ZZ
-	       the number of vertices
+	       the number of vertices (if a ring is specified, {\tt n} is the number of variables. 
 	  m:ZZ
 	       the dimension of the new facet
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
+	  R:Ring
+	      A polynomial ring. 
      Outputs
           p:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
@@ -501,7 +505,7 @@ doc ///
 	     Outputs the Stanley-Reisner ideal for each successive simplicial complex formed by truncating the simplicial complex. 
 	  Example
 	      P =  {{1, 2, 4}, {0, 1, 4}, {0, 2, 4}, {0, 3, 4}};
-	      idealChainFromSC(P,S)
+	      idealChainFromSC(P)
          
      
 ///
