@@ -247,20 +247,6 @@ testNewSimplex(List, List) := (P, D) ->(
      all(smalls, e -> any(antiFacets, v -> not member(v,e)))
 )
 
-subsetList = (A,B) -> (
-    --checks if A\subset B. requires that both lists be sorted
-    lenA := #A;
-    lenB := #B;
-    a := 0;
-    b := 0;
-    while (lenA-a)<=(lenB-b) and a<lenA and b<lenB do (
-        if A_a<B_b then return false;
-        if A_a==B_b then a=a+1;
-        b = b+1;
-    );
-    a==lenA
-)
-
 intersectLists = (D',D) -> D - set(D-set D')
 
 randomSubset = (n,m) -> (
