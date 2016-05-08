@@ -99,6 +99,10 @@ isLicci Ideal := opts -> I -> (
 isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
     ))
 
+-------------------------------------
+-- G_d Code
+-------------------------------------
+
 numgensByCodim = method()	
 numgensByCodim (Ideal,ZZ) := (J,k) -> (
     R := ring J;
@@ -109,6 +113,11 @@ numgensByCodim (Ideal,ZZ) := (J,k) -> (
 	M = map(R,R,matrix{toList M});
 	numgens trim M J
 	)
+    )
+
+numgensByCodim Ideal := J -> (
+    n := numgens ring J;
+    toList apply(n+1, i->numgensByCodim(J,i))
     )
 
 doc ///
@@ -202,7 +211,6 @@ I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
 isLicci(3, codim I, I)
 linkageBound (I, UseNormalModule => false)
 linkageBound (I, UseNormalModule => true)
-apply(4,i->numgensByCodim(I,i))
 
 I = minors(2, random(S^2, S^{4:-1}))
 isLicci(3, codim I, I)
