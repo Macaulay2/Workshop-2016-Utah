@@ -56,6 +56,8 @@ export{
 	"generatingRoot", ---MK
 	"FFiniteSupport", ---MK
 	"findAllCompatibleIdeals", ---MK	
+	"generatingMorphism", ---MK
+	"findGeneratingMorphisms", ---MK
     "minimalCompatible"
     "paraTestModule", ---MK
     "paraTestModuleAmbient" ---MK
