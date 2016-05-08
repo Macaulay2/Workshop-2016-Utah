@@ -3082,7 +3082,7 @@ generatingMorphism= (I,i) ->(
 --Cp=subquotient(gens Kp,F0p);
 	C1p:=prune(Cp);
 	hp:=C1p.cache.pruningMap;
-	A0:=gens(Kp)*matrix(entries hp); A=A0| F0p;
+	A0:=gens(Kp)*matrix(entries hp); A:=A0| F0p;
 	gbA:=gb(A, ChangeMatrix => true) ;
 	B:=generatingMorphism0// A;
 --- Now generatingMorphism0=A*B
