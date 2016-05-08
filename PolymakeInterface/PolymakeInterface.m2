@@ -486,7 +486,7 @@ doc ///
      The current polymake interface assumes that you can run the command {\tt polymake [script_file]} in the terminal to run a polymake script. To check if this works, just type {\tt polymake} in a terminal window. However, this does not work on some Mac machines. If you have this problem, see @HREF "https://github.com/Macaulay2/Workshop-2016-Utah/wiki/Running-polymake-on-a-Mac"@.
 
    Text
-     We can use the interface to get properties of @TO "PolyhedralObjects"@
+     We can use the interface to get properties of @TO "PolyhedralObjects"@.  Here is a list of @TO "Available properties"@.
 
    Example
      --needsPackage "PolyhedralObjects";
@@ -535,27 +535,49 @@ doc ///
   Description
    Text 
      "AffineHull"
+     
      "AmbientDim"
+     
      "BoundaryLatticePoints"
+     
      "Bounded"
+     
      "ConeAmbientDim"
+     
      "ConeDim"
+     
      "EhrhartPolynomialCoeff"
+     
      "Equations"
+     
      "Facets"
+     
      "Feasible"
+     
      "FVector"
+     
      "HilbertBasis"
+     
      "Inequalities"
+     
      "InputLineality"
+     
      "InputRays"
+     
      "InteriorLatticePoints"
+     
      "LatticePointsGenerators"
+     
      "LatticeVolume"
+     
      "LinealitySpace"
+     
      "LinearSpan"
+     
      "Points"
+     
      "Rays"
+     
      "Vertices"
      
 ///
