@@ -12,17 +12,61 @@ newPackage ( "ResidualIntersections",
     DebuggingMode => true
     )
 
-
 export {
 	"isLicci",
 	"minimalRegularSequence",
 	"linkageBound",
 	"UseNormalModule",
 	"randomRegularSequence",
+	"genericResidual",
+	"genericArtinNagata",
 	"numgensByCodim",
-	"maxGd"
+	"maxGd",
+	"residualCodims",
+        "koszulDepth",
+        "isStronglyCM"
         };
 
+--Generic Artin-Nagata Code
+genericArtinNagata = method()
+genericArtinNagata(ZZ,Ideal) := (s,I) -> (
+    needsPackage "MCMApproximations";
+    S := ring I;
+    K := genericResidual(s,I);
+    s' := codim K;
+    if s' === s then 
+      codepth := numgens (ring K) - depth ((ring K)^1/K)
+    else codepth = -1;
+    {s',codepth,K}
+    )
+    --tests whether the generic link is CM
+
+genericResidual = method()
+genericResidual(ZZ,Ideal):= (s,I) ->(
+    if s>= numgens I then return ideal(1_(ring I));
+    sgens := sort gens I;
+    rgens := (sgens)*random(source sgens, source sgens);
+    n := numcols rgens;
+    (ideal (rgens_{n-s..n-1})): I
+    )
+
+///
+restart
+loadPackage("RandomIdeal", Reload => true)
+loadPackage("ResidualIntersections", Reload =>true)
+S = ZZ/32003[x_0..x_5]
+--6 vars
+I = randomShellableIdeal(S,2,4)
+S = ZZ/32003[x_0..x_3]
+I = minors(3, random(S^3, S^{-2,-3,-4,-5}));
+--codim 3
+codim I
+s = 2;
+codim genericResidual(3,I)
+L = genericArtinNagata(s,I);
+L_{0,1}
+///
+---Licci code
 randomLink = method()
 randomLink (ZZ,Ideal) := (c,I) ->(
 {*
@@ -100,6 +144,46 @@ isLicci Ideal := opts -> I -> (
 isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
     ))
 
+depth := profondeur;
+
+
+profondeur = method()
+profondeur(Ideal, Module) := (I,M) ->(
+    --requires R to be an affine ring (eg NOT ZZ[x])
+    R := ring M;
+    d := max(1,dim M); -- d=0 causes a crash
+    if not isCommutative R then error"profondeur undefined for noncommutative rings";
+    F := M**dual res (R^1/I, LengthLimit => d);
+    i := 0;
+    while HH_i F == 0 do i=i-1;
+    -i)
+
+profondeur Module := M -> (
+    --profondeur of a module with respect to the max ideal, via finite proj dim
+    --gives error if the ultimate coeficient ring of R = ring M is not a field.
+    R := ring M;
+    if not isCommutative R then error"profondeur undefined for noncommutative rings";
+    (S,F) := flattenRing R;
+    if not isField coefficientRing S then error"input must be a module over an affine ring";
+    S0 := ring presentation S;
+    r := F*map(S,S0);
+    MM := pushForward(r,M);
+    numgens S0 - pdim MM)
+
+profondeur Ring := R -> profondeur R^1
+
+koszulDepth = method()
+koszulDepth(Ideal) := I -> (
+    C := koszul mingens I;
+    for i in 0..(numColumns(mingens I)-codim I) list depth HH_i(C)
+    )
+
+isStronglyCM = method()
+isStronglyCM(Ideal) := I -> (
+    d := dim I;
+    all(koszulDepth I,i -> i==d)
+    )
+
 -------------------------------------
 -- G_d Code
 -------------------------------------
@@ -123,10 +207,18 @@ numgensByCodim Ideal := J -> (
 
 maxGd = method()
 maxGd Ideal := J -> (
-    for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i-1;
-    numgens ring J
+    for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i;
+    infinity
     )
 
+residualCodims = method()
+residualCodims Ideal := J -> (
+    toList select((codim J + 1..numgens ring J + 1), i->numgensByCodim(J,i-1) <= i)
+    )
+
+------------------------------------------------------------
+-- DOCUMENTATION isLicci
+------------------------------------------------------------
 doc ///
    Key
     isLicci
@@ -164,6 +256,9 @@ doc ///
     randomRegularSequence
     randomLink
 ///
+------------------------------------------------------------
+-- DOCUMENTATION UseNormalModule
+------------------------------------------------------------
 doc ///
    Key
     UseNormalModule
@@ -182,7 +277,11 @@ doc ///
     isLicci
     linkageBound
 ///
-   
+
+------------------------------------------------------------
+-- DOCUMENTATION linkageBound
+------------------------------------------------------------
+
 doc ///
    Key
     linkageBound
@@ -203,6 +302,30 @@ doc ///
    SeeAlso
     isLicci
 ///
+
+------------------------------------------------------------
+-- DOCUMENTATION minimalRegularSequence
+------------------------------------------------------------
+doc ///
+   Key
+    minimalRegularSequence
+    (minimalRegularSequence,ZZ,Ideal)    
+   Headline
+    finds a maximal regular sequence of minimal degree in an ideal
+   Usage
+    J=minimalRegularSequence(n,I)
+   Inputs
+    n:ZZ
+    I:Ideal
+   Outputs
+    J:Ideal
+   Description
+    Text
+    Example
+   Caveat
+   SeeAlso
+///
+
 
 end--
    
@@ -236,7 +359,8 @@ time linkageBound (I, UseNormalModule => true)
 restart
 loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
-J = idealFromSC randomChain(10,5,20);
-numgensByCodim J
-maxGd J
+J = idealChainFromSC randomChain(10,5,20);
+J/maxGd
+J/residualCodims
+
 ///

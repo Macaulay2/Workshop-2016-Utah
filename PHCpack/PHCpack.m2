@@ -289,6 +289,8 @@ systemFromFile (String) := (name) -> (
   L := lines(s);
   dimL0 := separate(" ", L_0); -- deal with case of nonsquare systems
   n := value dimL0_0;          -- first is always number of equations
+  if n == null then
+    n = value dimL0_1;         -- deal with leading spaces
   result := {};
   i := 0; j := 1;
   local stop;
@@ -833,6 +835,7 @@ mixedVolume  List := Sequence => opt -> system -> (
       then result = (mixvol,stabmv,p,sols)
       else result = (mixvol,p,sols);
   ); 
+  if opt.interactive then result = (mixvol,stabmv,p,sols);
   result
 )
 
@@ -854,7 +857,8 @@ nonZeroFilter (List,ZZ,RR) := (sols,k,tol) -> (
 -- NUMERICAL IRREDUCIBLE DECOMPOSITION --
 -----------------------------------------
 
-numericalIrreducibleDecomposition=method(TypicalValue=>NumericalVariety, Options=>{StartDimension=>-1})
+numericalIrreducibleDecomposition=method(TypicalValue=>NumericalVariety,
+  Options=>{StartDimension=>-1})
 numericalIrreducibleDecomposition (List) := o -> (L) -> (
   --IN: an ideal, top dimension
   --OUT: a NumericalVariety
@@ -1143,7 +1147,8 @@ topWitnessSet (List,ZZ) := o->(system,dimension) -> (
 -- TRACK PATHS --
 -----------------
 
-trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false, interactive => false})
+trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2,
+  Verbose => false, numThreads=>0, seeProgress=>false, interactive => false})
 trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   -- IN: T, target system to be solved;
   --     S, start system with solutions in Ssols;
@@ -1197,7 +1202,7 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
     run(PHCexe|" -z "|outfile|" "|Tsolsfile);
       
   ) else (
-    bat := openOut batchfile;
+    bat = openOut batchfile; -- complaint with :=
   if not (o.numThreads > 1) then (
     bat << targetfile << endl << outfile << endl <<"n"<< endl 
     << startfile << endl << Ssolsfile << endl;
@@ -1572,7 +1577,7 @@ m = mixedVolume(f)
 --(mv,sv) = mixedVolume(f,StableMixedVolume => true)
 --mv = mixedVolume(f,interactive=>true)
 (mv,q,qsols) = mixedVolume(f,interactive=>true)
-(mv,q,qsols) = mixedVolume(f,StartSystem=>true,interactive=>true)
+(mv,smv,q,qsols) = mixedVolume(f,StartSystem=>true,interactive=>true)
 --mixedVolume(f,interactive=>true)
 --fsols = trackPaths(f,q,qsols)
 fsols = trackPaths(f,q,qsols, interactive=>true)
