@@ -85,11 +85,9 @@ doc ///
 	Key
 		imageOfMap
 		(imageOfMap,Matrix,Ideal,Ideal)
-		(imageOfMap,List,Ideal,Ideal)
 	Headline
 		Finds defining equations for the image of a rational map
 	Usage
-		image = imageOfMap(f,a,b)
 		image = imageOfMap(f,a,b)
 	Inputs
 		f: matrix or list 
