@@ -7,14 +7,16 @@
 ---------------------------------------------------------------------------
 newPackage("PolyhedralObjects",
     Headline => "A package with types for Polyhedra2, gfanInterface2, and PolymakeInterface",
-    Version => ".1",
+    Version => "0.2",
     Date => "August 5, 2011",
     Authors => {
          {Name => "Nathan Ilten",
 	  HomePage => "http://math.berkeley.edu/~nilten",
 	  Email => "nilten@math.berkeley.edu"},
      	  {Name => "Qingchun Ren"},
-	  {Name => "Josephine Yu"}
+	  {Name => "Josephine Yu"},
+	  {Name => "David Swinarski"},
+	  {Name => "Madeline Brandt"}
      },
     DebuggingMode => true
     )
@@ -89,10 +91,10 @@ doc ///
 		"PolyhedralObject"
 	Description
 		Text
-			{\tt PolyhedralObject} is the superclass of @TO"Polyhedron"@, @TO"Cone"@, @TO"Fan"@, and @TO "PolydralComplex"@.
+			@TT "PolyhedralObject"@ is the superclass of @TO"Polyhedron"@, @TO"Cone"@, @TO"Fan"@, and @TO "PolydralComplex"@.
 			It stores properties of polyhedral objects.
 
-			If the {\tt PolyhedralObject} is obtained as output of the software Gfan via the gfanInterface2 package, then we store their own string representation ({\tt "GfanFileRawString"}), along with parsed blocks ({\tt "GfanFileRawBlocks"}) and a separated header ({\tt "GfanFileHeader"}).  The name of the Gfan file is stored in {\tt "GfanFileName"}.
+			If the @TT "PolyhedralObject"@ is obtained as output of the software Gfan via the gfanInterface2 package, then we store their own string representation ({@TT "GfanFileRawString"@}), along with parsed blocks ({@TT "GfanFileRawBlocks"@}) and a separated header ({@TT "GfanFileHeader"@}).  The name of the Gfan file is stored in {@TT "GfanFileName"@}.
 
 		Example
 	SeeAlso
@@ -105,12 +107,12 @@ doc ///
 		"Fan"
 	Description
 		Text
-			A {\tt Fan} is a type of @TO "PolymakeObject"@ which stores various information
-			about a polyhedral fan. A {\tt Fan} is structured as @TO "HashTable"@ with strings for	keys that point to the stored information.
+			A @TT "Fan"@ is a type of @TO "PolymakeObject"@ which stores various information
+			about a polyhedral fan. A @TT "Fan"@ is structured as @TO "HashTable"@ with strings for	keys that point to the stored information.
 
 		Example
 		Text
-			Most of the keys refer to polyhedral information, while the keys starting with {\tt"Gfan"} refers to parsing information.
+			Most of the keys refer to polyhedral information, while the keys starting with @TT "Gfan"@ refers to parsing information.
 
 	SeeAlso
 		PolyhedralObject
@@ -122,13 +124,13 @@ doc ///
 		"Cone"
 	Description
 		Text
-			A {\tt Cone} is a type of @TO "PolyhedralObject"@ which stores various information
-			about a polyhedral cone. A {\tt Cone} is structured as @TO "Hashtable"@ with strings for
+			A @TT "Cone"@ is a type of @TO "PolyhedralObject"@ which stores various information
+			about a polyhedral cone. A @TT "Cone"@ is structured as @TO "Hashtable"@ with strings for
 			keys that point to the stored information.
 
 		Example
 		Text
-			Most of the keys refer to polyhedral information, while the keys starting with {\tt"Gfan"} refers to parsing information.
+			Most of the keys refer to polyhedral information, while the keys starting with {@TT "Gfan"@} refers to parsing information.
 
 	SeeAlso
 		PolyhedralObject

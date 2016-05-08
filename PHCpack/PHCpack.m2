@@ -1,8 +1,8 @@
 
 newPackage(
   "PHCpack",
-  Version => "1.6.4", 
-  Date => "31 May 2015",
+  Version => "1.7", 
+  Date => "8 May 2016",
   Authors => {
     {Name => "Elizabeth Gross",
      Email => "egross7@uic.edu",
@@ -16,7 +16,11 @@ newPackage(
     {Name => "Contributing Author: Anton Leykin",
      HomePage => "http://www.math.gatech.edu/~leykin"},
     {Name => "Contributing Author: Jeff Sommars",
-     HomePage => "http://www.math.uic.edu/~sommars"}
+     HomePage => "http://www.math.uic.edu/~sommars"},
+    {Name => "Contributing Author: Taylor Brysiewicz",
+     HomePage => "http://www.math.tamu.edu/~tbrysiewicz/"},
+    {Name => "Contributing Author: Corey Harris",
+     HomePage => "http://www.coreyharris.name/"}
   },
   Headline => "Interface to PHCpack",
   Configuration => { 
@@ -54,6 +58,7 @@ export {
   "constructEmbedding",
   "gamma",
   "factorWitnessSet",
+  "interactive",
   "isCoordinateZero",
   "isWitnessSetMember",
   "mixedVolume",
@@ -733,7 +738,7 @@ isWitnessSetMember (WitnessSet,Point) := o-> (witset,testpoint) -> (
 -- MIXED VOLUME --
 ------------------
 
-mixedVolume = method(Options => {StableMixedVolume => false, StartSystem => false, Verbose => false, numThreads => 0})
+mixedVolume = method(Options => {StableMixedVolume => false, StartSystem => false, Verbose => false, numThreads => 0, interactive=>false})
 mixedVolume  List := Sequence => opt -> system -> (
   -- IN:  system = list of polynomials in the system 
   -- OUT: mixed volume of the system. if optional inputs specified, then output is
@@ -763,10 +768,10 @@ mixedVolume  List := Sequence => opt -> system -> (
   outfile := filename|"PHCoutput";
   cmdfile := filename|"PHCcommands";
   sesfile := filename|"PHCsession";
-  if opt.StartSystem then startfile := filename|"PHCstart";
+  startfile := filename|"PHCstart";
 
   -- writing data to the corresponding files
-  file := openOut cmdfile; 
+  file := openOut cmdfile;
   file << "4" << endl; -- call MixedVol in PHCpack
   if opt.StartSystem
    then (file << "1" << endl)  -- random coefficient start system wanted
@@ -779,15 +784,19 @@ mixedVolume  List := Sequence => opt -> system -> (
     file << startfile << endl;
     file << "0" << endl << "1" << endl;
   );
-
   close file;
   systemToFile(system,infile);
   
+  if opt.interactive then (
+    << endl << "If you need a start system, the filename MUST be " << endl << endl << startfile << endl << endl << endl;
+    run(PHCexe|" -m "|infile|" "|outfile);
+  ) else (
   -- launching mixed volume calculator :
   execstr := PHCexe|" -m "|(if opt.numThreads > 1 then ("-t"|opt.numThreads|" ") else "")|infile|" "|outfile|" < "|cmdfile|" > "|sesfile;
   ret := run(execstr);
   if ret =!= 0 then 
     error "error occurred while executing PHCpack command: phc -m";
+  );
   F := get outfile; 
   
   -- search lines of outfile for:  " mixed volume : "
@@ -807,7 +816,7 @@ mixedVolume  List := Sequence => opt -> system -> (
       ), outfile);
   );
   local result;
-  if not opt.StartSystem then (
+  if not fileExists(startfile) then (
     if opt.StableMixedVolume
      then result = (mixvol, stabmv)
      else result = mixvol;
@@ -963,7 +972,6 @@ solveSystem  List := List =>  o->system -> (
 
   -- writing data to the corresponding files:    
   systemToFile(system,infile);
-
   -- launching blackbox solver:
   execstr := PHCexe|" -b "
     |(if o.numThreads > 1 then ("-t"|o.numThreads|" ") else "")
@@ -1135,7 +1143,7 @@ topWitnessSet (List,ZZ) := o->(system,dimension) -> (
 -- TRACK PATHS --
 -----------------
 
-trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false})
+trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false, interactive => false})
 trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   -- IN: T, target system to be solved;
   --     S, start system with solutions in Ssols;
@@ -1178,7 +1186,18 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   if n> numgens R then error "the system is overdetermined"; 
   
   -- making batch file
-  bat := openOut batchfile;
+  if o.interactive then (
+    bat := openOut batchfile;
+    bat << targetfile << endl << outfile << endl <<"n"<< endl 
+    << startfile << endl << Ssolsfile << endl;
+    close bat;
+    << "running (cat "|batchfile|"; cat) | PHCexe -p "<< endl;
+    -- (cat batch; cat) | phc -p
+    run("(cat "|batchfile|"; cat) | "|PHCexe|" -p ");
+    run(PHCexe|" -z "|outfile|" "|Tsolsfile);
+      
+  ) else (
+    bat := openOut batchfile;
   if not (o.numThreads > 1) then (
     bat << targetfile << endl << outfile << endl <<"n"<< endl 
     << startfile << endl << Ssolsfile << endl;
@@ -1220,6 +1239,7 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
      ("-t"|o.numThreads) else "")|"<"|batchfile|" >phc_session.log");
   run(PHCexe|" -z "|outfile|" "|Tsolsfile);
   
+  );
   -- parse and output the solutions
   result := parseSolutions(Tsolsfile, R);
   if n > numgens R then (
@@ -1537,3 +1557,21 @@ w#IsIrreducible
 R = ring rationalSystem_0
 PD = primaryDecomposition ideal rationalSystem
 for I in PD list << "(dim=" << dim I << ", deg=" << degree I << ") " 
+
+restart
+loadPackage "PHCpack"
+r = CC[x,y]
+solveSystem({2*x+y+5,5*y^2+3*x}, Verbose => true, interactive => true)
+
+restart 
+loadPackage "PHCpack"
+R = CC[x,y]
+f =  { x^3*y^5 + y^2 + x^2*y, x*y + x^2 - 1};
+I = ideal f;
+m = mixedVolume(f);
+(mv,sv) = mixedVolume(f,StableMixedVolume => true);
+-- (mv,q,qsols) = mixedVolume(f,interactive=>true);
+mv = mixedVolume(f,interactive=>true);
+(mv,q,qsols) = mixedVolume(f,interactive=>true);
+fsols = trackPaths(f,q,qsols);
+fsols = trackPaths(f,q,qsols, interactive=>true);
