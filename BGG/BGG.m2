@@ -60,7 +60,7 @@ bggComplex(Module,PolynomialRing) := ChainComplex => (P,S) -> (
     maxDeg := max degGensP + n;
     diffsInLP := for i from minDeg-1 to maxDeg list transpose bgg(i,P,S);
     LP := chainComplex diffsInLP;
-    LP[-minDeg+1]
+    dual(LP[-minDeg+1])
     )
 
 tateResolution = method(TypicalValue => ChainComplex)

@@ -4,10 +4,12 @@ newPackage ( "shelling",
     Version => "1.0",
     Date => "07 May 2016",
     Authors => {
+        {Name => "Katy"},
 	{Name => "David Eisenbud",
          Email => "de@msri.org",
          HomePage => "http://www.msri.org/~de"},
-     	 {Name => "Robert,Katy,Robert, Jay"}
+	{Name => "Robert"},
+	{Name => "Jay"}
 	},
     Headline => "Package for constructing random simplicial complex",
     Reload => true,
@@ -21,6 +23,7 @@ export {
 	"randomLink",
 	"testNewSimplex",
         "idealFromSC",
+	"idealChainFromSC",
         "isShelling",
 	"isLicci",
 	"minimalRegularSequence",
@@ -107,6 +110,9 @@ idealFromSC List := P -> (
     S := QQ[x_0..x_(n-1)];
     idealFromSC(P,S)
     )
+
+idealChainFromSC = method()
+idealChainFromSC List := P -> toList apply(#P,i->idealFromSC(take(P,i+1)))
 
 isShelling = method()
 isShelling(List) := P -> all(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
@@ -315,3 +321,9 @@ installPackage "shelling"
 restart
 loadPackage("shelling", Reload=>true)
 check "shelling"
+
+R = ZZ/32003[x_0..x_4]
+P = randomChain(5,1)
+L = apply(#P, i->idealFromSC take(P,i+1));
+netList L
+apply(L, I->linkageBound(I,UseNormalModule=>true))
