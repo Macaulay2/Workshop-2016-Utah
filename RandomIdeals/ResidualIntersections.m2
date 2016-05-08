@@ -333,11 +333,12 @@ doc ///
          a monomial ideal
    Outputs
       d:ZZ
-         the maximum value of d such that I has property G_d.
+         the maximum value of {\tt d} such that {\tt I} has property G_d (possibly infinity).
    Description
       Text
       Example
    Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
       residualCodims
@@ -392,8 +393,14 @@ doc ///
          a list of the numbers of generators for each codimension from 1 to the dimension of the ring
    Description
       Text
+         Because {\tt I} is monomial, we can check the number of generators of {\tt I} localized at a prime {\tt P} over only monomial primes {\tt P}.
       Example
+         R = QQ[x_0..x_4];
+	 I = ideal{x_0^2,x_1*x_2,x_3*x_4^2}
+	 numgensByCodim(I,2)
+	 numgensByCodim I
    Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       residualCodims
       maxGd
@@ -421,6 +428,7 @@ doc ///
       Text
       Example
    Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
       maxGd
