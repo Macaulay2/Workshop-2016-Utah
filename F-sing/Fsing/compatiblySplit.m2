@@ -46,7 +46,7 @@ findAllCompatibleIdealsInnards = (u,L,P) ->(
 	P1:=frobeniusPower(P,1);
 	C1:=ideal((singularLocus(P)).relations);
 	---tau=ideal mingens star(C1,u,1) ; ---OLD VERSION
-	tau=ideal mingens ascendIdeal (1,u,C1);
+	tau=ideal mingens minimalCompatible (1,u,C1);
 	Plist=minimalPrimes tau;
 	local Q;
 	local T;
@@ -65,7 +65,7 @@ findAllCompatibleIdealsInnards = (u,L,P) ->(
 ---	JB:=C1*C2; ---MK
 ---print(mingens P, mingens JB);
 ---tau=ideal mingens star(C2,u,1) ;  --- OLD VERSION
-	tau=ideal mingens ascendIdeal  (1,u,C2);
+	tau=ideal mingens minimalCompatible (1,u,C2);
 	Plist=minimalPrimes tau;
 	local Q;
 	local T;
