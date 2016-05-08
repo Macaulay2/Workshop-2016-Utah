@@ -19,7 +19,8 @@ export {
 	"linkageBound",
 	"UseNormalModule",
 	"randomRegularSequence",
-	"numgensByCodim"
+	"numgensByCodim",
+	"maxGd"
         };
 
 randomLink = method()
@@ -117,7 +118,13 @@ numgensByCodim (Ideal,ZZ) := (J,k) -> (
 
 numgensByCodim Ideal := J -> (
     n := numgens ring J;
-    toList apply(n+1, i->numgensByCodim(J,i))
+    toList apply(n, i->numgensByCodim(J,i+1))
+    )
+
+maxGd = method()
+maxGd Ideal := J -> (
+    for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i-1;
+    numgens ring J
     )
 
 doc ///
@@ -226,4 +233,10 @@ time linkageBound (I, UseNormalModule => true)
 
 --b = linkageBound I
 
+restart
+loadPackage "ResidualIntersections"
+loadPackage "RandomIdeal"
+J = idealFromSC randomChain(10,5,20);
+numgensByCodim J
+maxGd J
 ///
