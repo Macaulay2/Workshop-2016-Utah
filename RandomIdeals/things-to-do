@@ -1,0 +1,20 @@
+
+
+put shelling code into RandomIdeal.m2
+
+add to RandomIdeal random Borel-fixed ideal
+
+
+documentation
+
+tests
+
+ResidualIntersections
+now has licci code
+
+add tests for
+Gd (output: #gens at each codim. Also a version to turn this into d's for which Gd holds?)
+strongly CM
+sliding depth
+depths of powers
+generic Artin-Nagata
