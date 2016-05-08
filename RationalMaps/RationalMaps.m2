@@ -19,7 +19,7 @@ export{
 	"imageOfMap",
 	"baseLocusOfMap",
 	"dimImage",
-	"isRegular",
+	"isRegularMap",
 	"invertMap",
 	"isEmbedding",
 	"blowUpIdeals",
@@ -35,7 +35,7 @@ export{
 ----------------------------------------------------------------
 
 imageOfMap = method();
-imageOfMap(Matrix,Ideal,Ideal) := (f,a,b) -> (
+imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 	h := map((ring a)/a,(ring b)/b,f);
 	-- the image of f is the same as the kernel of its pullback on the 
 	-- coordinate rings. h is this pullback
@@ -44,7 +44,7 @@ imageOfMap(Matrix,Ideal,Ideal) := (f,a,b) -> (
 	);
 
 dimImage = method();
-dimImage(Matrix,Ideal,Ideal) := (f,a,b) ->(
+dimImage(Ideal,Ideal,Matrix) := (a,b,f) ->(
 	I := imageOfMap(f,a,b);
 	dim I - 1
 	-- substract 1 from the dimension of the image since in projective space
@@ -73,7 +73,9 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     
 );
 
+isRegularMap = method();
 
+baseLocusOfMap(
 
  blowUpIdeals=method();
   
