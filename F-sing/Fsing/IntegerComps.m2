@@ -6,6 +6,12 @@
 --*************************************************
 --*************************************************
 
+
+--*************************************************
+--*************************************************
+--Basic Manipulations with Numbers 
+--*************************************************
+--*************************************************
 --===================================================================================
 
 denom = method(); 
@@ -100,6 +106,14 @@ findNearPthPowerBelow = ( t1, pp, e1 ) ->
 
 --===================================================================================
 
+--*************************************************
+--*************************************************
+--Information Regarding Factors and Factorization
+--*************************************************
+--*************************************************
+
+--===================================================================================
+
 --Returns the digits in nn which are nonzero in binary 
 --for example, 5 in binary is 101, so this would return {0,2}
 --the second term tells me where to start the count, so passing
@@ -166,6 +180,14 @@ getFactorList = ( nn ) ->
 
 --===================================================================================
 
+--*************************************************
+--*************************************************
+--Finding Numbers in Given Range
+--*************************************************
+--*************************************************
+
+--===================================================================================
+
 findNumberBetweenWithDenom = method(); 
 
 --This function finds rational numbers in the range of the interval
@@ -211,6 +233,14 @@ findNumberBetween( ZZ, List ) := ( maxDenom, myInterv )->
 
 --===================================================================================
 
+--*************************************************
+--*************************************************
+--Base p-expansions
+--*************************************************
+--*************************************************
+
+--===================================================================================
+
 basePExp = method(); 
 
 --Computes the terminating base p expansion of an integer.
@@ -236,48 +266,97 @@ basePExp( ZZ, ZZ, ZZ ) := ( p, e1, N ) ->
     new List from E
 )
 
+--Creates a list of the first e digits of the non-terminating base p expansion of x in [0,1].
+basePExp( ZZ, ZZ, QQ ) = ( p, e, x ) -> 
+(
+    if x < 0 or x > 1 then(
+	 error "basePExp: Expected x in [0,1]"
+     )
+     else(
+     	 L := new MutableList;
+     	 for i from 0 to e-1 do L#i = digit(i+1,x,p);
+     	 L
+     )
+)
+
 --===================================================================================
 
---Gives the e-th digit of the non-terminating base p expansion of x in [0,1] 
 digit = method()
 
-digit (ZZ,QQ,ZZ) := (e, x, p) -> 
+--Gives the e-th digit of the non-terminating base p expansion of x in [0,1].
+digit ( ZZ, ZZ, QQ ) := ( p, e, x) -> 
 (
-     y := 0;
-     if fracPart(p^e*x) != 0 then y = floor(p^e*x) - p*floor(p^(e-1)*x);
-     if fracPart(p^e*x) == 0 then y = floor(p^e*x) - p*floor(p^(e-1)*x) - 1;
-     if fracPart(p^(e-1)*x) == 0 then y = p-1;
-     y
+    if x < 0 or x > 1 then(
+	 error "digit: Expected x in [0,1]"
+	 )
+    else(
+     	y := 0;
+     	if fracPart(p^e*x) != 0 then y = floor(p^e*x) - p*floor(p^(e-1)*x);
+     	if fracPart(p^e*x) == 0 then y = floor(p^e*x) - p*floor(p^(e-1)*x) - 1;
+     	if fracPart(p^(e-1)*x) == 0 then y = p-1;
+     	y	  
+     )
 )
 
---digit (ZZ,List,ZZ) threads over lists.
-digit (ZZ,List,ZZ) := (e,u,p) -> apply(u,x->digit(e,x,p))
+--Creates list containing e-th digits of non-terminating base p expansion of list of numbers.
+digit ( ZZ, ZZ, List ) := ( p, e, u ) -> 
+(
+    apply(u,x->digit(p,e,x))
+)
 
 --===================================================================================
 
---Gives the e-th truncation of the non-terminating base p expansion of a nonnegative 
---rational x as a fraction
 truncation = method()
 
-truncation (ZZ,QQ,ZZ) := (e,x,p) -> (ceiling(p^e*x)-1)/p^e
+--Gives the e-th truncation of the non-terminating base p expansion of a rational number.
+truncation ( ZZ, ZZ, QQ ) := ( p, e, x ) -> 
+(
+    if x<0 the(
+	error "truncation: Expected x>0"
+	)
+    else(	
+    	ceiling(p^e*x)-1)/p^e
+    	)
+)
 
 --truncation (ZZ,List,ZZ) threads over lists.
-truncation (ZZ,List,ZZ) := (e,u,p) -> apply(u,x->truncation(e,x,p))
-
---Gives the first e digits of the non-terminating base p expansion of x in [0,1]
---as a list
-truncationBaseP = (e,x,p) -> 
+truncation ( ZZ, ZZ, List) := (p,e,u) -> 
 (
-     L := new MutableList;
-     for i from 0 to e-1 do L#i = digit(i+1,x,p);
-     L
+    apply(u,x->truncation(p,e,x))
 )
+
+--===================================================================================
+
+--- write n=a*p^e+a_{e-1} p^{e-1} + \dots + a_0 where 0\leq e_j <p 
+baseP1 = ( n, p, e )->
+(
+	a:=n//(p^e);
+	answer:=1:a;
+	m:=n-a*(p^e);
+	f:=e-1; 
+	while (f>=0) do
+	{
+		d:=m//(p^f);
+		answer=append(answer,d);
+		m=m-d*(p^f);
+		f=f-1;
+	};
+	answer
+)	
+
+--===================================================================================
+
+--*************************************************
+--*************************************************
+--Manipulations with Vectors   
+--*************************************************
+--*************************************************
 
 --===================================================================================
 
 --Given a rational number x, if a is the power of p dividing its denomiator, 
 --finds an integer b so that p^a(p^b-1)*a is an integer
-bPower = (n,p) ->
+bPower = ( n, p ) ->
 (
      if aPower(n,p)>0 then n = n*p^(aPower(n,p));
      denom(n)
@@ -285,17 +364,17 @@ bPower = (n,p) ->
 
 --Given a vector w={x,y}, x and y rational in [0,1], returns a number of digits 
 --such that it suffices to check to see if x and y add without carrying in base p
-carryTest = (w,p) ->
+carryTest = ( w, p ) ->
 (
-     c := 0; for i from 0 to #w-1 do c = max(c, aPower(w#i, p));
-     d := 1; for j from 0 to #w-1 do if bPower(w#j, p)!=0 then d = lcm(d, bPower(w#j, p));
+     c := 0; for i from 0 to #w-1 do c = max(c, divideFraction(p,w#i)#1);
+     d := 1; for j from 0 to #w-1 do if (divideFraction(p, w#j)#2)!=0 then d = lcm(d,dividFraction(p,w#j)#2);
      c+d+1
 )
 
 --Given a vector w={x,y} of rational integers in [0,1], returns the first spot 
 --e where the x and y carry in base p; i.e., 
 --(the e-th digit of x)+(the e-th digit of y) >= p
-firstCarry = (w,p) ->
+firstCarry = ( w, p ) ->
 (     
     i:=0;
     d:=0;
@@ -315,61 +394,79 @@ firstCarry = (w,p) ->
       carry
 )
 
---Given a vector w, returns a vector of the reciprocals of the entries of w
-reciprocal = w ->
+--===================================================================================
+
+--Returns a vector of the reciprocals of the entries of a vector.
+reciprocal = ( w ) ->
 (
      v := new MutableList from w;
      for c from 0 to #w-1 do v#c = 1/w#c;
      v
 )
 
-{*
-    Miscellaneous.
-*}
+--===================================================================================
 
--- Some commands for dealing with vectors --
+canVector = method()
 
 --canVector(i,n) returns the i-th canonical basis vector in dimension n
 --Warning: for convenience, this uses Macaulay2's convention of indexing lists starting 
 --with 0; so, for example, {1,0,0,0} is canVector(0,4), not canVector(1,4).
-canVector = method()
-
-canVector (ZZ,ZZ) := (i,n) -> 
+canVector ( ZZ, ZZ ) := ( i, n ) -> 
 (
     if ((i<0) or (i>=n)) 
         then (error "canVector(i,n) expects integers i and n with 0<=i<n.");   
     apply(n,j->if i==j then 1 else 0)
 )
  
--- getNumAndDenom(u) takes a rational vector u and returns a pair (a,q), where a 
---is an integer vector and q an integer such that u=a/q.
+--===================================================================================
+
 getNumAndDenom = method()
 
-getNumAndDenom (List) := u -> 
+-- Takes a rational vector u and returns a pair (a,q), where a
+--is an integer vector and q an integer such that u=a/q.
+getNumAndDenom ( List ) := u -> 
 (
     den := lcm apply( u, denom );
     a := apply( u, n-> lift( n*den, ZZ ) );
     ( a, den )        
 )
 
---Computes the taxicab norm of a vector.
+--===================================================================================
+
 taxicabNorm = method()
 
-taxicabNorm (List) := u -> sum( u, abs )
+--Computes the taxicab norm of a vector.
+taxicabNorm ( List ) := u -> 
+(
+    sum( u, abs )
+)
+
+--===================================================================================
+
+--Finds the x-intercept of a line passing through two points
+xInt = ( x1, y1, x2, y2 ) ->  x1-(y1/((y1-y2)/(x1-x2)))
+ 
+--===================================================================================
+
+--*************************************************
+--*************************************************
+--Partitions
+--*************************************************
+--*************************************************
 
 ---------------------------------------------------------------------------------------
 --- The following code was written in order to more quickly compute eth roots of (f^n*I)
 --- It is used in fancyEthRoot
 ----------------------------------------------------------------------------------------
 --- Find all ORDERED partitions of n with k parts
-allPartitions = (n,k)->
+allPartitions = ( n, k )->
 (
 	PP0:=matrix{ toList(1..k) };
 	PP:=mutableMatrix PP0;
 	allPartitionsInnards (n,k,PP,{})
 )
 
-allPartitionsInnards = (n,k,PP,answer)->
+allPartitionsInnards = ( n, k, PP, answer)->
 (
 	local i;
 	if (k==1) then 
@@ -388,27 +485,4 @@ allPartitionsInnards = (n,k,PP,answer)->
 	answer
 )
 
-
-
-
---- write n=a*p^e+a_{e-1} p^{e-1} + \dots + a_0 where 0\leq e_j <p 
-baseP1 = (n,p,e)->
-(
-	a:=n//(p^e);
-	answer:=1:a;
-	m:=n-a*(p^e);
-	f:=e-1; 
-	while (f>=0) do
-	{
-		d:=m//(p^f);
-		answer=append(answer,d);
-		m=m-d*(p^f);
-		f=f-1;
-	};
-	answer
-)	
-
---Finds the x-intercept of a line passing through two points
-xInt = (x1, y1, x2, y2) ->  x1-(y1/((y1-y2)/(x1-x2)))
- 
- 
+--===================================================================================

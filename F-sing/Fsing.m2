@@ -52,12 +52,56 @@ export{
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
+<<<<<<< HEAD
     "fancyEthRoot",	
 	"generatingRoot", ---MK
 	"FFiniteSupport", ---MK
 	"findAllCompatibleIdeals", ---MK	
 	"generatingMorphism", ---MK
 	"findGeneratingMorphisms", ---MK
+=======
+    "fancyEthRoot",		
+    "minimalCompatible",
+--F-thresholds computations (FThresholds.m2)
+    "BinomialCheck",
+    "binomialFPT",
+    "canVector",
+    "DiagonalCheck", 
+    "diagonalFPT",
+    "estFPT",
+    "factorList",    
+    "findCPBelow",
+    "FPTApproxList",     
+    "FPT2VarHomog",     
+    "FPT2VarHomogInternal",
+    "FTApproxList",
+    "FTHatApproxList", 
+    "guessFPT",
+    "isBinomial",
+    "isCP",
+    "isDiagonal",
+    "isFJumpingNumberPoly",
+    "isFPTPoly",
+    "isInLowerRegion",
+    "isInUpperRegion",
+    "MaxExp",
+    "nu",
+    "nuAlt",
+    "NuCheck",
+    "nuHat",
+    "nuHatList",
+    "nuList",
+    "nuListAlt",
+    "nuListAlt1",
+    "PrintCP",
+    "setFTData",
+    "splittingField",
+    "taxicabNorm",
+    "minimalCompatible",
+    "paraTestModule",
+    "paraTestModuleAmbient",
+    "findAllCompatibleIdeals", ---MK	
+>>>>>>> a2d67bbb69c5811cf147d9fdc7d3303f84df4d1c
     "minimalCompatible",
     "paraTestModule", ---MK
     "paraTestModuleAmbient" ---MK
