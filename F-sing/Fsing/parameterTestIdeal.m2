@@ -104,6 +104,20 @@ paraTestModuleAmbient (Ring, Ideal) := (R1, canIdeal) -> (
 	(sub(tauOut, R1), sub(canIdeal, R1), u1)
 )
 
+paraTestModuleAmbient (Ring, Ideal) := (R1, canIdeal) -> (
+	S1 := ambient R1;
+	I1 := ideal(R1);
+	
+	J1 := findTestElementAmbient(R1);
+	tau0 := J1*canIdeal; --this is the starting test element times the ideal
+	
+	u1 := finduOfIdeal(canIdeal, I1); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
+	
+	tauOut := ascendIdeal(1, u1, tau0);
+	
+	(sub(tauOut, R1), sub(canIdeal, R1), u1)
+)
+
 --computes the parameter test ideal of an ambient ring
 paraTestIdealAmbient = (R1) -> (
 	tempList := paraTestModuleAmbient(R1);
