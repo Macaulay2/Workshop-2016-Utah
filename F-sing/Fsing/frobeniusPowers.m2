@@ -11,7 +11,7 @@
 --N = N_0 + N_1 p + ... + N_e p^e, where 0 <= N_i < p, then this computes f^N as
 --f^(N_0) (f^(N_1))^p ... (f^(N_e))^(p^e). 
 
-fastExp := (N,f) ->
+fastExp = (N,f) ->
 (
      p:=char ring f;
      E:=basePExp(p,N);
