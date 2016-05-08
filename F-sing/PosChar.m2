@@ -1781,92 +1781,10 @@ ethRoot(Ideal,ZZ) := (Im,e) -> (
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-----------------------------------------------------------------
---************************************************************--
---Functions for computing compatibly split ideals             --
---************************************************************--
-----------------------------------------------------------------
-
------------------------------------------------------------------------
 
 
---- Start of MK ---------------------------------------------------------------------------------------------------
-
--- FIND IDEALS COMPATIBLE WITH A GIVEN NEAR-SPLITTING
--- This is an implementation of the algorithm described in
--- Moty Katzman and Karl Schwede's paper 
--- "An algorithm for computing compatibly Frobenius split subvarieties"
--- J. Symbolic Comput. 47 (2012), no. 8, 996\961008. 
-
-----------------------------------------------------------------------------------------
-
-
---- Input:
----   	an element u of the polynomial ring R OVER A PRIME FIELD.
---- Output:
----	A list of all prime ideals P such that
----	(a) u P \subseteq P^{[p]}, and
----	(b) the action of uT on the the annihilator of P on the injective hull of the residue field of R 
----	is not the zero Frobenius map.
-
-
-findAllCompatibleIdeals = (u) ->(
-	L:={}; R:=ring u; p:=char R;
-	P:=ideal(0_R);
-	J:=ethRoot(ideal(u),1);
-	t:=1_R % (gens J);
-	if (t != 0_R) then print("*** WARNING *** Frobenius action has nilpotent elements");
-	findAllCompatibleIdealsInnards (u,L,P)
-)
-
-
-
-findAllCompatibleIdealsInnards = (u,L,P) ->(
-	R:=ring u;
-	p:=char R;
-	local tau;
-	local Plist;
-	P1:=frobeniusPower(P,1);
-	C1:=ideal((singularLocus(P)).relations);
-	---tau=ideal mingens star(C1,u,1) ; ---OLD VERSION
-	tau=ideal mingens ascendIdeal (C1, u, 1);
-	Plist=minimalPrimes tau;
-	local Q;
-	local T;
-	apply(Plist, Q->
-	{
-		f:= any(L,T -> T == Q);
----print(L,Q,f);
-		if (not f) then
-		{
-			L=append(L,Q);
-			L=unique(L | findAllCompatibleIdealsInnards(u,L,Q));
-		};
-	});
----
-	C2:=(P1+ideal(u)):(P1:P);
----	JB:=C1*C2; ---MK
----print(mingens P, mingens JB);
----tau=ideal mingens star(C2,u,1) ;  --- OLD VERSION
-	tau=ideal mingens ascendIdeal  (C2, u, 1);
-	Plist=minimalPrimes tau;
-	local Q;
-	local T;
-	apply(Plist, Q->
-	{
-		f:= any(L,T -> T == Q);
-	---print(L,Q,f);
-		if (not f) then
-		{
-			L=append(L,Q);
-			L=unique(L | findAllCompatibleIdealsInnards(u,L,Q));
-		};
-	});
-	---
-	L
-)
-
-
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-- START TRANSFERED TO EthRoots
 
 -----------------------------------------------------------------------------
 --- Extend the Frobenius p^e th roots and star operations to submodules of
@@ -2099,6 +2017,10 @@ minimalCompatible(Ideal,RingElement,ZZ,ZZ) :=  (Jk, hk, ak, ek) -> ascendIdealSa
 minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
 
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
+
+-- END TRANSFERED TO EthRoots
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 --Finds a test element of a ring R = k[x, y, ...]/I (or at least an ideal 
@@ -3010,58 +2932,6 @@ S:=syz(M);
 S^(toList(0..m-1))
 )
 
----compute a generating morphism for H^(dim R -i)_I(R)
----the output is (A,U) where U:coker(A) -> F(coker A) is the generating morphism
-generatingMorphism= (I,i) ->(
-	local F1; local K; local C;
-	local F1p; local Kp; local Cp;
-	R:=ring(I);
-	Ip:=frobeniusPower(I,1);
-	M:=coker I;
-	Mp:=coker Ip;
-	resM:=res M;
-	resMp:=res Mp;
-	f:=inducedMap(M,Mp);
-	resf:=res f;
----Compute the generating map Ext^i(R/I,R) -> F Ext^i(R/I,R) [[The top i doesnt work: the zero matrix is not given]]
-	G:=resf#i; G=transpose(G);
-	F0:=(resM.dd)#(i); F0=transpose(F0);
-	if (resM.dd)#?(i+1) then
-	{
-		F1=(resM.dd)#(i+1); F1=transpose(F1);
-		K=ker F1;
-	} else
-	{
-		K=target(F0);
-	};
-	temp1:=substitute(gens K,R);
-	if (temp1==0) then C=coker(F0) else C=subquotient(substitute(gens K,R),F0);
----C=subquotient(substitute(gens K,R),F0);
-	C1:=prune(C);
-	h:=C1.cache.pruningMap;
-	generatingMorphism0:=G*gens(K)*matrix(entries h);
-	F0p:=(resMp.dd)#(i); F0p=transpose(F0p);
-	if (resMp.dd)#?(i+1) then
-	{
-		F1p=(resMp.dd)#(i+1); F1p=transpose(F1p);
-		Kp=ker F1p;
-	} else
-	{
-		Kp=target(F0p);
-	};
-	temp1=substitute(gens Kp,R);
-	if (temp1==0) then Cp=coker(F0p) else Cp=subquotient(substitute(gens Kp,R),F0p);
---Cp=subquotient(gens Kp,F0p);
-	C1p:=prune(Cp);
-	hp:=C1p.cache.pruningMap;
-	A0:=gens(Kp)*matrix(entries hp); A:=A0| F0p;
-	gbA:=gb(A, ChangeMatrix => true) ;
-	B:=generatingMorphism0// A;
---- Now generatingMorphism0=A*B
-	k:=rank source A0;
-	(relations(C1), submatrix(B,toList(0..(k-1)),))
-)
-
 
 --- Given a generating morphism U:coker(A) -> F(coker A), compute a generating root U:coker(L) -> F(coker L)
 generatingRoot= (A,U) ->(
@@ -3101,54 +2971,6 @@ FFiniteSupport= (A,U) ->(
 	mingens radical annihilator answer
 )
 
-
--- Produce a sequence of maps Ext^i(R/I,R) ->  Ext^i(R/I^{[p]},R) induced
--- by the surjections R/I^{[p]} -> R/I
--- for i=1..pdim(coker I)
--- The output consists of a sequence of pairs (A,B) where the induced maps are
--- B: coker A -> coker A^{[p]}
-findGeneratingMorphisms = (I) ->
-(
-	local i;
-	Ip:=frobeniusPower(I,1);
-	M:=coker I;
-	Mp:=coker Ip;
-	resM:=res M;
-	resMp:=res Mp;
-	f:=inducedMap(M,Mp);
-	resf:=res f;
-	resLength:=length(resM);
-	answer:=();
-	apply(1..resLength, i->
-	{
-		G:=resf#i; G=transpose(G);
-		F1:=(resM.dd)_(i+1); F1=transpose(F1);
-		F0:=(resM.dd)_(i); F0=transpose(F0);
-		K:=ker F1;
-		C:=subquotient(gens K,F0);
-		C1:=prune(C);
-		h:=C1.cache.pruningMap;
---
-		generatingMorphism0:=G*gens(K)*matrix(entries h);
-		F1p:=(resMp.dd)_(i+1); F1p=transpose(F1p);
-		F0p:=(resMp.dd)_(i); F0p=transpose(F0p);
-		Kp:=ker F1p; 
-		Cp:=subquotient(gens Kp,F0p);
-		C1p:=prune(Cp);
-		hp:=C1p.cache.pruningMap;
---
-		A0:=gens(Kp)*matrix(entries hp); 
-		A:=A0| F0p;
-		gbA:=gb(A, ChangeMatrix => true) ;
-		B:=generatingMorphism0// A;
---- Now generatingMorphism0=A*B
-		k:=rank source A0;
-		generatingMorphism:=submatrix(B,toList(0..(k-1)),);
-		answer=append(answer, (C1,generatingMorphism));
----		print(generatingMorphism);
-	});
-answer
-)
 
 
 ----------------------------------------------------------------------------------------
