@@ -30,6 +30,7 @@ export {
 	"randomLink",
 	"testNewSimplex",
         "idealFromSC",
+	"idealChainFromSC",
         "isShelling"
      }
      
@@ -311,6 +312,9 @@ idealFromSC List := P -> (
     S := QQ[x_0..x_(n-1)];
     idealFromSC(P,S)
     )
+
+idealChainFromSC = method()
+idealChainFromSC List := P -> toList apply(#P,i->idealFromSC(take(P,i+1)))
 
 isShelling = method()
 isShelling(List) := P -> all(#P, i-> i==0 or testNewSimplex(take(P,i),P#i))
