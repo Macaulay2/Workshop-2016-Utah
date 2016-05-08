@@ -18,13 +18,11 @@ export {
 	"linkageBound",
 	"UseNormalModule",
 	"randomRegularSequence",
-<<<<<<< HEAD
 	"genericResidual",
-	"genericArtinNagata"
-=======
+	"genericArtinNagata",
 	"numgensByCodim",
-	"maxGd"
->>>>>>> 27a043742012f896ad270500f45363a80d058d36
+	"maxGd",
+	"residualCodims"
         };
 
 --Generic Artin-Nagata Code
@@ -171,6 +169,11 @@ maxGd Ideal := J -> (
     infinity
     )
 
+residualCodims = method()
+residualCodims Ideal := J -> (
+    toList select((codim J + 1..numgens ring J + 1), i->numgensByCodim(J,i-1) <= i)
+    )
+
 doc ///
    Key
     isLicci
@@ -281,6 +284,7 @@ restart
 loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
 J = idealChainFromSC randomChain(10,5,20);
---numgensByCodim J
 J/maxGd
+J/residualCodims
+
 ///
