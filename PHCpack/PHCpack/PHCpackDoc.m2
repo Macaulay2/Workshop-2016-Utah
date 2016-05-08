@@ -1163,6 +1163,7 @@ doc ///
   SeeAlso
     tDegree
     gamma
+    interactive
     numThreads
     seeProgress
 ///;
