@@ -58,7 +58,7 @@ export{
 	"findAllCompatibleIdeals", ---MK	
 	"generatingMorphism", ---MK
 	"findGeneratingMorphisms", ---MK
-    "minimalCompatible"
+    "minimalCompatible",
     "paraTestModule", ---MK
     "paraTestModuleAmbient" ---MK
 }
