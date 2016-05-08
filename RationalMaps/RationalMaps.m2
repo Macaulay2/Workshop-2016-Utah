@@ -45,7 +45,7 @@ imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 
 dimImage = method();
 dimImage(Ideal,Ideal,Matrix) := (a,b,f) ->(
-	I := imageOfMap(f,a,b);
+	I := imageOfMap(a,b,f);
 	dim I - 1
 	-- substract 1 from the dimension of the image since in projective space
 	);
@@ -75,7 +75,6 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
 
 isRegularMap = method();
 
-baseLocusOfMap(
 
  blowUpIdeals=method();
   
@@ -240,6 +239,8 @@ doc ///
     	Text   
     	 A package for computations with rational maps.
 ///
+
+
 
 doc ///
 	Key 
