@@ -84,12 +84,17 @@ doc ///
 doc ///
 	Key
 		imageOfMap
+		(imageOfMap,Matrix,Ideal,Ideal)
+		(imageOfMap,List,Ideal,Ideal)
 	Headline
 		Finds defining equations for the image of a rational map
 	Usage
 		image = imageOfMap(f,a,b)
+		image = imageOfMap(f,a,b)
 	Inputs
-		f: matrix
+		f: matrix or list 
+			used in the map function, which can take either a matrix
+			or list.
 			a rational map between 2 projective varieties, f: X -> Y
 			assumed that f is given by a polynomial representation
    		a: ideal
