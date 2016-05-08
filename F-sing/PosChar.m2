@@ -42,30 +42,30 @@ Reload => true
 )
 export{
     "aPower",
-    "ascendIdeal", 
-    "ascendIdealSafe",
-    "ascendIdealSafeList",
-    "AscentCount",
+    "ascendIdeal", -- EthRoots.m2
+    "ascendIdealSafe", -- EthRoots.m2
+    "ascendIdealSafeList", -- EthRoots.m2
+    "AscentCount", -- EthRoots.m2
     "basePExp",
     "basePExpMaxE",
-    "BinomialCheck",
-    "binomialFPT",
+    "BinomialCheck", -- FThresholds.m2
+    "binomialFPT", -- FThresholds.m2
     "canonicalIdeal",
-    "canVector",
+    "canVector", -- FThresholds.m2
     "carryTest",
     "digit", 	 
     "denom",
-    "DiagonalCheck", 
-    "diagonalFPT",
+    "DiagonalCheck", -- FThresholds.m2
+    "diagonalFPT", -- FThresholds.m2
     "divideFraction",
-    "estFPT",
-    "ethRoot",
-    "ethRootSafe", 		--MK
-    "ethRootSafeList",    
-    "factorList",
-    "fancyEthRoot",		--MK
+    "estFPT", -- FThresholds.m2
+    "ethRoot", -- EthRoots.m2
+    "ethRootSafe", -- EthRoots.m2
+    "ethRootSafeList", -- EthRoots.m2   
+    "factorList", -- FThresholds.m2
+    "fancyEthRoot", -- EthRoots.m2 
     "fastExp",
-    "findCPBelow",
+    "findCPBelow", -- FThresholds.m2
     "findGeneratingMorphisms",     --MK
     "findHSLloci",                 --MK
     "findTestElementAmbient",
@@ -74,38 +74,38 @@ export{
     "findQGorGen",
     "finduOfIdeal",
     "firstCarry", 
-    "FPTApproxList",     
-    "FPT2VarHomog",     
-    "FPT2VarHomogInternal",
+    "FPTApproxList", -- FThresholds.m2    
+    "FPT2VarHomog", -- FThresholds.m2    
+    "FPT2VarHomogInternal", -- FThresholds.m2
     "fracPart",
     "frobenius",
     "frobeniusPower",
     "fSig",
-    "FTApproxList",
-    "FTHatApproxList", 
+    "FTApproxList",  -- FThresholds.m2
+    "FTHatApproxList",  -- FThresholds.m2
     "FullMap",--specifies whether the full data should be returned
     "getNumAndDenom",
     "genFrobeniusPower",
-    "guessFPT",
+    "guessFPT",  -- FThresholds.m2
     "HSL",
     "imageOfRelativeCanonical",
     "imageOfTrace", --doesn't work!
-    "isBinomial",
-    "isCP",
-    "isDiagonal",
-    "isFJumpingNumberPoly",
-    "isFPTPoly",
+    "isBinomial",  -- FThresholds.m2
+    "isCP",  -- FThresholds.m2
+    "isDiagonal",  -- FThresholds.m2
+    "isFJumpingNumberPoly",  -- FThresholds.m2
+    "isFPTPoly",  -- FThresholds.m2
     "isFPure",
     "isFRegularPoly",
     "isFRegularQGor",
-    "isInLowerRegion",
-    "isInUpperRegion",
+    "isInLowerRegion",  -- FThresholds.m2
+    "isInUpperRegion",  -- FThresholds.m2
 --    "isJToAInIToPe",
     "isSharplyFPurePoly",
     "isMapSplit",
-    "MaxExp",
+    "MaxExp",  -- FThresholds.m2
     "maxIdeal",
-    "minimalCompatible",		--- MK
+    "minimalCompatible", -- EthRoots.m2 
 ---    "Mstar",			--- MK
     "multOrder",
     "MultiThread",
@@ -124,12 +124,12 @@ export{
     "OutputRange",
     "paraTestModule",
     "paraTestModuleAmbient",
-    "PrintCP",
-    "setFTData",
+    "PrintCP",  -- FThresholds.m2
+    "setFTData",  -- FThresholds.m2
     "sigmaAOverPEMinus1Poly", 
     "sigmaQGorAmb", --needs optimization
     "sigmaAOverPEMinus1QGor",      --needs optimization
-    "splittingField",
+    "splittingField",  -- FThresholds.m2
     "tauPoly",
     "tauNonPrincipalAOverPEPoly",
     "tauAOverPEMinus1Poly",
@@ -137,7 +137,7 @@ export{
     "tauGorAmb",--needs optimization
     "tauQGor",--needs optimization
     "tauQGorAmb",--needs optimization
-    "taxicabNorm",
+    "taxicabNorm",  -- FThresholds.m2
     "truncation",
     "truncationBaseP"
 }
@@ -642,6 +642,10 @@ nu(RingElement, Ideal, ZZ) := (f1, J1, e1) -> ( --this does a fast nu computatio
 
 nu( RingElement, ZZ ) := ( f, e ) -> nu( f, maxIdeal( ring f ), e )
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transfered to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 --Approximates the F-pure Threshold
 --Gives a list of nu_I(p^d)/p^d for d=1,...,e
 FPTApproxList = method();
@@ -669,6 +673,10 @@ FTApproxList (Ideal,Ideal,ZZ) := (I,J,e) ->
 )
 
 FTApproxList (RingElement,Ideal,ZZ) := (f1,J1,e1) -> FTApproxList(ideal(f1),J1,e1)
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transfered to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 --***********************************************************--
 --Some new functions for computing nus
@@ -853,6 +861,10 @@ nuHat( RingElement, Ideal, ZZ ) := ( f, J, e ) -> nu( f, J, e )
 
 nuHat( RingElement, ZZ ) := ( f, e ) -> nu( f, e )
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 --Aproximates the F-Threshold with respects to an ideal J
 
 FTHatApproxList = method();
@@ -866,6 +878,10 @@ FTHatApproxList (Ideal,Ideal,ZZ) := (I,J,e) ->
 )
 
 FTHatApproxList (RingElement,Ideal,ZZ) := (f1,J1,e1) -> FTHatApproxList(ideal(f1),J1,e1)
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 ---------------------------------------------------------------------
@@ -956,6 +972,10 @@ reciprocal = w ->
      for c from 0 to #w-1 do v#c = 1/w#c;
      v
 )
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 --Computes the F-pure threshold of a diagonal hypersurface 
 --x_1^(a_1) + ... +x_n^(a_n) using Daniel Hernandez' algorithm
@@ -1533,14 +1553,21 @@ isPolynomialOverFiniteField (RingElement) := F ->
     	else false   
 )    
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to EthRoots
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 ----------------------------------------------------------------
 --************************************************************--
 --Functions for computing eth roots                           --
 --************************************************************--
 ----------------------------------------------------------------
 
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
----- START: TRANSFERED TO EthRoot.m2
 
 ethRoot = method(); --- MK
 
@@ -1777,14 +1804,6 @@ ethRoot(Ideal,ZZ) := (Im,e) -> (
      J
 )
 
----- END: TRANSFERED TO EthRoot.m2
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
--- START TRANSFERED TO EthRoots
 
 -----------------------------------------------------------------------------
 --- Extend the Frobenius p^e th roots and star operations to submodules of
@@ -2018,10 +2037,9 @@ minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
 
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
 
--- END TRANSFERED TO EthRoots
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to EthRoots
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 --Finds a test element of a ring R = k[x, y, ...]/I (or at least an ideal 
 --containing a nonzero test element).  It views it as an element of the ambient ring
@@ -2655,6 +2673,10 @@ threshInt = (f,e,t,b,t1)-> (
 {b1,xInt(t,b,t1/(char ring f)^e,b1)}
 )
  
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
 --Guesses the FPT of ff.  It returns a list of all numbers in 
 --the range suggested by nu(ff,e1) with maxDenom as the maximum denominator
 guessFPT ={OutputRange=>false}>>o -> (ff, e1, maxDenom) ->(
@@ -2834,6 +2856,10 @@ isFPTPoly ={Verbose=> false,Origin=>false}>> o -> (f1, t1) -> (
 	returnValue
 )
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 --********************************************
 --Some functions for the purpose of checking whether a map of rings is a splitting.  It also computes images of (field) trace.
@@ -2892,6 +2918,10 @@ frobenius = (R1, e1) -> (
 	map(R1, R1, fPowerList);
 )
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- BEGIN: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 --isFJumpingNumberPoly determines if a given rational number is an F-jumping number
 --***************************************************************************
 --This needs to be speeded up, like the above function
@@ -2917,6 +2947,9 @@ isFJumpingNumberPoly ={Verbose=> false}>> o -> (f1, t1) -> (
 	not (isSubset(mySigma, myTau))
 )
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transferred to FThresholds
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
