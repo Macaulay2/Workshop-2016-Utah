@@ -52,8 +52,9 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     -- equivalent to (y : z) ). So we do this to get the 
     -- representation of our map that's defined on the biggest
     -- set of points (e.g. (y : z) extends (xy : xz) to the locus where
-    -- x is zero). To see why, see proposition x.xx of the following
-    -- paper: 
+    -- x is zero). C.f. proposition 1.1 of the paper
+    -- "Cremona Transformations and some Related Algebras" by Aron Simis, 
+    -- J. Algebra 280 (2004)
     
     
     L:= apply(entries M, ll->ideal(ll));
@@ -143,8 +144,12 @@ doc ///
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
 	-------------------------------------
+    R = QQ[x,y,z]	
+	M = matrix{{x^2*y, x^2*z, x*y*z}}
+	I = ideal(x*y, y*z, x*z)
+	assert(I == baseLocusOfMap(M))
+
 	
-	--I = ideal(x^2*y, x^2*z, x*y*z)
 	
 --/// 
 ----FUTURE PLANS------
