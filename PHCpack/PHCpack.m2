@@ -833,6 +833,7 @@ mixedVolume  List := Sequence => opt -> system -> (
       then result = (mixvol,stabmv,p,sols)
       else result = (mixvol,p,sols);
   ); 
+  if opt.interactive then result = (mixvol,stabmv,p,sols);
   result
 )
 
@@ -1572,7 +1573,7 @@ m = mixedVolume(f)
 --(mv,sv) = mixedVolume(f,StableMixedVolume => true)
 --mv = mixedVolume(f,interactive=>true)
 (mv,q,qsols) = mixedVolume(f,interactive=>true)
-(mv,q,qsols) = mixedVolume(f,StartSystem=>true,interactive=>true)
+(mv,smv,q,qsols) = mixedVolume(f,StartSystem=>true,interactive=>true)
 --mixedVolume(f,interactive=>true)
 --fsols = trackPaths(f,q,qsols)
 fsols = trackPaths(f,q,qsols, interactive=>true)
