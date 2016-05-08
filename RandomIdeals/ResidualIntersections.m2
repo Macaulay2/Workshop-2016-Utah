@@ -144,9 +144,7 @@ isLicci Ideal := opts -> I -> (
 isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
     ))
 
-depth := profondeur;
-
-
+--depth but faster
 profondeur = method()
 profondeur(Ideal, Module) := (I,M) ->(
     --requires R to be an affine ring (eg NOT ZZ[x])
@@ -175,7 +173,7 @@ profondeur Ring := R -> profondeur R^1
 koszulDepth = method()
 koszulDepth(Ideal) := I -> (
     C := koszul mingens I;
-    for i in 0..(numColumns(mingens I)-codim I) list depth HH_i(C)
+    for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
     )
 
 isStronglyCM = method()
