@@ -330,10 +330,10 @@ doc ///
       d = maxGd I
    Inputs
       I:Ideal
-         A monomial ideal
+         a monomial ideal
    Outputs
       d:ZZ
-         The maximum value of d such that I has property G_d.
+         the maximum value of d such that I has property G_d.
    Description
       Text
       Example
@@ -382,14 +382,14 @@ doc ///
       L = numgensByCodim(I)
    Inputs
       I:Ideal
-         A monomial ideal
+         a monomial ideal
       k:ZZ
-         An integer between 1 and the dimension of the ring
+         an integer between 1 and the dimension of the ring
    Outputs
       d:ZZ
-         The maximum number of generators of {\tt I} localized at a prime {\tt P} of codimension {\tt k}.
+         the maximum number of generators of {\tt I} localized at a prime {\tt P} of codimension {\tt k}.
       L:List
-         A list of the numbers of generators for each codimension from 1 to the dimension of the ring
+         a list of the numbers of generators for each codimension from 1 to the dimension of the ring
    Description
       Text
       Example
@@ -413,10 +413,10 @@ doc ///
       L = residualCodims I
    Inputs
       I:Ideal
-         A monomial ideal
+         a monomial ideal
    Outputs
       L:List
-         A list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
+         a list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
    Description
       Text
       Example
