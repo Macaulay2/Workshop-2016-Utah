@@ -762,7 +762,7 @@ document {
 	 bgg(1,P,S)
 	 bgg(0,P,S)
 	 ///,
-     SeeAlso => {symExt}
+     SeeAlso => {symExt, bggComplex}
      }
  
  document {
@@ -794,7 +794,7 @@ document {
           P = coker f;
 	  bggComplex(P,S)
 	  ///,
-      SeeAlso => {bgg}
+      SeeAlso => {bgg, symExt}
       }
 
 document { 
