@@ -53,10 +53,12 @@ export{
     "ethRootSafe", 	       
     "ethRootSafeList",    
     "fancyEthRoot",	
+	"generatingRoot", ---MK
+	"FFiniteSupport", ---MK
 	"findAllCompatibleIdeals", ---MK	
     "minimalCompatible"
     "paraTestModule", ---MK
-    "paraTestModuleAmbient", ---MK
+    "paraTestModuleAmbient" ---MK
 }
 
 --*************************************************
