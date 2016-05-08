@@ -23,7 +23,10 @@ export {
         "idealFromSC",
         "isShelling",
 	"isLicci",
-	"minimalRegularSequence"
+	"minimalRegularSequence",
+	"linkageBound",
+	"UseNormalModule",
+	"randomRegularSequence"
         };
 
 testNewSimplex = method()
@@ -132,9 +135,7 @@ apply(smalls, e ->apply(facets, E -> #(e-set E)))
 ///
 
 
------Toward the test for licci
-
-
+-----Test for licci
 randomLink = method()
 randomLink (ZZ,Ideal) := (c,I) ->(
 {*
@@ -151,13 +152,15 @@ if numgens I <= c then return ideal(1_(ring I));
 regseq := minimalRegularSequence(c,I);
 trim(regseq : I)
 )
+randomLink Ideal := I->randomLink(codim I, I)
 
-linkageBound = method()
-linkageBound Ideal := I ->(
-    --2(mu N(I) - (codim I +3))
-N := prune Hom(I, (ring I)^1/I);
-n := numgens N;
-2*(n-codim I)
+linkageBound = method(Options => {UseNormalModule =>false})
+linkageBound Ideal := opts -> I -> (
+if opts.UseNormalModule == false then
+    2*(codim I)*(degree I -1) -6
+ else (
+	N := prune Hom(I, (ring I)^1/I);
+	2*(numgens N - codim I))
 )
 
 minimalRegularSequence = method()
@@ -187,9 +190,10 @@ while c'<c do(
     );
 J
 )
+minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
 
-isLicci = method()
-isLicci(ZZ, ZZ, Ideal) := (b,c,I) -> (
+isLicci = method(Options => {UseNormalModule =>false})
+isLicci(ZZ, ZZ, Ideal) := opts -> (b,c,I) -> (
     --I homogeneous ideal
     --b = linkageBound I
     --c = codim I
@@ -197,28 +201,124 @@ isLicci(ZZ, ZZ, Ideal) := (b,c,I) -> (
     --successive random links
     J := I;
     p := numgens J;
-    <<p<<endl;flush;
+--    <<p<<endl;flush;
     apply(b, i -> (
 	    J = randomLink(c,J);
+	    if numgens J == c then break;
 	    <<numgens J<<endl;flush;
 	    numgens J))
     )
+isLicci(ZZ,Ideal) := opts -> (b,I) -> isLicci(b,codim I, I)
+isLicci Ideal := opts -> I -> (
+isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
+    ))
+	
+
+
+doc ///
+   Key
+    isLicci
+    (isLicci,ZZ,ZZ,Ideal)
+    (isLicci,ZZ,Ideal)
+    (isLicci,Ideal)
+    [isLicci,UseNormalModule]
+   Headline
+    Tests whether an ideal is licci
+   Usage
+    L = isLicci(b,c,I)
+    L = isLicci(b,I)
+    L = isLicci I
+   Inputs
+    b:ZZ
+     upper bound on how many successive random links to try
+    c:ZZ
+     codim of I
+    I:Ideal
+   Outputs
+    L:List
+     of integers, the numbers of generators of the successive links
+   Description
+    Text
+     Computes up to b successive random links,
+     using a regular sequence among the generators of I, and outputs the 
+     numbers of generators. If I is licci, such a sequence must terminate
+     in an ideal with c = codim I generators in at most
+     linkageBound I steps.
+    Example
+   Caveat
+    linkageBound I can be very large; linkageBound(I, UseNormalModule => true) can be very slow.
+   SeeAlso
+    linkageBound
+    randomRegularSequence
+    randomLink
+///
+doc ///
+   Key
+    UseNormalModule
+   Headline
+    option for linkageBound and isLicci
+   Description
+    Text
+     Default value is false. When true, it
+     enables a more refined computation of the bound on the number of general links of
+     an ideal I
+     that must be taken to definitively test the licci propery. 
+     When UseNormalModule = true the computation of the 
+     normal module Hom(I, (ring I)/I) is required and this can be slow;
+     if UseNormalModule = false the computation is fast, but the bound is large.
+   SeeAlso
+    isLicci
+    linkageBound
+///
+   
+doc ///
+   Key
+    linkageBound
+    (linkageBound,Ideal)    
+    [linkageBound, UseNormalModule]
+   Headline
+    computes a bound on the number of general links of an ideal to test the licci property
+   Usage
+    b = linkageBound I
+   Inputs
+    I:Ideal
+   Outputs
+    b:ZZ
+   Description
+    Text
+    Example
+   Caveat
+   SeeAlso
+    isLicci
+///
    
 ///
 restart
 loadPackage("shelling", Reload =>true)
+installPackage"shelling"
+
+viewHelp isLicci
 S = ZZ/101[x_0..x_3]
+installPackage "MCMApproximations"
 I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
 isLicci(3, codim I, I)
+linkageBound (I, UseNormalModule => false)
+linkageBound (I, UseNormalModule => true)
+
+I = minors(2, random(S^2, S^{4:-1}))
+isLicci(3, codim I, I)
+linkageBound (I, UseNormalModule => false)
+linkageBound (I, UseNormalModule => true)
 
 I = minors(3, random(S^3, S^{-2,-3,-4,-4}));
 isLicci(3, codim I, I)
 
-I = minors(2, random(S^2, S^{4:-1}))
-isLicci(3, codim I, I)
+linkageBound (I, UseNormalModule => false)
+time linkageBound (I, UseNormalModule => true)
+
 
 --b = linkageBound I
-b = 2*c
+
 ///
 
 ------------------------------------------------------------
@@ -318,7 +418,7 @@ doc ///
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
      Description
           Text
-               
+            This function randomly chooses a facet of size m+1 and checks whether the facet can be shellably added to the shelling. If it can be shellably added to the shelling, it is added to the shelling and the new shelling is returned. Otherwise, the process repeats up to 20 times.  
           Example
             P={{1,2,3}}
 	    L=randomAddition(6,3,P)
@@ -360,6 +460,8 @@ doc ///
 TEST///
 assert(#randomChain(5,2,6)==6)
 assert(#randomChain(5,2)==binomial(5,3))
+R=QQ[x1,x2,x3,x4,x5];
+assert(#randomChain(R,2,6)==6)
 ///
 
 
@@ -381,6 +483,13 @@ TEST///
 setRandomSeed(0);
 assert(#randomAddition(6,3,{{1,2,3}})==2)
 assert(#randomAddition(6,3,{{1,2,3,4}})==2)
+///
+
+TEST///
+needsPackage "SimplicialComplexes"
+needsPackage "SimplicialDecomposability"
+R=QQ[x1,x2,x3,x4,x5];
+assert(isShellable simplicialComplex randomChain(R,2,6))
 ///
 
 end--
