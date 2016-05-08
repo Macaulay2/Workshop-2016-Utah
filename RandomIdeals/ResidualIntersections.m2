@@ -123,8 +123,8 @@ numgensByCodim Ideal := J -> (
 
 maxGd = method()
 maxGd Ideal := J -> (
-    for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i-1;
-    numgens ring J
+    for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i;
+    infinity
     )
 
 doc ///
@@ -236,7 +236,7 @@ time linkageBound (I, UseNormalModule => true)
 restart
 loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
-J = idealFromSC randomChain(10,5,20);
-numgensByCodim J
-maxGd J
+J = idealChainFromSC randomChain(10,5,20);
+--numgensByCodim J
+J/maxGd
 ///
