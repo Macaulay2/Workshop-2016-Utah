@@ -27,15 +27,11 @@ export{
 --************************************************************--
 ----------------------------------------------------------------
 
-dimImage = method();
-
-dimImage(Ideal) := (I1) -> (
-);
-
-
 imageOfMap = method();
 imageOfMap(Matrix,Ideal,Ideal) := (f,a,b) -> (
 	h = map((ring a)/a,(ring b)/b,f);
+	-- the image of f is the same as the kernel of its pullback on the 
+	-- coordinate rings. h is this pullback
 	image = ker h;
 	image
 	);
@@ -44,6 +40,7 @@ dimImage = method();
 dimImage(Matrix,Ideal,Ideal) := (f,a,b) ->(
 	I = imageOfMap(f,a,b);
 	dim I - 1
+	-- substract 1 from the dimension of the image since in projective space
 	);
 
 baseLocusOfMap = method();
