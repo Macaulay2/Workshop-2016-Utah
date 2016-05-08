@@ -25,10 +25,8 @@ export {
      "squareFree",
      "regSeq",
      "AlexanderProbability",
-     "prepare",
         "randomAddition", 
 	"randomChain",
-	"testNewSimplex",
         "idealFromShelling",
 	"idealChainFromShelling",
         "isShelling",
@@ -393,9 +391,6 @@ doc ///
 ///
 
 
-
-
-
 ------------------------------------------------------------
 -- DOCUMENTATION isShelling
 ------------------------------------------------------------
@@ -411,7 +406,7 @@ doc ///
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a possible shelling.
      Outputs
-          B:Boolean
+          b:Boolean
 	       true if and only if P is a shelling.
      Description
           Text
@@ -477,7 +472,7 @@ doc ///
 	  I = idealFromShelling(S,P)
      Inputs
 	  S:Ring
-	      (If omitted, it will use {\tt S=QQ[x_0..x_(n-1)]} where {\tt n +1} is the maximum integer in the lists of {\tt P}.  
+	      (If omitted, it will use {\tt S=QQ[x_0..x_(n-1)]} where {\tt n} is the maximum integer in the lists of {\tt P}.  
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
      Outputs
@@ -518,49 +513,12 @@ doc ///
 	      a list of ideals
      Description
           Text  
-	     Outputs the Stanley-Reisner ideal for each successive simplicial complex formed by truncating the simplicial complex. 
+	     Outputs the Stanley-Reisner ideal for each successive simplicial complex formed by truncating the shelling. 
 	  Example
 	      P =  {{1, 2, 4}, {0, 1, 4}, {0, 2, 4}, {0, 3, 4}};
 	      idealChainFromShelling(P)
          
      
-///
-
-------------------------------------------------------------
--- DOCUMENTATION testNewSimplex
-------------------------------------------------------------
-
-doc ///
-     Key
-          testNewSimplex
-	  (testNewSimplex,List,List)
-     Headline
-          Tests whether a facet can be shellably added to a shelling.
-     Usage
-          b=testNewSimplex(P,S)
-     Inputs
-          P:List
-	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
-          S:List
-               A list of integers. This list is the new facet to add.
-     Outputs
-          b:Boolean
-	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
-     Description
-          Text
-               This function tests whether a given face can be shellably added to a shelling. 
-	       That is, given a shellable simplicial complex $P$ as a list of ordered lists $P_1, .., P_j$ of sets of integers in $[n]$ and a simplex $S$, 
-	       the function tests whether the intersection of $S$ with $P$ is of pure dimension $d-1$. 
-          Example
-            P={{1,2,3}};
-	    testNewSimplex(P,{2,3,4})
-	    Q ={{1,2,3},{2,3,4}};
-	    testNewSimplex(Q,{4,5,6})
-	    
-     Caveat
-          We do not test if P is a shelling in the first place.
-     SeeAlso
-     	 isShelling
 ///
 
 ------------------------------------------------------------
@@ -808,30 +766,6 @@ Description
    J
 ///
 
-doc ///
-Key
-  prepare
-Headline
-  Prepares a MonomialIdeal for "randomSquareFreeStep"
-Usage
-  L = prepare I
-Inputs
-  I: MonomialIdeal
-Outputs
-  L: List 
-    of one monomial ideal and two lists
-Description
-  Text
-   prepare I returns a list 
-   L =  {I, Igens, ISocgens}
-   consisting of I and two lists.
-   Igens is the list of monomial generators of I,
-   while ISocgens is the list of generators of I+squares,
-   where squares is the monomial ideal consisting of all
-   the squares of variables in ring I.
-SeeAlso
-  randomSquareFreeStep
-///  
 
 doc ///
 Key
