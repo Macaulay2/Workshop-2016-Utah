@@ -89,22 +89,21 @@ doc ///
 	Usage
 		image = imageOfMap(f,a,b)
 	Inputs
-		f: matrix
-			a rational map between 2 projective varieties, f: X -> Y
-		   	assumed that f is given by a polynomial representation
-                a: ideal
+		f: matrix  
+			projective rational map given by polynomial rep
+   		a: ideal
 			defining equations for X
-		b: ideal 
+   		b: ideal 
 			defining equations for Y
 	Outputs
-		image: ideal
+   		im: ideal
 			defining equations for the image of f
 	Description
-		Text
+   		Text
 			Defines the pullback map on the coordinate rings of X
-                        and Y. The kernel of this pullback map gives the image
+        		and Y. The kernel of this pullback map gives the image
 			of the original map f.
-		Example
+   		Example
 			S = QQ[x,y,z]
 			a = ideal(x^2+y^2+z^2)
 			T = QQ[u,v]

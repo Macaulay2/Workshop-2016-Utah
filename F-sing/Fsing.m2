@@ -62,4 +62,6 @@ load "./Fsing/IntegerComps.m2"
 
 load "./Fsing/EthRoots.m2"
 
+load "./Fsing/FPureAlgorithm.m2"
+
 load "./Fsing/FsingDocs.m2"
