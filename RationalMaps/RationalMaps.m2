@@ -29,16 +29,16 @@ export{
 
 imageOfMap = method();
 imageOfMap(Matrix,Ideal,Ideal) := (f,a,b) -> (
-	h = map((ring a)/a,(ring b)/b,f);
+	h := map((ring a)/a,(ring b)/b,f);
 	-- the image of f is the same as the kernel of its pullback on the 
 	-- coordinate rings. h is this pullback
-	im = ker h;
+	im := ker h;
 	im
 	);
 
 dimImage = method();
 dimImage(Matrix,Ideal,Ideal) := (f,a,b) ->(
-	I = imageOfMap(f,a,b);
+	I := imageOfMap(f,a,b);
 	dim I - 1
 	-- substract 1 from the dimension of the image since in projective space
 	);
@@ -81,74 +81,71 @@ doc ///
     	 A package for computations with rational maps.
 ///
 
-doc ///
-	Key
-		imageOfMap
-	Headline
-		Finds defining equations for the image of a rational map
-	Usage
-		image = imageOfMap(f,a,b)
-	Inputs
-		f: matrix
-			a rational map between 2 projective varieties, f: X -> Y
-		   	assumed that f is given by a polynomial representation
-                a: ideal
-			defining equations for X
-		b: ideal 
-			defining equations for Y
-	Outputs
-		image: ideal
-			defining equations for the image of f
-	Description
-		Text
-			Defines the pullback map on the coordinate rings of X
-                        and Y. The kernel of this pullback map gives the image
-			of the original map f.
-		Example
-			S = QQ[x,y,z]
-			a = ideal(x^2+y^2+z^2)
-			T = QQ[u,v]
-			b = ideal(u^2+v^2)
-			f = matrix{{x*y,y*z}}
-			imageOfMap(f,a,b)
-///
-
-doc ///
-        Key
-                dimImage
-        Headline
-                Computes dimension of image of rational map of projective varieties
-        Usage
-                dim = dimImage(f,a,b)
-        Inputs
-                f: matrix
-                        a rational map between 2 projective varieties, f: X -> Y
-                        assumed that f is given by a polynomial representation
-                a: ideal
-                        defining equations for X
-                b: ideal
-                        defining equations for Y
-        Outputs
-                dimension of image
-///
-TEST ///
-	------------------------------------
-	------- Tests for imageOfMap -------
-	------------------------------------   
-	S = QQ[x,y,z]
-        a = ideal(x^2+y^2+z^2)
-        T = QQ[u,v]
-        b = ideal(u^2+v^2)
-        f = matrix{{x*y,y*z}}
-        image = imageOfMap(f,a,b)  
-	assert(image == ideal(v^4,u*v^3))
+--doc ///
+--	Key 
+--		imageOfMap
+--	Headline
+--		Finds defining equations for the image of a rational map
+--	Usage
+--		image = imageOfMap(f,a,b)
+--	Inputs
+--		f:Matrix
+--			projective rational map given by polynomial represenative
+--		a:Ideal
+--			defining equations for X
+--		b:Ideal
+--			defining equations for Y
+--	Outputs
+--		im:Ideal
+--			defining equations for the image of f
+--	Description
+--		Text
+--			Defines the pullback map on the coordinate rings of X and Y. The kernel of this pullback map gives the image of the original map f
+--		Example
+--			S = QQ[x,y,z]
+--			a = ideal(x^2+y^2+z^2)
+--			T = QQ[u,v]
+--			b = ideal(u^2+v^2)
+--			f = matrix{{x*y,y*z}}
+--			imageOfMap(f,a,b)
+--///
+--			
+--doc ///
+--        Key
+--                dimImage
+--        Headline
+--                Computes dimension of image of rational map of projective varieties
+--        Usage
+--                dim = dimImage(f,a,b)
+--        Inputs
+--                f: matrix
+--                        a rational map between 2 projective varieties, f: X -> Y
+--                        assumed that f is given by a polynomial representation
+--                a: ideal
+--                        defining equations for X
+--                b: ideal
+--                        defining equations for Y
+--        Outputs
+--                dimension of image
+--///
+--TEST ///
+--	------------------------------------
+--	------- Tests for imageOfMap -------
+--	------------------------------------   
+--	S = QQ[x,y,z]
+--        a = ideal(x^2+y^2+z^2)
+--        T = QQ[u,v]
+--        b = ideal(u^2+v^2)
+--        f = matrix{{x*y,y*z}}
+--        image = imageOfMap(f,a,b)  
+--	assert(image == ideal(v^4,u*v^3))
 	
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
 	-------------------------------------
 	
-	I = ideal(x^2*y, x^2*z, x*y*z)
+	--I = ideal(x^2*y, x^2*z, x*y*z)
 	
-/// 
+--/// 
 ----FUTURE PLANS------
 
