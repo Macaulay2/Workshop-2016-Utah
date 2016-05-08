@@ -12,17 +12,59 @@ newPackage ( "ResidualIntersections",
     DebuggingMode => true
     )
 
-
 export {
 	"isLicci",
 	"minimalRegularSequence",
 	"linkageBound",
 	"UseNormalModule",
 	"randomRegularSequence",
+	"genericResidual",
+	"genericArtinNagata",
 	"numgensByCodim",
-	"maxGd"
+	"maxGd",
+	"residualCodims"
         };
 
+--Generic Artin-Nagata Code
+genericArtinNagata = method()
+genericArtinNagata(ZZ,Ideal) := (s,I) -> (
+    needsPackage "MCMApproximations";
+    S := ring I;
+    K := genericResidual(s,I);
+    s' := codim K;
+    if s' === s then 
+      codepth := numgens (ring K) - depth ((ring K)^1/K)
+    else codepth = -1;
+    {s',codepth,K}
+    )
+    --tests whether the generic link is CM
+
+genericResidual = method()
+genericResidual(ZZ,Ideal):= (s,I) ->(
+    if s>= numgens I then return ideal(1_(ring I));
+    sgens := sort gens I;
+    rgens := (sgens)*random(source sgens, source sgens);
+    n := numcols rgens;
+    (ideal (rgens_{n-s..n-1})): I
+    )
+
+///
+restart
+loadPackage("RandomIdeal", Reload => true)
+loadPackage("ResidualIntersections", Reload =>true)
+S = ZZ/32003[x_0..x_5]
+--6 vars
+I = randomShellableIdeal(S,2,4)
+S = ZZ/32003[x_0..x_3]
+I = minors(3, random(S^3, S^{-2,-3,-4,-5}));
+--codim 3
+codim I
+s = 2;
+codim genericResidual(3,I)
+L = genericArtinNagata(s,I);
+L_{0,1}
+///
+---Licci code
 randomLink = method()
 randomLink (ZZ,Ideal) := (c,I) ->(
 {*
@@ -125,6 +167,11 @@ maxGd = method()
 maxGd Ideal := J -> (
     for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i;
     infinity
+    )
+
+residualCodims = method()
+residualCodims Ideal := J -> (
+    toList select((codim J + 1..numgens ring J + 1), i->numgensByCodim(J,i-1) <= i)
     )
 
 doc ///
@@ -237,6 +284,7 @@ restart
 loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
 J = idealChainFromSC randomChain(10,5,20);
---numgensByCodim J
 J/maxGd
+J/residualCodims
+
 ///

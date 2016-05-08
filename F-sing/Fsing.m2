@@ -88,7 +88,10 @@ export{
     "PrintCP",
     "setFTData",
     "splittingField",
-    "taxicabNorm"
+    "taxicabNorm",
+    "minimalCompatible",
+    "paraTestModule",
+    "paraTestModuleAmbient",
 }
 
 --*************************************************
@@ -117,6 +120,4 @@ load "./Fsing/FsingDocs.m2"
 beginDocumentation()
 
 load "./Fsing/EthRootsDoc.m2"
-
-load "./Fsing/FThresholdsDoc.m2"
 
