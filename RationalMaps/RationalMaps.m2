@@ -75,7 +75,6 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
 
 isRegularMap = method();
 
-baseLocusOfMap(
 
  blowUpIdeals=method();
   
@@ -240,6 +239,8 @@ doc ///
     	Text   
     	 A package for computations with rational maps.
 ///
+
+
 
 doc ///
 	Key 
