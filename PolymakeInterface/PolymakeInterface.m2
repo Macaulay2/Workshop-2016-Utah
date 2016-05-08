@@ -19,6 +19,7 @@ newPackage(
 		     HomePage => "http://math.berkeley.edu/~brandtm/"}
 		},
     	Headline => "a package for interfacing with polymake",
+	PackageExports => {"PolyhedralObjects"},
     	DebuggingMode => true
     	)
 
@@ -35,9 +36,6 @@ export {
 ---------------------------------------------------------------------------
 -- Code
 ---------------------------------------------------------------------------
-
-needsPackage "SimpleDoc"
-needsPackage "PolyhedralObjects"
 
 runPolymakePrefix = "polymake"
 
