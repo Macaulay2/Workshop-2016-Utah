@@ -1,8 +1,8 @@
 
 newPackage(
   "PHCpack",
-  Version => "1.6.4", 
-  Date => "31 May 2015",
+  Version => "1.7", 
+  Date => "8 May 2016",
   Authors => {
     {Name => "Elizabeth Gross",
      Email => "egross7@uic.edu",
@@ -16,7 +16,11 @@ newPackage(
     {Name => "Contributing Author: Anton Leykin",
      HomePage => "http://www.math.gatech.edu/~leykin"},
     {Name => "Contributing Author: Jeff Sommars",
-     HomePage => "http://www.math.uic.edu/~sommars"}
+     HomePage => "http://www.math.uic.edu/~sommars"},
+    {Name => "Contributing Author: Taylor Brysiewicz",
+     HomePage => "http://www.math.tamu.edu/~tbrysiewicz/"},
+    {Name => "Contributing Author: Corey Harris",
+     HomePage => "http://www.coreyharris.name/"}
   },
   Headline => "Interface to PHCpack",
   Configuration => { 

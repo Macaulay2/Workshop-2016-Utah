@@ -58,9 +58,9 @@ bggComplex(Module,PolynomialRing) := ChainComplex => (P,S) -> (
     n := numgens S;
     minDeg := min degGensP;
     maxDeg := max degGensP + n;
-    diffsInLP := reverse for i from minDeg-1 to maxDeg list bgg(i,P,S);
+    diffsInLP := for i from minDeg-1 to maxDeg list transpose bgg(i,P,S);
     LP := chainComplex diffsInLP;
-    LP[-minDeg+1]
+    dual(LP[-minDeg+1])
     )
 
 tateResolution = method(TypicalValue => ChainComplex)
@@ -762,7 +762,7 @@ document {
 	 bgg(1,P,S)
 	 bgg(0,P,S)
 	 ///,
-     SeeAlso => {symExt}
+     SeeAlso => {symExt, bggComplex}
      }
  
  document {
@@ -794,7 +794,7 @@ document {
           P = coker f;
 	  bggComplex(P,S)
 	  ///,
-      SeeAlso => {bgg}
+      SeeAlso => {bgg, symExt}
       }
 
 document { 
