@@ -1539,6 +1539,9 @@ isPolynomialOverFiniteField (RingElement) := F ->
 --************************************************************--
 ----------------------------------------------------------------
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+---- START: TRANSFERED TO EthRoot.m2
+
 ethRoot = method(); --- MK
 
 
@@ -1633,41 +1636,6 @@ ethRootSafeList( List, List, ZZ ) := ( F, a, e ) ->
 	
 ethRoot(RingElement, Ideal, ZZ, ZZ) := (f, I, a, e) -> ethRootSafe (f, I, a, e) ---MK
 
-ethRootInternalOld = (Im,e) -> (
-     if (isIdeal(Im) != true) then (
-     	  error "ethRoot: Expted a nonnegative integer."; 
-     );
-     if (not (e >= 0)) then (error "ethRoot: Expected a nonnegative integer.");
-     Rm:=ring(Im); --Ambient ring
-     if (not (class Rm === PolynomialRing)) then (error "ethRoot: Expected an ideal in a PolynomialRing.");
-     pp:=char(Rm); --characteristic
-     Sm:=coefficientRing(Rm); --base field
-     n:=rank source vars(Rm); --number of variables
-     vv:=first entries vars(Rm); --the variables
-     YY:=local YY; -- this is an attempt to avoid the ring overwriting
-                         -- the ring in the users terminal
-			 -- MonomialOrder=>ProductOrder{n,n}
-     myMon := monoid[ (vv | toList(YY_1..YY_n)), MonomialOrder=>ProductOrder{n,n},MonomialSize=>64];
-     R1:=Sm myMon; -- a new ring with new variables
-     vv2 := first entries vars R1;
-     J0:=apply(1..n, i->vv2#(n+i-1)-vv2#(i-1)^(pp^e)); -- 
-     --print J0;
-     M:=toList apply(1..n, i->vv2#(n+i-1)=>substitute(vv#(i-1),R1));
-
-     G:=first entries compress( (gens substitute(Im,R1))%gens(ideal(J0)) );
-
-     L:=ideal 0_R1;
-     apply(G, t-> --this appears to just be a for loop
-	  {
-    	       L=L+ideal((coefficients(t,Variables=>vv))#1);
-	  });
-     L2:=mingens L;
-     L3:=first entries L2;
-     L4:=apply(L3, t->substitute(t,M));
-     --use(Rm);
-     substitute(ideal L4,Rm)
-)
-
 ethRootInternal = (I,e) -> (
      if (not isIdeal(I)) then (error "ethRoot: Expected first argument to be an ideal.");
      if (not e >= 0) then (error "ethRoot: Expected second argument to be a nonnegative integer.");
@@ -1676,15 +1644,15 @@ ethRootInternal = (I,e) -> (
      p:=char(R); --characteristic
      kk:=coefficientRing(R); --base field
      if ((kk =!= ZZ/p) and (class(kk) =!= GaloisField)) then (error "ethRoot: Expected the coefficient field to be ZZ/p or a GaloisField.");
-     n:=rank source vars(R); --number of variables
-     var:=first entries vars(R); --the variables (henceforth denoted X_i)
+     var:=R_*; --the variables (henceforth denoted X_i)
+     n:=#var; --number of variables
      Y:=local Y;
-     S:=kk(monoid[(var | toList(Y_1..Y_n)), MonomialOrder=>ProductOrder{n,n},MonomialSize=>64]);
+     newvar := var | toList(Y_1..Y_n);
+     S:=kk(monoid[newvar, MonomialOrder=>ProductOrder{n,n},MonomialSize=>64]);
          -- brand new ring, with a variable Y_i for each X_i
-     newvar := first entries vars(S);
-     J:=matrix {toList apply(0..(n-1), i->newvar#(n+i)-newvar#(i)^(p^e))}; 
-         -- J = (Y_i-x_i^(p^e)) 
-     rules:=toList apply(0..(n-1), i->newvar#(n+i)=>substitute(var#(i),S)); 
+     J:=matrix {toList apply(n, i->newvar#(n+i)-newvar#(i)^(p^e))}; 
+         -- J = (Y_i-X_i^(p^e)) 
+     rules:=toList apply(n, i->newvar#(n+i)=>substitute(var#(i),S)); 
          -- {Y_i =>X_i} 
      G:=first entries compress((gens substitute(I,S)) % J);
      	 -- replaces X_i^(p^e) with Y_i 
@@ -1809,92 +1777,14 @@ ethRoot(Ideal,ZZ) := (Im,e) -> (
      J
 )
 
-----------------------------------------------------------------
---************************************************************--
---Functions for computing compatibly split ideals             --
---************************************************************--
-----------------------------------------------------------------
-
------------------------------------------------------------------------
-
-
---- Start of MK ---------------------------------------------------------------------------------------------------
-
--- FIND IDEALS COMPATIBLE WITH A GIVEN NEAR-SPLITTING
--- This is an implementation of the algorithm described in
--- Moty Katzman and Karl Schwede's paper 
--- "An algorithm for computing compatibly Frobenius split subvarieties"
--- J. Symbolic Comput. 47 (2012), no. 8, 996\961008. 
-
-----------------------------------------------------------------------------------------
-
-
---- Input:
----   	an element u of the polynomial ring R OVER A PRIME FIELD.
---- Output:
----	A list of all prime ideals P such that
----	(a) u P \subseteq P^{[p]}, and
----	(b) the action of uT on the the annihilator of P on the injective hull of the residue field of R 
----	is not the zero Frobenius map.
-
-
-findAllCompatibleIdeals = (u) ->(
-	L:={}; R:=ring u; p:=char R;
-	P:=ideal(0_R);
-	J:=ethRoot(ideal(u),1);
-	t:=1_R % (gens J);
-	if (t != 0_R) then print("*** WARNING *** Frobenius action has nilpotent elements");
-	findAllCompatibleIdealsInnards (u,L,P)
-)
+---- END: TRANSFERED TO EthRoot.m2
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 
-findAllCompatibleIdealsInnards = (u,L,P) ->(
-	R:=ring u;
-	p:=char R;
-	local tau;
-	local Plist;
-	P1:=frobeniusPower(P,1);
-	C1:=ideal((singularLocus(P)).relations);
-	---tau=ideal mingens star(C1,u,1) ; ---OLD VERSION
-	tau=ideal mingens ascendIdeal (C1, u, 1);
-	Plist=minimalPrimes tau;
-	local Q;
-	local T;
-	apply(Plist, Q->
-	{
-		f:= any(L,T -> T == Q);
----print(L,Q,f);
-		if (not f) then
-		{
-			L=append(L,Q);
-			L=unique(L | findAllCompatibleIdealsInnards(u,L,Q));
-		};
-	});
----
-	C2:=(P1+ideal(u)):(P1:P);
----	JB:=C1*C2; ---MK
----print(mingens P, mingens JB);
----tau=ideal mingens star(C2,u,1) ;  --- OLD VERSION
-	tau=ideal mingens ascendIdeal  (C2, u, 1);
-	Plist=minimalPrimes tau;
-	local Q;
-	local T;
-	apply(Plist, Q->
-	{
-		f:= any(L,T -> T == Q);
-	---print(L,Q,f);
-		if (not f) then
-		{
-			L=append(L,Q);
-			L=unique(L | findAllCompatibleIdealsInnards(u,L,Q));
-		};
-	});
-	---
-	L
-)
 
-
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-- START TRANSFERED TO EthRoots
 
 -----------------------------------------------------------------------------
 --- Extend the Frobenius p^e th roots and star operations to submodules of
@@ -2127,6 +2017,10 @@ minimalCompatible(Ideal,RingElement,ZZ,ZZ) :=  (Jk, hk, ak, ek) -> ascendIdealSa
 minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
 
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
+
+-- END TRANSFERED TO EthRoots
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 --Finds a test element of a ring R = k[x, y, ...]/I (or at least an ideal 
@@ -3025,214 +2919,6 @@ isFJumpingNumberPoly ={Verbose=> false}>> o -> (f1, t1) -> (
 
 
 
---MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
-
-
---- Given matrices A, B with target R^alpha find all v\in R^alpha such that B v \in Image A
---- by finding partial syzygies
-matrixColon= (A, B) ->(
-assert(target(A)==target(B));
-m:=rank source B;
-M:=B | A;
-S:=syz(M);
-S^(toList(0..m-1))
-)
-
----compute a generating morphism for H^(dim R -i)_I(R)
----the output is (A,U) where U:coker(A) -> F(coker A) is the generating morphism
-generatingMorphism= (I,i) ->(
-	local F1; local K; local C;
-	local F1p; local Kp; local Cp;
-	R:=ring(I);
-	Ip:=frobeniusPower(I,1);
-	M:=coker I;
-	Mp:=coker Ip;
-	resM:=res M;
-	resMp:=res Mp;
-	f:=inducedMap(M,Mp);
-	resf:=res f;
----Compute the generating map Ext^i(R/I,R) -> F Ext^i(R/I,R) [[The top i doesnt work: the zero matrix is not given]]
-	G:=resf#i; G=transpose(G);
-	F0:=(resM.dd)#(i); F0=transpose(F0);
-	if (resM.dd)#?(i+1) then
-	{
-		F1=(resM.dd)#(i+1); F1=transpose(F1);
-		K=ker F1;
-	} else
-	{
-		K=target(F0);
-	};
-	temp1:=substitute(gens K,R);
-	if (temp1==0) then C=coker(F0) else C=subquotient(substitute(gens K,R),F0);
----C=subquotient(substitute(gens K,R),F0);
-	C1:=prune(C);
-	h:=C1.cache.pruningMap;
-	generatingMorphism0:=G*gens(K)*matrix(entries h);
-	F0p:=(resMp.dd)#(i); F0p=transpose(F0p);
-	if (resMp.dd)#?(i+1) then
-	{
-		F1p=(resMp.dd)#(i+1); F1p=transpose(F1p);
-		Kp=ker F1p;
-	} else
-	{
-		Kp=target(F0p);
-	};
-	temp1=substitute(gens Kp,R);
-	if (temp1==0) then Cp=coker(F0p) else Cp=subquotient(substitute(gens Kp,R),F0p);
---Cp=subquotient(gens Kp,F0p);
-	C1p:=prune(Cp);
-	hp:=C1p.cache.pruningMap;
-	A0:=gens(Kp)*matrix(entries hp); A:=A0| F0p;
-	gbA:=gb(A, ChangeMatrix => true) ;
-	B:=generatingMorphism0// A;
---- Now generatingMorphism0=A*B
-	k:=rank source A0;
-	(relations(C1), submatrix(B,toList(0..(k-1)),))
-)
-
-
---- Given a generating morphism U:coker(A) -> F(coker A), compute a generating root U:coker(L) -> F(coker L)
-generatingRoot= (A,U) ->(
-	R:=ring(A);
-	L:=A;
-	alpha:=rank target A;
-	LL:=transpose matrix{toList(alpha:0_R)};
-	while ((( L)%( LL))!=0) do
-	{
-		LL=L;
-		L=L | matrixColon(frobeniusPower(L,1),U);
-		L=mingens image L;
----		print("=================================================================");
----		print(L);
-	};
-	L
-)
-
-
---- Given a generating morphism U:coker(A) -> F(coker A), compute the support of the F-module
-FFiniteSupport= (A,U) ->(
-	R:=ring(A);
-	alpha:=rank source U;
-	LL:=id_(R^alpha);
-	L:=ethRoot(U*LL,1);
-	while (((gens image LL) %( (gens image L)|A))!=0) do
-	{
-		LL=L;
----		L=mingens image U*L;
-		L=U*L;
-		L=ethRoot(L,1);
----?		L=mingens image L;
----		print("=================================================================");
----		print(L);
-	};
-	answer:=prune subquotient(A | L, A);
-	mingens radical annihilator answer
-)
-
-
--- Produce a sequence of maps Ext^i(R/I,R) ->  Ext^i(R/I^{[p]},R) induced
--- by the surjections R/I^{[p]} -> R/I
--- for i=1..pdim(coker I)
--- The output consists of a sequence of pairs (A,B) where the induced maps are
--- B: coker A -> coker A^{[p]}
-findGeneratingMorphisms = (I) ->
-(
-	local i;
-	Ip:=frobeniusPower(I,1);
-	M:=coker I;
-	Mp:=coker Ip;
-	resM:=res M;
-	resMp:=res Mp;
-	f:=inducedMap(M,Mp);
-	resf:=res f;
-	resLength:=length(resM);
-	answer:=();
-	apply(1..resLength, i->
-	{
-		G:=resf#i; G=transpose(G);
-		F1:=(resM.dd)_(i+1); F1=transpose(F1);
-		F0:=(resM.dd)_(i); F0=transpose(F0);
-		K:=ker F1;
-		C:=subquotient(gens K,F0);
-		C1:=prune(C);
-		h:=C1.cache.pruningMap;
---
-		generatingMorphism0:=G*gens(K)*matrix(entries h);
-		F1p:=(resMp.dd)_(i+1); F1p=transpose(F1p);
-		F0p:=(resMp.dd)_(i); F0p=transpose(F0p);
-		Kp:=ker F1p; 
-		Cp:=subquotient(gens Kp,F0p);
-		C1p:=prune(Cp);
-		hp:=C1p.cache.pruningMap;
---
-		A0:=gens(Kp)*matrix(entries hp); 
-		A:=A0| F0p;
-		gbA:=gb(A, ChangeMatrix => true) ;
-		B:=generatingMorphism0// A;
---- Now generatingMorphism0=A*B
-		k:=rank source A0;
-		generatingMorphism:=submatrix(B,toList(0..(k-1)),);
-		answer=append(answer, (C1,generatingMorphism));
----		print(generatingMorphism);
-	});
-answer
-)
-
-
-----------------------------------------------------------------------------------------
---- Given an Artinian module with Frobenius action F whose Delta functor (=the Matlis dual
---- which keeps track of the given Frobenius action) U: coker A -> coker A^{[p]}
---- produce a sequence (I_0, I_1, ..., I_h) so that
---- the locus of primes on which HSL(F)>h is V(I_h).
---- I_h is always the unit ideal the "global HSL number" is h-1.
---- Note that the "non-F-injective" locus is V(I_0), 
-----------------------------------------------------------------------------------------
-findHSLloci = (A,U0) ->
-(
-U:=U0;
-local M1;
-local M2;
-M2=id_(target A); M2=matrix entries M2;
-answer:=();
-f:=true;
-e:=1;
-while (f) do
-{
-	M1=M2;
-	M2=ethRoot(U,e) | A;
-	W:=subquotient(M1,M2);
-	locus:=annihilator W;
-	answer=append(answer,locus);
-	if (locus==1) then f=false;  --- is this Kosher?
-	e=e+1;
-	U=U*frobeniusPower(U,1);
-};
-answer
-)
-
-
-nonFInjectiveLocus = (I) ->
-(
-R:=ring(I);
-answer:=ideal(1_R);
-local t;
-generatingMorphisms:=findGeneratingMorphisms (I); 
-apply (generatingMorphisms, t->
-{
-	A:=relations ((t)#0);
-	if (A!=0) then
-	{
-		U:=(t)#1;
-		HSLLoci:=findHSLloci(A,U);
-		answer=intersect(answer,HSLLoci#0);
-	};	
-});
-answer
-)
-
-
---MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
-
 --****************************************************--
 --*****************Documentation**********************--
 --****************************************************--
@@ -3266,6 +2952,8 @@ doc ///
 	    Returns the largest exponent e such that p^e divides x.
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- START: Transfered to EthRootDoc
 doc ///
      Key
      	ascendIdeal
@@ -3302,6 +2990,8 @@ doc ///
 	Text
 	     Let phi be the p^(-e) linear map obtained by multiplying e-th Frobenius trace by h^a.  Then this function finds the smallest phi-stable ideal containing J.  The idea is to consider the ascending chain J, J+phi(J), J+phi(J)+phi^2(J), etc.  We return the stable value.  For instance, this can be used to compute the test ideal.  This method appared first in the work of Mordechai Katzman on star closure.  It differs from ascendIdeal in that it minimizes the exponents that h is raised to, this can make it faster or slower depending on the circumstances.
 ///
+--- END: Transfered to EthRootDoc
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 doc ///
      Key
@@ -3469,6 +3159,9 @@ doc ///
 	      This tries to find an exact value for the fpt.  If it can, it returns that value.  Otherwise it should return a range of possible values (eventually).  It first checks to see if the ring is binonmial or diagonal.  In either case it uses methods of D. Hernandez.  Next it tries to estimate the range of the FPT using nu's.  Finally, it tries to use this to deduce the actual FPT via taking advantage of convexity of the F-signature function and a secant line argument.  finalCheck is a Boolean with default value True that determines whether the last isFRegularPoly is run (it is possibly very slow).  If FinalCheck is false, then a last time consuming check won't be tried.  If it is true, it will be.  Verbose set to true displays verbose output.
 ///
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- START: Transfered to EthRootDoc
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 doc ///
      Key
      	 ethRoot
@@ -3504,6 +3197,9 @@ doc ///
 	Text
 	     Computes the 1/p^e-th root of (f^a*I).  It does it while trying to minimize the power that f gets raised to (in case a is a large number).  This can either be faster or slower than ethRoot.
 ///
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--- END: Transfered to EthRootDoc
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 doc ///
      Key

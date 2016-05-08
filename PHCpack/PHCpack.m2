@@ -289,6 +289,8 @@ systemFromFile (String) := (name) -> (
   L := lines(s);
   dimL0 := separate(" ", L_0); -- deal with case of nonsquare systems
   n := value dimL0_0;          -- first is always number of equations
+  if n == null then
+    n = value dimL0_1;         -- deal with leading spaces
   result := {};
   i := 0; j := 1;
   local stop;
@@ -808,7 +810,7 @@ mixedVolume  List := Sequence => opt -> system -> (
       break
    ), outfile);
   local stabmv;
-  if opt.StableMixedVolume then (
+  if opt.interactive or opt.StableMixedVolume then (
     scanLines(line ->  
       if substring(0,21,line) == "stable mixed volume :" then (
         stabmv = value replace("stable mixed volume : ","",line);
@@ -817,7 +819,7 @@ mixedVolume  List := Sequence => opt -> system -> (
   );
   local result;
   if not fileExists(startfile) then (
-    if opt.StableMixedVolume
+    if opt.StableMixedVolume or (opt.interactive and class(stabmv) =!= Nothing)
      then result = (mixvol, stabmv)
      else result = mixvol;
   )
@@ -829,10 +831,11 @@ mixedVolume  List := Sequence => opt -> system -> (
     if ret =!= 0 then
       error "error occurred while executing PHCpack command: phc -z";
     sols := parseSolutions(solsfile, ring ideal system);
-    if opt.StableMixedVolume
+    if class(stabmv)===Nothing
       then result = (mixvol,stabmv,p,sols)
       else result = (mixvol,p,sols);
   ); 
+  if opt.interactive then result = (mixvol,stabmv,p,sols);
   result
 )
 
@@ -1566,12 +1569,13 @@ solveSystem({2*x+y+5,5*y^2+3*x}, Verbose => true, interactive => true)
 restart 
 loadPackage "PHCpack"
 R = CC[x,y]
-f =  { x^3*y^5 + y^2 + x^2*y, x*y + x^2 - 1};
+f =  {x^3*y^5 + y^2 + x^2*y, x*y + x^2 - 1};
 I = ideal f;
-m = mixedVolume(f);
-(mv,sv) = mixedVolume(f,StableMixedVolume => true);
--- (mv,q,qsols) = mixedVolume(f,interactive=>true);
-mv = mixedVolume(f,interactive=>true);
-(mv,q,qsols) = mixedVolume(f,interactive=>true);
-fsols = trackPaths(f,q,qsols);
-fsols = trackPaths(f,q,qsols, interactive=>true);
+m = mixedVolume(f)
+--(mv,sv) = mixedVolume(f,StableMixedVolume => true)
+--mv = mixedVolume(f,interactive=>true)
+(mv,q,qsols) = mixedVolume(f,interactive=>true)
+(mv,smv,q,qsols) = mixedVolume(f,StartSystem=>true,interactive=>true)
+--mixedVolume(f,interactive=>true)
+--fsols = trackPaths(f,q,qsols)
+fsols = trackPaths(f,q,qsols, interactive=>true)

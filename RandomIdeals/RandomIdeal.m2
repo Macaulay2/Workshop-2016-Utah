@@ -240,14 +240,12 @@ testNewSimplex(List, List) := (P, D) ->(
 --given a pure, d-dimensional simplicial complex (sc) as a list of ordered lists of d+1 vertices in [n], and
 --a simplex D as such a list, tests whether the intersection of D with P is a union of facets of D.
      d := #D-1; --dimension
-     ints := unique apply(P, D' -> intersectLists(D',D));
-     addSimplex := (L,S) -> (
-         if any(S,F -> subsetList(L,F))
-         then S
-         else select(S,F -> not (subsetList(F,L))) | {L}
-         );
-     ints = fold(ints,{}, addSimplex);
-     all(ints, L -> #L == d)
+     ints := apply(P, D' -> intersectLists(D',D));
+     facets := apply(unique select(ints, E -> #E==d),set);
+     antiFacets := apply(facets,F -> (D-F)#0);
+     if facets == {} then return false;
+     smalls := unique select(ints, E -> #E<d);
+     all(smalls, e -> any(antiFacets, v -> not member(v,e)))
 )
 
 subsetList = (A,B) -> (
