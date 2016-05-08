@@ -289,6 +289,8 @@ systemFromFile (String) := (name) -> (
   L := lines(s);
   dimL0 := separate(" ", L_0); -- deal with case of nonsquare systems
   n := value dimL0_0;          -- first is always number of equations
+  if n == null then
+    n = value dimL0_1;         -- deal with leading spaces
   result := {};
   i := 0; j := 1;
   local stop;
