@@ -52,10 +52,11 @@ export{
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
-    "fancyEthRoot",		
+    "fancyEthRoot",	
+	"findAllCompatibleIdeals", ---MK	
     "minimalCompatible"
-    "paraTestModule",
-    "paraTestModuleAmbient",
+    "paraTestModule", ---MK
+    "paraTestModuleAmbient", ---MK
 }
 
 --*************************************************
