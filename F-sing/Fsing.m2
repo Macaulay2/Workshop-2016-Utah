@@ -84,9 +84,23 @@ load "./Fsing/generatingMorphism.m2"
 
 load "./Fsing/FPureAlgorithm.m2"
 
+
+load "./Fsing/FFiniteSupport.m2"
+
+load "./Fsing/parameterTestIdeal.m2"
+
 load "./Fsing/FsingDocs.m2"
 
 beginDocumentation()
 
 load "./Fsing/EthRootsDoc.m2"
+
+load "./Fsing/compatiblySplitDoc.m2"
+
+load "./Fsing/FFiniteSupportDoc.m2"
+
+load "./Fsing/generatingMorphismDoc.m2"
+
+load "./Fsing/parameterTestIdealDoc.m2"
+
 
