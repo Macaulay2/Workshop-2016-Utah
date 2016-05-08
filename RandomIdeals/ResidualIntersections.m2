@@ -20,7 +20,8 @@ export {
 	"UseNormalModule",
 	"randomRegularSequence",
 	"numgensByCodim",
-	"maxGd"
+	"maxGd",
+	"residualCodims"
         };
 
 randomLink = method()
@@ -125,6 +126,11 @@ maxGd = method()
 maxGd Ideal := J -> (
     for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i;
     infinity
+    )
+
+residualCodims = method()
+residualCodims Ideal := J -> (
+    toList select((codim J + 1..numgens ring J + 1), i->numgensByCodim(J,i-1) <= i)
     )
 
 doc ///
@@ -237,6 +243,7 @@ restart
 loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
 J = idealChainFromSC randomChain(10,5,20);
---numgensByCodim J
 J/maxGd
+J/residualCodims
+
 ///
