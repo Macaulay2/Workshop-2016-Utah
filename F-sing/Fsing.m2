@@ -54,6 +54,8 @@ export{
     "ethRootSafeList",    
     "fancyEthRoot",		
     "minimalCompatible"
+    "paraTestModule",
+    "paraTestModuleAmbient",
 }
 
 --*************************************************
