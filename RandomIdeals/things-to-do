@@ -6,6 +6,8 @@ add to RandomIdeal random Borel-fixed ideal
 documentation of the shelling functions
 tests of ...
 
+make prepare and testNewSimplex non-exported.
+
 -----------
 ResidualIntersections
 now has licci code
@@ -20,3 +22,5 @@ generic Artin-Nagata
 input-output: store examples in a file.
 
 documentation and tests
+
+
