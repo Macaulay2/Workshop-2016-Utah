@@ -134,7 +134,10 @@ doc ///
         Outputs
                 dimension of image
 ///
-TEST ///   
+TEST ///
+	------------------------------------
+	------- Tests for imageOfMap -------
+	------------------------------------   
 	S = QQ[x,y,z]
         a = ideal(x^2+y^2+z^2)
         T = QQ[u,v]
