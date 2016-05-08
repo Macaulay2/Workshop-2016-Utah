@@ -15,14 +15,13 @@ gotzmannBound (RingElement, ZZ) := List => (P, s) -> (
 
 lexSegment = method()
 lexSegment Ideal := Ideal => I -> (
-	P := hilbertPolynomial(I, Projective => false);
-	s := gotzmannBound(P, 0);
+	s := gotzmannBound(hilbertPolynomial(I, Projective => false), 0);
 	R := ring I;
 	L := ideal(0_R);
-	hF := (flatten entries last coefficients hilbertSeries(I, Order => s+2))/(c -> lift(c, ZZ));
-	idealBound := toList(1..s+1)/(i -> binomial(#gens R+i-1, i) - hF#i);
+	hF := (flatten entries last coefficients hilbertSeries(I, Order => s+1))/(c -> lift(c, ZZ));
 	for i from 1 to s do (
-		L = L + ideal((basis(i, R))_{0..<idealBound#(i-1)});
+		A := basis(i, R/L);
+		L = trim(L + ideal(submatrix'(lift(A, R), {(numcols A - hF#i)..numcols A})));
 	);
 	L
 )
@@ -45,5 +44,7 @@ TEST ///
 R = QQ[x_0..x_4]
 I = ideal(x_0^2, x_1^3)
 P = hilbertPolynomial(I, Projective => false)
-gotzmannBound(P,0)
+s = gotzmannBound(P,0)
+time J = lexSegment I;
+hilbertSeries(I, Order => s) == hilbertSeries(J, Order => s)
 ///
