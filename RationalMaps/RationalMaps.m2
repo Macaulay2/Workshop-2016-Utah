@@ -130,6 +130,22 @@ doc ///
                 dim:ZZ
 			dimension of image
 ///
+
+doc ///
+    Key
+        baseLocusOfMap
+    Headline
+        Computes base locus of a map from a projective variety to projective space
+    Usage
+        I = baseLocusOfMap(L)
+    Inputs
+        L: Matrix
+            Row matrix whose entries correspond to the coordinates of your map to projective space.
+    Outputs
+        I: Ideal
+            The saturated defining ideal of the baselocus
+///
+
 TEST ///
 	------------------------------------
 	------- Tests for imageOfMap -------
@@ -147,12 +163,10 @@ TEST ///
 	-- Tests for baseLocusOfMap ---------
 	-------------------------------------
 
-        R = QQ[x,y,z]	
+    R = QQ[x,y,z]	
 	M = matrix{{x^2*y, x^2*z, x*y*z}}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(M))
-
-	
 	
 /// 
 ----FUTURE PLANS------
