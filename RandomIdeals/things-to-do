@@ -23,4 +23,33 @@ input-output: store examples in a file.
 
 documentation and tests
 
+-----
 
+Code Review Comments:
+
+Add definitions/references for what a shelling is
+
+Add an explanation/overview of shelling.
+
+Improve/change the Description section.
+
+randomAddition should mention non-pure + edit/rewrite caveat to say that we don't check shellability
+
+add a bunch of seeAlso references
+    randomAddition and randomChain should reference eachother
+
+
+improve randomChain documentation
+    change randomChain to randomShelling
+    add more text/examples describing the code.
+
+spellcheck everything
+
+add examples/desc to randomShellableIdeal
+    link to randomChain/randomShelling and randomShellableIdealChain
+
+add randomShellableIdealChaing
+
+
+Add depthsOfPowersOfIdeals code
+Add slidingDepth code
