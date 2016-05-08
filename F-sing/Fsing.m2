@@ -43,8 +43,17 @@ Reload => true
 export{
 --IntegerComputations (IntegerComps.m2)
 	"floorlog",
-	"multOrder"
+	"multOrder",
 --ethRootFunctions (EthRoots.m2)
+    "ascendIdeal", 
+    "ascendIdealSafe",
+    "ascendIdealSafeList",
+    "AscentCount",
+    "ethRoot",
+    "ethRootSafe", 	       
+    "ethRootSafeList",    
+    "fancyEthRoot",		
+    "minimalCompatible"
 }
 
 --*************************************************
@@ -65,3 +74,8 @@ load "./Fsing/EthRoots.m2"
 load "./Fsing/FPureAlgorithm.m2"
 
 load "./Fsing/FsingDocs.m2"
+
+beginDocumentation()
+
+load "./Fsing/EthRootsDoc.m2"
+

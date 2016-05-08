@@ -31,6 +31,7 @@ ethRoot(Ideal,ZZ) := (Im,e) -> (
      J
 )
 
+
 ethRoot(MonomialIdeal, ZZ ) := ( I, e ) ->
 (
      R := ring I;
@@ -142,6 +143,8 @@ ethRootInternal = (I,e) -> (
 --A short version of ethRoot
 eR = (I1,e1)-> (ethRoot(I1,e1) )
 
+{*
+--- GONE to IntegerComps
 ---------------------------------------------------------------------------------------
 --- The following code was written in order to more quickly compute eth roots of (f^n*I)
 --- It is used in fancyEthRoot
@@ -192,7 +195,7 @@ baseP1 = (n,p,e)->
 	};
 	answer
 )	
-
+*}
 
 fancyEthRoot = (I,m,e) ->
 (
@@ -224,25 +227,6 @@ fancyEthRoot = (I,m,e) ->
 ethRoot (Ideal, ZZ, ZZ) := (I,m,e) -> fancyEthRoot (I,m,e)  --- MK
 
 ethRoot( RingElement, ZZ, ZZ ) := ( f, a, e ) -> ethRoot( ideal( f ), a, e )
-
---Computes I^{[1/p^e]}, we must be over a perfect field. and working with a polynomial ring
---This is a slightly stripped down function due to Moty Katzman, with some changes to avoid the
---use(Rm) which is commented out below
---The real meat of the function is ethRootInternal, this function just looks for a certain error and calls 
---the other function depending on that error.
-ethRoot(Ideal,ZZ) := (Im,e) -> (
-     J := Im;
-     success := false;
-     count := 0;
-     try J = ethRootInternal(J,e) then success = true else (
---     print "blew a buffer";
-	 while(count < e) do (	 	
-	      J = ethRootInternal(J, 1);
-	      count = count + 1
-	 )
-     );
-     J
-)
 
 
 ----------------------------------------------------------------
