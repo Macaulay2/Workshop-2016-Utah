@@ -1539,6 +1539,9 @@ isPolynomialOverFiniteField (RingElement) := F ->
 --************************************************************--
 ----------------------------------------------------------------
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+---- START: TRANSFERED TO EthRoot.m2
+
 ethRoot = method(); --- MK
 
 
@@ -1633,41 +1636,6 @@ ethRootSafeList( List, List, ZZ ) := ( F, a, e ) ->
 	
 ethRoot(RingElement, Ideal, ZZ, ZZ) := (f, I, a, e) -> ethRootSafe (f, I, a, e) ---MK
 
-ethRootInternalOld = (Im,e) -> (
-     if (isIdeal(Im) != true) then (
-     	  error "ethRoot: Expted a nonnegative integer."; 
-     );
-     if (not (e >= 0)) then (error "ethRoot: Expected a nonnegative integer.");
-     Rm:=ring(Im); --Ambient ring
-     if (not (class Rm === PolynomialRing)) then (error "ethRoot: Expected an ideal in a PolynomialRing.");
-     pp:=char(Rm); --characteristic
-     Sm:=coefficientRing(Rm); --base field
-     n:=rank source vars(Rm); --number of variables
-     vv:=first entries vars(Rm); --the variables
-     YY:=local YY; -- this is an attempt to avoid the ring overwriting
-                         -- the ring in the users terminal
-			 -- MonomialOrder=>ProductOrder{n,n}
-     myMon := monoid[ (vv | toList(YY_1..YY_n)), MonomialOrder=>ProductOrder{n,n},MonomialSize=>64];
-     R1:=Sm myMon; -- a new ring with new variables
-     vv2 := first entries vars R1;
-     J0:=apply(1..n, i->vv2#(n+i-1)-vv2#(i-1)^(pp^e)); -- 
-     --print J0;
-     M:=toList apply(1..n, i->vv2#(n+i-1)=>substitute(vv#(i-1),R1));
-
-     G:=first entries compress( (gens substitute(Im,R1))%gens(ideal(J0)) );
-
-     L:=ideal 0_R1;
-     apply(G, t-> --this appears to just be a for loop
-	  {
-    	       L=L+ideal((coefficients(t,Variables=>vv))#1);
-	  });
-     L2:=mingens L;
-     L3:=first entries L2;
-     L4:=apply(L3, t->substitute(t,M));
-     --use(Rm);
-     substitute(ideal L4,Rm)
-)
-
 ethRootInternal = (I,e) -> (
      if (not isIdeal(I)) then (error "ethRoot: Expected first argument to be an ideal.");
      if (not e >= 0) then (error "ethRoot: Expected second argument to be a nonnegative integer.");
@@ -1676,15 +1644,15 @@ ethRootInternal = (I,e) -> (
      p:=char(R); --characteristic
      kk:=coefficientRing(R); --base field
      if ((kk =!= ZZ/p) and (class(kk) =!= GaloisField)) then (error "ethRoot: Expected the coefficient field to be ZZ/p or a GaloisField.");
-     n:=rank source vars(R); --number of variables
-     var:=first entries vars(R); --the variables (henceforth denoted X_i)
+     var:=R_*; --the variables (henceforth denoted X_i)
+     n:=#var; --number of variables
      Y:=local Y;
-     S:=kk(monoid[(var | toList(Y_1..Y_n)), MonomialOrder=>ProductOrder{n,n},MonomialSize=>64]);
+     newvar := var | toList(Y_1..Y_n);
+     S:=kk(monoid[newvar, MonomialOrder=>ProductOrder{n,n},MonomialSize=>64]);
          -- brand new ring, with a variable Y_i for each X_i
-     newvar := first entries vars(S);
-     J:=matrix {toList apply(0..(n-1), i->newvar#(n+i)-newvar#(i)^(p^e))}; 
-         -- J = (Y_i-x_i^(p^e)) 
-     rules:=toList apply(0..(n-1), i->newvar#(n+i)=>substitute(var#(i),S)); 
+     J:=matrix {toList apply(n, i->newvar#(n+i)-newvar#(i)^(p^e))}; 
+         -- J = (Y_i-X_i^(p^e)) 
+     rules:=toList apply(n, i->newvar#(n+i)=>substitute(var#(i),S)); 
          -- {Y_i =>X_i} 
      G:=first entries compress((gens substitute(I,S)) % J);
      	 -- replaces X_i^(p^e) with Y_i 
@@ -1809,6 +1777,10 @@ ethRoot(Ideal,ZZ) := (Im,e) -> (
      J
 )
 
+---- END: TRANSFERED TO EthRoot.m2
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 ----------------------------------------------------------------
 --************************************************************--
 --Functions for computing compatibly split ideals             --
@@ -1895,6 +1867,8 @@ findAllCompatibleIdealsInnards = (u,L,P) ->(
 )
 
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-- START TRANSFERED TO EthRoots
 
 -----------------------------------------------------------------------------
 --- Extend the Frobenius p^e th roots and star operations to submodules of
@@ -2127,6 +2101,10 @@ minimalCompatible(Ideal,RingElement,ZZ,ZZ) :=  (Jk, hk, ak, ek) -> ascendIdealSa
 minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
 
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
+
+-- END TRANSFERED TO EthRoots
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 --Finds a test element of a ring R = k[x, y, ...]/I (or at least an ideal 
