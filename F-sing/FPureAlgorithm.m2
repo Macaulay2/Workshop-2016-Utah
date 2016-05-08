@@ -63,62 +63,6 @@ clearAll;
 -- Output:
 -- the smallest ideal J of R containing B with the property that A is in J^{[p^e]}
 
-ethRoot=method();
-
-ethRoot(Ideal,Ideal,ZZ):= (A,B,e) ->(
-R:=ring(A);
-pp:=char(R);
-F:=coefficientRing(R);
-n:=rank source vars(R);
-vv:=first entries vars(R);
-R1:=F[vv, Y_1..Y_n, MonomialOrder=>ProductOrder{n,n},MonomialSize=>16];
-q:=pp^e;
-J0:=apply(1..n, i->Y_i-substitute(vv#(i-1)^q,R1));
-S:=toList apply(1..n, i->Y_i=>substitute(vv#(i-1),R1));
-G:=first entries compress( (gens substitute(A,R1))%gens(ideal(J0)) );
-L:=ideal 0_R1;
-apply(G, t->
-{
-    L=L+ideal((coefficients(t,Variables=>vv))#1);
-});
-L1:=L+substitute(B,R1);
-L2:=mingens L1;
-L3:=first entries L2;
-L4:=apply(L3, t->substitute(t,S));
-use(R);
-substitute(ideal L4,R)
-);
-
-----------------------------------------------------------------------------------------
-
-frobeniusPower=method();
-
--- In the next function we compute the Frobenius power of an ideal
-
--- included in a polynomial ring of prime characteristic.
-
--- Input: ideal I inside a polynomial ring of prime characteristic p
--- and non-negative integer e.
-
--- Output: the ideal I^{[p^e]}.
-
-frobeniusPower(Ideal,ZZ) := (I,e) ->(
-R:=ring I;
-p:=char R;
-local u;
-local answer;
-G:=first entries gens I;
-if (#G==0) then
-{
-     answer=ideal(0_R);
-}
-else
-{
-     N:=p^e;
-     answer=ideal(apply(G, u->u^N));
-};
-answer
-);
 
 -------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------
@@ -134,7 +78,7 @@ answer
 
 -- Output: the list of all 1-codimensional vector subspaces of F^d.
 
-VECTORSPACES=new MutableHashTable;
+VECTORSPACES=new MutableHashTable; --Fix this!!!
 findAllOneDimensionalSubspaces = (F,d) ->(
 local i;
 local j;
@@ -349,10 +293,10 @@ f:=true;
 answer=P;
 while (f) do
 {
-	P1=(frobeniusPower(answer,1)):u;
+	P1=(frobeniusPower(1,answer)):u;
 	P1=intersect(answer,P1);
 	P2=ideal(u)*answer;
-	P2=ethRoot(P2,ideal(0_R),1);
+	P2=ethRoot(1,P2);
 	P1=intersect(P1,P2);
 	P1=compress((gens(P1))%M);
 	P1=ideal(P1);
