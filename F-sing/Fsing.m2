@@ -43,8 +43,59 @@ Reload => true
 export{
 --IntegerComputations (IntegerComps.m2)
 	"floorlog",
-	"multOrder"
+	"multOrder",
 --ethRootFunctions (EthRoots.m2)
+    "ascendIdeal", 
+    "ascendIdealSafe",
+    "ascendIdealSafeList",
+    "AscentCount",
+    "ethRoot",
+    "ethRootSafe", 	       
+    "ethRootSafeList",    
+    "fancyEthRoot",		
+    "minimalCompatible",
+--F-thresholds computations (FThresholds.m2)
+    "BinomialCheck",
+    "binomialFPT",
+    "canVector",
+    "DiagonalCheck", 
+    "diagonalFPT",
+    "estFPT",
+    "factorList",    
+    "findCPBelow",
+    "FPTApproxList",     
+    "FPT2VarHomog",     
+    "FPT2VarHomogInternal",
+    "FTApproxList",
+    "FTHatApproxList", 
+    "guessFPT",
+    "isBinomial",
+    "isCP",
+    "isDiagonal",
+    "isFJumpingNumberPoly",
+    "isFPTPoly",
+    "isInLowerRegion",
+    "isInUpperRegion",
+    "MaxExp",
+    "nu",
+    "nuAlt",
+    "NuCheck",
+    "nuHat",
+    "nuHatList",
+    "nuList",
+    "nuListAlt",
+    "nuListAlt1",
+    "PrintCP",
+    "setFTData",
+    "splittingField",
+    "taxicabNorm",
+    "minimalCompatible",
+    "paraTestModule",
+    "paraTestModuleAmbient",
+    "findAllCompatibleIdeals", ---MK	
+    "minimalCompatible",
+    "paraTestModule", ---MK
+    "paraTestModuleAmbient" ---MK
 }
 
 --*************************************************
@@ -69,3 +120,8 @@ load "./Fsing/generatingMorphism.m2"
 load "./Fsing/FPureAlgorithm.m2"
 
 load "./Fsing/FsingDocs.m2"
+
+beginDocumentation()
+
+load "./Fsing/EthRootsDoc.m2"
+
