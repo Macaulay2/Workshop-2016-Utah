@@ -24,6 +24,7 @@ export {
 	"maxGd",
 	"residualCodims",
         "koszulDepth",
+        "hasSlidingDepth",
         "isStronglyCM"
         };
 
@@ -176,10 +177,29 @@ koszulDepth(Ideal) := I -> (
     for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
     )
 
+koszulDepth(Ideal,ZZ) := (I,k) -> (
+    C := koszul mingens I;
+    profondeur HH_k(C)
+    )
+
+
 isStronglyCM = method()
 isStronglyCM(Ideal) := I -> (
     d := dim I;
     all(koszulDepth I,i -> i==d)
+    )
+
+hasSlidingDepth = method()
+
+hasSlidingDepth(Ideal,ZZ) := (I,k) -> (
+    d := dim I;
+    s := numColumns(mingens I)-codim I;
+    all(k+1, i -> (koszulDepth(I,s-i))>=d-i)
+    )
+
+hasSlidingDepth(Ideal) := (I) -> (
+    s := numColumns(mingens I)-codim I;
+    hasSlidingDepth(I,s)
     )
 
 -------------------------------------
