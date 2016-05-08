@@ -32,8 +32,8 @@ imageOfMap(Matrix,Ideal,Ideal) := (f,a,b) -> (
 	h = map((ring a)/a,(ring b)/b,f);
 	-- the image of f is the same as the kernel of its pullback on the 
 	-- coordinate rings. h is this pullback
-	image = ker h;
-	image
+	im = ker h;
+	im
 	);
 
 dimImage = method();
