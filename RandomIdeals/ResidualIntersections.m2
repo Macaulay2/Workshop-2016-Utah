@@ -324,6 +324,30 @@ doc ///
    SeeAlso
 ///
 
+------------------------------------------------------------
+-- DOCUMENTATION genericArtinNagata
+------------------------------------------------------------
+
+doc ///
+   Key
+    genericArtinNagata
+    (genericArtinNagata,ZZ,Ideal)    
+   Headline
+    Generic Artin nagata
+   Usage
+    L = genericArtinNagata(n,I)
+   Inputs
+    n:ZZ
+    I:Ideal
+   Outputs
+    L:List
+   Description
+    Text
+    Example
+   Caveat
+   SeeAlso
+///
+
 
 end--
    
