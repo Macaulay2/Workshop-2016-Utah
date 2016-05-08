@@ -21,6 +21,22 @@ export {
 	"randomRegularSequence"
         };
 
+--Generic Artin-Nagata Code
+genericArtinNagata = method()
+genericArtinNagata(ZZ,Ideal) := (s,I) -> ()
+    --tests whether the generic link is CM
+
+genericResidual = method()
+genericResidual(ZZ,Ideal):= (s,I) ->(
+    
+    )
+
+///
+restart
+loadPackage("RandomIdeals", Reload => true)
+
+///
+---Licci code
 randomLink = method()
 randomLink (ZZ,Ideal) := (c,I) ->(
 {*
