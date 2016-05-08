@@ -1,6 +1,6 @@
 ---compute a generating morphism for H^(dim R -i)_I(R)
 ---the output is (A,U) where U:coker(A) -> F(coker A) is the generating morphism
-generatingMorphism= (I,i) ->(
+generatingMorphism= (i,I) ->(
 	local F1; local K; local C;
 	local F1p; local Kp; local Cp;
 	R:=ring(I);
