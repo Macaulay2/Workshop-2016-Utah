@@ -633,19 +633,25 @@ doc ///
       depthsOfPowers
       (depthsOfPowers,ZZ,ZZ,Ideal)
    Headline
-      needs description
+      Computes depth of powers of an ideal
    Usage
       L = depthsOfPowers(s,c,I)
    Inputs
       s:ZZ
+      	  number of powers to compute
       c:ZZ
       	  should be codim I
       I:Ideal
    Outputs
       L:List
+      	 The depths of the powers of I from 1 to s-c+1. 
    Description
       Text
+      	  Computes the depth of $S/I^k$ for $k$ from 1 to $s-c+1$.
       Example
+      	  R = QQ[a,b,c,d,e,f];
+	  I = ideal (b*c, b*d, b*e, d*e, a*d*f, e*f);
+	  depthsOfPowers(6,3,I)
    Caveat
    SeeAlso
 ///
