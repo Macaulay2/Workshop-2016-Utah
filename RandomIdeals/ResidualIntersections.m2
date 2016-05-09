@@ -281,6 +281,18 @@ residualCodims MonomialIdeal := J -> (
     )
 
 ------------------------------------------------------------
+-- DOCUMENTATION ResidualIntersections
+------------------------------------------------------------
+doc ///
+   Key
+    ResidualIntersections
+   Headline
+    A package for residual intersections
+   Description
+   SeeAlso
+///
+
+------------------------------------------------------------
 -- DOCUMENTATION isLicci
 ------------------------------------------------------------
 doc ///
@@ -373,13 +385,16 @@ doc ///
 doc ///
    Key
     minimalRegularSequence
-    (minimalRegularSequence,ZZ,Ideal)    
+    (minimalRegularSequence,ZZ,Ideal)
+    (minimalRegularSequence,Ideal)
    Headline
     finds a maximal regular sequence of minimal degree in an ideal
    Usage
     J=minimalRegularSequence(n,I)
+    J=minimalRegularSequence(I)
    Inputs
     n:ZZ
+    I:Ideal
 ///
 
 ------------------------------------------------------------
