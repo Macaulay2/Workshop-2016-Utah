@@ -45,7 +45,7 @@ imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 
 dimImage = method();
 dimImage(Ideal,Ideal,Matrix) := (a,b,f) ->(
-	I := imageOfMap(f,a,b);
+	I := imageOfMap(a,b,f);
 	dim I - 1
 	-- substract 1 from the dimension of the image since in projective space
 	);
@@ -75,7 +75,6 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
 
 isRegularMap = method();
 
-baseLocusOfMap(
 
  blowUpIdeals=method();
   
@@ -241,20 +240,22 @@ doc ///
     	 A package for computations with rational maps.
 ///
 
+
+
 doc ///
 	Key 
 		imageOfMap
 	Headline
 		Finds defining equations for the image of a rational map
 	Usage
-		image = imageOfMap(f,a,b)
+		image = imageOfMap(a,b,f)
 	Inputs
-		f:Matrix
-			projective rational map given by polynomial represenative
 		a:Ideal
 			defining equations for X
 		b:Ideal
 			defining equations for Y
+		f:Matrix
+                        projective rational map given by polynomial represenative
 	Outputs
 		im:Ideal
 			defining equations for the image of f
@@ -267,7 +268,7 @@ doc ///
 			T = QQ[u,v]
 			b = ideal(u^2+v^2)
 			f = matrix{{x*y,y*z}}
-			imageOfMap(f,a,b)
+			imageOfMap(a,b,f)
 ///
 			
 doc ///
@@ -276,15 +277,14 @@ doc ///
         Headline
                 Computes dimension of image of rational map of projective varieties
         Usage
-                dim = dimImage(f,a,b)
+                dim = dimImage(a,b,f)
         Inputs
-                f: Matrix
-                        a rational map between 2 projective varieties, f: X -> Y
-                        assumed that f is given by a polynomial representation
                 a: Ideal
                         defining equations for X
                 b: Ideal
                         defining equations for Y
+		f:Matrix
+                        projective rational map given by polynomial represenative
         Outputs
                 dim:ZZ
 			dimension of image
@@ -315,8 +315,54 @@ TEST ///
         T = QQ[u,v]
         b = ideal(u^2+v^2)
         f = matrix{{x*y,y*z}}
-        image = imageOfMap(f,a,b)  
+        image = imageOfMap(a,b,f)  
 	assert(image == ideal(v^4,u*v^3))
+
+	S = QQ[x0,x1]
+	a = ideal(0*x0)
+	T = QQ[y0,y1,y2]
+	b = ideal(0*y1)
+	f = matrix{{x0^4,x0^2*x1^2,x1^4}}
+	im = imageOfMap(a,b,f)
+	assert(im == ideal(y2^2-y1*y^3))
+
+	-- Since in Projective Space, check to make sure different representations give the same result
+	S = QQ[x,y]
+	a = ideal(0*x)
+	T = QQ[u,v]
+	b = ideal(0*v)
+	f1 = matrix{{x,y}}
+	f2 = matrix{{x^3*y^2,x^2*y^3}}
+	assert(imageOfMap(a,b,f1)==imageOfMap(a,b,f2))
+
+	-------------------------------------
+	------ Tests for dimImage -----------
+	-------------------------------------
+
+	S = QQ[x,y,z]
+        a = ideal(x^2+y^2+z^2)
+        T = QQ[u,v]
+        b = ideal(u^2+v^2)
+        f = matrix{{x*y,y*z}}
+        dim = dimImage(a,b,f)
+        assert(dim == -1)
+
+        S = QQ[x0,x1]
+        a = ideal(0*x0)
+        T = QQ[y0,y1,y2]
+        b = ideal(0*y1)
+        f = matrix{{x0^4,x0^2*x1^2,x1^4}}
+        dim = dimImage(a,b,f)
+        assert(im == 1)	
+
+	-- Since in Projective Space, check to make sure different representations give the same result
+        S = QQ[x,y]
+        a = ideal(0*x)
+        T = QQ[u,v]
+        b = ideal(0*v)
+        f1 = matrix{{x,y}}
+        f2 = matrix{{x^3*y^2,x^2*y^3}}
+        assert(dimImage(a,b,f1)==dimImage(a,b,f2))
 
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
