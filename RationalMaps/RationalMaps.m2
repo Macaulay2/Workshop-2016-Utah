@@ -519,11 +519,11 @@ doc ///
         Headline
                 Computes dimension of image of rational map of projective varieties
         Usage
-                dim = dimImage(a,b,f)
-		dim = dimImage(a,b,g)
-		dim = dimImage(R,S,f)
-		dim = dimImage(R,S,g)
-		dim = dimImage(p)
+                d = dimImage(a,b,f)
+		d = dimImage(a,b,g)
+		d = dimImage(R,S,f)
+		d = dimImage(R,S,g)
+		d = dimImage(p)
         Inputs 
                 a: Ideal
                         defining equations for X
@@ -540,7 +540,7 @@ doc ///
                 p:RingMap
                         projective rational map given by polynomial representatives
 	Outputs
-                dim:ZZ
+                d:ZZ
 			dimension of image
 	Description
                 Text
@@ -638,7 +638,7 @@ TEST ///
         T = QQ[u,v]
         b = ideal(u^2+v^2)
         f = matrix{{x*y,y*z}}
-        image = imageOfMap(a,b,f)  
+        im = imageOfMap(a,b,f)  
 	assert(image == ideal(v^4,u*v^3))
 
 	S = QQ[x0,x1]
@@ -667,16 +667,16 @@ TEST ///
         T = QQ[u,v]
         b = ideal(u^2+v^2)
         f = matrix{{x*y,y*z}}
-        dim = dimImage(a,b,f)
-        assert(dim == -1)
+        d = dimImage(a,b,f)
+        assert(d == -1)
 
         S = QQ[x0,x1]
         a = ideal(0*x0)
         T = QQ[y0,y1,y2]
         b = ideal(0*y1)
         f = matrix{{x0^4,x0^2*x1^2,x1^4}}
-        dim = dimImage(a,b,f)
-        assert(im == 1)	
+        d = dimImage(a,b,f)
+        assert(d == 1)	
 
 	-- Since in Projective Space, check to make sure different representations give the same result
         S = QQ[x,y]
