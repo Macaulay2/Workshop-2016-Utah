@@ -217,11 +217,13 @@ profondeur Ring := R -> profondeur R^1
 
 koszulDepth = method()
 koszulDepth(Ideal) := I -> (
+    if I==0 then return {};
     C := koszul mingens I;
     for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
     )
 
 koszulDepth(ZZ,Ideal) := (k,I) -> (
+    if I==0 then return -1;
     C := koszul mingens I;
     profondeur HH_k(C)
     )
@@ -499,6 +501,7 @@ doc ///
    Outputs
       L:List
          a list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
+	 The range of values is {\tt codim I} + 1 and the dimension of the ring + 1.
    Description
       Text
          For each {\tt s} computes the maximum over all monomial primes {\tt P} with codimension {\tt s-1} 
@@ -507,6 +510,9 @@ doc ///
       Text
          The values {\tt s} returned are candidates for {\tt I} possibly being an {\tt s}-rsidual intersection.
       Example
+         R = QQ[a,b,c];
+	 I = monomialIdeal{a*b,b*c^2}
+	 residualCodims I
    SeeAlso
       numgensByCodim
       maxGs
@@ -526,7 +532,6 @@ doc ///
       b = isStronglyCM I
    Inputs
       I:Ideal
-         an ideal
    Outputs
       b:Boolean
          true if {\tt I} is Strongly Cohen Macaulay
@@ -534,8 +539,8 @@ doc ///
       Text
          Checks whether {\tt I} is Strongly Cohen Macaulay. We compute the depths of the Koszul homology by using {\tt koszulDepth} and compares it to {\tt codim I}.
       Example
-         R = QQ[x_0..x_2];
-	 I = ideal{x_0*x_1,x_1*x_2};
+         R = QQ[x_1..x_5];
+	 I = ideal{x_1*x_3,x_2*x_4,x_3*x_4,x_1*x_5,x_3*x_5};
          isStronglyCM I
    SeeAlso
        koszulDepth
@@ -558,7 +563,6 @@ doc ///
       d = koszulDepth(k,I)
    Inputs
       I:Ideal
-         an ideal
       k:ZZ
          the homological index to compute
    Outputs
@@ -571,10 +575,10 @@ doc ///
          The one parameter version computes the depths of the non-vanishing Koszul homology of {\tt I}.
          The two parameter version computes only the depth of the {\tt k}-th Koszul homology.
       Example
-         R = QQ[x_0..x_2];
-	 I = ideal{x_0*x_1,x_1*x_2};
+         R = QQ[x_1..x_6];
+	 I = ideal{x_1*x_2,x_1*x_3,x_2*x_4*x_5,x_1*x_6,x_4*x_6,x_5*x_6};
          koszulDepth I
-         koszulDepth(1,I)
+         koszulDepth(2,I)
    SeeAlso
        isStronglyCM
        hasSlidingDepth
@@ -596,11 +600,10 @@ doc ///
       b = hasSlidingDepth(k,I)
    Inputs
       I:Ideal
-         an ideal
       k:ZZ
    Outputs
       b:Boolean
-         if {\tt I} has sliding depth
+         true if {\tt I} has sliding depth
    Description
       Text
          This computes whether the ideal {\tt I} has sliding depth.
@@ -611,17 +614,58 @@ doc ///
          depth equal to $dim I$, every ideal has 0-sliding depth. We say that a module has
          sliding depth without a parameter if it has $(n-codim(I))$-sliding depth
       Example
-         R = QQ[x_0..x_2];
-	 I = ideal{x_0*x_1,x_1*x_2};
+         R = QQ[x_1..x_6];
+	 I = ideal{x_1*x_2,x_1*x_3,x_2*x_4*x_5,x_1*x_6,x_4*x_6,x_5*x_6};
          hasSlidingDepth I
-         hasSlidingDepth(0,I)
+         hasSlidingDepth(1,I)
+         hasSlidingDepth(2,I)
    SeeAlso
        isStronglyCM
        koszulDepth
 ///
 
+------------------------------------------------------------
+-- DOCUMENTATION depthsOfPowers
+------------------------------------------------------------
 
+doc ///
+   Key
+      depthsOfPowers
+      (depthsOfPowers,ZZ,ZZ,Ideal)
+   Headline
+      needs description
+   Usage
+      L = depthsOfPowers(s,c,I)
+   Inputs
+      s:ZZ
+      c:ZZ
+      	  should be codim I
+      I:Ideal
+   Outputs
+      L:List
+   Description
+      Text
+      Example
+   Caveat
+   SeeAlso
+///
 
+TEST ///
+R = QQ[x_1..x_6];
+I = ideal{x_1*x_2,x_1*x_3,x_2*x_4*x_5,x_1*x_6,x_4*x_6,x_5*x_6};
+assert(koszulDepth I == {3,0,2,3})
+assert(koszulDepth(2,I) == 2)
+assert(not hasSlidingDepth I)
+assert(hasSlidingDepth(1,I))
+assert(not hasSlidingDepth(2,I))
+assert(not isStronglyCM I)
+///
+
+TEST ///
+R = QQ[x_1..x_5];
+I = ideal{x_1*x_3,x_2*x_4,x_3*x_4,x_1*x_5,x_3*x_5};
+assert(isStronglyCM I)
+///
 end--
 insta
 linkageBound (I, UseNormalModule => false)

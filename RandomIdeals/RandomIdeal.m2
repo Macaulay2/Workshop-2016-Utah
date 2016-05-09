@@ -373,14 +373,19 @@ doc ///
 	  m:ZZ
 	       the dimension of the facets
 	  k:ZZ
-	       the number of facets (if ommited, the number will be {\tt n} choose {\tt m+1})
+	       the number of facets (if omitted, the number will be {\tt n} choose {\tt m+1})
 	      
      Outputs
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.  If called with a Ring {\tt R} instead of an integer {\tt n}, each facet is represented by a square-free monomial instead of a list.
      Description
           Text
-              The function produces a random chain of shellable complexes.  
+              The function produces a list of facets of a random shellable simplicial complex.
+	      The order of the facets is a shelling.
+	  Text
+	      The alogorithm works by choosing one of the previous facets at random, and replacing one of its vertices with a new vertex chosen at random.
+	      If the choice meets the criteria of a shelling, that facet is added to list, otherwise it is discarded and the algorithm tries again.
+	      The first facet is chosen uniformly at random.
           Example
                P = randomShelling(6,3,10)
 	       Q = randomShelling(6,3)
