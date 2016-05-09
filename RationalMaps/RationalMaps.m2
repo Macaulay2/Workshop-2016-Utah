@@ -38,6 +38,7 @@ export{
 ----------------------------------------------------------------
 
 imageOfMap = method();
+
 imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 	h := map((ring a)/a,(ring b)/b,f);
 	-- the image of f is the same as the kernel of its pullback on the 
@@ -46,7 +47,24 @@ imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 	im
 	);
 
+imageOfMap(Ideal,Ideal,BasicList) := (a,b,f) ->
+	imageOfMap(a,b,f)
+	);
+
+imageOfMap(Ring,Ring,Matrix) := (a,b,f) ->
+	imageOfMap(ideal a, ideal b, f)
+	);
+
+imageOfMap(Ring,Ring,BasicList) := (a,b,f) ->
+        imageOfMap(ideal a, ideal b, f)
+	);
+
+imageOfMap(RingMap) := (f) ->
+        imageOfMap(target f, source f, first entries matrix f)
+	);
+
 dimImage = method();
+
 dimImage(Ideal,Ideal,Matrix) := (a,b,f) ->(
 	I := imageOfMap(a,b,f);
 	dim I - 1
@@ -308,7 +326,8 @@ inverseOfMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
    SbarJD:=submatrix(barJD,,Col);
    Inv:={};
    for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
-   Inv   );    
+   map(S/im, R/di, Inv)
+);    
 
 inverseOfMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
     inverseOfMap(ideal R1, ideal S1, bm)
