@@ -85,23 +85,24 @@ isRegularMap = method();
   
   blowUpIdeals(Ideal, BasicList):=(a,L)->(
     r:=length  L;
-    S:=ring L_0;
-    n:=numgens ambient  S;
-    K:=coefficientRing S;
+    SS:=ring a;
+    LL:=apply(L,uu->sub(uu, SS));
+    n:=numgens ambient  SS;
+    K:=coefficientRing SS;
     yyy:=local yyy;
     ttt:=local ttt;
-    mymon:=monoid[({ttt}|gens ambient S|toList(yyy_0..yyy_(r-1))), MonomialOrder=>Eliminate 1];
+    mymon:=monoid[({ttt}|gens ambient SS|toList(yyy_0..yyy_(r-1))), MonomialOrder=>Eliminate 1];
     tR:=K(mymon);
-   -- tR:=K[t,gens ambient S,vars(0..r-1),   MonomialOrder=>Eliminate 1];
-    f:=map(tR,S,submatrix(vars tR,{1..n}));
-    F:=f(matrix{L});
+   -- tR:=K[t,gens ambient SS,vars(0..r-1),   MonomialOrder=>Eliminate 1];
+    f:=map(tR,SS,submatrix(vars tR,{1..n}));
+    F:=f(matrix{LL});
     myt:=(gens tR)#0;
-    J:=ideal(f(gens a))+ideal apply(1..r,j->(gens tR)_(n+j)-myt*F_(0,(j-1)));
+    J:=sub(a,tR)+ideal apply(1..r,j->(gens tR)_(n+j)-myt*F_(0,(j-1)));
     L2:=ideal selectInSubring(1,gens gb J);
     W:=local W;
-    nextmon:=monoid[(gens ambient  S|toList(W_0..W_(r-1))), Degrees=>{n:{1,0},r:{0,1}}];
-    R:=K(nextmon);
-    g:=map(R,tR,0|vars R);
+    nextmon:=monoid[(gens ambient  SS|toList(W_0..W_(r-1))), Degrees=>{n:{1,0},r:{0,1}}];
+    RR:=K(nextmon);
+    g:=map(RR,tR,0|vars RR);
     trim g(L2)); 
 
 blowUpIdeals(Ideal, Ideal):=(a,b)->(
@@ -270,11 +271,20 @@ doc ///
                         true if the map is birational, false if otherwise
         Description
     	        Text   
-    	                This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to have a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.
+    	                This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to have a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  Let's check that the plane quadratic cremona transformation is birational.
                 Example
-                       R=QQ[x,y,z]
-                       S=QQ[a,b,c] 
-///
+                       R=QQ[x,y,z];
+                       S=QQ[a,b,c];
+                       Pi = map(R, S, {x*y, x*z, y*z});
+                       isBirationalMap(Pi)
+                Text   
+                        We can also verify that a cover of $P^1$ by an elliptic curve is not birational.
+                Example
+                        R=QQ[x,y,z]/(x^3+y^3-z^3);
+                        S=QQ[s,t];
+                        Pi = map(R, S, {x, y-z});
+                        isBirationalMap(Pi)
+///                     
 
 doc ///
 	Key 
