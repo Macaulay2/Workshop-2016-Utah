@@ -61,12 +61,14 @@ export {
   "interactive",
   "isCoordinateZero",
   "isWitnessSetMember",
+  "loadSettingsPath",
   "mixedVolume",
   "nonZeroFilter",
   "numericalIrreducibleDecomposition",
   "numThreads",
   "randomSeed",
   "refineSolutions",
+  "saveSettingsPath",
   "seeProgress",
   "solveRationalSystem",
   "solveSystem",
@@ -1146,13 +1148,11 @@ topWitnessSet (List,ZZ) := o->(system,dimension) -> (
                   ideal(take(e,{#e-dimension,#e-1})),g);
   return (w,ns);
 )
-
 -----------------
 -- TRACK PATHS --
 -----------------
 
-trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2,
-  Verbose => false, numThreads=>0, seeProgress=>false, interactive => false})
+trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false, interactive => false, saveSettingsPath => "", loadSettingsPath => ""})
 trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   -- IN: T, target system to be solved;
   --     S, start system with solutions in Ssols;
@@ -1166,6 +1166,9 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
 
   if not(class coefficientRing ring first S===ComplexField) then
     error "coefficient ring of start system is not complex";  
+
+  if (o.loadSettingsPath != "") and o.interactive then
+    error "You cannot both load settings and be in interactive mode. Please reset your options.";
 
   R := ring first T;
   n := #T;
@@ -1189,14 +1192,31 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   if o.Verbose then
     stdio << "using temporary files " << outfile
           << " and " << Tsolsfile << endl;
-  
+
   if n < numgens R then error "the system is underdetermined";
-  
-  if n> numgens R then error "the system is overdetermined"; 
-  
+
+  if n > numgens R then error "the system is overdetermined";
+
+  bat := openOut batchfile;
+  if (o.loadSettingsPath != "") then (
+    if o.numThreads > 1 then (
+      bat << targetfile << endl << outfile << endl 
+      << startandsolutionfile << endl;
+    ) else (
+      bat << targetfile << endl << outfile << endl <<"n"<< endl
+      << startfile << endl << Ssolsfile << endl;
+    );
+    optionFileLines := lines get o.loadSettingsPath;
+    for i from 0 to #optionFileLines - 1 do (
+      bat << optionFileLines#i << endl;
+    );
+    close bat;
+    run(PHCexe|" -p "|(if o.numThreads > 1 then 
+       ("-t"|o.numThreads) else "")|"<"|batchfile|" >phc_session.log");
+    run(PHCexe|" -z "|outfile|" "|Tsolsfile);
+  )
   -- making batch file
-  if o.interactive then (
-    bat := openOut batchfile;
+  else if o.interactive then (
     bat << targetfile << endl << outfile << endl <<"n"<< endl 
     << startfile << endl << Ssolsfile << endl;
     close bat;
@@ -1206,11 +1226,10 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
     run(PHCexe|" -z "|outfile|" "|Tsolsfile);
       
   ) else (
-    bat = openOut batchfile;
   if not (o.numThreads > 1) then (
     bat << targetfile << endl << outfile << endl <<"n"<< endl 
     << startfile << endl << Ssolsfile << endl;
-  
+
     -- first menu with settings of the construction of the homotopy
     bat << "k" << endl << o.tDegree << endl;
     if o.gamma != 0 then (
@@ -1271,7 +1290,81 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
     << "track[PHCpack]: discarded "<< 
     totalN-#result << " out of " << totalN << " solutions" << endl;
   );
+  if o.saveSettingsPath != "" then
+    saveTrackPathsOptions(outfile, o.saveSettingsPath);
   return result;
+)
+
+stripSpaces = method();
+stripSpaces (String) := S -> (
+  cleanS := "";
+  for i from 0 to #S - 1 do (
+    if S#i != " " then
+      cleanS = cleanS | S#i;
+  );
+ return cleanS;
+);
+
+saveTrackPathsOptions = method()
+saveTrackPathsOptions (String, String) := (outputFileName, saveFileName) -> (
+  saveFile := openOut saveFileName;
+  fileLines := lines get outputFileName;
+  for i from 0 to #fileLines - 1 do (
+    if fileLines#i == "HOMOTOPY PARAMETERS :" then(
+      saveFile << "d" << endl << stripSpaces(substring(fileLines#(i+1),5,4)) << endl;
+      saveFile << "k" << endl << stripSpaces(substring(fileLines#(i+2),5,4)) << endl;
+      saveFile << "a" << endl << substring(fileLines#(i+3),6,21) << endl << substring(fileLines#(i+3),29,21) << endl;
+      saveFile << "t" << endl << substring(fileLines#(i+4),6,21) << endl << substring(fileLines#(i+4),29,21) << endl;
+      if #select(".no projective.",fileLines#(i+5)) == 1 then (
+        saveFile << "p" << endl << "n" << endl;
+      ) else (
+        saveFile << "p" << endl << "y" << endl;
+      );
+      saveFile << 0 << endl;
+    );
+    if fileLines#i == "GLOBAL MONITOR : " then (
+      saveFile << 1 << endl << stripSpaces(substring(fileLines#(i+1),46,100)) << endl;
+      saveFile << 2 << endl << stripSpaces(substring(fileLines#(i+2),46,100)) << endl;
+      saveFile << 3 << endl << stripSpaces(substring(fileLines#(i+3),46,100)) << endl;
+      saveFile << 4 << endl << stripSpaces(substring(fileLines#(i+4),46,100)) << endl;
+      saveFile << 5 << endl << stripSpaces(substring(fileLines#(i+5),46,100)) << endl;
+      saveFile << 6 << endl << stripSpaces(substring(fileLines#(i+6),46,100)) << endl;
+      saveFile << 7 << endl << stripSpaces(substring(fileLines#(i+8),46,11)) << endl;
+      saveFile << 8 << endl << stripSpaces(substring(fileLines#(i+8),58,11)) << endl;
+      saveFile << 9 << endl << stripSpaces(substring(fileLines#(i+9),46,11)) << endl;
+      saveFile << 10 << endl << stripSpaces(substring(fileLines#(i+9),58,11)) << endl;
+      saveFile << 11 << endl << stripSpaces(substring(fileLines#(i+10),46,11)) << endl;
+      saveFile << 12 << endl << stripSpaces(substring(fileLines#(i+10),58,11)) << endl;
+      saveFile << 13 << endl << stripSpaces(substring(fileLines#(i+11),46,11)) << endl;
+      saveFile << 14 << endl << stripSpaces(substring(fileLines#(i+11),58,11)) << endl;
+      saveFile << 15 << endl << stripSpaces(substring(fileLines#(i+12),46,11)) << endl;
+      saveFile << 16 << endl << stripSpaces(substring(fileLines#(i+12),58,11)) << endl;
+      saveFile << 17 << endl << stripSpaces(substring(fileLines#(i+13),46,11)) << endl;
+      saveFile << 18 << endl << stripSpaces(substring(fileLines#(i+13),58,11)) << endl;
+      saveFile << 19 << endl << stripSpaces(substring(fileLines#(i+15),46,11)) << endl;
+      saveFile << 20 << endl << stripSpaces(substring(fileLines#(i+15),58,11)) << endl;
+      saveFile << 21 << endl << stripSpaces(substring(fileLines#(i+16),46,11)) << endl;
+      saveFile << 22 << endl << stripSpaces(substring(fileLines#(i+16),58,11)) << endl;
+      saveFile << 23 << endl << stripSpaces(substring(fileLines#(i+17),46,11)) << endl;
+      saveFile << 24 << endl << stripSpaces(substring(fileLines#(i+17),58,11)) << endl;
+      saveFile << 25 << endl << stripSpaces(substring(fileLines#(i+18),46,11)) << endl;
+      saveFile << 26 << endl << stripSpaces(substring(fileLines#(i+18),58,11)) << endl;
+      saveFile << 27 << endl << stripSpaces(substring(fileLines#(i+19),46,11)) << endl;
+      saveFile << 28 << endl << stripSpaces(substring(fileLines#(i+19),58,11)) << endl;
+      saveFile << 29 << endl << stripSpaces(substring(fileLines#(i+21),46,11)) << endl;
+      saveFile << 30 << endl << stripSpaces(substring(fileLines#(i+21),58,11)) << endl;
+      saveFile << 31 << endl << stripSpaces(substring(fileLines#(i+22),46,11)) << endl;
+      saveFile << 32 << endl << stripSpaces(substring(fileLines#(i+22),58,11)) << endl;
+      saveFile << 33 << endl << stripSpaces(substring(fileLines#(i+23),46,11)) << endl;
+      saveFile << 34 << endl << stripSpaces(substring(fileLines#(i+23),58,11)) << endl;
+      saveFile << 0 << endl;
+    );
+    if fileLines#i == "OUTPUT INFORMATION DURING CONTINUATION :" then (
+      print stripSpaces(substring(fileLines#(i+1),0,4));
+      saveFile << 0 << endl;
+    );
+  );
+  close saveFile;
 )
 
 -----------------

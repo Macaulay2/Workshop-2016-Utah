@@ -5,10 +5,6 @@ Version => "0.1", Date => "May 08 2016", Authors => {
      {Name=> "Andrew Bydlon",
      Email=> "thelongdivider@gmail.com",
      HomePage => "http://www.math.utah.edu/~bydlon/"
-     },
-     {Name => "Karl Schwede",
-     Email=> "kschwede@gmail.com",
-     HomePage=> "http://www.math.utah.edu/~schwede"
      }
 }, --this file is in the public domain
 Headline => "A package for computing the section ring of a Weil Divisor.", DebuggingMode => true, Reload=>true)
@@ -181,41 +177,41 @@ mRegular(Ideal) := (I) -> ( 					--Returns the number m for which O_X(D) is m-re
 
 sectionRing = method();
 sectionRing(Ideal) := (I) -> (
-	local A;
-	local F;
+	--local A;
 	local G;
-	local J;
 	local V;
 	local L;
-	local Y;
-	local j;
+	--local Y;
+	--local j;
 	local e;
 	local b;
-	local n;
-	local Map;
+	--local n;
+	--local Map;
 	local Rel;
 	local KerT;
-	local Part;
+	--local Part;
 	local Ramb;
-	local Vect;
+	--local Vect;
 	local bool;
 	local LengP;
 	local LengPa;
 	local numDegs;
 	local MapTot;
-	local TotMap;
-	local AdmPart;
-	local TotVect;
+	--local TotMap;
+	--local AdmPart;
+	--local TotVect;
 	local myVars;
 	local myVarsData;
 	local NumCols;
 	local VectTot;
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 	R := ring(I);						--To Apply the Regularity Theorem of Mumford, the sheaf needs to be Globally Generated Sheaf
+	
 	l := globallyGenerated(I);
 	bound := l;
 	G = first entries gens I;
 	J_l = Hom(ideal(apply(G, z->z^l)),R);
+	j:=1;
 	while(j<l) do (						--Calculate regularity of each of the sheaves OO_X(D), ... , OO_X(l*D)
 		J_j = Hom(ideal(apply(G, z->z^j)),R);
 		bound = max(bound,l*(mRegular(sheaf(J_j),sheaf(J_l)))+j);
@@ -248,7 +244,7 @@ sectionRing(Ideal) := (I) -> (
 		);
 		i=i+1;
 	);
-	
+
 	Vars := flatten myVars;
 	numVars:= #Vars;
 
@@ -342,18 +338,18 @@ sectionRing(Ideal) := (I) -> (
 			);
 			e=e+1;
 		); 
-
 		j=j+1;
 	);
 
+	
 	BetterS := KK[A_1..A_numVars];
 	BetterMap := map(BetterS,S,toList(A_1..A_numVars));
 	BetterRelIdeal := BetterMap(RelIdeal);	
-	BestSR := minimalPresentation(BetterS/BetterRelIdeal)
-	
+	SR := minimalPresentation(BetterS/BetterRelIdeal)
+);
 
-	--SectionRing = minimalPresentation Spar;
-	--SectionRing
+sectionRing(WDiv) := D -> (
+	sectionRing(divisorToIdeal(D))
 );
 
 isVectScalar = L -> (

@@ -68,40 +68,40 @@ divideFraction = method();
 -- This function takes in a fraction t and a prime p and spits out a list
 -- {a,b,c}, where t = (a/p^b)(1/(p^c-1))
 -- if c = 0, then this means that t = (a/p^b)
-divideFraction( ZZ, QQ ) := ( pp, t1 ) -> 
+divideFraction( ZZ, QQ ) := ( p, t ) -> 
 (
-     a := num t1; -- finding a is easy, for now
-     den:=denom(t1);
+     a := num t; -- finding a is easy, for now
+     den:=denom(t);
      b := 1;
      while den%p^b==0 do b=b+1;
      b = b-1; 
-     temp := denom(t1*pp^b); --find the p^c-1 part of the denominator
+     temp := denom(t*p^b); --find the p^c-1 part of the denominator
      pow := 0; --we will look around looking for the power of pp that is 1 mod temp. 
      done := false; --when we found the power, this is set to true.
      if (temp == 1) then done = true; --if there is nothing to do, do nothing.
      while (done==false)  do (
           pow = pow + 1;
-	  if (pp^pow % temp == 1) then done = true
+	  if (p^pow % temp == 1) then done = true
      );
      c := pow; --we found c, now we return the list
-     if (c > 0) then a = lift(a*(pp^c-1)/temp, ZZ); --after we fix a
+     if (c > 0) then a = lift(a*(p^c-1)/temp, ZZ); --after we fix a
      {a,b,c}
 )
 
 --===================================================================================
      
 --Finds the a/pp^e1 nearest t1 from above.
-findNearPthPowerAbove = ( t1, pp, e1 ) -> 
+findNearPthPowerAbove = ( p, e, t ) -> 
 (
-     ceiling(t1*pp^e1)/pp^e1
+     ceiling(t*p^e)/p^e
 )
 
 --===================================================================================
 
 --Finds the a/pp^e1 nearest t1 from below.
-findNearPthPowerBelow = ( t1, pp, e1 ) -> 
+findNearPthPowerBelow = ( p, e, t ) -> 
 (
-     floor(t1*pp^e1)/pp^e1
+     floor(t*p^e)/p^e
 )
 
 --===================================================================================
@@ -119,12 +119,12 @@ findNearPthPowerBelow = ( t1, pp, e1 ) ->
 --the second term tells me where to start the count, so passing
 --5,0 gives {0,2} but 5,1 is sent to {1,3}.  i should be
 --used only for recursive purposes
-getNonzeroBinaryDigits = ( nn, i ) -> 
+getNonzeroBinaryDigits = ( i, n ) -> 
 (
-    halfsies := nn//2;
-    val1 := nn%2;
+    halfsies := n//2;
+    val1 := n%2;
     val2 := false; 
-    if (halfsies > 0) then val2 = (getNonzeroBinaryDigits(nn//2,i+1));
+    if (halfsies > 0) then val2 = (getNonzeroBinaryDigits(i+1,n//2));
     if ( (val1 != 0) and (not (val2 === false))) then (
 	 flatten {i, val2}
     )
@@ -145,9 +145,9 @@ getNonzeroBinaryDigits = ( nn, i ) ->
 getSublistOfList = method();
 
 --Returns the entries of myList specified by their position.
-getSublistOfList( List, List ) = ( entryList, myList ) -> 
+getSublistOfList( List, List ) := ( entryList, myList ) -> 
 (
-     apply( #entryList, i->myList#(entryList#i) )
+     apply(#entryList, i->myList#(entryList#i) )
 )
 
 --===================================================================================
@@ -155,25 +155,25 @@ getSublistOfList( List, List ) = ( entryList, myList ) ->
 --Returns the power set of a  list removing the emptyset.  
 nontrivialPowerSet = ( myList ) ->
 (
-     apply(2^(#myList)-1, i-> getSublistOfList(myList, getNonzeroBinaryDigits(i+1,0) ) )
+     apply(2^(#myList)-1, i-> getSublistOfList(getNonzeroBinaryDigits(0,i+1),myList))
 )
 
 --===================================================================================
 
 --Returns a list of factors of a number with repeats.
-numberToPrimeFactorList = ( nn )->
+numberToPrimeFactorList = ( n )->
 (
-     prod := factor nn;
+     prod := factor n;
      flatten (apply(#prod, i -> toList(((prod#(i))#1):((prod#(i))#0)) ))
 )
 
 --===================================================================================
 
 --Returns a list of all proper factors of number.
-getFactorList = ( nn ) ->
+getFactorList = ( n ) ->
 (
-     if (nn < 1) then error "getFactorList: expected an integer greater than 1.";
-     powSet := nontrivialPowerSet(numberToPrimeFactorList(nn)); 
+     if (n < 1) then error "getFactorList: expected an integer greater than 1.";
+     powSet := nontrivialPowerSet(numberToPrimeFactorList(n)); 
      toList ( set apply(#powSet, i->product(powSet#i)) )
 )
 
@@ -223,7 +223,7 @@ findNumberBetween( ZZ, List ) := ( maxDenom, myInterv )->
      i := maxDenom;
      while (i > 0) do (
 	  if ((divisionChecks#(i-1)) == true) then --if we need to do a computation..
-	      outList = join(outList,findNumberBetweenWithDenom(myInterv, i));
+	      outList = join(outList,findNumberBetweenWithDenom(i,myInterv));
 	  factorList := getFactorList(i);
      	  apply(#factorList, j-> (divisionChecks#( (factorList#j)-1) = false) );
 	  i = i - 1;
@@ -247,14 +247,14 @@ basePExp = method();
 basePExp( ZZ, ZZ ) := ( p, N ) ->
 (
     if N < p then return {N};
-    prepend( N % p, basePExp( N // p, p ))
+    prepend( N % p, basePExp(p, N // p))
 )
 
 --Computes terminating base p expansion of an integer 
 --from digits zero to e-1 (little-endian first).
-basePExp( ZZ, ZZ, ZZ ) := ( p, e1, N ) ->
+basePExp( ZZ, ZZ, ZZ ) := ( p, f, N ) ->
 (
-    e:=e1-1;
+    e:=f-1;
     E:=new MutableList;
     scan(0..e,i-> 
     	(
@@ -267,14 +267,14 @@ basePExp( ZZ, ZZ, ZZ ) := ( p, e1, N ) ->
 )
 
 --Creates a list of the first e digits of the non-terminating base p expansion of x in [0,1].
-basePExp( ZZ, ZZ, QQ ) = ( p, e, x ) -> 
+basePExp( ZZ, ZZ, QQ ) := ( p, e, x ) -> 
 (
     if x < 0 or x > 1 then(
 	 error "basePExp: Expected x in [0,1]"
      )
      else(
      	 L := new MutableList;
-     	 for i from 0 to e-1 do L#i = digit(i+1,x,p);
+     	 for i from 0 to e-1 do L#i = digit(p,i+1,x);
      	 L
      )
 )
@@ -311,15 +311,11 @@ truncation = method()
 --Gives the e-th truncation of the non-terminating base p expansion of a rational number.
 truncation ( ZZ, ZZ, QQ ) := ( p, e, x ) -> 
 (
-    if x<0 the(
-	error "truncation: Expected x>0"
-	)
-    else(	
-    	ceiling(p^e*x)-1)/p^e
-    	)
+    if x<0 then (error "truncation: Expected x>0")
+    else (ceiling(p^e*x)-1)/p^e    	
 )
 
---truncation (ZZ,List,ZZ) threads over lists.
+--truncation threads over lists.
 truncation ( ZZ, ZZ, List) := (p,e,u) -> 
 (
     apply(u,x->truncation(p,e,x))
@@ -354,17 +350,10 @@ baseP1 = ( n, p, e )->
 
 --===================================================================================
 
---Given a rational number x, if a is the power of p dividing its denomiator, 
---finds an integer b so that p^a(p^b-1)*a is an integer
-bPower = ( n, p ) ->
-(
-     if aPower(n,p)>0 then n = n*p^(aPower(n,p));
-     denom(n)
-)
 
 --Given a vector w={x,y}, x and y rational in [0,1], returns a number of digits 
 --such that it suffices to check to see if x and y add without carrying in base p
-carryTest = ( w, p ) ->
+carryTest = ( p, w ) ->
 (
      c := 0; for i from 0 to #w-1 do c = max(c, divideFraction(p,w#i)#1);
      d := 1; for j from 0 to #w-1 do if (divideFraction(p, w#j)#2)!=0 then d = lcm(d,dividFraction(p,w#j)#2);
@@ -374,7 +363,7 @@ carryTest = ( w, p ) ->
 --Given a vector w={x,y} of rational integers in [0,1], returns the first spot 
 --e where the x and y carry in base p; i.e., 
 --(the e-th digit of x)+(the e-th digit of y) >= p
-firstCarry = ( w, p ) ->
+firstCarry = ( p, w ) ->
 (     
     i:=0;
     d:=0;
@@ -383,12 +372,12 @@ firstCarry = ( w, p ) ->
     for j from 0 to #w-1 do if w#j == 0 then zeroTest=true;
     if zeroTest == true then carry = -1 else
      (
-	       i = 0; while d < p and i < carryTest(w,p) do 
+	       i = 0; while d < p and i < carryTest(p,w) do 
 	       (
 	       	    i = i + 1;
-	       	    d = 0; for j from 0 to #w-1 do  d = d + digit(i,w#j,p);
+	       	    d = 0; for j from 0 to #w-1 do  d = d + digit(p, i,w#j);
 	   	);
-      	       if i == carryTest(w,p) then i = -1;
+      	       if i == carryTest(p,w) then i = -1;
       	       carry = i;
       );
       carry
