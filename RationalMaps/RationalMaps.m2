@@ -450,6 +450,8 @@ doc ///
 doc ///
     Key
         baseLocusOfMap
+        (baseLocusOfMap, Matrix)
+        (baseLocusOfMap, List)
     Headline
         Computes base locus of a map from a projective variety to projective space
     Usage
