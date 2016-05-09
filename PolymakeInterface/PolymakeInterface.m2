@@ -26,6 +26,7 @@ newPackage(
 export {
      "runPolymake",
      "ParseAllProperties",
+     "BinaryOperationOutputType",
      "hasProperty",
      "getProperty",
      "getPropertyNames",
@@ -41,7 +42,7 @@ runPolymakePrefix = "polymake"
 
 -- May 6, 2016: polymake 3.0 on some Macs returns extra 
 -- characters with the output, ending in a bell (ascii 7).  
-runPolymake = method(Options => {ParseAllProperties => false,BinaryOperationOutputType=>PolyhedralObject})
+runPolymake = method(Options => {"ParseAllProperties" => false,"BinaryOperationOutputType"=>PolyhedralObject})
 runPolymake(String) := o -> (script) -> (
      filename := temporaryFileName()|currentTime()|".poly";
      filename << script << endl << close;
@@ -465,7 +466,7 @@ runPolymake(PolyhedralObject,String) := o -> (P,propertyName) -> (
                propertiesList := lines propertiesString;
                P#cache#"AvailableProperties" = new Set from propertiesList;
 	       );
-	  if (o.ParseAllProperties) then (
+	  if (o#"ParseAllProperties") then (
 	       parseAllAvailableProperties(P);
 	       );
 	  getProperty(P,propertyName)
@@ -478,26 +479,21 @@ runPolymake(PolyhedralObject,String) := o -> (P,propertyName) -> (
 ------------------------------------------------------------------------------
  
 runPolymake(PolyhedralObject,PolyhedralObject,String):= o ->(P,Q,binaryOperationName) -> (
-   if o#BinaryOperationOutputType==Boolean then (
-            writePolymakeFile(P);
-    writePolymakeFile(Q);        
-    fn:=temporaryFileName()|currentTime()|".poly";
-    script:="use application \"polytope\";
-             my $P = load(\""|P.cache#"PolymakeFile"|"\");
-             my $Q = load(\""|Q.cache#"PolymakeFile"|"\");		 
-             my $R = "|binaryOperationName|"($P,$Q);
-             $R->CONE_AMBIENT_DIM;
-             my $fn=\""|fn|"\";
-	     save($R,$fn);
-             my @properties = $R->list_properties;
-             my $numberOfProperties = scalar @properties;
-             for(my $i=0;$i<$numberOfProperties;$i++)
-             {print \"$properties[$i]\\n\";}";
-    );
     writePolymakeFile(P);
-    writePolymakeFile(Q);        
+    writePolymakeFile(Q);   
     fn:=temporaryFileName()|currentTime()|".poly";
-    script:="use application \"polytope\";
+    script:="";
+    if o#"BinaryOperationOutputType"===Boolean then (
+        writePolymakeFile(P);
+        writePolymakeFile(Q);        
+        script="use application \"polytope\";
+                 my $P = load(\""|P.cache#"PolymakeFile"|"\");
+                 my $Q = load(\""|Q.cache#"PolymakeFile"|"\");
+	         my $v = "|binaryOperationName|"($P,$Q);
+                 if($v){print(\"true\")}else{print(\"false\");}";
+        return(runPolymake(script)=="true")
+    );
+    script="use application \"polytope\";
              my $P = load(\""|P.cache#"PolymakeFile"|"\");
              my $Q = load(\""|Q.cache#"PolymakeFile"|"\");		 
              my $R = "|binaryOperationName|"($P,$Q);
@@ -511,7 +507,7 @@ runPolymake(PolyhedralObject,PolyhedralObject,String):= o ->(P,Q,binaryOperation
     propertiesString := runPolymake(script);
     propertiesList := lines propertiesString;
     R:=new Polyhedron from {cache=>new MutableHashTable from {"PolymakeFile"=>fn,"AvailableProperties"=>new Set from propertiesList}};
-    if (o.ParseAllProperties) then (
+    if (o#"ParseAllProperties") then (
         parseAllAvailableProperties(R);
     );
     R
@@ -664,7 +660,7 @@ doc ///
         result = runPolymake(polymakeScript)
 	result = runPolymake(P,propertyName)
 	result = runPolymake(P,Q,binaryOperationName)
-	result = runPolymake(P,propertyName,ParseAllProperties=>true)
+	result = runPolymake(P,propertyName,"ParseAllProperties"=>true)
     Inputs
         polymakeScript:String
 	P:PolyhedralObject
@@ -691,13 +687,13 @@ doc ///
             Q = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,0,1}}}
 	    R = runPolymake(P,Q,"minkowski_sum")
 	Text
-	    When Polymake computes a property of a polyhedral object, it may compute other properties in the process. If the ParseAllProperties option is set {\tt true}, then all properties that is computed in the process are parsed into M2 format. Otherwise, only the needed property is parsed, and the other properties are stored in a temporary file in Polymake format.
+	    When Polymake computes a property of a polyhedral object, it may compute other properties in the process. If the "ParseAllProperties" option is set {\tt true}, then all properties that is computed in the process are parsed into M2 format. Otherwise, only the needed property is parsed, and the other properties are stored in a temporary file in Polymake format.
 	Example
 	    --needsPackage "PolyhedralObjects";
             P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,1},{1,1,0},{1,1,1}}};
-            runPolymake(P, "FVector",ParseAllProperties=>true)
+            runPolymake(P, "FVector","ParseAllProperties"=>true)
 	    Q = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,1},{1,1,0},{1,1,1}}};
-            runPolymake(Q, "FVector",ParseAllProperties=>false)
+            runPolymake(Q, "FVector","ParseAllProperties"=>false)
 	Text
 	    The type of the output varies according to the type of the property.
 	Example
@@ -799,16 +795,16 @@ doc ///
 
 doc ///
     Key
-        ParseAllProperties
+        "ParseAllProperties"
     Headline
         optional parameter for runPolymake
     Description
         Text
-	    When Polymake computes a property of a polyhedral object, it may compute other properties in the process. If the ParseAllProperties option is set {\tt true}, then all properties that is computed in the process are parsed into M2 format. Otherwise, only the needed property is parsed, and the other properties are stored in a temporary file in Polymake format.
+	    When Polymake computes a property of a polyhedral object, it may compute other properties in the process. If the "ParseAllProperties" option is set {\tt true}, then all properties that is computed in the process are parsed into M2 format. Otherwise, only the needed property is parsed, and the other properties are stored in a temporary file in Polymake format.
 	Example
 	    --needsPackage "PolyhedralObjects";
             P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,1},{1,1,0},{1,1,1}}};
-            runPolymake(P, "FVector",ParseAllProperties=>true)
+            runPolymake(P, "FVector","ParseAllProperties"=>true)
 ///
 
 ---------------------------------------------------------------------------
@@ -961,7 +957,7 @@ matrix {{1/1, 0, 0}, {1, 0, 1}, {1, 0, 2}, {1, 1, 0}, {1, 1, 1}, {1, 1, 2}, {1, 
 TEST ///
     --needsPackage "PolyhedralObjects";
     P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,1},{1,1,0},{1,1,1}}};
-    result = runPolymake(P,"FVector",ParseAllProperties=>true);
+    result = runPolymake(P,"FVector","ParseAllProperties"=>true);
     assert(result=={4,4});
     assert(class(result)===class({4,4}));
     propertyNames = getPropertyNames(P);
@@ -1054,7 +1050,7 @@ TEST ///
 TEST ///
     P = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,1,0}}};
     Q = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,0,1}}};
-    R = runPolymake(P,Q,"minkowski_sum",ParseAllProperties=>true);
+    R = runPolymake(P,Q,"minkowski_sum","ParseAllProperties"=>true);
     L1 = set(entries R#"Points");
     L2 = {{1,0,0},{1,0,1},{1,1,0},{1,1,1}};    
     L2 = set(apply(L2, i -> (1/1)*i))

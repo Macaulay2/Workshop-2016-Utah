@@ -55,6 +55,7 @@ newPackage(
 
 export { 
   "cascade",
+  "computingPrecision",
   "constructEmbedding",
   "gamma",
   "factorWitnessSet",
@@ -972,7 +973,8 @@ refineSolutions (List,List,ZZ) := o-> (f,sols,dp) -> (
 -- SOLVE SYSTEM --
 ------------------
 
-solveSystem = method(TypicalValue => List, Options => {Verbose => false, numThreads=>0, randomSeed => -1})
+solveSystem = method(TypicalValue => List, 
+  Options => {Verbose => false, numThreads=>0, randomSeed => -1, computingPrecision => 1})
 solveSystem  List := List =>  o->system -> (
   -- IN:  system = list of polynomials with complex coeffiecients, 
   -- i.e. the system to solved 
@@ -986,6 +988,9 @@ solveSystem  List := List =>  o->system -> (
   if not(class coefficientRing ring first system===ComplexField) then
     error "coefficient ring is not complex";
     
+  if not member(o.computingPrecision,{1,2,4}) then
+    error "Precision must be set to 1, 2, or 4.";
+
   filename := getFilename();
   if o.Verbose then
     stdio << "using temporary files " << filename|"PHCinput"
@@ -1018,7 +1023,8 @@ solveSystem  List := List =>  o->system -> (
   -- writing data to the corresponding files:    
   systemToFile(system,infile);
   -- launching blackbox solver:
-  execstr := PHCexe|" -b "
+  execstr := PHCexe|" -b"
+    |(if o.computingPrecision == 2 then "2 " else if o.computingPrecision == 4 then "4 " else " ")
     |(if o.numThreads > 1 then ("-t"|o.numThreads|" ") else "")
     |(if o.randomSeed > -1 then ("-0"|o.randomSeed|" ") else "")
     |infile|" "|outfile;
@@ -1332,12 +1338,14 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
 
 stripSpaces = method();
 stripSpaces (String) := S -> (
-  cleanS := "";
-  for i from 0 to #S - 1 do (
-    if S#i != " " then
-      cleanS = cleanS | S#i;
-  );
- return cleanS;
+  -- Helper function to make saveTrackPaths more readable
+  return replace(" ", "", S);
+);
+
+addToFile = method();
+addToFile (File, ZZ, String, ZZ) := (f, OptionNumber, S,StartIndex) -> (
+  -- Helper function to make saveTrackPaths more readable
+  f << OptionNumber << endl << stripSpaces(substring(S,StartIndex,11)) << endl;
 );
 
 saveTrackPathsOptions = method()
@@ -1345,11 +1353,20 @@ saveTrackPathsOptions (String, String) := (outputFileName, saveFileName) -> (
   saveFile := openOut saveFileName;
   fileLines := lines get outputFileName;
   for i from 0 to #fileLines - 1 do (
+    -- Start by saving the homotopy parameters.
     if fileLines#i == "HOMOTOPY PARAMETERS :" then(
-      saveFile << "d" << endl << stripSpaces(substring(fileLines#(i+1),5,4)) << endl;
-      saveFile << "k" << endl << stripSpaces(substring(fileLines#(i+2),5,4)) << endl;
-      saveFile << "a" << endl << substring(fileLines#(i+3),6,21) << endl << substring(fileLines#(i+3),29,21) << endl;
-      saveFile << "t" << endl << substring(fileLines#(i+4),6,21) << endl << substring(fileLines#(i+4),29,21) << endl;
+      saveFile << "d" << endl
+        << stripSpaces(substring(fileLines#(i+1),5,4)) << endl;
+
+      saveFile << "k" << endl
+        << stripSpaces(substring(fileLines#(i+2),5,4)) << endl;
+
+      saveFile << "a" << endl << substring(fileLines#(i+3),6,21)
+        << endl << substring(fileLines#(i+3),29,21) << endl;
+
+      saveFile << "t" << endl << substring(fileLines#(i+4),6,21)
+        << endl << substring(fileLines#(i+4),29,21) << endl;
+
       if #select(".no projective.",fileLines#(i+5)) == 1 then (
         saveFile << "p" << endl << "n" << endl;
       ) else (
@@ -1357,46 +1374,46 @@ saveTrackPathsOptions (String, String) := (outputFileName, saveFileName) -> (
       );
       saveFile << 0 << endl;
     );
+    -- Save chunk of 34 parameters.
     if fileLines#i == "GLOBAL MONITOR : " then (
-      saveFile << 1 << endl << stripSpaces(substring(fileLines#(i+1),46,100)) << endl;
-      saveFile << 2 << endl << stripSpaces(substring(fileLines#(i+2),46,100)) << endl;
-      saveFile << 3 << endl << stripSpaces(substring(fileLines#(i+3),46,100)) << endl;
-      saveFile << 4 << endl << stripSpaces(substring(fileLines#(i+4),46,100)) << endl;
-      saveFile << 5 << endl << stripSpaces(substring(fileLines#(i+5),46,100)) << endl;
-      saveFile << 6 << endl << stripSpaces(substring(fileLines#(i+6),46,100)) << endl;
-      saveFile << 7 << endl << stripSpaces(substring(fileLines#(i+8),46,11)) << endl;
-      saveFile << 8 << endl << stripSpaces(substring(fileLines#(i+8),58,11)) << endl;
-      saveFile << 9 << endl << stripSpaces(substring(fileLines#(i+9),46,11)) << endl;
-      saveFile << 10 << endl << stripSpaces(substring(fileLines#(i+9),58,11)) << endl;
-      saveFile << 11 << endl << stripSpaces(substring(fileLines#(i+10),46,11)) << endl;
-      saveFile << 12 << endl << stripSpaces(substring(fileLines#(i+10),58,11)) << endl;
-      saveFile << 13 << endl << stripSpaces(substring(fileLines#(i+11),46,11)) << endl;
-      saveFile << 14 << endl << stripSpaces(substring(fileLines#(i+11),58,11)) << endl;
-      saveFile << 15 << endl << stripSpaces(substring(fileLines#(i+12),46,11)) << endl;
-      saveFile << 16 << endl << stripSpaces(substring(fileLines#(i+12),58,11)) << endl;
-      saveFile << 17 << endl << stripSpaces(substring(fileLines#(i+13),46,11)) << endl;
-      saveFile << 18 << endl << stripSpaces(substring(fileLines#(i+13),58,11)) << endl;
-      saveFile << 19 << endl << stripSpaces(substring(fileLines#(i+15),46,11)) << endl;
-      saveFile << 20 << endl << stripSpaces(substring(fileLines#(i+15),58,11)) << endl;
-      saveFile << 21 << endl << stripSpaces(substring(fileLines#(i+16),46,11)) << endl;
-      saveFile << 22 << endl << stripSpaces(substring(fileLines#(i+16),58,11)) << endl;
-      saveFile << 23 << endl << stripSpaces(substring(fileLines#(i+17),46,11)) << endl;
-      saveFile << 24 << endl << stripSpaces(substring(fileLines#(i+17),58,11)) << endl;
-      saveFile << 25 << endl << stripSpaces(substring(fileLines#(i+18),46,11)) << endl;
-      saveFile << 26 << endl << stripSpaces(substring(fileLines#(i+18),58,11)) << endl;
-      saveFile << 27 << endl << stripSpaces(substring(fileLines#(i+19),46,11)) << endl;
-      saveFile << 28 << endl << stripSpaces(substring(fileLines#(i+19),58,11)) << endl;
-      saveFile << 29 << endl << stripSpaces(substring(fileLines#(i+21),46,11)) << endl;
-      saveFile << 30 << endl << stripSpaces(substring(fileLines#(i+21),58,11)) << endl;
-      saveFile << 31 << endl << stripSpaces(substring(fileLines#(i+22),46,11)) << endl;
-      saveFile << 32 << endl << stripSpaces(substring(fileLines#(i+22),58,11)) << endl;
-      saveFile << 33 << endl << stripSpaces(substring(fileLines#(i+23),46,11)) << endl;
-      saveFile << 34 << endl << stripSpaces(substring(fileLines#(i+23),58,11)) << endl;
+      addToFile(saveFile,1,fileLines#(i+1),46);
+      addToFile(saveFile,2,fileLines#(i+2),46);
+      addToFile(saveFile,3,fileLines#(i+3),46);
+      addToFile(saveFile,4,fileLines#(i+4),46);
+      addToFile(saveFile,5,fileLines#(i+5),46);
+      addToFile(saveFile,6,fileLines#(i+6),46);
+      addToFile(saveFile,7,fileLines#(i+8),46);
+      addToFile(saveFile,8,fileLines#(i+8),58);
+      addToFile(saveFile,9,fileLines#(i+9),46);
+      addToFile(saveFile,10,fileLines#(i+9),58);
+      addToFile(saveFile,11,fileLines#(i+10),46);
+      addToFile(saveFile,12,fileLines#(i+10),58);
+      addToFile(saveFile,13,fileLines#(i+11),46);
+      addToFile(saveFile,14,fileLines#(i+11),58);
+      addToFile(saveFile,15,fileLines#(i+12),46);
+      addToFile(saveFile,16,fileLines#(i+12),58);
+      addToFile(saveFile,17,fileLines#(i+13),46);
+      addToFile(saveFile,18,fileLines#(i+13),58);
+      addToFile(saveFile,19,fileLines#(i+15),46);
+      addToFile(saveFile,20,fileLines#(i+15),58);
+      addToFile(saveFile,21,fileLines#(i+16),46);
+      addToFile(saveFile,22,fileLines#(i+16),58);
+      addToFile(saveFile,23,fileLines#(i+17),46);
+      addToFile(saveFile,24,fileLines#(i+17),58);
+      addToFile(saveFile,25,fileLines#(i+18),46);
+      addToFile(saveFile,26,fileLines#(i+18),58);
+      addToFile(saveFile,27,fileLines#(i+19),46);
+      addToFile(saveFile,28,fileLines#(i+19),58);
+      addToFile(saveFile,29,fileLines#(i+21),46);
+      addToFile(saveFile,30,fileLines#(i+21),58);
+      addToFile(saveFile,31,fileLines#(i+22),46);
+      addToFile(saveFile,32,fileLines#(i+22),58);
+      addToFile(saveFile,33,fileLines#(i+23),46);
+      addToFile(saveFile,34,fileLines#(i+23),58);
       saveFile << 0 << endl;
     );
     if fileLines#i == "OUTPUT INFORMATION DURING CONTINUATION :" then (
-      print stripSpaces(substring(fileLines#(i+1),0,4));
-      saveFile << 0 << endl;
+      saveFile << stripSpaces(substring(fileLines#(i+1),0,4)) << endl;
     );
   );
   close saveFile;
@@ -1698,7 +1715,7 @@ for I in PD list << "(dim=" << dim I << ", deg=" << degree I << ") "
 restart
 loadPackage "PHCpack"
 r = CC[x,y]
-solveSystem({2*x+y+5,5*y^2+3*x}, Verbose => true, interactive => true)
+solveSystem({2*x+y+5,5*y^2+3*x})
 
 restart 
 loadPackage "PHCpack"
