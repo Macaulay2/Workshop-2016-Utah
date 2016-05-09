@@ -58,6 +58,8 @@ baseLocusOfMap = method();
 baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     --maybe check all the maps in L1 are of the same degree?
 
+    --just need to convert L1 to a basic list, I guess
+    --if isSameDegree(L1)==false then error "Expected a matrix of homogenous elements of the same degree";
     M:= gens ker transpose presentation image L1;
     -- this matrix gives all the "equivalent"
     -- ways to write the map in question (e.g. (xy : xz) is 
@@ -472,14 +474,38 @@ doc ///
         Text
             This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring
 ///  
---
---doc ///
---    Key
---        inverseOfMap
---		(isBirationalMap, Ideal, Ideal, BasicList)
---		(isBirationalMap, Ring, Ring, BasicList)
---		(isBirationalMap, RingMap)
---
+
+doc ///
+    Key
+        inverseOfMap
+		(inverseOfMap, Ideal, Ideal, BasicList)
+		(inverseOfMap, Ring, Ring, BasicList)
+		(inverseOfMap, RingMap)
+    Headline
+        Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational
+    Usage
+        f = inverseOfMap(I, J, L)
+        f = inverseOfMap(R, S, L)
+        f = inverseOfMap(g)
+    Inputs
+        I: Ideal
+            Defining ideal of source
+        J: Ideal
+            Defining ideal of target
+        L: List
+            List of polynomials that define the coordinates of your birational map
+        g: RingMap
+            Your birational map
+    Outputs
+        f: RingMap
+            Inverse function of your birational map
+    Description
+        Text
+            Finds the inverse function of your birational map
+    Caveat
+        Only works for irreducible varieties
+        
+///
 
 TEST ///
 	------------------------------------
