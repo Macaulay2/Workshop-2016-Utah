@@ -17,7 +17,6 @@ export {
 	"minimalRegularSequence",
 	"linkageBound",
 	"UseNormalModule",
-	"randomRegularSequence",
 	"genericResidual",
 	"genericArtinNagata",
 	"numgensByCodim",
@@ -315,7 +314,6 @@ doc ///
     linkageBound I can be very large; linkageBound(I, UseNormalModule => true) can be very slow.
    SeeAlso
     linkageBound
-    randomRegularSequence
     randomLink
 ///
 ------------------------------------------------------------
