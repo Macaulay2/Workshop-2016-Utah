@@ -42,7 +42,7 @@ Reload => true
 )
 
 
---- *** I SORTED THESE ALPHABETICALLY TO FINDMY WAY AROUND *** MK
+--- *** I SORTED THESE ALPHABETICALLY TO FIND MY WAY AROUND *** MK
 export{
 --IntegerComputations (IntegerComps.m2)
 	"floorlog",
