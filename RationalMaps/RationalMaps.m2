@@ -80,6 +80,10 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     
 );
 
+baseLocusOfMap(List) := (L) ->(
+    baseLocusOfMap(matrix{L})
+);
+
 isRegularMap = method();
 
 isRegularMap(Matrix) := (L1) -> ( --L1 is a row matrix
@@ -450,9 +454,12 @@ doc ///
         Computes base locus of a map from a projective variety to projective space
     Usage
         I = baseLocusOfMap(M)
+        I = baseLocusOfMap(L)
     Inputs
         M: Matrix
             Row matrix whose entries correspond to the coordinates of your map to projective space.
+        L: List
+            A list whose entries correspond to the coordinates of your map to projective space
     Outputs
         I: Ideal
             The saturated defining ideal of the baselocus
