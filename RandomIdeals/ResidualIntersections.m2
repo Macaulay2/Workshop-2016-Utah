@@ -441,10 +441,8 @@ doc ///
      S = ZZ/101[a,b,c]
      I = ideal"ab,b2,c2"
      minimalRegularSequence I
-     minimalRegularSequence1 I     
      I = ideal"cb,b2,a2"
      minimalRegularSequence I     
-     minimalRegularSequence1 I     
    Caveat
    SeeAlso
 ///
@@ -521,7 +519,7 @@ doc ///
 ///
 
 end--
-
+insta
 linkageBound (I, UseNormalModule => false)
 time linkageBound (I, UseNormalModule => true)
 
@@ -531,6 +529,7 @@ time linkageBound (I, UseNormalModule => true)
 restart
 loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
+installPackage "ResidualIntersections"
 J = idealChainFromSC randomChain(10,5,20);
 J/maxGd
 J/residualCodims
