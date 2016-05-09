@@ -52,14 +52,12 @@ export{
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
-<<<<<<< HEAD
     "fancyEthRoot",	
 	"generatingRoot", ---MK
 	"FFiniteSupport", ---MK
 	"findAllCompatibleIdeals", ---MK	
 	"generatingMorphism", ---MK
 	"findGeneratingMorphisms", ---MK
-=======
     "fancyEthRoot",		
     "minimalCompatible",
 --F-thresholds computations (FThresholds.m2)
@@ -74,6 +72,7 @@ export{
     "FPTApproxList",     
     "FPT2VarHomog",     
     "FPT2VarHomogInternal",
+	"FPureIdeals",
     "FTApproxList",
     "FTHatApproxList", 
     "guessFPT",
@@ -101,7 +100,6 @@ export{
     "paraTestModule",
     "paraTestModuleAmbient",
     "findAllCompatibleIdeals", ---MK	
->>>>>>> a2d67bbb69c5811cf147d9fdc7d3303f84df4d1c
     "minimalCompatible",
     "paraTestModule", ---MK
     "paraTestModuleAmbient" ---MK
@@ -146,5 +144,7 @@ load "./Fsing/FFiniteSupportDoc.m2"
 load "./Fsing/generatingMorphismDoc.m2"
 
 load "./Fsing/parameterTestIdealDoc.m2"
+
+load "./Fsing/Fpure.m2"
 
 

@@ -24,10 +24,22 @@ export {
 	"maxGd",
 	"residualCodims",
         "koszulDepth",
-        "isStronglyCM"
+        "hasSlidingDepth",
+        "isStronglyCM",
+	"depthsOfPowers"
         };
 
---Generic Artin-Nagata Code
+--
+depthsOfPowers = method()
+depthsOfPowers(ZZ,ZZ,Ideal) := (s,c,I) ->(
+    --c should be codim I
+    S := ring I;
+    apply(s-c+1, j->profondeur(S^1/I^(j+1)))
+    )
+depthsOfPowers(ZZ,Ideal) := (s,I) -> depthsOfPowers(s,codim I, I)
+
+
+--generic Artin-Nagata Code
 genericArtinNagata = method()
 genericArtinNagata(ZZ,Ideal) := (s,I) -> (
     needsPackage "MCMApproximations";
@@ -57,11 +69,15 @@ loadPackage("ResidualIntersections", Reload =>true)
 S = ZZ/32003[x_0..x_5]
 --6 vars
 I = randomShellableIdeal(S,2,4)
+codim I
+depthsOfPowers(numgens ring I,I)
+
 S = ZZ/32003[x_0..x_3]
-I = minors(3, random(S^3, S^{-2,-3,-4,-5}));
+I = minors(3, random(S^3, S^{-2,-3,-3,-3}));
 --codim 3
 codim I
 s = 2;
+depthsOfPowers(3,I)
 codim genericResidual(3,I)
 L = genericArtinNagata(s,I);
 L_{0,1}
@@ -94,17 +110,9 @@ if opts.UseNormalModule == false then
 	2*(numgens N - codim I))
 )
 
+{*
 minimalRegularSequence = method()
 minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
-{*
-c:ZZ
- codim of I
-I:Ideal
- homogeneous
-Description
- Text
-  finds a maximal regular sequence in I of minimal degree.
-*}
 if numgens I == c then return I;
     --takes care of I = 0 and I principal;
 sgens := sort gens I;
@@ -122,6 +130,44 @@ while c'<c do(
 J
 )
 minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
+*}
+
+minimalRegularSequence = method()
+minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
+if numgens I == c then return I;
+    --takes care of I = 0 and I principal;
+sgens := sort gens I;
+n :=numcols sgens;
+J := ideal sgens_{0};
+K := J;
+c' := codim J;
+c'' := c;
+for i from 1 to n-1 do(
+    c'' = codim(K = J + ideal(sgens_{i}));
+    if c''>c' then (
+        J = K;
+	c' = c''));
+if c' == c then return J;
+error();
+rgens := sgens * random(source sgens, source sgens);
+for i from 0 to c-(c'+1) do(
+    c' = codim(K = J + ideal(rgens_{i}));
+    if c'>c then(
+        J = K;
+	c = c'));
+J)
+minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
+
+///
+restart
+loadPackage "ResidualIntersections"
+S = ZZ/101[a,b,c]
+I = ideal"cb,b2,ab,a2"
+codim I 
+minimalRegularSequence(codim I, I)
+     I = ideal"cb,b2,a2"
+     minimalRegularSequence I     
+///
 
 isLicci = method(Options => {UseNormalModule =>false})
 isLicci(ZZ, ZZ, Ideal) := opts -> (b,c,I) -> (
@@ -176,10 +222,29 @@ koszulDepth(Ideal) := I -> (
     for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
     )
 
+koszulDepth(Ideal,ZZ) := (I,k) -> (
+    C := koszul mingens I;
+    profondeur HH_k(C)
+    )
+
+
 isStronglyCM = method()
 isStronglyCM(Ideal) := I -> (
     d := dim I;
     all(koszulDepth I,i -> i==d)
+    )
+
+hasSlidingDepth = method()
+
+hasSlidingDepth(Ideal,ZZ) := (I,k) -> (
+    d := dim I;
+    s := numColumns(mingens I)-codim I;
+    all(k+1, i -> (koszulDepth(I,s-i))>=d-i)
+    )
+
+hasSlidingDepth(Ideal) := (I) -> (
+    s := numColumns(mingens I)-codim I;
+    hasSlidingDepth(I,s)
     )
 
 -------------------------------------
@@ -223,7 +288,6 @@ doc ///
     (isLicci,ZZ,ZZ,Ideal)
     (isLicci,ZZ,Ideal)
     (isLicci,Ideal)
-    [isLicci,UseNormalModule]
    Headline
     Tests whether an ideal is licci
    Usage
@@ -260,6 +324,8 @@ doc ///
 doc ///
    Key
     UseNormalModule
+    [isLicci,UseNormalModule]
+    [linkageBound, UseNormalModule]
    Headline
     option for linkageBound and isLicci
    Description
@@ -284,7 +350,7 @@ doc ///
    Key
     linkageBound
     (linkageBound,Ideal)    
-    [linkageBound, UseNormalModule]
+
    Headline
     computes a bound on the number of general links of an ideal to test the licci property
    Usage
@@ -300,6 +366,7 @@ doc ///
    SeeAlso
     isLicci
 ///
+
 
 ------------------------------------------------------------
 -- DOCUMENTATION minimalRegularSequence
@@ -330,14 +397,15 @@ doc ///
       d = maxGd I
    Inputs
       I:Ideal
-         A monomial ideal
+         a monomial ideal
    Outputs
       d:ZZ
-         The maximum value of d such that I has property G_d.
+         the maximum value of {\tt d} such that {\tt I} has property G_d (possibly infinity).
    Description
       Text
       Example
    Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
       residualCodims
@@ -362,7 +430,21 @@ doc ///
     L:List
    Description
     Text
+     Produces an "efficient" regular sequence that is among a set of minimal generators of I
+     by the following algorithm
+     Sorts the generators of I by degree-rev-lex to get sgens, and
+     takes as many elements from this list as possible. Then 
+     makes a general triangular change of generators to get rgens.
+     and take the rest of the regular sequence from this list.
     Example
+     setRandomSeed 0
+     S = ZZ/101[a,b,c]
+     I = ideal"ab,b2,c2"
+     minimalRegularSequence I
+     minimalRegularSequence1 I     
+     I = ideal"cb,b2,a2"
+     minimalRegularSequence I     
+     minimalRegularSequence1 I     
    Caveat
    SeeAlso
 ///
@@ -382,18 +464,24 @@ doc ///
       L = numgensByCodim(I)
    Inputs
       I:Ideal
-         A monomial ideal
+         a monomial ideal
       k:ZZ
-         An integer between 1 and the dimension of the ring
+         an integer between 1 and the dimension of the ring
    Outputs
       d:ZZ
-         The maximum number of generators of {\tt I} localized at a prime {\tt P} of codimension {\tt k}.
+         the maximum number of generators of {\tt I} localized at a prime {\tt P} of codimension {\tt k}.
       L:List
-         A list of the numbers of generators for each codimension from 1 to the dimension of the ring
+         a list of the numbers of generators for each codimension from 1 to the dimension of the ring
    Description
       Text
+         Because {\tt I} is monomial, we can check the number of generators of {\tt I} localized at a prime {\tt P} over only monomial primes {\tt P}.
       Example
+         R = QQ[x_0..x_4];
+	 I = ideal{x_0^2,x_1*x_2,x_3*x_4^2}
+	 numgensByCodim(I,2)
+	 numgensByCodim I
    Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       residualCodims
       maxGd
@@ -408,19 +496,25 @@ doc ///
       residualCodims
       (residualCodims,Ideal)
    Headline
-      a list of possible codimensions where...
+      a list of possible residual intersection codimensions
    Usage
       L = residualCodims I
    Inputs
       I:Ideal
-         A monomial ideal
+         a monomial ideal
    Outputs
       L:List
-         A list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
+         a list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
    Description
       Text
+         For each {\tt s} computes the maximum of all monomial primes {\tt P} of codimension {\tt s-1} 
+	 of the minimal size of a generating set of {\tt I} localized at {\tt P}.  If this number is 
+	 less than {\tt s}, then {\tt s} is included in the list.
+      Text
+         The values {\tt s} returned are candidates for {\tt I} being an {\tt s}-rsidual intersection.
       Example
    Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
       maxGd
