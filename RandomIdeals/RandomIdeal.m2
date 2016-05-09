@@ -3,14 +3,16 @@ newPackage(
     	Version => "2.0", 
     	Date => "May 9, 2016",
         Authors => {
-	    {Name => "Katie Ansaldi"},
+	    {Name => "Katie Ansaldi",
+		Email => "kansaldi@gmail.com"},
 	    {Name => "David Eisenbud",
          	Email => "de@msri.org",
          	HomePage => "http://www.msri.org/~de"},
      	    {Name => "Robert Krone",
-	 	Email => "rk71@queensu.ca",
-	 	HomePage => "http://www.rckr.one"},
-	    {Name => "Jay Yang"}
+	 	Email => "rckrone@gmail.com",
+	 	HomePage => "http://rckr.one"},
+	    {Name => "Jay Yang",
+		Email => "jkelleyy@gmail.com"}
 	    },
     	HomePage => "http://www.msri.org/~de",
     	Headline => "a package for creating random ideals of various sorts",
