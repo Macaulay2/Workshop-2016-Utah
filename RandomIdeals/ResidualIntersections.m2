@@ -657,7 +657,7 @@ doc ///
       s:ZZ
       	  number of powers to compute
       c:ZZ
-      	  should be codim I
+      	  (If omitted, it will use c = codim I)
       I:Ideal
    Outputs
       L:List
@@ -669,6 +669,31 @@ doc ///
       	  R = QQ[a,b,c,d,e,f];
 	  I = ideal (b*c, b*d, b*e, d*e, a*d*f, e*f);
 	  depthsOfPowers(6,3,I)
+   Caveat
+   SeeAlso
+///
+
+
+------------------------------------------------------------
+-- DOCUMENTATION genericResidual
+------------------------------------------------------------
+
+doc ///
+   Key
+      genericResidual
+      (genericResidual,ZZ,Ideal)
+   Headline
+      Computes generic residual intersections of an ideal
+   Usage
+      J = genericResidual(s,I)
+   Inputs
+      s:ZZ
+      I:Ideal
+   Outputs
+      J:Ideal
+   Description
+      Text
+      Example
    Caveat
    SeeAlso
 ///
