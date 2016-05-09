@@ -49,24 +49,23 @@ export{
     "ascendIdealSafe",
     "ascendIdealSafeList",
     "AscentCount",
-    "ethRoot",
-    "ethRootSafe", 	       
-    "ethRootSafeList",    
-    "fancyEthRoot",	
-	"generatingRoot", ---MK
-	"FFiniteSupport", ---MK
-	"findAllCompatibleIdeals", ---MK	
-	"generatingMorphism", ---MK
-	"findGeneratingMorphisms", ---MK
-    "minimalCompatible",
---F-thresholds computations (FThresholds.m2)
     "BinomialCheck",
     "binomialFPT",
     "canVector",
     "DiagonalCheck", 
     "diagonalFPT",
     "estFPT",
+    "ethRoot",
+    "ethRootSafe", 	       
+    "ethRootSafeList",    
+    "fancyEthRoot",	
+	"generatingRoot", ---MK
+	"FFiniteSupport", ---MK
+	"generatingMorphism", ---MK
+	"findGeneratingMorphisms", ---MK
+--F-thresholds computations (FThresholds.m2)
     "factorList",    
+    "findAllCompatibleIdeals", ---MK	
     "findCPBelow",
     "FPTApproxList",     
     "FPT2VarHomog",     
@@ -83,6 +82,7 @@ export{
     "isInLowerRegion",
     "isInUpperRegion",
     "MaxExp",
+    "minimalCompatible",
     "nu",
     "nuAlt",
     "NuCheck",
@@ -95,11 +95,6 @@ export{
     "setFTData",
     "splittingField",
     "taxicabNorm",
-    "minimalCompatible",
-    "paraTestModule",
-    "paraTestModuleAmbient",
-    "findAllCompatibleIdeals", ---MK	
-    "minimalCompatible",
     "paraTestModule", ---MK
     "paraTestModuleAmbient" ---MK
 }
@@ -127,7 +122,7 @@ load "./Fsing/compatiblySplit.m2"
 
 load "./Fsing/generatingMorphism.m2"
 
-load "./Fsing/FPureAlgorithm.m2"
+load "./Fsing/FPure.m2"
 
 load "./Fsing/FFiniteSupport.m2"
 
