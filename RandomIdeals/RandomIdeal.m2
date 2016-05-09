@@ -30,7 +30,8 @@ export {
         "idealFromShelling",
 	"idealChainFromShelling",
         "isShelling",
-	"randomShellableIdeal"
+	"randomShellableIdeal",
+	"randomShellableIdealChain"
      }
 
 randomMonomial = method(TypicalValue => RingElement)
@@ -285,7 +286,7 @@ idealFromShelling = method()
 idealFromShelling (Ring,List) := (S,P) -> (
     Delta := toList (0..numgens S - 1);
     V := vars S;
-    intersect apply(P, D -> ideal(V_(Delta - set D)))
+    intersect apply(P, D -> monomialIdeal {V_(Delta - set D)})
     )
 
 idealFromShelling List := P -> (
@@ -320,6 +321,10 @@ randomShellableIdeal(Ring,ZZ,ZZ) := (R,dimProj,deg) -> (
     idealFromShelling(R,randomShelling(numgens R ,dimProj, deg))
     )
 
+randomShellableIdealChain=method()
+randomShellableIdealChain(Ring,ZZ,ZZ) := (R,dimProj,deg)->(
+    idealChainFromShelling(R,randomShelling(numgens R,dimProj,deg))
+    )
 ///
 S = ZZ/101[x_0..x_5]
 I = randomShellableIdeal(S,2,5)
@@ -329,6 +334,10 @@ degree I == 5
 
 randomShelling(Ring,ZZ,ZZ) := (R,m,k) -> listsToMonomials(randomShelling(numgens R,m,k),R)
 randomShelling(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomShelling(numgens R,m),R)
+
+
+
+
 
 --this is NOT the Reisner association
 listsToMonomials = (P,R) -> apply(P, D->product apply(D,d->R_d))
@@ -442,11 +451,12 @@ doc ///
             This function randomly chooses a facet of size m+1 and checks whether the facet can be shellably added to the shelling. 
 	    If it can be shellably added to the shelling, it is added to the shelling and the new shelling is returned. 
 	    Otherwise, the process repeats up to 20 times.  
+	    This function can be used to randomly construct non-pure shellable complexes. 
           Example
             P={{1,2,3}}
 	    L=randomAddition(6,3,P)
      Caveat
-	  If the input is not a shellable simplicial complex, the new complex will not be shellable.
+	  If the input is not a shellable simplicial complex, the new complex will not be shellable. The function does not check whether the input is shellable.
      SeeAlso
      	  randomShelling
 	  idealChainFromShelling
@@ -710,7 +720,7 @@ Key
   (randomSquareFreeStep, List) 
   [randomSquareFreeStep,AlexanderProbability]
 Headline
- A step in a random walk with uniform distribution over all monomomial ideals
+ A step in a random walk with uniform distribution over all monomial ideals
 Usage
   M = randomSquareFreeStep(I)
   M = randomSquareFreeStep(I, AlexanderProbability => p)  
