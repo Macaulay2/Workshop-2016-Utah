@@ -3,41 +3,50 @@ newPackage(
     	Version => "1.0", 
     	Date => "May 8, 2016",
     	Authors => {
-	     {Name => "Michael Perlman", Email => "a", HomePage => "https://www3.nd.edu/~mperlman/"},
+	     {Name => "Michael Perlman", Email => "mperlman@nd.edu", HomePage => "https://www3.nd.edu/~mperlman/"},
 	     {Name => "Claudiu Raicu", Email => "craicu@nd.edu", HomePage => "https://www3.nd.edu/~craicu/"}
 	     },
     	Headline => "Representations of gl(mn) and syzygies",
-	PackageExports => {"SchurRings","BGG"},
+	PackageExports => {"SchurRings","BGG","SimpleDoc"},
     	DebuggingMode => false
     	)
     
-export{"charE", "charL", "charK"}
+export{"characterLlambda", "characterKlambda", "bettiTableIlam", "hilbertFunctionLlambda"}
 
+--the character of the exterior algebra
 charE = method()
 charE(ZZ,ZZ) := (m,n) -> (
     parsmn := flatten for i from 0 to m*n list select(partitions i,x->#x <= n and (try(x#0 <= m) else true));
     apply(parsmn,par -> {toList conjugate par,toList par})   
     )
---charE = memoize charE
 
-charK = method()
-charK(List,List,SchurRing,SchurRing) := (mn,ll,S,T) -> (
+--the character of the Kac module associated with lambda
+characterKlambda = method()
+characterKlambda(List,List,SchurRing,SchurRing) := (mn,ll,S,T) -> (
     cE := charE(mn#0,mn#1);
     chrE := sum apply(cE,x -> S_(x#0) * T_(x#1));
     S_ll * T_ll * chrE
     )
-charK(ZZ,ZZ,List) := (m,n,ll) -> (
-    T := schurRing(getSymbol"t000t000t",n);
-    S := schurRing(T,getSymbol"s000s000s",m);
-    chrK := charK({m,n},ll,S,T);
+undocumented (characterKlambda,List,List,SchurRing,SchurRing)
+
+characterKlambda(ZZ,ZZ,List) := (m,n,ll) -> (
+    t := local t;
+    s := local s;
+    T := schurRing(t,n);
+    S := schurRing(T,s,m);
+    chrK := characterKlambda({m,n},ll,S,T);
     flatten apply(listForm(chrK),ter -> apply(listForm(ter#1), x -> {ter#0,x#0,x#1}))
     )
---charE = memoize charE
 
+--half sum of the positive weights
 delta := k -> for i from 0 to k-1 list k-1-i
 delta = memoize delta
+
+--the dot action of the symmetric group on partitions
 dotact := (per,mu,k) -> (dk := delta k; (for i from 0 to k-1 list mu#(per#i) + dk#(per#i))-dk)
 dotact = memoize dotact
+
+--the length function for permutations
 leng := (per,k) -> (lng := 0; for i from 0 to k-2 do for j from i+1 to k-1 do if per#i>per#j then lng = lng + 1;lng)
 leng = memoize leng
 
@@ -54,29 +63,192 @@ generateMus := (lam,k) ->
     musleng := for per in perms list (pl := dotact(per,lam,k); lst := last pl; (leng(per,k),reverse(for i from 0 to k-1 list (lst = max(lst,pl#(k-1-i));lst))));
     musleng / (x->x#1)
     )
---generateMus = memoize generateMus
 
-charL = method()
-charL(ZZ,ZZ,List) := (m,n,lam) -> (
+--the character of the irreducible glmn-module associated to the partition lambda
+characterLlambda = method()
+characterLlambda(ZZ,ZZ,List) := (m,n,lam) -> (
     lam = lam | splice{n-#lam:0};
     mus := generateMus(lam,n);
     MAX := lam + splice{n:m};
     rez := 0;
-    S := schurRing(getSymbol"s000s000s",m);
-    T := schurRing(S,getSymbol"t000t000t",n);
+    s := local s;
+    t := local t;
+    S := schurRing(s,m);
+    T := schurRing(S,t,n);
     for mu in mus do 
         for ll in mu..MAX do if ll == reverse sort(ll) then 
-	    rez = rez + (-1)^(sum(ll-lam)) * charK({m,n},ll,S,T);
+	    rez = rez + (-1)^(sum(ll-lam)) * characterKlambda({m,n},ll,S,T);
     selsmall := select(listForm rez,x->all(splice{0..#(x#0)-1},i-> (x#0#i <= MAX#i)));
     flatten apply(selsmall,x -> apply(listForm(x#1),ter -> {ter#0,x#0,ter#1}))
     )
---charL = memoize charL
+
+--the betti table of the ideal I_lambda
+--p is the prime characteristic of the residue field
+bettiTableIlambda = method()
+bettiTableIlambda(ZZ,ZZ,ZZ,List) := (n,m,p,lam) -> (
+     r := local r;
+     s := local s;
+     x := local x;
+     R := schurRing(r,n);
+     T := schurRing(s,m);
+     conjlam := toList conjugate( new Partition from lam);
+     d := dim r_lam;
+     e := dim s_lam;
+     kk := ZZ/p;
+     S := kk[x_(1,1)..x_(n,m)];
+     M := genericMatrix(S,m,n);
+     lis := for i from 0 to d*e-1 list
+     (
+    A := random(kk^m,kk^m);
+    B := random(kk^n,kk^n);
+    N := A * M * B;
+    product for j from 0 to #conjlam-1 list det(N_{0..conjlam_j-1}^{0..conjlam_j-1})
+     );
+    J := ideal lis;
+    I := ideal mingens J;
+    if (numgens I != e*d) then error"wrong number of generators"
+    else betti res I --needs to be replaced by next two lines
+    --else F:= res(I, FastNonminimal => true);
+   -- betti(F, Minimize => true)
+    )
+
+bettiTableIlambda(ZZ,ZZ,List) := (n,m,lam) -> (
+    bettiTableIlambda(n,m,32003,lam)
+    )
+
+--the dimension of the degree d component of the irreducible glmn module Llambda
+dimLlamd = method()
+dimLlamd(ZZ,ZZ,List,ZZ) := (n,m,lam,d) -> (
+    F := select(characterLlambda(n,m,lam), x-> sum(x#0) == d);
+    t := local t;
+    s := local s;
+    T1 := schurRing(t,n);
+    T2 := schurRing(s,m);
+    sum apply(F, x-> dim(T1_(x#0)) * dim(T2_(x#1)) * x#2)
+    )
+
+--the list of dimensions of graded components of the simple glmn module Llambda
+hilbertFunctionLlambda = method()
+hilbertFunctionLlambda(ZZ,ZZ,List) := (n,m,lam) -> (
+    G := apply(characterLlambda(n,m,lam),x->sum(x#0));
+    for i from sum lam to max G list dimLlamd(n,m,lam,i)
+    )
+
+beginDocumentation()
+
+
+doc ///
+    Key
+       GLmnReps
+    Headline
+       Representations of the general linear Lie superalgebra, and syzygies
+    Description
+      Text
+        This package implements basic functionality for the representation theory of
+	the general linear Lie superalgebra {\tt gl(m|n)}. We compute characters of irreducible 
+	{\tt gl(m|n)}-modules, as well as those of Kac modules. As an application, we pursue the
+	problem of describing the syzygies of thickenings of determinantal ideals.
+--    Caveat
+--       It's far from completed
+///
   
+doc ///
+    Key
+       characterKlambda
+       (characterKlambda,ZZ,ZZ,List)
+    Headline
+       Compute the character of the Kac module corresponding to a partition lambda
+    Usage
+       lis = characterKlambda(m,n,lambda)    
+    Inputs
+       m:ZZ
+       n:ZZ
+       lambda:List
+    Outputs
+       lis:List
+           a list of triples, where the first two entries in each triple are partitions, and the third is a non-negative integer
+    Description
+      Text
+        For a given a partition {\tt \lambda}, we let {\tt E=\Lambda(C^m\otimes C^n)} be the 
+	exterior algebra and consider the Kac module 
+	{\tt K_{\lambda} = S_{\lambda}C^m\otimes S_{\lambda}C^n\otimes E}. As an {\tt E}-module
+	{\tt K_{\lambda}} is free, but it's structure as a {\tt gl(m|n)}-module is more
+	interesting. A first approximation of this structure is its decomposition into irreducible
+	representations of {\tt gl(m)\oplus gl(n)}. This is computed by the function
+	{\tt characterKlambda} as a list of triples {\tt (\mu,\delta,r)}, where {\tt r} denotes
+	the multiplicity of the irreducible {\tt gl(m)\oplus gl(n)}-representation
+	{\tt S_{\mu}C^m\otimes S_{\delta}C^n} inside {\tt K_{\lambda}}.
+	
+	When {\tt \lambda=\{\}} is the empty partition, {\tt K_{\lambda} = E} and its character
+	is described by Cauchy's formula:
+      
+      Example
+    	c = characterKlambda(3,2,{})
+	netList c --irreducibles are classified by pairs of conjugate partitions, and they appear with multiplicity one
+
+      Text
+      	In general, the partition {\tt \lambda} should have at most {\tt min(m,n)} parts.
+	
+      Example
+        c = characterKlambda(2,2,{3,1})
+	netList c
+    
+    SeeAlso
+      characterLlambda
+///  
+
+doc ///
+    Key
+       characterLlambda
+       (characterLlambda,ZZ,ZZ,List)
+    Headline
+       Compute the character of the irreducible {\tt gl(m|n)}-module corresponding to a partition lambda
+    Usage
+       c = characterLlambda(m,n,lambda)    
+    Inputs
+       m:ZZ
+       n:ZZ
+       lambda:List
+    Outputs
+       c:List
+         a list of triples, where the first two entries in each triple are partitions, 
+	 and the third is a non-negative integer
+    Description
+      Text
+        For a given a partition {\tt \lambda}, {\tt L_{\lambda}} is the irreducible 
+	{\tt gl(m|n)}-module of lowest weight {\tt \lambda}. One concrete realization of {\tt L_{\lambda}}
+	is as the unique simple quotient of the Kac module {\tt K_{\lambda}}. 
+	The function {\tt characterLlambda} computes the decomposition of {\tt L_{\lambda}} into
+	a direct sum of irreducible representations of {\tt gl(m)\oplus gl(n)}. The output is
+	given as a list of triples {\tt (\mu,\delta,r)}, where {\tt r} denotes
+	the multiplicity of the irreducible {\tt gl(m)\oplus gl(n)}-representation
+	{\tt S_{\mu}C^m\otimes S_{\delta}C^n} inside {\tt L_{\lambda}}.
+	
+      Example
+    	c = characterLlambda(3,1,{4})
+	netList c
+        d = characterLlambda(2,2,{3,1})
+	netList d
+    
+    SeeAlso
+      characterKlambda
+///  
 end
 
 restart
 uninstallPackage"GLmnReps"
 installPackage"GLmnReps"
-charL(3,2,{2,1})
-charK(3,2,{1})
+viewHelp GLmnReps
+
+debug needsPackage"GLmnReps"
+
+characterLlambda(3,2,{2,1})
+characterKlambda(3,2,{1})
 charE(4,3)
+hilbertFunctionLlambda(3,3,{3,1})
+dimLlamd(3,3,{3,1},5)
+
+--F = resolution(I,DegreeLimit => 5)
+--F = resolution I
+F = res(I, FastNonminimal => true)
+betti(F, Minimize => true)

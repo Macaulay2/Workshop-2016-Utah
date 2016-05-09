@@ -55,18 +55,21 @@ newPackage(
 
 export { 
   "cascade",
+  "computingPrecision",
   "constructEmbedding",
   "gamma",
   "factorWitnessSet",
   "interactive",
   "isCoordinateZero",
   "isWitnessSetMember",
+  "loadSettingsPath",
   "mixedVolume",
   "nonZeroFilter",
   "numericalIrreducibleDecomposition",
   "numThreads",
   "randomSeed",
   "refineSolutions",
+  "saveSettingsPath",
   "seeProgress",
   "solveRationalSystem",
   "solveSystem",
@@ -180,6 +183,45 @@ parseSolutions (String,Ring) := o -> (s,R) -> (
   sols := toList apply(value L, sol->new HashTable from toList sol);
   defaultPrecision = oldprec;
   apply(sols, sol->point( {apply(gens R, v->sol#v)} | outputToPoint sol ))
+)
+
+
+parseIntermediateSolutions = (output,numsols,R) -> (
+    L := get output;
+    rgx = "\\*{5} +path([[:digit:]]) +\\*+$";
+    start := (regex(rgx,L))#0#0;
+    linesL := lines substring(start,L);
+    solsize := 0;
+    for i from 1 to #linesL do (
+        if match("^\\*",linesL#i) then (
+            solsize = i;
+            break;
+            ););
+    chunksize := numsols*solsize;
+    chunks := {};
+    while match(rgx,linesL#0) do (
+        chunks = append(chunks,take(linesL,chunksize));
+        linesL = drop(linesL,chunksize);
+    );
+    chunks = for chunk in chunks list (
+        for l in chunk list (
+            replace(rgx,"solution \\1 :",l);
+        );
+    );
+    for chunk in chunks list (
+        --fname := getFilename();
+        fname := "this.that";
+        f := openOut fname;  
+        for sol in chunk do (
+            for l in sol do (
+                f << toString(l) << endl;
+            );
+        );
+        close f;
+        foutname := fname | ".sols";
+        run("phc -z "|fname|" "|foutname);
+        parseSolutions(get foutname,R)
+    )
 )
 
 pointsToFile = method(TypicalValue => Nothing, Options => {Append => false})
@@ -831,7 +873,7 @@ mixedVolume  List := Sequence => opt -> system -> (
     if ret =!= 0 then
       error "error occurred while executing PHCpack command: phc -z";
     sols := parseSolutions(solsfile, ring ideal system);
-    if class(stabmv)===Nothing
+    if class(stabmv)=!=Nothing
       then result = (mixvol,stabmv,p,sols)
       else result = (mixvol,p,sols);
   ); 
@@ -931,7 +973,8 @@ refineSolutions (List,List,ZZ) := o-> (f,sols,dp) -> (
 -- SOLVE SYSTEM --
 ------------------
 
-solveSystem = method(TypicalValue => List, Options => {Verbose => false, numThreads=>0, randomSeed => -1})
+solveSystem = method(TypicalValue => List, 
+  Options => {Verbose => false, numThreads=>0, randomSeed => -1, computingPrecision => 1})
 solveSystem  List := List =>  o->system -> (
   -- IN:  system = list of polynomials with complex coeffiecients, 
   -- i.e. the system to solved 
@@ -945,6 +988,9 @@ solveSystem  List := List =>  o->system -> (
   if not(class coefficientRing ring first system===ComplexField) then
     error "coefficient ring is not complex";
     
+  if not member(o.computingPrecision,{1,2,4}) then
+    error "Precision must be set to 1, 2, or 4.";
+
   filename := getFilename();
   if o.Verbose then
     stdio << "using temporary files " << filename|"PHCinput"
@@ -977,7 +1023,8 @@ solveSystem  List := List =>  o->system -> (
   -- writing data to the corresponding files:    
   systemToFile(system,infile);
   -- launching blackbox solver:
-  execstr := PHCexe|" -b "
+  execstr := PHCexe|" -b"
+    |(if o.computingPrecision == 2 then "2 " else if o.computingPrecision == 4 then "4 " else " ")
     |(if o.numThreads > 1 then ("-t"|o.numThreads|" ") else "")
     |(if o.randomSeed > -1 then ("-0"|o.randomSeed|" ") else "")
     |infile|" "|outfile;
@@ -1142,13 +1189,11 @@ topWitnessSet (List,ZZ) := o->(system,dimension) -> (
                   ideal(take(e,{#e-dimension,#e-1})),g);
   return (w,ns);
 )
-
 -----------------
 -- TRACK PATHS --
 -----------------
 
-trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2,
-  Verbose => false, numThreads=>0, seeProgress=>false, interactive => false})
+trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false, interactive => false, saveSettingsPath => "", loadSettingsPath => ""})
 trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   -- IN: T, target system to be solved;
   --     S, start system with solutions in Ssols;
@@ -1162,6 +1207,9 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
 
   if not(class coefficientRing ring first S===ComplexField) then
     error "coefficient ring of start system is not complex";  
+
+  if (o.loadSettingsPath != "") and o.interactive then
+    error "You cannot both load settings and be in interactive mode. Please reset your options.";
 
   R := ring first T;
   n := #T;
@@ -1185,14 +1233,31 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   if o.Verbose then
     stdio << "using temporary files " << outfile
           << " and " << Tsolsfile << endl;
-  
+
   if n < numgens R then error "the system is underdetermined";
-  
-  if n> numgens R then error "the system is overdetermined"; 
-  
+
+  if n > numgens R then error "the system is overdetermined";
+
+  bat := openOut batchfile;
+  if (o.loadSettingsPath != "") then (
+    if o.numThreads > 1 then (
+      bat << targetfile << endl << outfile << endl 
+      << startandsolutionfile << endl;
+    ) else (
+      bat << targetfile << endl << outfile << endl <<"n"<< endl
+      << startfile << endl << Ssolsfile << endl;
+    );
+    optionFileLines := lines get o.loadSettingsPath;
+    for i from 0 to #optionFileLines - 1 do (
+      bat << optionFileLines#i << endl;
+    );
+    close bat;
+    run(PHCexe|" -p "|(if o.numThreads > 1 then 
+       ("-t"|o.numThreads) else "")|"<"|batchfile|" >phc_session.log");
+    run(PHCexe|" -z "|outfile|" "|Tsolsfile);
+  )
   -- making batch file
-  if o.interactive then (
-    bat := openOut batchfile;
+  else if o.interactive then (
     bat << targetfile << endl << outfile << endl <<"n"<< endl 
     << startfile << endl << Ssolsfile << endl;
     close bat;
@@ -1202,11 +1267,10 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
     run(PHCexe|" -z "|outfile|" "|Tsolsfile);
       
   ) else (
-    bat = openOut batchfile; -- complaint with :=
   if not (o.numThreads > 1) then (
     bat << targetfile << endl << outfile << endl <<"n"<< endl 
     << startfile << endl << Ssolsfile << endl;
-  
+
     -- first menu with settings of the construction of the homotopy
     bat << "k" << endl << o.tDegree << endl;
     if o.gamma != 0 then (
@@ -1267,7 +1331,92 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
     << "track[PHCpack]: discarded "<< 
     totalN-#result << " out of " << totalN << " solutions" << endl;
   );
+  if o.saveSettingsPath != "" then
+    saveTrackPathsOptions(outfile, o.saveSettingsPath);
   return result;
+)
+
+stripSpaces = method();
+stripSpaces (String) := S -> (
+  -- Helper function to make saveTrackPaths more readable
+  return replace(" ", "", S);
+);
+
+addToFile = method();
+addToFile (File, ZZ, String, ZZ) := (f, OptionNumber, S,StartIndex) -> (
+  -- Helper function to make saveTrackPaths more readable
+  f << OptionNumber << endl << stripSpaces(substring(S,StartIndex,11)) << endl;
+);
+
+saveTrackPathsOptions = method()
+saveTrackPathsOptions (String, String) := (outputFileName, saveFileName) -> (
+  saveFile := openOut saveFileName;
+  fileLines := lines get outputFileName;
+  for i from 0 to #fileLines - 1 do (
+    -- Start by saving the homotopy parameters.
+    if fileLines#i == "HOMOTOPY PARAMETERS :" then(
+      saveFile << "d" << endl
+        << stripSpaces(substring(fileLines#(i+1),5,4)) << endl;
+
+      saveFile << "k" << endl
+        << stripSpaces(substring(fileLines#(i+2),5,4)) << endl;
+
+      saveFile << "a" << endl << substring(fileLines#(i+3),6,21)
+        << endl << substring(fileLines#(i+3),29,21) << endl;
+
+      saveFile << "t" << endl << substring(fileLines#(i+4),6,21)
+        << endl << substring(fileLines#(i+4),29,21) << endl;
+
+      if #select(".no projective.",fileLines#(i+5)) == 1 then (
+        saveFile << "p" << endl << "n" << endl;
+      ) else (
+        saveFile << "p" << endl << "y" << endl;
+      );
+      saveFile << 0 << endl;
+    );
+    -- Save chunk of 34 parameters.
+    if fileLines#i == "GLOBAL MONITOR : " then (
+      addToFile(saveFile,1,fileLines#(i+1),46);
+      addToFile(saveFile,2,fileLines#(i+2),46);
+      addToFile(saveFile,3,fileLines#(i+3),46);
+      addToFile(saveFile,4,fileLines#(i+4),46);
+      addToFile(saveFile,5,fileLines#(i+5),46);
+      addToFile(saveFile,6,fileLines#(i+6),46);
+      addToFile(saveFile,7,fileLines#(i+8),46);
+      addToFile(saveFile,8,fileLines#(i+8),58);
+      addToFile(saveFile,9,fileLines#(i+9),46);
+      addToFile(saveFile,10,fileLines#(i+9),58);
+      addToFile(saveFile,11,fileLines#(i+10),46);
+      addToFile(saveFile,12,fileLines#(i+10),58);
+      addToFile(saveFile,13,fileLines#(i+11),46);
+      addToFile(saveFile,14,fileLines#(i+11),58);
+      addToFile(saveFile,15,fileLines#(i+12),46);
+      addToFile(saveFile,16,fileLines#(i+12),58);
+      addToFile(saveFile,17,fileLines#(i+13),46);
+      addToFile(saveFile,18,fileLines#(i+13),58);
+      addToFile(saveFile,19,fileLines#(i+15),46);
+      addToFile(saveFile,20,fileLines#(i+15),58);
+      addToFile(saveFile,21,fileLines#(i+16),46);
+      addToFile(saveFile,22,fileLines#(i+16),58);
+      addToFile(saveFile,23,fileLines#(i+17),46);
+      addToFile(saveFile,24,fileLines#(i+17),58);
+      addToFile(saveFile,25,fileLines#(i+18),46);
+      addToFile(saveFile,26,fileLines#(i+18),58);
+      addToFile(saveFile,27,fileLines#(i+19),46);
+      addToFile(saveFile,28,fileLines#(i+19),58);
+      addToFile(saveFile,29,fileLines#(i+21),46);
+      addToFile(saveFile,30,fileLines#(i+21),58);
+      addToFile(saveFile,31,fileLines#(i+22),46);
+      addToFile(saveFile,32,fileLines#(i+22),58);
+      addToFile(saveFile,33,fileLines#(i+23),46);
+      addToFile(saveFile,34,fileLines#(i+23),58);
+      saveFile << 0 << endl;
+    );
+    if fileLines#i == "OUTPUT INFORMATION DURING CONTINUATION :" then (
+      saveFile << stripSpaces(substring(fileLines#(i+1),0,4)) << endl;
+    );
+  );
+  close saveFile;
 )
 
 -----------------
@@ -1566,7 +1715,7 @@ for I in PD list << "(dim=" << dim I << ", deg=" << degree I << ") "
 restart
 loadPackage "PHCpack"
 r = CC[x,y]
-solveSystem({2*x+y+5,5*y^2+3*x}, Verbose => true, interactive => true)
+solveSystem({2*x+y+5,5*y^2+3*x})
 
 restart 
 loadPackage "PHCpack"
@@ -1574,10 +1723,10 @@ R = CC[x,y]
 f =  {x^3*y^5 + y^2 + x^2*y, x*y + x^2 - 1};
 I = ideal f;
 m = mixedVolume(f)
---(mv,sv) = mixedVolume(f,StableMixedVolume => true)
+(mv,sv) = mixedVolume(f,StableMixedVolume => true)
 --mv = mixedVolume(f,interactive=>true)
-(mv,q,qsols) = mixedVolume(f,interactive=>true)
-(mv,smv,q,qsols) = mixedVolume(f,StartSystem=>true,interactive=>true)
+(mv,smv,q,qsols) = mixedVolume(f,StableMixedVolume=>true,StartSystem=>true)
+(mv,smv,q,qsols) = mixedVolume(f,interactive=>true)
 --mixedVolume(f,interactive=>true)
 --fsols = trackPaths(f,q,qsols)
 fsols = trackPaths(f,q,qsols, interactive=>true)
