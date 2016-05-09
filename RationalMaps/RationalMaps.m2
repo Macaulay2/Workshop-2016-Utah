@@ -372,7 +372,14 @@ mapOntoImage(Ideal, Ideal, BasicList) := (a,b,l)->(
 isEmbedding = method(); --checks whether a map is a closed embedding.
 
 isEmbedding(Ideal, Ideal, BasicList) := (a1, b1, f1)->(
-)
+);
+
+isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
+);
+
+isEmbedding(RingMap) := (f1)->(
+        
+);
     
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
@@ -474,7 +481,7 @@ doc ///
         Headline
                 Computes dimension of image of rational map of projective varieties
         Usage
-                dim = dimImage(a,b,f)
+                d = dimImage(a,b,f)
         Inputs
                 a: Ideal
                         defining equations for X
@@ -483,9 +490,50 @@ doc ///
 		f:Matrix
                         projective rational map given by polynomial represenative
         Outputs
-                dim:ZZ
+                d:ZZ
 			dimension of image
 ///
+
+doc ///
+        Key
+                mapOntoImage
+                (mapOntoImage, RingMap)
+                (mapOntoImage, Ideal, Ideal, BasicList)
+                (mapOntoImage, Ring, Ring, BasicList)
+        Headline
+                Given a map of rings, correspoing to $f : X -> Y$, this returns the map of rings corresponding to $f : X -> f(X)$.
+        Usage
+                h = mapOntoImage(f)
+                h = mapOntoImage(a,b,l)
+                h = mapOntoImage(R,S,l)                
+        Inputs
+                a:Ideal
+                        defining equations for X
+                b:Ideal
+                        defining equations for Y
+		l:BasicList
+                        projective rational map given by polynomial represenatives of the same degree
+                f:RingMap
+                        the ring map corresponding to $f : X -> Y$
+                R:Ring
+                        coordinate ring for X
+                S:Ring
+                        coordinate ring for Y
+                
+        Outputs
+                h:RingMap
+			the map of rings corresponding to $f : X -> f(X)$.  
+	Description
+	        Text
+	                This function is really simple, given $S -> R$, this just returns $S/kernel -> R$.  
+	        Example 
+	                R = QQ[x,y];
+	                S = QQ[a,b,c];
+	                f = map(R, S, {x^2, x*y, y^2});
+	                mapOntoImage(f)
+	                mapOntoImage(R,S,{x^2,x*y,y^2})
+///
+
 
 doc ///
     Key
