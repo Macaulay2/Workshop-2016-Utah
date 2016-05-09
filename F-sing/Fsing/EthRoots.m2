@@ -25,7 +25,7 @@
 --*************************************************
 --*************************************************
 
-ethRoot = method(Options => {ethRootStrategy => Substitution});
+ethRoot = method(Options => {EthRootStrategy => Substitution});
 --ethRoot takes two strategy options: Substitution and MonomialBasis
 --The second strategy seems to generally be faster for computing I^[1/p^e] when e = 1, especially for polynomials of
 --high degree, but slower for larger e. 
@@ -42,7 +42,7 @@ ethRoot ( ZZ, Ideal ) := Ideal => opts -> (e,I) -> (
     G := I_*;
     --Produces a list of the generators of I.
     if #G == 0 then ideal(0_R) 
-    else if opts.ethRootStrategy == MonomialBasis then (
+    else if opts.EthRootStrategy == MonomialBasis then (
 	L := sum( apply( G, f -> ethRootMonStrat(e,p,q,k,f,R) ) );
 	L = first entries mingens L;
 	ideal(L)
@@ -181,7 +181,7 @@ ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
         
         aPowerList := apply(elmtList, expOfaList, (f, z) -> f^(z#0));
         
-        IN1 := I1*ideal(product(aPowerList));
+        IN1 := I*ideal(product(aPowerList));
         if (e > 0) then (
                 IN1 = ethRoot( 1, IN1 );
                 i := 1;

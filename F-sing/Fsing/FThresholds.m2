@@ -619,6 +619,7 @@ isFPTPoly ( QQ, RingElement ) := o -> ( t, f ) ->
 isFJumpingNumberPoly = method( Options => {Verbose=> false} )
 
 isFJumpingNumberPoly ( QQ, RingElement ) := o -> ( t, f ) -> 
+(
 	p := char ring f;
 	--this writes t = a/(p^b(p^c-1))
 	(a,b,c) := toSequence divideFraction( p, t );

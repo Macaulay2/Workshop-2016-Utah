@@ -120,6 +120,7 @@ doc ///
 	     Returns true if t is an F-jumping number, otherwise it returns false.
 ///
 
+{*
 doc ///
      Key
      	isFPTPoly 
@@ -139,6 +140,8 @@ doc ///
      	Text
 	     Returns true if t is the FPT, otherwise it returns false.  If Origin is true, it only checks it at the homogeneous maximal ideal.
 ///
+
+*} 
 
 doc ///
      Key

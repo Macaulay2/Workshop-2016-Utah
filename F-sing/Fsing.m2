@@ -63,9 +63,13 @@ export{
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
-    "fancyEthRoot",	
---F-thresholds computations (FThresholds.m2)
+    "EthRootStrategy",    
+    "fancyEthRoot",
+    "MonomialBasis",	
+    "Substitution",
+    --F-thresholds computations (FThresholds.m2)
     "factorList",    
+    "FinalCheck",    
     "findAllCompatibleIdeals", ---MK	
     "findCPBelow",
 	"findTestElementAmbient", ---Karl
@@ -91,6 +95,8 @@ export{
     "isInUpperRegion",
     "MaxExp",
     "minimalCompatible",
+    "MultiThread",    
+    "Nontrivial",    
     "nu",
     "nuAlt",
     "NuCheck",
@@ -99,6 +105,8 @@ export{
     "nuList",
     "nuListAlt",
     "nuListAlt1",
+    "Origin",
+    "OutputRange",
     "PrintCP",
     "setFTData",
     "splittingField",
@@ -118,10 +126,9 @@ export{
 --*************************************************
 --*************************************************
 
-load "./Fsing/IntegerComps.m2"
+load "./Fsing/BasicFunctions.m2"
 
 load "./Fsing/EthRoots.m2"
-
 
 load "./Fsing/generatingMorphism.m2"
 
