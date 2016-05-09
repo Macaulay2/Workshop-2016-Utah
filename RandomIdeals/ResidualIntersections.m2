@@ -103,10 +103,10 @@ randomLink Ideal := I->randomLink(codim I, I)
 linkageBound = method(Options => {UseNormalModule =>false})
 linkageBound Ideal := opts -> I -> (
 if opts.UseNormalModule == false then
-    2*(codim I)*(degree I -1) -6
+    max(0, 2*(codim I)*(degree I -1) -6)
  else (
 	N := prune Hom(I, (ring I)^1/I);
-	2*(numgens N - codim I))
+	max(0, 2*(numgens N - codim I)-6))
 )
 
 {*
@@ -139,7 +139,7 @@ sgens := sort gens I;
 n :=numcols sgens;
 J := ideal sgens_{0};
 K := J;
-c' := codim J;
+c' := 1;
 c'' := c;
 for i from 1 to n-1 do(
     c'' = codim(K = J + ideal(sgens_{i}));
@@ -147,13 +147,13 @@ for i from 1 to n-1 do(
         J = K;
 	c' = c''));
 if c' == c then return J;
-error();
 rgens := sgens * random(source sgens, source sgens);
-for i from 0 to c-(c'+1) do(
-    c' = codim(K = J + ideal(rgens_{i}));
-    if c'>c then(
+for i from 0 to n-1 do(
+    c'' = codim(K = J + ideal(rgens_{i}));
+    if c''>c' then(
         J = K;
-	c = c'));
+	c' = c'';
+	if c' ==c then break));
 J)
 minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
 
@@ -166,9 +166,11 @@ codim I
 minimalRegularSequence(codim I, I)
      I = ideal"cb,b2,a2"
      minimalRegularSequence I     
+     I = ideal"ab,ac,bc"
+     minimalRegularSequence( I)
 ///
 
-isLicci = method(Options => {UseNormalModule =>false})
+isLicci = method(Options => {UseNormalModule =>false, Verbose =>false})
 isLicci(ZZ, ZZ, Ideal) := opts -> (b,c,I) -> (
     --I homogeneous ideal
     --b = linkageBound I
@@ -177,18 +179,35 @@ isLicci(ZZ, ZZ, Ideal) := opts -> (b,c,I) -> (
     --successive random links
     J := I;
     p := numgens J;
+    count := 0;
 --    <<p<<endl;flush;
-    apply(b, i -> (
+    scan(b, i -> (count = i+1;
 	    J = randomLink(c,J);
 	    if numgens J == c then break;
-	    <<numgens J<<endl;flush;
-	    numgens J))
-    )
+	    if Verbose === true then <<numgens J<<endl<<flush;
+	    ));
+   if Verbose === true then <<" done in "<< count << " steps"<<endl;
+   c == numgens J)
+
 isLicci(ZZ,Ideal) := opts -> (b,I) -> isLicci(b,codim I, I)
 isLicci Ideal := opts -> I -> (
 isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
     ))
-
+///
+restart
+loadPackage("ResidualIntersections", Reload=>true)
+installPackage("RandomIdeal")
+--viewHelp RandomIdeal
+     setRandomSeed 0     
+     S = ZZ/32003[x_0..x_6]
+     L = idealChainFromShelling(S,randomShelling(7,3,6))
+     
+     apply(L, I-> {linkageBound I, linkageBound(I, UseNormalModule =>true)})
+     scan(L, I ->print isLicci(I, UseNormalModule => true))
+     numgens prune Hom(module I, S^1/I)
+     
+     (codim I)*(degree I)
+///
 --depth but faster
 profondeur = method()
 profondeur(Ideal, Module) := (I,M) ->(
@@ -323,12 +342,21 @@ doc ///
      numbers of generators. If I is licci, such a sequence must terminate
      in an ideal with c = codim I generators in at most
      linkageBound I steps.
+     
+     Every perfect codimension 2 ideal (nxn minors of an (nx(n+1) matrix) is licci,
+     but other ideals of minors are generally not, as illustrated below.
     Example
+     setRandomSeed 0     
+     needsPackage "RandomIdeal"
+     needsPackage "ResidualIntersections"
+     S = ZZ/32003[x_0..x_6]
+     L = idealChainFromShelling(S,randomShelling(7,3,8))
+     apply(L, I-> {linkageBound I, linkageBound(I, UseNormalModule =>true)})
+     scan(L, I ->print isLicci(I, UseNormalModule => true))
    Caveat
-    linkageBound I can be very large; linkageBound(I, UseNormalModule => true) can be very slow.
+    linkageBound I can be very large; linkageBound(I, UseNormalModule => true) can be slow.
    SeeAlso
     linkageBound
-    randomLink
 ///
 ------------------------------------------------------------
 -- DOCUMENTATION UseNormalModule
@@ -346,9 +374,9 @@ doc ///
      enables a more refined computation of the bound on the number of general links of
      an ideal I
      that must be taken to definitively test the licci propery. 
-     When UseNormalModule = true the computation of the 
+     When UseNormalModule == true the computation of the 
      normal module Hom(I, (ring I)/I) is required and this can be slow;
-     if UseNormalModule = false the computation is fast, but the bound is large.
+     if UseNormalModule == false the computation is fast, but the bound is large.
    SeeAlso
     isLicci
     linkageBound
@@ -362,7 +390,6 @@ doc ///
    Key
     linkageBound
     (linkageBound,Ideal)    
-
    Headline
     computes a bound on the number of general links of an ideal to test the licci property
    Usage
@@ -373,10 +400,30 @@ doc ///
     b:ZZ
    Description
     Text
-    Example
+     An ideal I in a polynomial ring S is licci if it Cohen-Macaulay and is linked in finitely many steps
+     I --> (F):I, where F is a maximal regular sequence in I,
+     to a complete intersection. Bernd Ulrich showed that if I is licci and each
+     step of the linkage
+     is done via a regular sequence F that is a subset of a minimal set of generators,
+     then the linkage process will terminate after at most b steps, where
+     
+     b = 2(codim I)*(degree I -1) -6.
+     
+     (Theorem 2.4 of "On Licci Ideals", Contemp. Math 88 (1989).
+     This is computed by linkageBound I.
+     He did this via a more refined formula; the (generally sharper) 
+     intermediate result gives the bound 
+     
+     b = 2(numgens(Hom(I, S/I) - codim I).
+	 
+     The call linkageBound(I, UseNormalModule =>true) computes this refined bound.
+     See isLicci for examples.
    Caveat
+    The crude bound can be quite large; computing the refined bound (which is often large
+    as well) can be quite slow.
    SeeAlso
     isLicci
+    UseNormalModule
 ///
 
 
@@ -422,7 +469,6 @@ doc ///
 	  I = monomialIdeal(x_1^2,x_1*x_2,x_1*x_3,x_2^2,x_2*x_3);
 	  maxGs(I)
    Caveat
-      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
       residualCodims
@@ -715,7 +761,7 @@ I = ideal{x_1*x_3,x_2*x_4,x_3*x_4,x_1*x_5,x_3*x_5};
 assert(isStronglyCM I)
 ///
 end--
-insta
+
 linkageBound (I, UseNormalModule => false)
 time linkageBound (I, UseNormalModule => true)
 
@@ -725,7 +771,9 @@ time linkageBound (I, UseNormalModule => true)
 restart
 loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
+uninstallPackage "ResidualIntersections"
 installPackage "ResidualIntersections"
+
 J = idealChainFromSC randomChain(10,5,20);
 J/maxGs
 J/residualCodims
