@@ -58,7 +58,6 @@ export{
 	"findAllCompatibleIdeals", ---MK	
 	"generatingMorphism", ---MK
 	"findGeneratingMorphisms", ---MK
-    "fancyEthRoot",		
     "minimalCompatible",
 --F-thresholds computations (FThresholds.m2)
     "BinomialCheck",
