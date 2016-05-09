@@ -2,9 +2,16 @@ newPackage(
 	"RandomIdeal",
     	Version => "2.0", 
     	Date => "May 9, 2016",
-    	Authors => {
-	     {Name => "David Eisenbud", Email => "de@msri.org"}
-	     },
+        Authors => {
+	    {Name => "Katie Ansaldi"},
+	    {Name => "David Eisenbud",
+         	Email => "de@msri.org",
+         	HomePage => "http://www.msri.org/~de"},
+     	    {Name => "Robert Krone",
+	 	Email => "rk71@queensu.ca",
+	 	HomePage => "http://www.rckr.one"},
+	    {Name => "Jay Yang"}
+	    },
     	HomePage => "http://www.msri.org/~de",
     	Headline => "a package for creating random ideals of various sorts",
 	AuxiliaryFiles => false, -- set to true if package comes with auxiliary files,

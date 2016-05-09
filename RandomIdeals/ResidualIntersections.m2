@@ -2,10 +2,14 @@ newPackage ( "ResidualIntersections",
     Version => "1.0",
     Date => "07 May 2016",
     Authors => {
+	{Name => "Katie Ansaldi"},
 	{Name => "David Eisenbud",
          Email => "de@msri.org",
          HomePage => "http://www.msri.org/~de"},
-     	 {Name => "Robert,Katy,Robert, Jay"}
+     	{Name => "Robert Krone",
+	 Email => "rk71@queensu.ca",
+	 HomePage => "http://www.rckr.one"},
+	{Name => "Jay Yang"}
 	},
     Headline => "Package for studying conditions associated to Residual Intersection theory",
     Reload => true,
