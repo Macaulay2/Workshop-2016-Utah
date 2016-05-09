@@ -308,7 +308,8 @@ inverseOfMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
    SbarJD:=submatrix(barJD,,Col);
    Inv:={};
    for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
-   Inv   );    
+   map(S/im, R/di, Inv)
+);    
 
 inverseOfMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
     inverseOfMap(ideal R1, ideal S1, bm)
