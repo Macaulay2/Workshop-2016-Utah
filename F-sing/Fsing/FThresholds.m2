@@ -16,21 +16,15 @@
 
 -- Main functions: FPTApproxList, FTApproxList, FTHatApproxList
 
--- Auxiliary Functions: 
-
 ----------------------------------------------------------------------------------
 -- FThreshold Estimates
 
 -- Main functions: guessFPT, estFPT
 
--- Auxiliary Functions: 
-
 ----------------------------------------------------------------------------------
 -- FPT/F-Jumping number check
 
 -- Main functions: isFPTPoly, isFJumpingNumberPoly
-
--- Auxiliary Functions: 
 
 ----------------------------------------------------------------------------------
 -- FPTs of special types of polynomials
@@ -41,9 +35,9 @@
 --    twoIntersection, allIntersections, isInPolytope, isInInteriorPolytope,
 --    polytopeDefiningPoints, maxCoordinateSum, dCalculation, calculateEpsilon
 --    isBinomial, setFTData, isInUpperRegion, isInLowerRegion, 
---    neighborInUpperRegion, isCP, findCPBelow, FPT2VarHomogInternal, canVector,
---    getNumAndDenom, taxicabNorm, factorList, splittingField, isBinaryForm
---    isNonConstantBinaryForm, isLinearBinaryForm, isPolynomialOverFiniteField
+--    neighborInUpperRegion, isCP, findCPBelow, FPT2VarHomogInternal, 
+--    factorList, splittingField, isBinaryForm, isNonConstantBinaryForm, 
+--    isLinearBinaryForm, isPolynomialOverFiniteField
 
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1104,36 +1098,6 @@ FPT2VarHomog (List,List) :=  opt -> (L,m) ->
 {*
     Miscellaneous.
 *}
-
--- Some commands for dealing with vectors --
-
---canVector(i,n) returns the i-th canonical basis vector in dimension n
---Warning: for convenience, this uses Macaulay2's convention of indexing lists starting 
---with 0; so, for example, {1,0,0,0} is canVector(0,4), not canVector(1,4).
-canVector = method()
-
-canVector (ZZ,ZZ) := (i,n) -> 
-(
-    if ((i<0) or (i>=n)) 
-        then (error "canVector(i,n) expects integers i and n with 0<=i<n.");   
-    apply(n,j->if i==j then 1 else 0)
-)
- 
--- getNumAndDenom(u) takes a rational vector u and returns a pair (a,q), where a 
---is an integer vector and q an integer such that u=a/q.
-getNumAndDenom = method()
-
-getNumAndDenom (List) := u -> 
-(
-    den := lcm apply( u, denom );
-    a := apply( u, n-> lift( n*den, ZZ ) );
-    ( a, den )        
-)
-
---Computes the taxicab norm of a vector.
-taxicabNorm = method()
-
-taxicabNorm (List) := u -> sum( u, abs )
 
 -- Factorization of polynomials and splitting fields --
 
