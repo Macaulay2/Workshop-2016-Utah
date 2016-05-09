@@ -31,6 +31,100 @@ lexSegment Ideal := Ideal => I -> (
 	L
 )
 
+-------------------------------------------------------
+--DOCUMENTATION gotzmannBound
+-------------------------------------------------------
+
+doc///
+     Key
+     	  gotzmannBound
+	  (gotzmannBound,RingElement)
+	  (gotzmannBound,RingElement,ZZ)
+	  (gotzmannBound,Ideal)
+     Headline
+     	  the Gotzmann bound of a Hilbert polynomial
+     Usage
+     	  a=gotzmannBound(P,d) or a=gotzmannBound(P) or a=gotzmannBound(I)
+     Inputs
+     	  P:RingElement
+		a Hilbert polynomial
+	  d:ZZ
+		an integer
+	  I:Ideal
+		an Ideal
+     Outputs
+     	  a:ZZ
+		the Gotzmann bound of P (or of hilbertPolynomial(I))
+     Description
+     	  Text
+		Returns the Gotzmann bound for regularity of a saturated ideal with Hilbert polynomial P,
+		which is the number of binomial coefficients in the Gotzmann representation of P. The 
+		Gotzmann bound of hilbertPolynomial(I) is computed when an ideal I is input. The optional
+		integer input is meant for internal use of the function in recursive calls.
+	  Example
+	       a=gotzmannBound(P)
+	       a=gotzmannBound(P,0)
+	       a=gotzmannBound(I)
+     SeeAlso
+	  lexSegment     	  
+///
+
+doc///
+     Key
+     	  binomPoly
+	  (binomPoly,Ring,ZZ,ZZ)
+     Headline
+     	  the Hilbert polynomial of k[x_1, ..., x_b](a)
+     Usage
+     	  p=binomPoly(R,a,b)
+     Inputs
+	  R:Ring
+		The univariate ring for numerical polynomials (usually QQ[i])
+	  a:ZZ
+		an integer
+	  b:ZZ
+		an integer
+     Outputs
+     	  p:RingElement
+		the Hilbert polynomial of k[x_1, ..., x_b](a)
+     Description
+     	  Text
+		Returns the Hilbert polynomial of projective space P^(b-1), twisted by a, 
+		as an element of QQ[i].
+	  Example
+	       p=binomPoly(QQ[i],3,3)
+     SeeAlso
+     	  gotzmannBound
+	  lexSegment
+///
+
+doc///
+     Key
+     	  lexSegment
+	  (lexSegment,Ideal)
+     Headline
+     	  the lex segment ideal with the same Hilbert function
+     Usage
+     	  L=lexSegment(I)
+     Inputs
+	  I:Ideal
+		an Ideal
+     Outputs
+     	  L:Ideal
+		the lex segment ideal with the same Hilbert function as I
+     Description
+     	  Text
+		Returns the lex segment ideal with the same Hilbert function as I.  Does not rely
+		on lexIdeal() method in the case of a non-artinian ideal. Uses the larger of the
+		max generating degree of I and the Gotzmann bound of hilbertPolynomial(I) to 
+		determine the lergest degree in which to compute the lex segment ideal.
+	  Example
+	       L=lexSegment(I)
+     SeeAlso
+     	  lexIdeal
+///
+
+
 TEST ///
 R = QQ[i]
 assert(binomPoly(R, 3, 3) == 1/6*i^3 + i^2 + 11/6*i + 1)
