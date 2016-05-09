@@ -650,9 +650,22 @@ doc ///
    SeeAlso
 ///
 
+TEST ///
+R = QQ[x_1..x_6];
+I = ideal{x_1*x_2,x_1*x_3,x_2*x_4*x_5,x_1*x_6,x_4*x_6,x_5*x_6};
+assert(koszulDepth I == {3,0,2,3})
+assert(koszulDepth(2,I) == 2)
+assert(not hasSlidingDepth I)
+assert(hasSlidingDepth(1,I))
+assert(not hasSlidingDepth(2,I))
+assert(not isStronglyCM I)
+///
 
-
-
+TEST ///
+R = QQ[x_1..x_5];
+I = ideal{x_1*x_3,x_2*x_4,x_3*x_4,x_1*x_5,x_3*x_5};
+assert(isStronglyCM I)
+///
 end--
 insta
 linkageBound (I, UseNormalModule => false)
