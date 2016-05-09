@@ -499,6 +499,7 @@ doc ///
    Outputs
       L:List
          a list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
+	 The range of values is {\tt codim I} + 1 and the dimension of the ring + 1.
    Description
       Text
          For each {\tt s} computes the maximum over all monomial primes {\tt P} with codimension {\tt s-1} 
@@ -507,6 +508,9 @@ doc ///
       Text
          The values {\tt s} returned are candidates for {\tt I} possibly being an {\tt s}-rsidual intersection.
       Example
+         R = QQ[a,b,c];
+	 I = monomialIdeal{a*b,b*c^2}
+	 residualCodims I
    SeeAlso
       numgensByCodim
       maxGs
