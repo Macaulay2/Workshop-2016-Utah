@@ -13,7 +13,7 @@ Version => "0.1", Date => "May 7th, 2016", Authors => {
      {Name => "C.J. Bott",
      Email => "cjamesbott@gmail.com"}
 }, --this file is in the public domain
-Headline => "A package for working with Weil divisors.", DebuggingMode => true, Reload=>true)
+Headline => "A package for working with rational maps.", DebuggingMode => true, Reload=>true)
 export{
 	"isBirationalMap",
 	"imageOfMap",
@@ -53,6 +53,8 @@ dimImage(Ideal,Ideal,Matrix) := (a,b,f) ->(
 baseLocusOfMap = method();
 
 baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
+    --maybe check all the maps in L1 are of the same degree?
+
     M:= gens ker transpose presentation image L1;
     -- this matrix gives all the "equivalent"
     -- ways to write the map in question (e.g. (xy : xz) is 
@@ -75,6 +77,10 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
 
 isRegularMap = method();
 
+isRegularMap(Matrix) := (L1) -> ( --L1 is a row matrix
+    I:= baseLocusOfMap(L1);
+    I == ideal 1_(ring I)
+);
 
  blowUpIdeals=method();
   
@@ -232,13 +238,13 @@ isBirationalMap(RingMap) :=(f)->(
 beginDocumentation();
 
 doc /// 
-	 Key
-		RationalMaps
-     Headline
-     	A package for computations with rational maps.
-     Description
-    	Text   
-    	 A package for computations with rational maps.
+    Key
+        RationalMaps
+    Headline
+        A package for computations with rational maps.
+    Description
+    	Text
+            A package for computations with rational maps.
 ///
 
 doc /// 
@@ -340,14 +346,31 @@ doc ///
     Headline
         Computes base locus of a map from a projective variety to projective space
     Usage
-        I = baseLocusOfMap(L)
+        I = baseLocusOfMap(M)
     Inputs
-        L: Matrix
+        M: Matrix
             Row matrix whose entries correspond to the coordinates of your map to projective space.
     Outputs
         I: Ideal
             The saturated defining ideal of the baselocus
 ///
+
+doc ///
+    Key
+        isRegularMap
+    Headline
+        Checks whether a map to projective space is regular
+    Usage
+        b = isRegularMap(M)
+    Inputs
+        M: Matrix
+            Row matrix whose entries correspond to the coordinates of your map to projective space
+    Outputs
+        b: Boolean
+    Description
+        Text
+            This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring
+///  
 
 TEST ///
 	------------------------------------
@@ -417,6 +440,29 @@ TEST ///
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(M))
 	
+	-- reducible source
+
+	R = QQ[x,y,z]/(x*y)
+	M = matrix{{x^2, x*y, y^2}}
+	I = ideal(x,y)
+	assert(I == baseLocusOfMap(M))
+
+	-------------------------------------
+	----- isRegularMap -----------------
+	-------------------------------------
+
+	R = QQ[x,y,z,w]/(x*y - z*w)
+	M = matrix{{1, 0, 0}}
+	assert(isRegularMap(M))
+
+    R = QQ[x,y]/(x*y)
+    M = matrix{{x,y}}
+    assert(isRegularMap(M))
+
+    R = QQ[x,y,z]/(x^3 + y^3 - z^3)
+    M = matrix{{y-z, x}}
+    assert(isRegularMap(M) == false)
+
 /// 
 ----FUTURE PLANS------
 
