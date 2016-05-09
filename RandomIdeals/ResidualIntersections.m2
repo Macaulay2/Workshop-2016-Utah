@@ -268,8 +268,8 @@ numgensByCodim Ideal := J -> (
     toList apply(n, i->numgensByCodim(J,i+1))
     )
 
-maxGd = method()
-maxGd Ideal := J -> (
+maxGs = method()
+maxGs Ideal := J -> (
     for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i;
     infinity
     )
@@ -384,23 +384,23 @@ doc ///
 ///
 
 ------------------------------------------------------------
--- DOCUMENTATION maxGd
+-- DOCUMENTATION maxGs
 ------------------------------------------------------------
 
 doc ///
    Key
-      maxGd
-      (maxGd,Ideal)    
+      maxGs
+      (maxGs,Ideal)    
    Headline
-      maximum G_d of a monomial ideal
+      maximum G_s of a monomial ideal
    Usage
-      d = maxGd I
+      d = maxGs I
    Inputs
       I:Ideal
          a monomial ideal
    Outputs
       d:ZZ
-         the maximum value of {\tt d} such that {\tt I} has property G_d (possibly infinity).
+         the maximum value of {\tt s} such that {\tt I} has property G_s (possibly infinity).
    Description
       Text
       Example
