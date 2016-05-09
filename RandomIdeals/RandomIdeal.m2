@@ -473,7 +473,7 @@ doc ///
 	    glued to previous simplices of dimension at least {\tt m}.  If all previous simplices are smaller, then the addition will fail.
           Example
             P={{1,2,3}}
-	    L=randomAddition(6,3,P)
+	    L=randomAddition(6,2,P)
      Caveat
 	  If the input is not a shellable simplicial complex, the new complex will not be shellable. The function does not check whether the input is shellable.
      SeeAlso
