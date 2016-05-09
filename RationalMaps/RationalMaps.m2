@@ -25,7 +25,10 @@ export{
 	"blowUpIdeals",
 	"relationType",
 	"dgi",
-	"isSameDegree"
+	"isSameDegree",
+	"isBirationalOntoImage",
+	"nonZeroMinor",
+	"inverseOfMap"
 }
 
 ----------------------------------------------------------------
@@ -228,7 +231,104 @@ isBirationalMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
 isBirationalMap(RingMap) :=(f)->(
     isBirationalMap(target f, source f, first entries matrix f)
     );
+ 
+  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+isBirationalOntoImage = method();
+
+isBirationalOntoImage(Ideal,Ideal, BasicList) :=(di,im,bm)->(
+      tar:=imageOfMap(di,im, bm);
+      isBirationalMap(di,tar,bm)
+      );
+  
+ isBirationalOntoImage(Ring,Ring,BasicList) := (R1, S1, bm)->(
+    isBirationalMap(ideal R1, ideal S1, bm)
+    ); 
+
+isBirationalOntoImage(RingMap) :=(f)->(
+    isBirationalOntoImage(target f, source f, first entries matrix f)
+    );
     
+    
+    --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    nonZeroMinor=method();
+nonZeroMinor(Matrix,ZZ):=(M,ra)->(
+    cc:=numColumns(M);
+    ro:=numRows(M);
+    col:=apply(0..cc-1,i->i);
+    row:=apply(0..ro-1,i->i);
+    Collist:=subsets(col,ra);
+    Rowlist:=subsets(row,ra);
+    nzlist:={};
+    for i from 0 to (#Collist)-1 do  (
+       if nzlist!={} then break; 
+       for j from 0 to (#Rowlist)-1 do (
+	   if det(submatrix(M,Rowlist#j,Collist#i))!=0 then (
+	       nzlist=append(nzlist,{Collist#i,Rowlist#j});
+	       break;
+	   );
+       );
+   );
+flatten nzlist);  
+   
+ --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+  
+  
+inverseOfMap = method();
+
+--this checks whether a map X -> Y is birational.
+
+--X = Proj R
+--Y = Proj S
+--This madfp is given by a list of elements in R, all homogeneous
+--of the same degree.  
+--Below we have defining ideal of X = di
+--defining ideal of Y = im
+--list of elements = bm
+inverseOfMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
+    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    R:=ring di;
+    r:=numgens ambient R;
+    K:=coefficientRing R;
+    Jr:= blowUpIdeals(di,bm);
+    n:=numgens Jr;
+    L:={};
+    for i from 0 to (n-1) do if  (degree Jr_i)_0==1 then
+      L=append(L, Jr_i);
+   JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
+   S:=ring im;
+   vS:=gens ambient S;
+   g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
+   barJD:=g(JD);
+   jdd:=(numgens ambient R)-1+dgi(di);
+   if not(isSubset(minors(jdd,barJD),im))==false then error "The map is not Birational";
+   Col:=(nonZeroMinor(barJD,jdd))#0;
+   SbarJD:=submatrix(barJD,,Col);
+   Inv:={};
+   for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
+   Inv   );    
+
+inverseOfMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
+    inverseOfMap(ideal R1, ideal S1, bm)
+    );
+
+--isBirationalMap(Ideal,Ring,BasicList) := (di, S1, bm)->(
+--    isBirationalMap(di, ideal S1, bm)
+--    );
+
+--isBirationalMap(Ring,Ideal,BasicList) := (R1, im, bm)->(
+--    isBirationalMap(ideal R1, im, bm)
+--    );
+
+inverseOfMap(RingMap) :=(f)->(
+    inverseOfMap(target f, source f, first entries matrix f)
+    );
+    
+    
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   
  
 
 --****************************************************--
