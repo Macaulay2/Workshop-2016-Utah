@@ -20,7 +20,6 @@ export{
 	"baseLocusOfMap",
 	"dimImage",
 	"isRegularMap",
-	"invertMap",
 	"isEmbedding",
 	"blowUpIdeals",
 	"relationType",
@@ -119,11 +118,21 @@ baseLocusOfMap(List) := (L) ->(
     baseLocusOfMap(matrix{L})
 );
 
+baseLocusOfMap(RingMap) := (ff) ->(
+    mm := sub(matrix ff, target ff);  
+    baseLocusOfMap(mm)
+);
+
 isRegularMap = method();
 
 isRegularMap(Matrix) := (L1) -> ( --L1 is a row matrix
     I:= baseLocusOfMap(L1);
     I == ideal 1_(ring I)
+);
+
+isRegularMap(RingMap) := (ff) ->(
+        I:=baseLocusOfMap(ff);
+        I == ideal 1_(ring I)
 );
 
  blowUpIdeals=method();
@@ -400,6 +409,18 @@ isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
 );
 
 isEmbedding(RingMap) := (f1)->(
+        f2 := mapOntoImage(f1);
+        flag := true;
+        try ( h := inverseOfMap(f2) ) then (
+                flag = isRegularMap(f2);
+                if (flag == true) then(
+                        flag = isRegularMap(h);
+                );                
+        )
+        else (
+                flag = false
+        );
+        flag
         
 );
     
