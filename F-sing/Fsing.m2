@@ -52,14 +52,12 @@ export{
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
-<<<<<<< HEAD
     "fancyEthRoot",	
 	"generatingRoot", ---MK
 	"FFiniteSupport", ---MK
 	"findAllCompatibleIdeals", ---MK	
 	"generatingMorphism", ---MK
 	"findGeneratingMorphisms", ---MK
-=======
     "fancyEthRoot",		
     "minimalCompatible",
 --F-thresholds computations (FThresholds.m2)
@@ -102,7 +100,6 @@ export{
     "paraTestModule",
     "paraTestModuleAmbient",
     "findAllCompatibleIdeals", ---MK	
->>>>>>> a2d67bbb69c5811cf147d9fdc7d3303f84df4d1c
     "minimalCompatible",
     "paraTestModule", ---MK
     "paraTestModuleAmbient" ---MK
