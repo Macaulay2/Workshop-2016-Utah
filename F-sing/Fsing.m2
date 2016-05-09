@@ -120,12 +120,15 @@ load "./Fsing/IntegerComps.m2"
 
 load "./Fsing/EthRoots.m2"
 
+load "./Fsing/FThresholds.m2"
+
+load "./Fsing/SpecialFThresholds.m2"
+
 load "./Fsing/compatiblySplit.m2"
 
 load "./Fsing/generatingMorphism.m2"
 
 load "./Fsing/FPureAlgorithm.m2"
-
 
 load "./Fsing/FFiniteSupport.m2"
 
@@ -136,6 +139,10 @@ load "./Fsing/FsingDocs.m2"
 beginDocumentation()
 
 load "./Fsing/EthRootsDoc.m2"
+
+load "./Fsing/FThresholdsDoc.m2"
+
+load "./Fsing/SpecialFThresholdsDoc.m2"
 
 load "./Fsing/compatiblySplitDoc.m2"
 
