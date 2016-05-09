@@ -281,6 +281,18 @@ residualCodims MonomialIdeal := J -> (
     )
 
 ------------------------------------------------------------
+-- DOCUMENTATION ResidualIntersections
+------------------------------------------------------------
+doc ///
+   Key
+    ResidualIntersections
+   Headline
+    A package for residual intersections
+   Description
+   SeeAlso
+///
+
+------------------------------------------------------------
 -- DOCUMENTATION isLicci
 ------------------------------------------------------------
 doc ///
@@ -374,13 +386,16 @@ doc ///
 doc ///
    Key
     minimalRegularSequence
-    (minimalRegularSequence,ZZ,Ideal)    
+    (minimalRegularSequence,ZZ,Ideal)
+    (minimalRegularSequence,Ideal)
    Headline
     finds a maximal regular sequence of minimal degree in an ideal
    Usage
     J=minimalRegularSequence(n,I)
+    J=minimalRegularSequence(I)
    Inputs
     n:ZZ
+    I:Ideal
 ///
 
 ------------------------------------------------------------
@@ -632,10 +647,12 @@ doc ///
    Key
       depthsOfPowers
       (depthsOfPowers,ZZ,ZZ,Ideal)
+      (depthsOfPowers,ZZ,Ideal)
    Headline
       Computes depth of powers of an ideal
    Usage
       L = depthsOfPowers(s,c,I)
+      L = depthsOfPowers(s,I)
    Inputs
       s:ZZ
       	  number of powers to compute
