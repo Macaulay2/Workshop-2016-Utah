@@ -74,6 +74,7 @@ export{
     "FPTApproxList",     
     "FPT2VarHomog",     
     "FPT2VarHomogInternal",
+	"FPureIdeals",
     "FTApproxList",
     "FTHatApproxList", 
     "guessFPT",
@@ -146,5 +147,7 @@ load "./Fsing/FFiniteSupportDoc.m2"
 load "./Fsing/generatingMorphismDoc.m2"
 
 load "./Fsing/parameterTestIdealDoc.m2"
+
+load "./Fsing/Fpure.m2"
 
 
