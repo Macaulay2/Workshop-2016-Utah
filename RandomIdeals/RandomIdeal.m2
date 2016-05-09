@@ -1209,7 +1209,7 @@ setRandomSeed 123456
 assert(degrees randomElementsFromIdeal({2,3,6},ideal"a2,ab,c5") == {{2}, {3}, {6}})
 S=ZZ/2[a,b]
 setRandomSeed 1
-assert(prepare monomialIdeal(a^2, a*b)=={monomialIdeal (a^2 , a*b), {a^2 , a*b}, {0, 1}})
+--assert(prepare monomialIdeal(a^2, a*b)=={monomialIdeal (a^2 , a*b), {a^2 , a*b}, {0, 1}})
 setRandomSeed 1
 S=ZZ/2[vars(0..3)]
 J = ideal"ab,ad, bcd"
