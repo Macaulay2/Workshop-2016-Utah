@@ -75,7 +75,6 @@ export{
     "FPT2VarHomog",     
     "FPT2VarHomogInternal",
 	"FPureIdeals",
-	"findAllFPurePrimes",
     "FTApproxList",
     "FTHatApproxList", 
     "guessFPT",
