@@ -21,7 +21,7 @@ export {
 	"genericResidual",
 	"genericArtinNagata",
 	"numgensByCodim",
-	"maxGd",
+	"maxGs",
 	"residualCodims",
         "koszulDepth",
         "hasSlidingDepth",
@@ -482,7 +482,7 @@ doc ///
       It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       residualCodims
-      maxGd
+      maxGs
 ///
 
 ------------------------------------------------------------
@@ -515,7 +515,7 @@ doc ///
       It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
-      maxGd
+      maxGs
 ///
 
 end--
@@ -531,5 +531,5 @@ loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
 installPackage "ResidualIntersections"
 J = idealChainFromSC randomChain(10,5,20);
-J/maxGd
+J/maxGs
 J/residualCodims
