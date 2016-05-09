@@ -38,6 +38,7 @@ export{
 ----------------------------------------------------------------
 
 imageOfMap = method();
+
 imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 	h := map((ring a)/a,(ring b)/b,f);
 	-- the image of f is the same as the kernel of its pullback on the 
@@ -45,6 +46,20 @@ imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 	im := ker h;
 	im
 	);
+
+imageOfMap(Ideal,Ideal,BasicList) := (a,b,f) ->
+	imageOfMap(a,b,f)
+	);
+
+imageOfMap(Ring,Ring,Matrix) := (a,b,f) ->
+	imageOfMap(ideal a, ideal b, f)
+	);
+
+imageOfMap(Ring,Ring,BasicList) := (a,b,f) ->
+        imageOfMap(ideal a, ideal b, f)
+
+imageOfMap(RingMap) := (f) ->
+        imageOfMap(target f, source f, first entries matrix f)
 
 dimImage = method();
 dimImage(Ideal,Ideal,Matrix) := (a,b,f) ->(
