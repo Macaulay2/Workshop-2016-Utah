@@ -222,7 +222,7 @@ koszulDepth(Ideal) := I -> (
     for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
     )
 
-koszulDepth(Ideal,ZZ) := (I,k) -> (
+koszulDepth(ZZ,Ideal) := (k,I) -> (
     C := koszul mingens I;
     profondeur HH_k(C)
     )
@@ -236,15 +236,15 @@ isStronglyCM(Ideal) := I -> (
 
 hasSlidingDepth = method()
 
-hasSlidingDepth(Ideal,ZZ) := (I,k) -> (
+hasSlidingDepth(ZZ,Ideal) := (k,I) -> (
     d := dim I;
     s := numColumns(mingens I)-codim I;
-    all(k+1, i -> (koszulDepth(I,s-i))>=d-i)
+    all(k+1, i -> (koszulDepth(s-i,I))>=d-i)
     )
 
-hasSlidingDepth(Ideal) := (I) -> (
+hasSlidingDepth(Ideal) := I -> (
     s := numColumns(mingens I)-codim I;
-    hasSlidingDepth(I,s)
+    hasSlidingDepth(s,I)
     )
 
 -------------------------------------
