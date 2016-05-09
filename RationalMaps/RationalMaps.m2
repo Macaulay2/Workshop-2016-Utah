@@ -28,7 +28,8 @@ export{
 	"isSameDegree",
 	"isBirationalOntoImage",
 	"nonZeroMinor",
-	"inverseOfMap"
+	"inverseOfMap",
+	"mapOntoImage"
 }
 
 ----------------------------------------------------------------
@@ -327,6 +328,33 @@ inverseOfMap(RingMap) :=(f)->(
     inverseOfMap(target f, source f, first entries matrix f)
     );
     
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+mapOntoImage = method(); --given a map f : X -> Y, this creates the map f : X -> f(X).
+
+mapOntoImage(RingMap) := (f)->(
+        newMap := map(target f, ambient source f, matrix f);
+        kk := ker(newMap);
+        map(target f, (source newMap)/kk, matrix f)
+        
+);
+
+mapOntoImage(Ring, Ring, BasicList) := (R,S,l)->(
+        im := imageOfMap(R,S,l);
+        map(R, S, l)
+);
+    
+mapOntoImage(Ideal, Ideal, BasicList) := (a,b,l)->(
+        im := imageOfMap(a,b,l);
+        map((ring a)/a, (ring b)/b, l)
+);
+    
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+isEmbedding = method(); --checks whether a map is a closed embedding.
+
+isEmbedding(Ideal, Ideal, BasicList) := (a1, b1, f1)->(
+)
     
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
