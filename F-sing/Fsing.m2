@@ -68,6 +68,7 @@ export{
     "factorList",    
     "findAllCompatibleIdeals", ---MK	
     "findCPBelow",
+	"findTestElementAmbient", ---Karl
 	"FFiniteSupport", ---MK
 	"findGeneratingMorphisms", ---MK
 	"frobeniusPower",
@@ -77,6 +78,7 @@ export{
 	"FPureIdeals",
     "FTApproxList",
     "FTHatApproxList", 
+	"FullMap", ---Karl
 	"generatingMorphism", ---MK
 	"generatingRoot", ---MK
     "guessFPT",
@@ -131,6 +133,8 @@ load "./Fsing/FPure.m2"
 
 load "./Fsing/FFiniteSupport.m2"
 
+
+
 load "./Fsing/parameterTestIdeal.m2"
 
 
@@ -159,5 +163,4 @@ load "./Fsing/generatingMorphismDoc.m2"
 load "./Fsing/parameterTestIdealDoc.m2"
 
 load "./Fsing/Fpure.m2"
-
 
