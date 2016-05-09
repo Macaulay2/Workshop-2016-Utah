@@ -566,11 +566,6 @@ estFPT={FinalCheck=> true, Verbose=> false, MultiThread=>false, DiagonalCheck=>t
 --isFPTPoly, determines if a given rational number is the FPT of a pair in a polynomial ring. 
 --if Origin is specified, it only checks at the origin. 
 
-FPT2VarHomogInternal = method(Options => {MaxExp => infinity, PrintCP => false, Nontrivial => false})
-
-FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
-
-
 isFPTPoly = method( Options => {Verbose=> false,Origin=>false} )
 isFPTPoly ( QQ, RingElement ) := o -> ( t, f ) -> 
 (
