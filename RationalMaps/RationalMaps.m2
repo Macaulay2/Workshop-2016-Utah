@@ -33,7 +33,7 @@ export{
 
 ----------------------------------------------------------------
 --************************************************************--
---Structure of our divisor objects and their display------------
+-------------------- Function Defitions ------------------------
 --************************************************************--
 ----------------------------------------------------------------
 
@@ -353,9 +353,9 @@ doc ///
 		(isBirationalMap, Ideal, Ideal, BasicList)
 		(isBirationalMap, Ring, Ring, BasicList)
 		(isBirationalMap, RingMap)
-        Headline
-     	        Checks if a map X -> Y between projective varieties is birational.
-        Usage
+    Headline
+        Checks if a map X -> Y between projective varieties is birational.
+    Usage
 		val = isBirationalMap(a,b,f)
 		val = isBirationalMap(R,S,f)
 		val = isBirationalMap(Pi)
@@ -365,60 +365,60 @@ doc ///
 		b:Ideal
 			defining equations for Y
 		f:BasicList
-                        A list of where to send the variables in the ring of b, to in the ring of a.
-                R:Ring
-                        the homogeneous coordinate ring of X
-                S:Ring
-                        the homogeneous coordinate ring of Y
-                Pi:RingMap
-                        A ring map S to R corresponding to X mapping to Y
-        Outputs
-                val:Boolean
-                        true if the map is birational, false if otherwise
-        Description
-    	        Text   
-    	                This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to have a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  Let's check that the plane quadratic cremona transformation is birational.
-                Example
-                       R=QQ[x,y,z];
-                       S=QQ[a,b,c];
-                       Pi = map(R, S, {x*y, x*z, y*z});
-                       isBirationalMap(Pi)
-                Text   
-                        We can also verify that a cover of $P^1$ by an elliptic curve is not birational.
-                Example
-                        R=QQ[x,y,z]/(x^3+y^3-z^3);
-                        S=QQ[s,t];
-                        Pi = map(R, S, {x, y-z});
-                        isBirationalMap(Pi)
+            A list of where to send the variables in the ring of b, to in the ring of a.
+        R:Ring
+            the homogeneous coordinate ring of X
+        S:Ring
+            the homogeneous coordinate ring of Y
+        Pi:RingMap
+            A ring map S to R corresponding to X mapping to Y
+    Outputs
+        val:Boolean
+            true if the map is birational, false if otherwise
+    Description
+        Text   
+            This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to have a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  Let's check that the plane quadratic cremona transformation is birational.
+        Example
+            R=QQ[x,y,z];
+            S=QQ[a,b,c];
+            Pi = map(R, S, {x*y, x*z, y*z});
+            isBirationalMap(Pi)
+        Text   
+            We can also verify that a cover of $P^1$ by an elliptic curve is not birational.
+        Example
+            R=QQ[x,y,z]/(x^3+y^3-z^3);
+            S=QQ[s,t];
+            Pi = map(R, S, {x, y-z});
+            isBirationalMap(Pi)
 ///                     
 
 doc ///
-	Key 
-		imageOfMap
-	Headline
-		Finds defining equations for the image of a rational map
-	Usage
-		image = imageOfMap(a,b,f)
-	Inputs
-		a:Ideal
-			defining equations for X
-		b:Ideal
-			defining equations for Y
-		f:Matrix
-                        projective rational map given by polynomial represenative
-	Outputs
-		im:Ideal
-			defining equations for the image of f
-	Description
-		Text
-			Defines the pullback map on the coordinate rings of X and Y. The kernel of this pullback map gives the image of the original map f
-		Example
-			S = QQ[x,y,z]
-			a = ideal(x^2+y^2+z^2)
-			T = QQ[u,v]
-			b = ideal(u^2+v^2)
-			f = matrix{{x*y,y*z}}
-			imageOfMap(a,b,f)
+    Key 
+        imageOfMap
+    Headline
+        Finds defining equations for the image of a rational map
+    Usage
+        image = imageOfMap(a,b,f)
+    Inputs
+        a:Ideal
+            defining equations for X
+        b:Ideal
+            defining equations for Y
+        f:Matrix
+            projective rational map given by polynomial represenative
+    Outputs
+        im:Ideal
+            defining equations for the image of f
+    Description
+        Text
+            Defines the pullback map on the coordinate rings of X and Y. The kernel of this pullback map gives the image of the original map f
+        Example
+            S = QQ[x,y,z]
+            a = ideal(x^2+y^2+z^2)
+            T = QQ[u,v]
+            b = ideal(u^2+v^2)
+            f = matrix{{x*y,y*z}}
+            imageOfMap(a,b,f)
 ///
 			
 doc ///
@@ -433,11 +433,11 @@ doc ///
                         defining equations for X
                 b: Ideal
                         defining equations for Y
-		f:Matrix
+                f:Matrix
                         projective rational map given by polynomial represenative
         Outputs
                 dim:ZZ
-			dimension of image
+                    dimension of image
 ///
 
 doc ///
@@ -471,6 +471,14 @@ doc ///
         Text
             This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring
 ///  
+--
+--doc ///
+--    Key
+--        inverseOfMap
+--		(isBirationalMap, Ideal, Ideal, BasicList)
+--		(isBirationalMap, Ring, Ring, BasicList)
+--		(isBirationalMap, RingMap)
+--
 
 TEST ///
 	------------------------------------
