@@ -20,7 +20,6 @@ export{
 	"baseLocusOfMap",
 	"dimImage",
 	"isRegularMap",
-	"invertMap",
 	"isEmbedding",
 	"blowUpIdeals",
 	"relationType",
@@ -394,6 +393,18 @@ isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
 );
 
 isEmbedding(RingMap) := (f1)->(
+        f2 := mapOntoImage(f1);
+        flag := true;
+        try ( h := inverseOfMap(f2) ) then (
+                flag = isRegularMap(f2);
+                if (flag == true) then(
+                        flag = isRegularMap(h);
+                );                
+        )
+        else (
+                flag = false
+        );
+        flag
         
 );
     
