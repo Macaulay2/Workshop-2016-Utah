@@ -476,7 +476,7 @@ doc ///
       residualCodims
       (residualCodims,Ideal)
    Headline
-      a list of possible codimensions where...
+      a list of possible residual intersection codimensions
    Usage
       L = residualCodims I
    Inputs
@@ -487,6 +487,11 @@ doc ///
          a list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
    Description
       Text
+         For each {\tt s} computes the maximum of all monomial primes {\tt P} of codimension {\tt s-1} 
+	 of the minimal size of a generating set of {\tt I} localized at {\tt P}.  If this number is 
+	 less than {\tt s}, then {\tt s} is included in the list.
+      Text
+         The values {\tt s} returned are candidates for {\tt I} being an {\tt s}-rsidual intersection.
       Example
    Caveat
       It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
