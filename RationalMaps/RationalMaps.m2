@@ -38,12 +38,18 @@ export{
 ----------------------------------------------------------------
 
 imageOfMap = method();
+
 imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 	h := map((ring a)/a,(ring b)/b,f);
 	-- the image of f is the same as the kernel of its pullback on the 
 	-- coordinate rings. h is this pullback
 	im := ker h;
 	im
+	);
+
+imageOfMap(Ideal,Ideal,BasicList) := (a,b,f) ->
+	h := map((ring a)/a, (ring b)/b, f);
+	im := ker h;
 	);
 
 dimImage = method();
