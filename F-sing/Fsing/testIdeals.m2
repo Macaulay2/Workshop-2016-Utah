@@ -1,8 +1,8 @@
---**************************************************
---**************************************************
---This file houses functions related to test ideals.
---**************************************************
---**************************************************
+--****************************************************
+--****************************************************
+--This file contains functions related to test ideals.
+--****************************************************
+--****************************************************
 
 
 
@@ -17,29 +17,6 @@ tauAOverPEMinus1Poly = (e,a,f) -> (
      I := ethRootSafe(fm, ideal(f), a2, e);
      I = ascendIdealSafe(I, fm, a2, e1);
      I*ideal(f^k)
-)
-
---------------------------------------------------------------------------------------------------------
-
---Computes the test ideal of (R, f^t), when R is a polynomial ring over a perfect field.
-
-tauPoly = (t,f) -> (
-     R := ring f; 
-     p := char R;
-     L := divideFraction(t,p); --L={a,b,c}, where t = a/(p^b*(p^c-1))
-     local I;
-     --first we compute tau(R, f^{a/(p^c-1)})
-     if (L1#2 != 0) then 
-     (
-         I1 = tauAOverPEMinus1Poly(L#2,L#0,f);
-         if (L#1 != 0) then I = ethRoot(I, L#1)
-     )
-     else 
-     (
-         if (L#1 != 0) then I = ethRootSafe(f, ideal(sub(1, R)), L#0, L#1)
-     	    else I = ideal(f^(L#0))
-     );
-     I
 )
 
 --------------------------------------------------------------------------------------------------------
@@ -59,21 +36,47 @@ findTestElementAmbient = R -> (
 
 --------------------------------------------------------------------------------------------------------
 
---Outputs the test ideal of a (Q-)Gorenstein ring (with no pair or exponent), where 
+--Computes the test ideal in different cases
+
+testIdeal = method();
+
+
+--Computes the test ideal of (R, f^t), when R is a polynomial ring over a perfect field.
+
+testIdeal(QQ,RingElement) := (t,f) -> (
+     R := ring f; 
+     p := char R;
+     L := divideFraction(t,p); --L={a,b,c}, where t = a/(p^b*(p^c-1))
+     local I;
+     --first we compute tau(R, f^{a/(p^c-1)})
+     if (L1#2 != 0) then 
+     (
+         I1 = tauAOverPEMinus1Poly(L#2,L#0,f);
+         if (L#1 != 0) then I = ethRoot(I, L#1)
+     )
+     else 
+     (
+         if (L#1 != 0) then I = ethRootSafe(f, ideal(sub(1, R)), L#0, L#1)
+     	    else I = ideal(f^(L#0))
+     );
+     I
+)
+
+
+--Computes the test ideal of a (Q-)Gorenstein ring (with no pair or exponent), where 
 --the index divides (p^e - 1).  It outputs the appropriate stable/fixed ideal inside 
 --the ambient ring
 
-tauQGorAmb = (e, R) -> (
+testIdeal(ZZ,Ring) : = (e, R) -> (
      J := findTestElementAmbient(R);
      h := findQGorGen(e,R);	
      sub(ascendIdeal(e,h,J),R)  
 )
 
---------------------------------------------------------------------------------------------------------
 
 --Computes the test ideal of a Gorenstein ring
 
-tauGorAmb = R -> (tauQGorAmb(1,R))
+testIdeal(Ring) = R -> (testIdeal(1,R))
 
 --------------------------------------------------------------------------------------------------------
 
@@ -81,20 +84,17 @@ tauGorAmb = R -> (tauQGorAmb(1,R))
 --R = S/I. Other inuputs are J, a nonzero ideal contained in the test ideal, h, the 
 --multiple used to form phi of the ambient ring, and ek, the power associated with h.
 
-tauAOverPEMinus1QGorAmb = (S, Jk, hk, ek, f, a, e1) -> (
+tauAOverPEMinus1QGorAmb = (S, Jk, h, ek, f, a, e1) -> (
      p := char S;
      et := lcm(ek, e1);
      
-     ak1 := numerator ((p^et - 1)/(p^ek - 1)); --an exponent for hk
-     a3 := numerator (a*(p^et - 1)/(p^e1 - 1)); --we need to use a common e for both the 
-                                               --index of R and of our divisor.
+     ak1 := numerator((p^et - 1)/(p^ek - 1)); --an exponent for hk
+     a3 := numerator(a*(p^et - 1)/(p^e1 - 1)); --we need to use a common e for both 
+                                                --the index of R, and of our divisor.
      a2 := a3 % (p^et - 1);
      k2 := a3 // (p^et - 1);    --save value to use Skoda tau(f^(1+k)) = f*tau(f^k)     
-     Jl := ascendIdealSafe(Jk, hk, 1, ek);
-                      
-        --          assert false;                             
+     Jl := ascendIdealSafe(Jk, h, 1, ek);                            
      Iasc := ascendIdealSafeList(Jk*ideal(f)^(ceiling(a3/(p^et - 1))), (f, hk), (a2, numerator ((p^et - 1)/(p^ek - 1))), et);
---     assert false;
      Iasc*ideal(fastExp(k2,f))
 )
 
@@ -102,7 +102,7 @@ tauAOverPEMinus1QGorAmb = (S, Jk, hk, ek, f, a, e1) -> (
 
 --Computes the test ideal of (Rk, fk^t1), where Rk is a (Q-)Gorenstein ring, where index of the
 --canonical module divides (p^ek - 1)
-tauQGor := (Rk, ek, fk, t1) -> (
+tauQGor = (Rk, ek, fk, t1) -> (
      Sk := ambient Rk;
      pp := char Sk;
      L1 := divideFraction(t1,pp); --this breaks up t1 into the pieces we need

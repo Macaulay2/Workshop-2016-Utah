@@ -285,7 +285,7 @@ idealFromShelling = method()
 idealFromShelling (Ring,List) := (S,P) -> (
     Delta := toList (0..numgens S - 1);
     V := vars S;
-    intersect apply(P, D -> ideal(V_(Delta - set D)))
+    intersect apply(P, D -> monomialIdeal {V_(Delta - set D)})
     )
 
 idealFromShelling List := P -> (
