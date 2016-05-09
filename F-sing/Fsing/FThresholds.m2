@@ -1,4 +1,4 @@
--- changes in order or arguments
+-- CHANGES IN ORDERS OF ARGUMENTS
 
 -- internal functions acted on:     nu*, FTApproxList, FPTApproxList, FTHatApproxList, 
 --     	       	       	       	    isFPTPoly, isFJumpingNumberPoly
@@ -9,6 +9,11 @@
 --    	      	      	      	  frobeniusPower, genFrobeniusPower  
 
 -- external functions to do: ethRoot*, tau*, sigma*
+
+-- TO DO:
+
+-- There is a lot of repeated code here, in the computations of nus
+-- (the code of certain binary search is repeated at least 4 times). Clean up!
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------

@@ -1,15 +1,18 @@
 -- changes in argument order:
 
--- internal: 
+-- INTERNAL: 
 
--- ethRoot, eR (I,e) -> (e,I)
--- (f, I, a, e) -> (e,a,f,I)
+-- ethRoot: (I,e) -> (e,I), (f, I, a, e) -> (e,a,f,I), (Matrix, ZZ) -> (ZZ, Matrix)
 
--- ethRootSafe: (f,I,a,e) -> (e,a,f,I)
---    	    	(f,a,e) -> (e,a,f)
+-- eR: gone
+
+-- ethRootSafe: (f,I,a,e) -> (e,a,f,I), (f,a,e) -> (e,a,f)
 		
--- ethRootSafeList: (fList,I,aList,e) -> (e,aList,fList,I)
---    	    	 (fList,aList,e) -> (e,aList,fList)
+-- ethRootSafeList: (fList,I,aList,e) -> (e,aList,fList,I), (fList,aList,e) -> (e,aList,fList)
+
+-- mEthRoot, mEthRootOneElement: (A,e) -> (e,A)
+
+-- EXTERNAL: basePExpMaxE
 
 --*************************************************
 --*************************************************
@@ -26,7 +29,8 @@ ethRoot = method(Options => {ethRootStrategy => Substitution});
 --ethRoot takes two strategy options: Substitution and MonomialBasis
 --The second strategy seems to generally be faster for computing I^[1/p^e] when e = 1, especially for polynomials of
 --high degree, but slower for larger e. 
-ethRoot(ZZ,Ideal) := Ideal => opts -> (e,I) -> (
+
+ethRoot ( ZZ, Ideal ) := Ideal => opts -> (e,I) -> (
     if (not e >= 0) then (error "ethRoot: Expected second argument to be a nonnegative integer.");
     R := ring I;
     if (class R =!= PolynomialRing) then (error "ethRoot: Expected an ideal in a PolynomialRing.");
@@ -48,13 +52,30 @@ ethRoot(ZZ,Ideal) := Ideal => opts -> (e,I) -> (
 
 -----------------------------------------------------------------------------
 
-ethRoot(ZZ,MonomialIdeal) := Ideal => opts -> (e,I) -> (
+ethRoot ( ZZ, MonomialIdeal ) := Ideal => opts -> (e,I) -> (
      R := ring I;
      p := char R;
      G := I_*;
      if #G == 0 then ideal( 0_R ) else ideal( apply( G, f -> R_((exponents(f))#0//p^e )))
 )
+-----------------------------------------------------------------------------
 
+ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootSafe ( e, a, f, I ) ---MK
+
+-----------------------------------------------------------------------------
+
+ethRoot (Ideal, ZZ, ZZ) := opts -> (I,m,e) -> fancyEthRoot (I,m,e)  --- MK
+
+-----------------------------------------------------------------------------
+
+ethRoot( RingElement, ZZ, ZZ ) := opts -> ( f, a, e ) -> ethRoot( ideal( f ), a, e )
+
+-----------------------------------------------------------------------------
+
+ethRoot ( ZZ, Matrix ) := opts -> (e, A) -> mEthRoot (e,A)  --- MK
+
+-----------------------------------------------------------------------------
+-- MACHINERY
 -----------------------------------------------------------------------------
 
 getFieldGenRoot = (e,p,q,k) -> (
@@ -126,7 +147,7 @@ ethRootSafe( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> (
 	aRem := a%(p^e);
 	aQuot := floor(a/p^e);
 	
-	expOfA := basePExpMaxE(p,e,aRem); --this gives "a base p", with the left-most term the smallest "endian".
+	expOfA := basePExp(p,e,aRem); --this gives "a base p", with the left-most term the smallest "endian".
 	
 	IN1 := I;
 	
@@ -160,29 +181,23 @@ ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
         
         aPowerList := apply(elmtList, expOfaList, (f, z) -> f^(z#0));
         
-        IN1 := I1*ideal(fold(times, aPowerList));
+        IN1 := I1*ideal(product(aPowerList));
         if (e > 0) then (
                 IN1 = ethRoot( 1, IN1 );
                 i := 1;
                 while(i < e) do (
                         aPowerList = apply(elmtList, expOfaList, (f, z) -> f^(z#i));
-                        IN1 = ethRoot( 1, IN1*ideal(fold(times, aPowerList)) );
+                        IN1 = ethRoot( 1, IN1*ideal(product(aPowerList)) );
                         i = i + 1;
                 )
         );
         aPowerList = apply(elmtList, aListQuot, (f, z) -> f^z);
-        IN1*ideal(fold(times, aPowerList))
+        IN1*ideal(product(aPowerList))
 )
 
 ethRootSafeList( ZZ, List, List ) := ( e, a, F ) ->
     ethRootSafeList( e, a, F, ideal( 1_( ring( F#0 )  ) ) )
 	
-ethRoot( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> ethRootSafe (e, a, f, I ) ---MK
-
-
---A short version of ethRoot
-eR = (e,I)-> ethRoot(e,I) 
-
 fancyEthRoot = (I,m,e) ->
 (
 	G:=first entries mingens I;
@@ -210,10 +225,6 @@ fancyEthRoot = (I,m,e) ->
 	ideal(mingens(answer))
 )
 
-ethRoot (Ideal, ZZ, ZZ) := (I,m,e) -> fancyEthRoot (I,m,e)  --- MK
-
-ethRoot( RingElement, ZZ, ZZ ) := ( f, a, e ) -> ethRoot( ideal( f ), a, e )
-
 
 ----------------------------------------------------------------
 --************************************************************--
@@ -237,7 +248,7 @@ ascendIdeal = (Jk, hk, ek) -> (
      while (isSubset(IN, IP) == false) do(
      	  IP = IN;
 --	  error "help";
-	  IN = eR(ek,ideal(hk)*IP)+IP
+	  IN = ethRoot(ek,ideal(hk)*IP)+IP
      );
 
      --trim the output
@@ -255,7 +266,7 @@ ascendIdealSafe = (Jk, hk, ak, ek) -> (
      while (isSubset(IN, IP) == false) do(
      	  IP = IN;
 --	  error "help";
-	  	IN = ethRootSafe(hk, IP, ak, ek)+IP
+	  	IN = ethRootSafe( ek, ak, hk, IP )+IP
      );
 
      --trim the output
@@ -276,7 +287,7 @@ ascendIdealSafeList ={AscentCount=>false} >> o ->  (Jk, hkList, akList, ek) -> (
 	while (isSubset(IN, IP) == false) do(
 		i1 = i1 + 1; --
 		IP = IN;
-		IN = ethRootSafeList( hkList, IP, akList, ek) + IP
+		IN = ethRootSafeList( ek, akList, hkList, IP ) + IP
 	);
 	
 	--trim the output
@@ -324,7 +335,7 @@ apply(t, i->
 answer
 )
 
-mEthRootOfOneElement= (v,e) ->(
+mEthRootOfOneElement= (e,v) ->(
 	local i; local j;
 	local d;
 	local w;
@@ -379,14 +390,10 @@ mEthRootOfOneElement= (v,e) ->(
 	answer
 )
 
-
-
-
-
-mEthRoot = (A,e) ->(
+mEthRoot = (e,A) ->(
 	local i;
 	local answer;
-	answer1:=apply(1..(rank source A), i->mEthRootOfOneElement (A_{i-1},e));
+	answer1:=apply(1..(rank source A), i->mEthRootOfOneElement (e, A_{i-1}));
 	if (#answer1==0) then 
 	{
 		answer=A;
@@ -400,7 +407,6 @@ mEthRoot = (A,e) ->(
 )	
 
 
-ethRoot (Matrix, ZZ) := (A,e) -> mEthRoot (A,e)  --- MK
 
 
 
@@ -430,7 +436,7 @@ Mstar = (A,U,e) ->(
 		while (f) do
 		{
 			f=false;
-			A1:=mEthRoot(mingens image ((U^Ne)*lastA),e);
+			A1:=mEthRoot(e, mingens image ((U^Ne)*lastA));
 			A1=A1 | lastA;
 			t1:=compress ((A1))%((lastA));
 			if (t1!=0) then 
