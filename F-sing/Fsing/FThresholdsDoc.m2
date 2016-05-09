@@ -21,17 +21,17 @@ doc ///
 doc ///
      Key
      	 FPTApproxList
-	 (FPTApproxList,Ideal,ZZ)
-	 (FPTApproxList,RingElement,ZZ)
+	 (FPTApproxList,ZZ,Ideal)
+	 (FPTApproxList,ZZ,RingElement)
      Headline
         Gives a list of nu_I(p^d)/p^d for d=1,...,e.
      Usage
-     	  FPTApproxList(I,e)
-	  FPTApproxList(f,e) 
+     	  FPTApproxList(e,I)
+	  FPTApproxList(e,f) 
      Inputs
+         e:ZZ
      	 I:Ideal
 	 f:RingElement
-         e:ZZ
      Outputs
          :List
      Description
@@ -42,18 +42,18 @@ doc ///
 doc ///
      Key
      	 FTApproxList
-	 (FTApproxList,Ideal,Ideal, ZZ)
-	 (FTApproxList,RingElement,Ideal,ZZ)
+	 (FTApproxList,ZZ,Ideal,Ideal)
+	 (FTApproxList,ZZ,RingElement,Ideal)
      Headline
         Gives a list of nu_I^J(p^d)/p^d for d=1,...,e.
      Usage
-     	  FTApproxList(I,J,e)
-	  FTApproxList(f,J,e) 
+     	  FTApproxList(e,I,J)
+	  FTApproxList(e,f,J) 
      Inputs
+         e:ZZ
      	 I:Ideal
 	 J:Ideal
 	 f:RingElement
-         e:ZZ
      Outputs
          :List
      Description
@@ -64,18 +64,18 @@ doc ///
 doc ///
      Key
      	 FTHatApproxList
-	 (FTHatApproxList,Ideal,Ideal, ZZ)
-	 (FTHatApproxList,RingElement,Ideal,ZZ)
+	 (FTHatApproxList,ZZ,Ideal,Ideal)
+	 (FTHatApproxList,ZZ,RingElement,Ideal)
      Headline
         Gives a list of nuHat_I^J(p^d)/p^d for d=1,...,e.
      Usage
-     	  FTHatApproxList(I,J,e)
-	  FTHatApproxList(f,J,e) 
+     	  FTHatApproxList(e,I,J)
+	  FTHatApproxList(e,f,J) 
      Inputs
+         e:ZZ
      	 I:Ideal
 	 J:Ideal
 	 f:RingElement
-         e:ZZ
      Outputs
          :List
      Description
@@ -104,14 +104,15 @@ doc ///
 doc ///
      Key
      	isFJumpingNumberPoly 
+     	(isFJumpingNumberPoly,QQ,RingElement)
      Headline
-        Checks whether a given number is the FPT
+        Checks whether a given number is an F-jumping number
      Usage
-     	  isFJumpingNumberPoly(f,t,Verbose=>V)  
+     	  isFJumpingNumberPoly(t,f,Verbose=>V)  
      Inputs
+	 	t:QQ
          	f:RingElement
-	 	t:ZZ
-		W:Boolean
+		V:Boolean
      Outputs
         :Boolean
      Description
@@ -122,20 +123,21 @@ doc ///
 doc ///
      Key
      	isFPTPoly 
+   	(isFPTPoly,QQ,RingElement)
      Headline
         Checks whether a given number is the FPT
      Usage
-     	  isFPTPoly(f,t,Verbose=>V,Origin=>W)  
-     Inputs
-         	f:RingElement
-	 	t:ZZ
+     	  isFPTPoly(t,f,Verbose=>V,Origin=>W)  
+    Inputs
+ 	 	t:QQ
+        	f:RingElement
+		V:Boolean
 		W:Boolean
-		W:Origin
      Outputs
         :Boolean
      Description
      	Text
-	     Returns true if t is the FPT, otherwise it returns false.  If Origin is true, it only checks it at ideal(vars ring f).
+	     Returns true if t is the FPT, otherwise it returns false.  If Origin is true, it only checks it at the homogeneous maximal ideal.
 ///
 
 doc ///
@@ -153,10 +155,10 @@ doc ///
 	  nu(e,f,J)
 	  nu(e,f) 
      Inputs
+         e:ZZ
      	 I:Ideal
 	 J:Ideal
 	 f:RingElement
-         e:ZZ
      Outputs
         :ZZ
      Description
@@ -179,10 +181,10 @@ doc ///
 	  nuList(e,f,J)
 	  nuList(e,f) 
      Inputs
+         e:ZZ
      	 I:Ideal
 	 J:Ideal
 	 f:RingElement
-         e:ZZ
      Outputs
         :List
      Description
@@ -205,10 +207,10 @@ doc ///
 	  nuHat(e,f,J)
 	  nuHat(e,f) 
      Inputs
+         e:ZZ
      	 I:Ideal
 	 J:Ideal
 	 f:RingElement
-         e:ZZ
      Outputs
         :ZZ
      Description
@@ -231,10 +233,10 @@ doc ///
 	  nuHatList(e,f,J)
 	  nuHatList(e,f) 
      Inputs
+         e:ZZ
      	 I:Ideal
 	 J:Ideal
 	 f:RingElement
-         e:ZZ
      Outputs
         :List
      Description
