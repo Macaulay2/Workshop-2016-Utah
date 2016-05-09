@@ -1,3 +1,10 @@
+-- changes in argument order
+ 
+-- functions in this file:
+
+-- outside functions: floorlog -> floorLog, digit, truncation, firstCarry, 
+--    	      	      canVector -> getCanVector
+
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
 -- CONTENTS - FPTs of special types of polynomials
@@ -26,10 +33,10 @@ diagonalFPT = f ->
 (
      p := char ring f;
      w := apply(terms f, g->first degree(g));
-     y := 0; if firstCarry(reciprocal(w),p)==-1 then for i from 0 to #w-1 do y = y + 1/w#i else
+     y := 0; if firstCarry(p,reciprocal(w))==-1 then for i from 0 to #w-1 do y = y + 1/w#i else
      (
-	  x := 0; for c from 0 to #w-1 do x = x + truncation(firstCarry(reciprocal(w),p)-1, 1/w#c, p); 
-	  y = x+1/p^(firstCarry(reciprocal(w),p)-1);
+	  x := 0; for c from 0 to #w-1 do x = x + truncation( p, firstCarry(p,reciprocal(w))-1, 1/w#c ); 
+	  y = x+1/p^(firstCarry(p,reciprocal(w))-1);
      );
      y
 )
@@ -164,10 +171,10 @@ maxCoordinateSum = L ->
 --for F-pure thresholds of binomials
 dCalculation = (w,N,p) ->
 (
-     d := 0; for j from 0 to #w-1 do  d = d + digit(N+1,w#j,p);
+     d := 0; for j from 0 to #w-1 do  d = d + digit(p,N+1,w#j);
      i := N; while d > p-2 do 
      (
-	  d = 0; for j from 0 to #w-1 do  d = d + digit(i,w#j,p);
+	  d = 0; for j from 0 to #w-1 do  d = d + digit(p,i,w#j);
 	  i = i - 1;
      );
      i + 1
@@ -223,14 +230,14 @@ binomialFPT = g ->
      Q := maxCoordinateSum(polytopeDefiningPoints(v,w));
      if Q#0+Q#1 > 1 then FPT = 1 else
      (
-	  L :=  firstCarry(Q,p);
+	  L :=  firstCarry(p,Q);
 	  if L == -1 then FPT = Q#0+Q#1 else
      	  (
      	       d := dCalculation(Q,L-1,p);
-     	       P := (truncation(d,Q#0,p),  truncation(d,Q#1,p));
+     	       P := (truncation(p,d,Q#0),  truncation(p,d,Q#1));
      	       P1 := {P#0, P#1+1/p^d};
      	       P2 := {P#0+1/p^d,P#1};
-     	       FPT = truncation(L-1,Q#0+Q#1,p);
+     	       FPT = truncation(p,L-1,Q#0+Q#1);
      	       if calculateEpsilon(P1,P2, v, w) != -1 then FPT = FPT +  calculateEpsilon(P1, P2, v, w);
      	  );
      );
@@ -333,7 +340,7 @@ neighborInUpperRegion (List,ZZ,FTData) := (a,q,S) ->
     local neighbor;
     while ((not found) and (i<#posEntries)) do 
     (
-	candidate=a-canVector(posEntries_i,n);
+	candidate=a-getCanVector(posEntries_i,n);
 	if isInUpperRegion(candidate,q,S) then (found=true; neighbor=candidate);
 	i=i+1;
     );
@@ -408,7 +415,7 @@ FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
     while (I != ideal(1_rng) and e < (opt.MaxExp) and e < mult) do 
     (
 	e=e+1;
-	dgt=digit(e,u,p);
+	dgt=digit(p,e,u);
 	I=frobeniusPower(I,1):product(polys,dgt,(f,k)->f^k);
 	ideals=append(ideals,I)
     );
@@ -426,9 +433,9 @@ FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
 	e0=e0-1;
         -- zoom out one step and look for CP again
     	S1=setFTData(ideals_e0,polys);
-	cp=findCPBelow(cp/p+digit(e0+1,u,p)/p,S1) 
+	cp=findCPBelow(cp/p+digit(p,e0+1,u)/p,S1) 
     );
-    cp=cp/p^e0+truncation(e0,u,p); -- "zoom out"
+    cp=cp/p^e0+truncation(p,e0,u); -- "zoom out"
     if opt.PrintCP then print(toString cp);
     max apply(cp,a,(c,k)->c/k)
 )
@@ -490,7 +497,7 @@ splittingField (RingElement) := F ->
     ord:=(coefficientRing(ring F))#order;
     factors:=first transpose factorList(F);
     deg:=lcm select(flatten apply(factors,degree),i->i>0);
-    GF(p,deg*floorlog(p,ord))
+    GF(p,deg*floorLog(p,ord))
 )
 
 -- Some tests
