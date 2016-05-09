@@ -401,7 +401,7 @@ getCanVector = method()
 --canVector(i,n) returns the i-th canonical basis vector in dimension n
 --Warning: for convenience, this uses Macaulay2's convention of indexing lists starting 
 --with 0; so, for example, {1,0,0,0} is canVector(0,4), not canVector(1,4).
-canVector ( ZZ, ZZ ) := ( i, n ) -> 
+getCanVector ( ZZ, ZZ ) := ( i, n ) -> 
 (
     if ((i<0) or (i>=n)) 
         then (error "canVector(i,n) expects integers i and n with 0<=i<n.");   
