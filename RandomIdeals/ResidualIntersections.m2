@@ -247,7 +247,7 @@ hasSlidingDepth(Ideal) := I -> (
     )
 
 -------------------------------------
--- G_d Code
+-- G_s Code
 -------------------------------------
 
 numgensByCodim = method()	
@@ -401,6 +401,11 @@ doc ///
    Description
       Text
       Example
+      	  R = QQ[x_1,x_2,x_3];
+	  I = ideal(x_1^2,x_1*x_2,x_1*x_3,x_2^2,x_2*x_3);
+	  whichGs(I)
+   Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
       residualCodims
