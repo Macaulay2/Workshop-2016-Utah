@@ -532,6 +532,7 @@ doc ///
 	      idealChainFromShelling(P)
      SeeAlso
      	 idealFromShelling
+	 randomShellableIdealChain
      
 ///
 
@@ -604,7 +605,7 @@ doc ///
      	 randomShelling
 	 idealFromShelling
 	 idealChainFromShelling
-	 randomShellableIdealChain
+	 randomShellableIdeal
 ///         
 
 
