@@ -2,14 +2,14 @@
 
 -- internal: 
 
-ethRoot, eR (I,e) -> (e,I)
-(f, I, a, e) -> (e,a,f,I)
+-- ethRoot, eR (I,e) -> (e,I)
+-- (f, I, a, e) -> (e,a,f,I)
 
-ethRootSafe: (f,I,a,e) -> (e,a,f,I)
-    	    	(f,a,e) -> (e,a,f)
+-- ethRootSafe: (f,I,a,e) -> (e,a,f,I)
+--    	    	(f,a,e) -> (e,a,f)
 		
-ethRootSafeList: (fList,I,aList,e) -> (e,aList,fList,I)
-    	    	 (fList,aList,e) -> (e,aList,fList)
+-- ethRootSafeList: (fList,I,aList,e) -> (e,aList,fList,I)
+--    	    	 (fList,aList,e) -> (e,aList,fList)
 
 --*************************************************
 --*************************************************
