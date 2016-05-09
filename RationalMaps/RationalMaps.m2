@@ -48,11 +48,23 @@ imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 	);
 
 imageOfMap(Ideal,Ideal,BasicList) := (a,b,f) ->
-	h := map((ring a)/a, (ring b)/b, f);
-	im := ker h;
+	imageOfMap(a,b,f)
+	);
+
+imageOfMap(Ring,Ring,Matrix) := (a,b,f) ->
+	imageOfMap(ideal a, ideal b, f)
+	);
+
+imageOfMap(Ring,Ring,BasicList) := (a,b,f) ->
+        imageOfMap(ideal a, ideal b, f)
+	);
+
+imageOfMap(RingMap) := (f) ->
+        imageOfMap(target f, source f, first entries matrix f)
 	);
 
 dimImage = method();
+
 dimImage(Ideal,Ideal,Matrix) := (a,b,f) ->(
 	I := imageOfMap(a,b,f);
 	dim I - 1

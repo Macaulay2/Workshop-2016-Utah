@@ -402,8 +402,8 @@ doc ///
       Text
       Example
       	  R = QQ[x_1,x_2,x_3];
-	  I = ideal(x_1^2,x_1*x_2,x_1*x_3,x_2^2,x_2*x_3);
-	  whichGs(I)
+	  I = monomialIdeal(x_1^2,x_1*x_2,x_1*x_3,x_2^2,x_2*x_3);
+	  maxGs(I)
    Caveat
       It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
@@ -474,7 +474,7 @@ doc ///
          Because {\tt I} is monomial, we can check the number of generators of {\tt I} localized at a prime {\tt P} over only monomial primes {\tt P}.
       Example
          R = QQ[x_0..x_4];
-	 I = ideal{x_0^2,x_1*x_2,x_3*x_4^2}
+	 I = monomialIdeal{x_0^2,x_1*x_2,x_3*x_4^2}
 	 numgensByCodim(I,2)
 	 numgensByCodim I
    SeeAlso
