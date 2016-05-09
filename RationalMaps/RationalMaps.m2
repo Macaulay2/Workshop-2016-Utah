@@ -350,18 +350,18 @@ mapOntoImage = method(); --given a map f : X -> Y, this creates the map f : X ->
 mapOntoImage(RingMap) := (f)->(
         newMap := map(target f, ambient source f, matrix f);
         kk := ker(newMap);
-        map(target f, (source newMap)/kk, matrix f)
+        map(target newMap, (source newMap)/kk, matrix newMap)
         
 );
 
 mapOntoImage(Ring, Ring, BasicList) := (R,S,l)->(
-        im := imageOfMap(R,S,l);
-        map(R, S, l)
+        newMap := map(R, ambient S, l);
+        mapOntoImage(newMap)
 );
     
 mapOntoImage(Ideal, Ideal, BasicList) := (a,b,l)->(
-        im := imageOfMap(a,b,l);
-        map((ring a)/a, (ring b)/b, l)
+        newMap := map((ring a)/a, (ring b)/b, l);
+        mapOntoImage(newMap)
 );
     
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
