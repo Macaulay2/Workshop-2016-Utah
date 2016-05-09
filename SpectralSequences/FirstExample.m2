@@ -2,12 +2,19 @@ needsPackage "SpectralSequences"
 
 tensor(RingMap,ChainComplex) := ChainComplex => 
 opts -> (f,C) -> (
-    differentials := apply(select(keys C.dd, 
-	    i -> instance(i,ZZ)), j -> f ** C.dd_j);
     k := min C; 
-    D := chainComplex(differentials);
-    if even(k) then D[-k] else (-1)*D[-k]
+    D := chainComplex(
+	if even(k) then apply(
+	    drop(select(keys C.dd, 
+	    	i -> instance(i,ZZ)),1), 
+	    j -> f ** C.dd_j)
+	else apply(
+	    drop(select(keys C.dd, 
+	    	i -> instance(i,ZZ)),1), 
+	    j -> (-1) * (f ** C.dd_j)));
+    D[-k]
     )
+   
 end
 
 restart
@@ -25,6 +32,8 @@ D = res(N,LengthLimit => 10);
 E0 = C' ** (filteredComplex D);
 E = prune spectralSequence E0
 E_infinity
+E_2 .dd_{1,0}
+
 -- Example 2
 restart
 load "FirstExample.m2"
@@ -78,7 +87,41 @@ R = S/ideal"x2,y2,z2";
 N = R^1/ideal"x,y,z";
 C = res M;
 C' = C ** R;
-D = res(N,LengthLimit => 10);
+D = res(N,LengthLimit => 7);
 E0 = C' ** (filteredComplex D);
-E = prune spectralSequence E0
+E = prune spectralSequence E0;
 E_infinity
+-- Example with Ext-Ext (4):
+restart
+load "FirstExample.m2"
+k = QQ;
+R = k[a,b,c, Degrees => {2,2,2}]/ideal"b2-ac";
+S = k[s,t]
+phi = map(S,R,{s^2,s*t,t^2})
+-- N is k over the Veronese
+N' = R^1/ideal"a,b,c"
+-- M is k over the polynomial ring
+N = S^1/ideal(s,t)
+-- C is Hom_R(S,N)
+C = res (pushForward(phi,S^1), LengthLimit => 7)
+Hom(C,N')
+C' = tensor(phi,Hom(C,N'))
+D = res N
+K = Hom( filteredComplex D, C')
+E = prune spectralSequence K
+pushForward(phi,(E_infinity)_{-1,0})
+Ext^1(N',N')
+E_infinity
+(E_infinity)_{0,0}
+---
+for i to 10 list (if E_i_{1,0} != E_infinity_{1,0} then E_i_{1,0} else continue
+H = Hom(C,N)
+H.dd
+tensor(phi,H.dd_1)
+methods symbol *
+C.dd
+prune pushForward(phi,S^1)
+prune presentation pushForward(phi,S^1)
+
+
+
