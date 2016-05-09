@@ -15,7 +15,6 @@ newPackage ( "ResidualIntersections",
 export {
 	"isLicci",
 	"minimalRegularSequence",
-	"minimalRegularSequence1",	
 	"linkageBound",
 	"UseNormalModule",
 	"randomRegularSequence",
@@ -110,6 +109,7 @@ if opts.UseNormalModule == false then
 	2*(numgens N - codim I))
 )
 
+{*
 minimalRegularSequence = method()
 minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
 if numgens I == c then return I;
@@ -129,10 +129,10 @@ while c'<c do(
 J
 )
 minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
+*}
 
-
-minimalRegularSequence1 = method()
-minimalRegularSequence1(ZZ,Ideal) := (c,I) ->(
+minimalRegularSequence = method()
+minimalRegularSequence(ZZ,Ideal) := (c,I) ->(
 if numgens I == c then return I;
     --takes care of I = 0 and I principal;
 sgens := sort gens I;
@@ -155,17 +155,17 @@ for i from 0 to c-(c'+1) do(
         J = K;
 	c = c'));
 J)
-minimalRegularSequence1 Ideal := I -> minimalRegularSequence1(codim I, I)
+minimalRegularSequence Ideal := I -> minimalRegularSequence(codim I, I)
+
 ///
 restart
 loadPackage "ResidualIntersections"
 S = ZZ/101[a,b,c]
 I = ideal"cb,b2,ab,a2"
 codim I 
-minimalRegularSequence1(codim I, I)
+minimalRegularSequence(codim I, I)
      I = ideal"cb,b2,a2"
      minimalRegularSequence I     
-     minimalRegularSequence1 I     
 ///
 
 isLicci = method(Options => {UseNormalModule =>false})
@@ -465,11 +465,6 @@ doc ///
    SeeAlso
       residualCodims
       maxGd
-///
-restart
-loadPackage("ResidualIntersections", Reload =>true)
-uninstallPackage"ResidualIntersections"
-installPackage"ResidualIntersections"
 ///
 
 ------------------------------------------------------------
