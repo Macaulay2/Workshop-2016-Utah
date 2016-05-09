@@ -217,11 +217,13 @@ profondeur Ring := R -> profondeur R^1
 
 koszulDepth = method()
 koszulDepth(Ideal) := I -> (
+    if I==0 then return {};
     C := koszul mingens I;
     for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
     )
 
 koszulDepth(ZZ,Ideal) := (k,I) -> (
+    if I==0 then return -1;
     C := koszul mingens I;
     profondeur HH_k(C)
     )

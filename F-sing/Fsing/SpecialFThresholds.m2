@@ -1,9 +1,13 @@
 -- changes in argument order
  
--- functions in this file:
+-- internal functions acted on:
 
--- outside functions: floorlog -> floorLog, digit, truncation, firstCarry, 
---    	      	      canVector -> getCanVector
+-- internal functions acted to do:
+
+-- external functions acted on: floorlog -> floorLog, digit, truncation, 
+--   firstCarry, canVector -> getCanVector, isFPTPoly, fastExp, frobeniusPower
+
+-- external functions to do: 
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
@@ -308,7 +312,7 @@ isInUpperRegion = method()
 isInUpperRegion (List,ZZ,FTData) := (a,q,S) -> 
 (
     frob:=ideal apply(S#"gens",f->f^q);
-    F:=product(S#"polylist",a,(f,i)->fastExp(f,i));
+    F:=product(S#"polylist",a,(f,i)->fastExp(i,f));
     (F % frob) == 0
 )
 
@@ -401,7 +405,7 @@ FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
 	else
 	(
 	    F:=product(S#"polylist",a,(f,i)->f^i);
-	    if isFPTPoly(F,2/deg) then (return (2/deg))
+	    if isFPTPoly( 2/deg, F ) then (return (2/deg))
 	    else mult = infinity
 	)
     );    
@@ -416,7 +420,7 @@ FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
     (
 	e=e+1;
 	dgt=digit(p,e,u);
-	I=frobeniusPower(I,1):product(polys,dgt,(f,k)->f^k);
+	I=frobeniusPower(1,I):product(polys,dgt,(f,k)->f^k);
 	ideals=append(ideals,I)
     );
     if I!=ideal(1_rng) then 
@@ -454,7 +458,7 @@ FPT2VarHomog (RingElement) :=  opt ->  F ->
     -- because factoring is the weakness of this algorithm, we try to avoid it
     -- by first checking if fpt=lct
     deg:=(degree F)_0;
-    if isFPTPoly(F,2/deg) then return 2/deg;
+    if isFPTPoly( 2/deg, F ) then return 2/deg;
     R:=ring F;
     vv:=R_*;
     kk:=splittingField(F);
