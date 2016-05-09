@@ -184,6 +184,45 @@ parseSolutions (String,Ring) := o -> (s,R) -> (
   apply(sols, sol->point( {apply(gens R, v->sol#v)} | outputToPoint sol ))
 )
 
+
+parseIntermediateSolutions = (output,numsols,R) -> (
+    L := get output;
+    rgx = "\\*{5} +path([[:digit:]]) +\\*+$";
+    start := (regex(rgx,L))#0#0;
+    linesL := lines substring(start,L);
+    solsize := 0;
+    for i from 1 to #linesL do (
+        if match("^\\*",linesL#i) then (
+            solsize = i;
+            break;
+            ););
+    chunksize := numsols*solsize;
+    chunks := {};
+    while match(rgx,linesL#0) do (
+        chunks = append(chunks,take(linesL,chunksize));
+        linesL = drop(linesL,chunksize);
+    );
+    chunks = for chunk in chunks list (
+        for l in chunk list (
+            replace(rgx,"solution \\1 :",l);
+        );
+    );
+    for chunk in chunks list (
+        --fname := getFilename();
+        fname := "this.that";
+        f := openOut fname;  
+        for sol in chunk do (
+            for l in sol do (
+                f << toString(l) << endl;
+            );
+        );
+        close f;
+        foutname := fname | ".sols";
+        run("phc -z "|fname|" "|foutname);
+        parseSolutions(get foutname,R)
+    )
+)
+
 pointsToFile = method(TypicalValue => Nothing, Options => {Append => false})
 pointsToFile (List,Ring,String) := o -> (S,R,name) -> (
   -- writes list of points to file in PHCpack format
