@@ -316,7 +316,6 @@ doc ///
     linkageBound I can be very large; linkageBound(I, UseNormalModule => true) can be very slow.
    SeeAlso
     linkageBound
-    randomLink
 ///
 ------------------------------------------------------------
 -- DOCUMENTATION UseNormalModule
@@ -407,7 +406,6 @@ doc ///
 	  I = monomialIdeal(x_1^2,x_1*x_2,x_1*x_3,x_2^2,x_2*x_3);
 	  maxGs(I)
    Caveat
-      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
       residualCodims
