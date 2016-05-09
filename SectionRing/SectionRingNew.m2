@@ -1,5 +1,3 @@
-
-
 newPackage( "SectionRing",
 Version => "0.1", Date => "May 08 2016", Authors => {
      {Name=> "Andrew Bydlon",
@@ -28,6 +26,7 @@ dualToIdeal(Ideal) := (I) -> (
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+
 
 globallyGenerated = method();
 globallyGenerated(WDiv) := (D) -> (				--Finds the smallest positive number such that O_X(a*D) is globally generated
@@ -177,36 +176,7 @@ mRegular(Ideal) := (I) -> ( 					--Returns the number m for which O_X(D) is m-re
 
 sectionRing = method();
 sectionRing(Ideal) := (I) -> (
-	--local A;
-	local G;
-	local V;
-	local L;
-	--local Y;
-	--local j;
-	local e;
-	local b;
-	--local n;
-	--local Map;
-	local Rel;
-	local KerT;
-	--local Part;
-	local Ramb;
-	--local Vect;
-	local bool;
-	local LengP;
-	local LengPa;
-	local numDegs;
-	local MapTot;
-	--local TotMap;
-	--local AdmPart;
-	--local TotVect;
-	local myVars;
-	local myVarsData;
-	local NumCols;
-	local VectTot;
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
-	R := ring(I);						--To Apply the Regularity Theorem of Mumford, the sheaf needs to be Globally Generated Sheaf
-	
+	R := ring(I);						--To Apply the Regularity Theorem of Mumford, the sheaf needs to be Globally Generated Sheaf	
 	l := globallyGenerated(I);
 	bound := l;
 	G = first entries gens I;
@@ -226,142 +196,21 @@ sectionRing(Ideal) := (I) -> (
 	F_1 = basis(Shift,J_1);
 	n_1 = numColumns(F_1);
 	F_1 = map(R^(numRows(F_1)),R^(n_1),F_1);
-	Map_1 = (gens J_1)*(F_1);				--Map_i Represents the map H^0(O_X(iD)) -> J^(i)
-	myVars = {};						--Begins to create a list for the necessary variables
-	DegreeList :={};					--and a list of their corresponding degrees.
-	i:=1;
-	while (i < bound) do(
-		J_i = reflexivePower(i,J_1);
-		F_i = basis((Shift*i),J_i);
-		n_i = numColumns((F_i));			--Rank of H^0(O_X(iD))
-		F_i = map(R^(numRows((F_i))),R^(n_i),F_i);
-		Map_i = (gens J_i)*(F_i);
-		myVars = (myVars) | {toList(Y_{i,1}..Y_{i,n_i})};  --Creates a list of variables, grouped internally by degree for convenience
-		l=0;
-		while(l<n_i) do(				--Creates the degree list for the section ring
-			DegreeList = DegreeList | toList({i});
-			l = l+1;
-		);
-		i=i+1;
-	);
-
-	Vars := flatten myVars;
-	numVars:= #Vars;
-
-	S := KK [Vars,Degrees=>DegreeList];			--Create ring containing all of the generators, in the form Y_{ degree , numberOfAGivenDegree }
-	myVars = apply(myVars, z->apply(z,x->value(x)));
-	numDegs = #myVars;
-	myVarsData = {};
-	i=0;
-	while (i<numDegs) do (
-		j=0;
-		while(j<(#(myVars#i))) do(
-			myVarsData = myVarsData | {myVars#i#j,Map_(i+1)_j};
-			j=j+1;
-		);
-		i = i+1;
-	);
-
-	RelIdeal := ideal(0);					--Starts the ideal of relations on the variables
-	Spar := S;						--Partial ring of relations
-
-	c:=1;
-	while((c<bound) and (n_c>0)) do (			--Creates a vector of variables to be multiplied by relation matrices
-		Vect_c = transpose matrix{myVars#(c-1)};
-		c=c+1;
-	);
-
-
-	j=2;
-	while ( (dim(Spar) >  dim(R)) or (isDomain(Spar) != true)) do ( --Create a list of relations
-		
-		Part_j = partitions(j);				--Uses the partitions of j to get relations coming from products of elements
-		LengP = #(Part_j);   					--of lower degrees into the elements of degree j
-		
-		a:=0;
-		AdmPart_j = {};					--Creates a list of admissable partitions, given that there are variables only
-		while (a<LengP) do(					--in sufficiently small degree
-			if(Part_j#a#0 < bound) then (
-				AdmPart_j = AdmPart_j | {(Part_j)#a}; 
-			);
-			a=a+1;
-		);
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 	
+	Map_1 = (gens J_1)*(F_1);
 	
-		LengP = #(AdmPart_j);
+		
 
-		a=0;
 
-		TotMap_a = Map_((AdmPart_j)#a#0);			--Creates the map O_X(a_1 D) ** ... ** O_X(a_n D) \oplus O_X(j D) -> R		
-		TotVect_a = Vect_((AdmPart_j)#a#0);
-		b=1;
-		LengPa = #((AdmPart_j)#a);
-		while (b<LengPa) do (
-			TotMap_a = TotMap_a ** Map_((AdmPart_j)#a#b);
-			TotVect_a = TotVect_a ** Vect_((AdmPart_j)#a#b);
-			b = b+1;
-		);
 
-		MapTot = TotMap_0;
-		VectTot = TotVect_0;
 
-		a=1;
-		while(a<LengP) do ( 						--Relate each of the partitions in the form (a1>=a2>=...>=an) of j
-			TotMap_a = Map_((AdmPart_j)#a#0);			--Starts to create the map O_X(a_1 D) ** ... ** O_X(a_n D) \oplus O_X(j D) -> R		
-			TotVect_a = Vect_((AdmPart_j)#a#0);
 
-			b=1;
-			LengPa = #((AdmPart_j)#a);
-			while (b<LengPa) do (
-				TotMap_a = TotMap_a ** Map_((AdmPart_j)#a#b);
-				TotVect_a = TotVect_a ** Vect_((AdmPart_j)#a#b);
-				b = b+1;
-			);
 
-			MapTot = MapTot | TotMap_a;
-			VectTot = VectTot || TotVect_a;
-			a = a+1;
-		);
 
-		KerT = generators ker(MapTot);		
 
-		NumCols = numColumns(KerT);
-		e = 0;
-			
-		while (e < NumCols) do (
-			L = flatten entries KerT_{e};
-			if ((isVectScalar L) == true) then (
-				L = convertScalarVect(S,L);
-				Rel = sub((entries (matrix{L}*VectTot))#0#0,S);
-				RelIdeal = trim(RelIdeal + ideal(Rel));
-				Spar = S/RelIdeal;
-			);
-			e=e+1;
-		); 
-		j=j+1;
-	);
 
-	
-	BetterS := KK[A_1..A_numVars];
-	BetterMap := map(BetterS,S,toList(A_1..A_numVars));
-	BetterRelIdeal := BetterMap(RelIdeal);	
-	SR := minimalPresentation(BetterS/BetterRelIdeal)
+
+
+
 );
 
-sectionRing(WDiv) := D -> (
-	sectionRing(divisorToIdeal(D))
-);
 
-isVectScalar = L -> (
-	Ramb := ring (L#0); 
-	all(L, z -> (degree(z) <= degree (sub(1, Ramb))) ) 
-);
-
-convertScalarVect = (newS, L) -> (apply(L, z->sub(z, newS)));
-
-beginDocumentation();
-
-
-
-
-end

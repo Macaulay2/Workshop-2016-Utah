@@ -1,3 +1,15 @@
+-- changes in order or arguments
+
+-- internal functions acted on:     nu*, FTApproxList, FPTApproxList, FTHatApproxList, 
+--     	       	       	       	    isFPTPoly, isFJumpingNumberPoly
+
+-- internal functions to do: guessFPT, estFPT
+
+-- external functions acted on: divideFraction, findNumberBetween, fastExp,
+--    	      	      	      	  frobeniusPower, genFrobeniusPower  
+
+-- external functions to do: ethRoot*, tau*, sigma*
+
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
 -- CONTENTS
@@ -16,35 +28,15 @@
 
 -- Main functions: FPTApproxList, FTApproxList, FTHatApproxList
 
--- Auxiliary Functions: 
-
 ----------------------------------------------------------------------------------
 -- FThreshold Estimates
 
--- Main functions: guessFPT, estFPT
-
--- Auxiliary Functions: 
+-- Main functions: PT, estFPT
 
 ----------------------------------------------------------------------------------
 -- FPT/F-Jumping number check
 
 -- Main functions: isFPTPoly, isFJumpingNumberPoly
-
--- Auxiliary Functions: 
-
-----------------------------------------------------------------------------------
--- FPTs of special types of polynomials
-
--- Main functions: diagonalFPT, binomialFPT, FPT2VarHomog, 
-
--- Auxiliary Functions: isDiagonal, factorOutMonomial, monomialFactor
---    twoIntersection, allIntersections, isInPolytope, isInInteriorPolytope,
---    polytopeDefiningPoints, maxCoordinateSum, dCalculation, calculateEpsilon
---    isBinomial, setFTData, isInUpperRegion, isInLowerRegion, 
---    neighborInUpperRegion, isCP, findCPBelow, FPT2VarHomogInternal, canVector,
---    getNumAndDenom, taxicabNorm, factorList, splittingField, isBinaryForm
---    isNonConstantBinaryForm, isLinearBinaryForm, isPolynomialOverFiniteField
-
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
@@ -69,7 +61,7 @@ effPolyRad = ( f, J ) ->
 (
     if not isSubset( ideal( f ), radical( J ) ) then error "The polynomial is not contained in the radical of the ideal.";
     d := 1;
-    while not isSubset( ideal( fastExp( f, d ) ), J ) do d = d+1;
+    while not isSubset( ideal( fastExp( d, f ) ), J ) do d = d+1;
     d
 )
 
@@ -77,32 +69,32 @@ effPolyRad = ( f, J ) ->
 
 nuList = method()
 
-nuList(Ideal, Ideal,  ZZ) := (I1, J1, e1) -> ( --this is a faster nuList computation, it tries to do a smart nu list computation
-	d1 := 0;
-	p1 := char ring I1;
+nuList( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this is a faster nuList computation, it tries to do a smart nu list computation
+	d := 0;
+	p := char ring I;
 	local top;--for the binary search
 	local bottom;--for the binary search
  	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down
 	
-	if isSubset(I1, radical(J1))==false then (print "Error: Nu Undefined")
+	if isSubset(I, radical(J))==false then (print "Error: Nu Undefined")
 	else(
 	myList := new MutableList;
-	nuPrev := effRad(I1,J1);
-	N := numgens(trim(J1));
-	top = nuPrev*(N*p1-1);
+	nuPrev := effRad(I,J);
+	N := numgens(trim(J));
+	top = nuPrev*(N*p-1);
 	bottom = 0;
 	
-	for d1 from 1 to e1 do (
+	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(I1^middle, frobeniusPower(J1, d1));
+			answer = isSubset(I^middle, frobeniusPower( d, J));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
-		myList#(d1-1) = nuPrev;
-		top = (nuPrev+1)*(N*p1-1);
-		bottom = p1*nuPrev;
+		myList#(d-1) = nuPrev;
+		top = (nuPrev+1)*(N*p-1);
+		bottom = p*nuPrev;
 	);
 	toList myList)
 )
@@ -110,38 +102,37 @@ nuList(Ideal, Ideal,  ZZ) := (I1, J1, e1) -> ( --this is a faster nuList computa
 -- Computes the list of values of nu_I^J(p^d) for d=1,..., e 
 -- when J = maximal ideal
 
-nuList( Ideal, ZZ ) := ( I, e ) -> nuList( I, maxIdeal( ring I ), e )
-
+nuList( ZZ, Ideal ) := ( e, I ) -> nuList( e, I, maxIdeal( ring I ) )
 
 -- Computes the list of values of nu_I^J(p^d) for d=1,..., e
 -- when I=(f) is a principal ideal
 
-nuList(RingElement, Ideal,  ZZ) := (f1, J1, e1) -> ( --this is a faster nuList computation for a polynomial, it tries to do a smart nu list computation
-	d1 := 0;
-	p1 := char ring f1;
+nuList( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this is a faster nuList computation for a polynomial, it tries to do a smart nu list computation
+	d := 0;
+	p := char ring f;
 	local top;--for the binary search
 	local bottom;--for the binary search
  	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down
 	
-	if isSubset(ideal(f1), radical(J1))==false then (print "Error: Nu Undefined")
+	if isSubset(ideal(f), radical(J))==false then (print "Error: Nu Undefined")
 	else(
 	myList := new MutableList;
-	nuPrev := effPolyRad(f1,J1);
-	N := numgens(trim(J1));
-	top = nuPrev*(N*p1-1);
+	nuPrev := effPolyRad(f,J);
+	N := numgens(trim(J));
+	top = nuPrev*(N*p-1);
 	bottom = 0;
 	
-	for d1 from 1 to e1 do (
+	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(ideal(fastExp(f1,middle)), frobeniusPower(J1, d1));
+			answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
-		myList#(d1-1) = nuPrev;
-		top = (nuPrev+1)*(N*p1-1);
-		bottom = p1*nuPrev;
+		myList#(d-1) = nuPrev;
+		top = (nuPrev+1)*(N*p-1);
+		bottom = p*nuPrev;
 	);
 	toList myList)
 )
@@ -150,30 +141,30 @@ nuList(RingElement, Ideal,  ZZ) := (f1, J1, e1) -> ( --this is a faster nuList c
 -- when I=(f) is a principal ideal
 -- and J=maximal ideal
 
-nuList( RingElement, ZZ ) := ( f, e ) -> nuList( f, maxIdeal( ring f ), e )
+nuList( ZZ, RingElement ) := ( e, f ) -> nuList( e, f, maxIdeal( ring f ) )
 
 -- Computes the value of (nu_I)^J(p^e)
 
 nu = method()
 
-nu(Ideal, Ideal, ZZ) := (I1, J1, e1) -> ( --this does a fast nu computation
-	p1 := char ring I1;
+nu( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this does a fast nu computation
+	p := char ring I;
 	local top;--for the binary search
 	local bottom;--for the binary search
 	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down 
-	if isSubset(I1, radical(J1))==false then (print "Error: Nu Undefined")
+	if isSubset(I, radical(J))==false then (print "Error: Nu Undefined")
 	else(
 	N := 0;
 	myList := new MutableList;
-	nuPrev := effRad(I1,J1);
-	N = numgens(trim(J1));
-	top = nuPrev*N*p1^e1-1;
+	nuPrev := effRad(I,J);
+	N = numgens(trim(J));
+	top = nuPrev*N*p^e-1;
 	bottom = 0;
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(I1^middle, frobeniusPower(J1, e1));
+		answer = isSubset(I^middle, frobeniusPower( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -182,30 +173,29 @@ nu(Ideal, Ideal, ZZ) := (I1, J1, e1) -> ( --this does a fast nu computation
 -- Computes the value of (nu_I)^J(p^e) 
 -- when J=maximal ideal
 
-nu( Ideal, ZZ ) := ( I, e ) -> nu( I, maxIdeal( ring I ), e )
-
+nu( ZZ, Ideal ) := ( e, I ) -> nu( e, I, maxIdeal( ring I ) )
 
 -- Computes the value of (nu_I)^J(p^e) 
 -- when I=(f) a principal ideal
 
-nu(RingElement, Ideal, ZZ) := (f1, J1, e1) -> ( --this does a fast nu computation for a polynomial
-	p1 := char ring f1;
+nu( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this does a fast nu computation for a polynomial
+	p := char ring f;
 	local top;--for the binary search
 	local bottom;--for the binary search
 	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down 
-	if isSubset(ideal(f1), radical(J1))==false then (print "Error: Nu Undefined")
+	if isSubset(ideal(f), radical(J))==false then (print "Error: Nu Undefined")
 	else(
 	N := 0;
 	myList := new MutableList;
-	nuPrev := effPolyRad(f1,J1);
-	N = numgens(trim(J1));
-	top = nuPrev*N*p1^e1-1;
+	nuPrev := effPolyRad(f,J);
+	N = numgens(trim(J));
+	top = nuPrev*N*p^e-1;
 	bottom = 0;
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(ideal(fastExp(f1,middle)), frobeniusPower(J1, e1));
+		answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -215,7 +205,7 @@ nu(RingElement, Ideal, ZZ) := (f1, J1, e1) -> ( --this does a fast nu computatio
 -- when I=(f) a principal ideal 
 -- and J=maximal ideal
 
-nu( RingElement, ZZ ) := ( f, e ) -> nu( f, maxIdeal( ring f ), e )
+nu( ZZ, RingElement ) := ( e, f ) -> nu( e, f, maxIdeal( ring f ) )
 
 -- isJToAInIToPe checks whether or not J^a is in I^(p^e).
 -- It seems to be much faster than raising J to a power.
@@ -239,7 +229,7 @@ binarySearch = ( I, J, e, int ) ->
 -- fixed and slightly streamlined 
 nuListAlt = method(); 
 
-nuListAlt( Ideal, Ideal, ZZ ) := ( I, J, n ) -> 
+nuListAlt( ZZ, Ideal, Ideal ) := ( n, I, J ) -> 
 ( 
     theList := { };
     p := char ring I;
@@ -254,30 +244,30 @@ nuListAlt( Ideal, Ideal, ZZ ) := ( I, J, n ) ->
     theList	    
 )
 
-nuListAlt( RingElement, Ideal, ZZ ) := ( f, J, n ) -> nuListAlt( ideal( f ), J, n )
+nuListAlt( ZZ, RingElement, Ideal ) := ( n, f, J ) -> nuListAlt( n, ideal( f ), J )
 
 -- nu lists with respect to the homogeneous maximal ideal
-nuListAlt( Ideal, ZZ ) := ( I, n ) -> nuListAlt( I, maxIdeal( ring I ), n )
+nuListAlt( ZZ, Ideal ) := ( n, I ) -> nuListAlt( n, I, maxIdeal( ring I ) )
 
-nuListAlt( RingElement, ZZ ) := ( f, n ) -> nuListAlt( f, maxIdeal( ring f ), n )
+nuListAlt( ZZ, RingElement ) := ( n, f ) -> nuListAlt( n, f, maxIdeal( ring f ) )
 
 -- nuAlt computes individual nus
 -- (it simply grabs the last element of a nuList)
 nuAlt = method();
 
-nuAlt( Ideal, Ideal, ZZ ) := ( I, J, e ) -> last nuListAlt( I, J, e )
+nuAlt( ZZ, Ideal, Ideal ) := ( e, I, J ) -> last nuListAlt( e, I, J )
 
-nuAlt( RingElement, Ideal, ZZ ) := ( f, J, e ) -> last nuListAlt( f, J, e )
+nuAlt( ZZ, RingElement, Ideal ) := ( e, f, J ) -> last nuListAlt( e, f, J )
 
 -- nu with respect to the homogeneous maximal ideal
-nuAlt( Ideal, ZZ ) := ( I, e ) -> nuAlt( I, maxIdeal( ring I ), e )
+nuAlt( ZZ, Ideal ) := ( e, I ) -> nuAlt( e, I, maxIdeal( ring I ) )
 
-nuAlt( RingElement, ZZ ) := ( f, e ) -> nuAlt( f, maxIdeal( ring f ), e )
+nuAlt( ZZ, RingElement ) := ( e, f ) -> nuAlt( e, f, maxIdeal( ring f ) )
 
 -- This is a different approach to nuList, that uses colon ideals. 
 nuListAlt1 = method();
 
-nuListAlt1( RingElement, Ideal, ZZ ) := ( f, J, n ) ->  
+nuListAlt1( ZZ, RingElement, Ideal ) := ( n, f, J ) ->  
 (
     p := char ring f;
     nu := effPolyRad( f, J ) - 1;  -- nu(p^0)
@@ -288,44 +278,42 @@ nuListAlt1( RingElement, Ideal, ZZ ) := ( f, J, n ) ->
 	    I = I: ideal( f^nu );
 	    nu = binarySearch( f, I, 1, { 0, p } );
 	    theList = append( theList, p*(last theList) + nu );
-	    I = frobeniusPower( I, 1 ); 
+	    I = frobeniusPower( 1, I ); 
 	)
     );
     theList
 )    
 
-nuListAlt1( RingElement, ZZ ) := ( f, n ) -> nuListAlt1( f, maxIdeal( ring f ), n )
-
+nuListAlt1( ZZ, RingElement ) := ( n, f ) -> nuListAlt1( n, f, maxIdeal( ring f ) )
 
 -- Computes the list of values of \(nuHat_I)^J(p^d) for d=1,..., e
 nuHatList = method()
 
-nuHatList(Ideal, Ideal,  ZZ) := (I1, J1, e1) -> ( --this is a faster nuList computation, it tries to do a smart nu list computation
-	d1 := 0;
-	p1 := char ring I1;
+nuHatList( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this is a faster nuList computation, it tries to do a smart nu list computation
+	d := 0;
+	p := char ring I;
 	local top;--for the binary search
 	local bottom;--for the binary search
  	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down
-    	if isSubset(I1, radical(J1))==false then (print "Error: NuHat Undefined")
+    	if isSubset(I, radical(J))==false then (print "Error: NuHat Undefined")
 	else(
 	myList := new MutableList;
-	nuPrev := effRad(I1,J1);
---	N = numgens(trim(J1));
-	top =nuPrev*p1;
+	nuPrev := effRad(I,J);
+--	N = numgens(trim(J));
+	top =nuPrev*p;
 	bottom = 0;
 	
-	
-	for d1 from 1 to e1 do (
+	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(genFrobeniusPower(I1,middle), frobeniusPower(J1,d1));
+			answer = isSubset(genFrobeniusPower( middle, I ), frobeniusPower( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
-		myList#(d1-1) = bottom;
-		top = p1*(nuPrev+1);
-		bottom = p1*nuPrev;
+		myList#(d-1) = bottom;
+		top = p*(nuPrev+1);
+		bottom = p*nuPrev;
 	);
 	toList myList)
 )
@@ -333,40 +321,39 @@ nuHatList(Ideal, Ideal,  ZZ) := (I1, J1, e1) -> ( --this is a faster nuList comp
 -- Computes the list of values of \(nuHat_I)^J(p^d) for d=1,..., e
 -- when for J=maximal ideal
 
-nuHatList( Ideal, ZZ ) := ( I, e ) -> nuHatList( I, maxIdeal( ring I ), e )
+nuHatList( ZZ, Ideal ) := ( e, I ) -> nuHatList( e, I, maxIdeal( ring I ) )
 
 -- Computes the list of values of \(nuHat_I)^J(p^d) for d=1,..., e
 -- when I=(f) is a principal ideal
 
-nuHatList( RingElement, Ideal, ZZ ) := ( f, J, e ) -> nuList( f, J, e ) 
+nuHatList( ZZ, RingElement, Ideal ) := ( e, f, J ) -> nuList( e, f, J ) 
 
 -- Computes the list of values of \(nuHat_I)^J(p^d) for d=1,..., e
 -- when I=(f) is a pricipal ideal and J=maximal ideal
  
-nuHatList( RingElement, ZZ ) := ( f, e ) -> nuList( f, e ) 
-
+nuHatList( ZZ, RingElement ) := ( e, f ) -> nuList( e, f ) 
 
 -- Computes values of \(nuHat_I)^J(p^e)
 
 nuHat = method()
 
-nuHat (Ideal, Ideal, ZZ) := (I1, J1, e1) -> ( --this does a fast nu computation
-	p1 := char ring I1;
+nuHat ( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this does a fast nu computation
+	p := char ring I;
 	local top;--for the binary search
 	local bottom;--for the binary search
 	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down
-    	if isSubset(I1, radical(J1))==false then (print "Error: NuHat Undefined")
+    	if isSubset(I, radical(J))==false then (print "Error: NuHat Undefined")
 	else(
 	myList := new MutableList;
-	nuPrev := effRad(I1,J1);
---	N = numgens(trim(J1));
-	top = nuPrev*p1^e1;
+	nuPrev := effRad(I,J);
+--	N = numgens(trim(J));
+	top = nuPrev*p^e;
 	bottom = 0;
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(genFrobeniusPower(I1, middle), frobeniusPower(J1,e1));
+		answer = isSubset(genFrobeniusPower( middle, I ), frobeniusPower( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -376,18 +363,18 @@ nuHat (Ideal, Ideal, ZZ) := (I1, J1, e1) -> ( --this does a fast nu computation
 -- Computes values of \(nuHat_I)^J(p^e)
 -- when J=maximal ideal
 
-nuHat( Ideal, ZZ ) := ( I, e ) -> nuHat( I, maxIdeal( ring I ), e )
+nuHat( ZZ, Ideal ) := ( e, I ) -> nuHat( e, I, maxIdeal( ring I ) )
 
 -- Computes  values of \(nuHat_I)^J(p^e)
 -- when I=(f) is a principal ideal
 
-nuHat( RingElement, Ideal, ZZ ) := ( f, J, e ) -> nu( f, J, e )
+nuHat( ZZ, RingElement, Ideal ) := ( e, f, J ) -> nu( e, f, J )
 
 -- Computes  values of \(nuHat_I)^J(p^e)
 -- when I=(f) is a principal ideal 
 -- and J=maximal ideal 
 
-nuHat( RingElement, ZZ ) := ( f, e ) -> nu( f, e )
+nuHat( ZZ, RingElement ) := ( e, f ) -> nu( e, f )
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
@@ -399,52 +386,51 @@ nuHat( RingElement, ZZ ) := ( f, e ) -> nu( f, e )
 --Gives a list of nu_I(p^d)/p^d for d=1,...,e
 FPTApproxList = method();
 
-FPTApproxList (Ideal,ZZ) := (I,e) ->
+FPTApproxList ( ZZ, Ideal ) := (e, I) ->
 (
      p := char ring I;
-     nus := nuList(I,e);
+     nus := nuList(e,I);
      apply( nus, 1..e, (n,k) -> n/p^k )
 )
 
-FPTApproxList (RingElement,ZZ) := (f,e) -> FPTApproxList(ideal(f),e)
+FPTApproxList ( ZZ, RingElement ) := ( e, f ) -> FPTApproxList( e, ideal(f) )
 
 --Approximates the F-Threshold with respect to an ideal J
 --More specifically, this gives a list of nu_I^J(p^d)/p^d for d=1,...,e
 
 FTApproxList = method();
 
-FTApproxList (Ideal,Ideal,ZZ) := (I,J,e) ->
+FTApproxList ( ZZ, Ideal, Ideal ) := ( e, I, J ) ->
 (
     if not isSubset( I, radical(J) ) then error "F-threshold undefined.";
      p := char ring I;
-     nus := nuList(I,J,e);
+     nus := nuList(e,I,J);
      apply( nus, 1..e, (n,k) -> n/p^k )
 )
 
-FTApproxList (RingElement,Ideal,ZZ) := (f1,J1,e1) -> FTApproxList(ideal(f1),J1,e1)
+FTApproxList ( ZZ, RingElement, Ideal ) := ( e, f, J ) -> FTApproxList( e, ideal(f), J )
 
 FTHatApproxList = method();
 
-FTHatApproxList (Ideal,Ideal,ZZ) := (I,J,e) ->
+FTHatApproxList ( ZZ, Ideal, Ideal ) := ( e, I, J ) ->
 (
     if not isSubset( I, radical(J) ) then error "F-threshold undefined.";
      p := char ring I;
-     nus := nuHatList(I,J,e);
+     nus := nuHatList( e, I, J );
      apply( nus, 1..e, (n,k) -> n/p^k )
 )
 
-FTHatApproxList (RingElement,Ideal,ZZ) := (f1,J1,e1) -> FTHatApproxList(ideal(f1),J1,e1)
-
+FTHatApproxList ( ZZ, RingElement, Ideal ) := ( e, f, J ) -> FTHatApproxList( e, ideal(f), J )
 
 --Guesses the FPT of ff.  It returns a list of all numbers in 
---the range suggested by nu(ff,e1) with maxDenom as the maximum denominator
+--the range suggested by nu(e1,ff) with maxDenom as the maximum denominator
 guessFPT ={OutputRange=>false}>>o -> (ff, e1, maxDenom) ->(
-     nn := nu(ff, e1);
+     nn := nu(e1,ff);
      pp := char ring ff;
      if (o.OutputRange == false) then 
-          findNumberBetween({nn/(pp^e1-1), (nn+1)/(pp^e1)}, maxDenom)
+          findNumberBetween( maxDenom, {nn/(pp^e1-1), (nn+1)/(pp^e1)} )
      else
-          {{ nn/(pp^e1-1), (nn+1)/(pp^e1)}, findNumberBetween({nn/(pp^e1-1), (nn+1)/(pp^e1)}, maxDenom)}
+          {{ nn/(pp^e1-1), (nn+1)/(pp^e1)}, findNumberBetween( maxDenom, {nn/(pp^e1-1), (nn+1)/(pp^e1)} )}
 )
 
 --F-pure threshold estimation, at the origin
@@ -480,7 +466,7 @@ estFPT={FinalCheck=> true, Verbose=> false, MultiThread=>false, DiagonalCheck=>t
      --compute nu's
      if (foundAnswer == false) then (
      	  pp:=char ring ff;
-     	  nn:=nu(ff,ee);
+     	  nn:=nu(ee,ff);
 	  if  (o.Verbose==true) then print "nu's have been computed";
 
      	  --if our nu's aren't fine enough, we just spit back some information
@@ -580,42 +566,46 @@ estFPT={FinalCheck=> true, Verbose=> false, MultiThread=>false, DiagonalCheck=>t
 --isFPTPoly, determines if a given rational number is the FPT of a pair in a polynomial ring. 
 --if Origin is specified, it only checks at the origin. 
 
-isFPTPoly ={Verbose=> false,Origin=>false}>> o -> (f1, t1) -> (
-	pp := char ring f1;
-	if (o.Origin == true) then org := ideal(vars (ring f1));
-	funList := divideFraction(t1, pp);
-	--this writes t1 = a/(p^b(p^c-1))
-	aa := funList#0;
-	bb := funList#1;
-	cc := funList#2;
-	mySigma := ideal(f1);
-	myTau := ideal(sub(1, ring f1));
-	myA := aa;
+FPT2VarHomogInternal = method(Options => {MaxExp => infinity, PrintCP => false, Nontrivial => false})
+
+FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
+
+
+isFPTPoly = method( Options => {Verbose=> false,Origin=>false} )
+isFPTPoly ( QQ, RingElement ) := o -> ( t, f ) -> 
+(
+	p := char ring f;
+	if (o.Origin == true) then org := ideal(vars (ring f));
+	--this writes t = a/(p^b(p^c-1))
+	(a,b,c) := toSequence divideFraction( p, t );
+	mySigma := ideal(f);
+	myTau := ideal(sub(1, ring f));
+	myA := a;
 	myA2 := 0;
 	
-	if (cc != 0) then (
-		myA = floor(aa / (pp^cc - 1));
-		myTau = tauPoly( f1, (aa%(pp^cc-1))/(pp^cc-1) )
+	if (c != 0) then (
+		myA = floor(a / (p^c - 1));
+		myTau = tauPoly( f, (a%(p^c-1))/(p^c-1) )
 	);
 	
 	if (o.Verbose==true) then print "higher tau Computed";
 
 	--first we check whether this is even a jumping number.
-	if (cc == 0) then (
-		myA2 = aa-1;
-		mySigma = sigmaAOverPEMinus1Poly(f1, (pp-1), 1)
+	if (c == 0) then (
+		myA2 = a-1;
+		mySigma = sigmaAOverPEMinus1Poly(f, (p-1), 1)
 	)
 	else (
-		myA2 = floor((aa-1)/(pp^cc-1));
-		mySigma = (sigmaAOverPEMinus1Poly(f1, ((aa-1)%(pp^cc-1))+1, cc))
+		myA2 = floor((a-1)/(p^c-1));
+		mySigma = (sigmaAOverPEMinus1Poly(f, ((a-1)%(p^c-1))+1, c))
 	);
 	if (o.Verbose==true) then print "higher sigma Computed";
 
 	returnValue := false;
 	
-	if ( isSubset(ideal(sub(1, ring f1)), ethRootSafe(f1, mySigma, myA2, bb) )) then (
-		if (o.Verbose==true) then print "we know t1 <= FPT";
-		if (not isSubset(ideal(sub(1, ring f1)), ethRootSafe(f1, myTau, myA, bb) ))  then returnValue = true 
+	if ( isSubset(ideal(sub(1, ring f)), ethRootSafe(f, mySigma, myA2, b) )) then (
+		if (o.Verbose==true) then print "we know t <= FPT";
+		if (not isSubset(ideal(sub(1, ring f)), ethRootSafe(f, myTau, myA, b) ))  then returnValue = true 
 	);
 		
 	returnValue
@@ -625,572 +615,24 @@ isFPTPoly ={Verbose=> false,Origin=>false}>> o -> (f1, t1) -> (
 --***************************************************************************
 --This needs to be speeded up, like the above function
 --***************************************************************************
-isFJumpingNumberPoly ={Verbose=> false}>> o -> (f1, t1) -> (
-	pp := char ring f1;
-	funList := divideFraction(t1, pp);
-	--this writes t1 = a/(p^b(p^c-1))
-	aa := funList#0;
-	bb := funList#1;
-	cc := funList#2;
-	mySigma := ideal(f1);
-	myTau := ethRoot(tauPoly(f1, t1*pp^bb), bb);
+
+isFJumpingNumberPoly = method( Options => {Verbose=> false} )
+
+isFJumpingNumberPoly ( QQ, RingElement ) := o -> ( t, f ) -> 
+	p := char ring f;
+	--this writes t = a/(p^b(p^c-1))
+	(a,b,c) := toSequence divideFraction( p, t );
+	mySigma := ideal(f);
+	myTau := ethRoot(tauPoly(f, t*p^b), b);
 	if (o.Verbose==true) then print "higher tau Computed";
 
 	--first we check whether this is even a jumping number.
-	if (cc == 0) then
-		mySigma = ethRoot((ideal(f1^(aa-1)))*((sigmaAOverPEMinus1Poly(f1, (pp-1), 1))), bb)
+	if (c == 0) then
+		mySigma = ethRoot((ideal(f^(a-1)))*((sigmaAOverPEMinus1Poly(f, (p-1), 1))), b)
 	else 
-		mySigma = ethRoot((sigmaAOverPEMinus1Poly(f1, aa, cc)),bb);
+		mySigma = ethRoot((sigmaAOverPEMinus1Poly(f, a, c)),b);
 	if (o.Verbose==true) then print "sigma Computed";
 
 	not (isSubset(mySigma, myTau))
 )
 
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-----------------------------------------------------------------------------------
--- Functions for computing FPTs of diagonal polynomials
-----------------------------------------------------------------------------------
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
---Computes the F-pure threshold of a diagonal hypersurface 
---x_1^(a_1) + ... +x_n^(a_n) using Daniel Hernandez' algorithm
-diagonalFPT = f ->
-(
-     p := char ring f;
-     w := apply(terms f, g->first degree(g));
-     y := 0; if firstCarry(reciprocal(w),p)==-1 then for i from 0 to #w-1 do y = y + 1/w#i else
-     (
-	  x := 0; for c from 0 to #w-1 do x = x + truncation(firstCarry(reciprocal(w),p)-1, 1/w#c, p); 
-	  y = x+1/p^(firstCarry(reciprocal(w),p)-1);
-     );
-     y
-)
-
---Determines whether a polynomial f is diagonal; i.e., of the form 
---x_1^(a_1)+...+x_n^(a_n) 
-isDiagonal = f -> product(exponents(f),v->#(positions(v,x->x!=0)))==1
-
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-----------------------------------------------------------------------------------
--- Functions for computing FPTs of binomials
-----------------------------------------------------------------------------------
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
---Given input vectors v={a_1,...,a_n} and w={b_1,...,b_n}, gives the
---corresponding vectors that omit all a_i and b_i such that a_i=b_i
-factorOutMonomial = (v,w) ->
-(
-     diffCoords := positions(v-w,x->x!=0);
-     (apply(diffCoords,i->v_i),apply(diffCoords,i->w_i))
-)
-
---Given input vectors v={a_1,...,a_n} and w={b_1,...,b_n}, gives the
---vector of the a_i for which a_i=b_i
-monomialFactor = (v,w) ->
-(
-     equalCoords := positions(v-w,x->x==0);
-     apply(equalCoords,i->v_i)
-)
-
---Given two vectors v={v0,v1} and w={w0,w1} in the real plane, finds 
---the intersection of the associated lines v0*x+w0*y=1 and v1*x+w1*y=1
-twoIntersection = (v,w) ->
-(
-     if v#0*w#1-v#1*w#0 != 0 then 
-     (
-	  x := (w#1-w#0)/(v#0*w#1-v#1*w#0);
-	  y := (v#0 - v#1)/(v#0*w#1-v#1*w#0);
-	  P := {x,y};
-     ) else P = {0,0};
-P
-)
-
---Given two vectors v={v0,...vn} and w={w0,...,wn}, list the 
---intersections of all lines vi*x+wi*y=1 and vj*x+wj*y=1
-allIntersections = (v,w) ->
-(
-     L := new MutableList;
-     c := 0;
-     for i from 0 to #v-1 do
-     (
-	  for j from i+1 to #v-1 do 
-     	  (
-     	       if twoIntersection({v#i,v#j}, {w#i,w#j}) != {0,0} then 
-     	       (
-	  	    L#c = twoIntersection({v#i,v#j}, {w#i,w#j});
-	  	    c = c+1;
-     	       );
-	  );
-     );
-     for i from 0 to #v-1 do
-     (
-	  if v#i !=0 then  
-	  (
-	       L#c = {1/(v#i), 0};
-	       c = c + 1;
-	  );
-     );
-     for i from 0 to #v-1 do
-     (
-	  if w#i !=0 then  
-	  (
-	       L#c = {0, 1/(w#i)};
-	       c = c + 1;
-	  );
-     ); 
-     K := new MutableList;
-     c = 0; for i from 0 to #L-1 do
-     (
-	  if (L#i)#0 >= 0 and (L#i)#1 >=0 then (K#c = {(L#i)#0, (L#i)#1}; c = c+1);
-     );
-     K
-)
-
---Given a point a=(x,y) in the real plane and two vectors v={v0,...,vn} and w={w0,...,wn}, checks whether a is in the polytope defined by the equations vi*x+wi*y<=1
-isInPolytope = (a,v,w) ->
-(
-     alert := true;
-     for i from 0 to #v-1 do
-     (
-	  if v#i*a#0 + w#i*a#1 > 1 then alert = false;
-     );
-     alert
-)
-
-
---Given a point a=(x,y) in the real plane and two vectors
---v={v0,...,vn} and w={w0,...,wn}, checks whether a is in
---the polytope defined by the equations vi*x+wi*y<=1
-isInInteriorPolytope = (a,v,w) ->
-(
-     alert := true;
-     for i from 0 to #v-1 do
-     (
-	  if v#i*a#0 + w#i*a#1 >= 1 then alert = false;
-     );
-     alert
-)
-
---Given two vectors v and w of the same length, outputs 
---a list of the defining vectors of the polytope as in isInPolytope
-polytopeDefiningPoints = (v,w) ->
-(
-     L := allIntersections(v,w);
-     K := new MutableList;
-     c := 0;
-     for j from 0 to #L-1 do
-     (
-	  if isInPolytope(L#j,v,w) == true then (K#c = {(L#j)#0, (L#j)#1}; c = c+1;)
-     );
-     K
-)
-
---Given a list of coordinates in the real plane, 
---outputs the one with the largest coordinate sum
-maxCoordinateSum = L ->
-(
-     maxSum :=max apply(L,sum);
-     first select(1,L,v->sum(v)==maxSum)
-)
-
---Finds the "delta" in Daniel Hernandez's algorithm
---for F-pure thresholds of binomials
-dCalculation = (w,N,p) ->
-(
-     d := 0; for j from 0 to #w-1 do  d = d + digit(N+1,w#j,p);
-     i := N; while d > p-2 do 
-     (
-	  d = 0; for j from 0 to #w-1 do  d = d + digit(i,w#j,p);
-	  i = i - 1;
-     );
-     i + 1
-)
-
---Given the "truncation" point (P1,P2) and two vectors 
---defining the binomial v and w, outputs the "epsilon" in 
---Daniel Hernandez's algorithm for F-thresholds of binomials
-calculateEpsilon = (P1,P2,v,w) ->
-(
-     X := new MutableList;
-     Y := new MutableList;
-     c:=0; d := 0; for i from 0 to #v-1 do 
-     (
-	  if w#i != 0 then 
-     	  (
-	       X#c = (1 - (v#i)*(P2#0) - (w#i)*(P2#1))/(w#i);
-	       c = c+1;
-	  );
-          if v#i != 0 then 
-	  (
-	       Y#d = (1 - (v#i)*(P1#0) - (w#i)*(P1#1))/(v#i);
-	       d = d+1;
-	  );
-     );
-     i:=0;
-     epsilon:=0;
-     if isInInteriorPolytope(P1,v,w)==false and isInInteriorPolytope(P2,v,w)==false then epsilon = -1 else
-     (
-	  if isInInteriorPolytope(P1,v,w)==false then for i from 0 to #v-1 do X#1 = 0;
-	  if isInInteriorPolytope(P2,v,w)==false then for i from 0 to #v-1 do Y#1 = 0;
-	  M := X#0; 
-	  N := Y#0;
-	  for i from 1 to #X-1 do M = min(M, X#i);
-	  for j from 1 to #Y-1 do N = min(N, Y#j);
-	  epsilon = max(M,N); 
-     );
-     epsilon
-)
-
---Computes the FPT of a binomial, based on the work of Daniel Hernandez 
---(implemented by Emily Witt)
-binomialFPT = g ->
-(
-     p := char ring g;
-     v := (exponents(g))#0;
-     w := (exponents(g))#1;
-     FPT := 0;
-     f := monomialFactor(v,w);
-     x := factorOutMonomial(v,w);
-     v = x#0;
-     w = x#1;
-     Q := maxCoordinateSum(polytopeDefiningPoints(v,w));
-     if Q#0+Q#1 > 1 then FPT = 1 else
-     (
-	  L :=  firstCarry(Q,p);
-	  if L == -1 then FPT = Q#0+Q#1 else
-     	  (
-     	       d := dCalculation(Q,L-1,p);
-     	       P := (truncation(d,Q#0,p),  truncation(d,Q#1,p));
-     	       P1 := {P#0, P#1+1/p^d};
-     	       P2 := {P#0+1/p^d,P#1};
-     	       FPT = truncation(L-1,Q#0+Q#1,p);
-     	       if calculateEpsilon(P1,P2, v, w) != -1 then FPT = FPT +  calculateEpsilon(P1, P2, v, w);
-     	  );
-     );
-     monFPT := infinity;
-     for i from 0 to #f-1 do (if f#i!=0 then monFPT = min(monFPT, 1/(f#i)););
-     if monFPT != 0 then FPT = min(FPT, monFPT);
-     FPT
-)
-
---Returns true if the polynomial is binomial.
-isBinomial = f -> #(terms f)<=2
-
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-----------------------------------------------------------------------------------
--- Functions for computing FPTs of forms in two variables
-----------------------------------------------------------------------------------
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
--- Based on the work of Hernandez and Teixeira. -- 	                                           --                      
-
-{*
-    Remark: At this point, only commands for computations of F-pure thresholds are
-    implemented. Eventually computations of F-thresholds with respect to more general
-    ideals will be implemented, and perhaps of more general polynomials. Some structures 
-    and functions below are already designed to handle such greater generality. 
-*}
-    
-{*
-    Types and auxiliary commands
-*}
-
---FTData is a HashTable that stores the data necessary in F-threshold calculations
---(for conveniently passing those data from one function to another).
---It contains the following keys:
---    "ring": the ring of the polynomial in question;
---    "char": the characteristic of ring;
---    "ideal": the ideal with respect to which we want to compute the F-threshold;
---    "gens": the generators of the ideal;
---    "polylist": a list of the (non-associated) factors of the polynomial in question;
---    "numpolys": the number of factors.
-FTData = new Type of HashTable
-
---setFTData takes a list of generators of the ideal or the ideal itself and a list
---    of polynomials, and builds an FTData from them.
-setFTData = method()
-
-setFTData (List,List) := (gen,polylist) -> 
-(
-    	A:=ring gen_0;
-    	p:= char A;	
-	new FTData from {"char"=>p,"ring"=>A, "ideal"=>ideal gen, "gens" => gen,
-	    "numpolys"=>#polylist,"polylist"=>polylist}
-)
-
-setFTData (Ideal,List) := (I,polylist) -> setFTData(I_*,polylist)
-
-{*
-    Tests and auxiliary functions
-*}
-
---isInUpperRegion(a,q,S)/isInUpperRegion(u,S) test if the point u=a/q is in the
---upper region attached to S. Suppose I is the ideal of the FTData S under consideration 
---and L={L_1,...,L_n} is the "polylist". Then a point a/q (where a=(a_1,...,a_n) is a 
---nonnegative integer vector and q a power of "char") is in the "upper region" if 
---L_1^(a_1)...L_n^(a_n) is in I^[q]; otherwise it is in the lower region.
-isInUpperRegion = method()
-
-isInUpperRegion (List,ZZ,FTData) := (a,q,S) -> 
-(
-    frob:=ideal apply(S#"gens",f->f^q);
-    F:=product(S#"polylist",a,(f,i)->fastExp(f,i));
-    (F % frob) == 0
-)
-
-isInUpperRegion (List,FTData) := (u,S) ->
-    isInUpperRegion append(getNumAndDenom(u),S)
-
---isInLoweRegion(a,q,S)/isInLoweRegion(u,S) test if the point u=a/q is in the
---lower region attached to S.
-isInLowerRegion = method()
-
-isInLowerRegion (List,ZZ,FTData) := (a,q,S) -> not isInUpperRegion(a,q,S)
-
-isInLowerRegion (List,FTData) := (u,S) -> not isInUpperRegion(u,S)
-
---neighborInUpperRegion(a,q,S)/neighborInUpperRegion(u,S): auxiliary commands that, 
---given a point u=a/q in the upper region, try to find a "neighbor" of the form 
---(a-e_i)/q that also lies in the upper region. If the search is successful, they return
---the first such neighbor found; otherwise they return nothing.
-neighborInUpperRegion = method()
-
-neighborInUpperRegion (List,ZZ,FTData) := (a,q,S) ->
-(
-    if isInLowerRegion(a,q,S) then (error "Expected point in the upper region.");
-    n := S#"numpolys";
-    posEntries := positions(a,k->(k>0));
-    found := false;
-    i:=0;
-    local candidate;
-    local neighbor;
-    while ((not found) and (i<#posEntries)) do 
-    (
-	candidate=a-canVector(posEntries_i,n);
-	if isInUpperRegion(candidate,q,S) then (found=true; neighbor=candidate);
-	i=i+1;
-    );
-    if (not found) then null else (neighbor,q)
-)
-
-neighborInUpperRegion (List,FTData) := (u,S) -> 
-(
-    nbr:=neighborInUpperRegion append(getNumAndDenom(u),S);
-    if nbr===null then nbr else (nbr_0)/(nbr_1)
-)
-
---isCP(a,q,S)/isCP(u,S) test if u=a/q is a critical point, that is, if u is in the
---upper region but each neighbor (a-e_i)/q (where a_i>0) is not.
-isCP = method()
-
-isCP (List,ZZ,FTData) := (a,q,S) -> 
-(
-    if isInLowerRegion(a,q,S) then return false;
-    neighborInUpperRegion(a,q,S)===null
-)
-
-isCP (List,FTData) := (u,S) -> isCP append(getNumAndDenom(u),S)
-
---findCPBelow(u,S) takes a point u in the upper region attached to S and finds a 
---critical point <= u with the same denominator.
-findCPBelow = method()
-
-findCPBelow (List,FTData) := (pt,S) ->
-(
-    if isInLowerRegion(pt,S) then (error "The point must be in the upper region.");
-    nbr:=neighborInUpperRegion(pt,S);
-    if nbr===null then return pt else findCPBelow(nbr,S)
-)
-
-{*
-    Computation of FPTs
-*}
-
---FPT2VarHomogInternal({a1,...an},S): if S#"polylist={L1,...,Ln} is a list of linear
---forms, FPT2VarHomogInternal({a1,...an},S) finds the FPT of the polynomial
---F=L1^(a1)...Ln^(an)
-FPT2VarHomogInternal = method(Options => {MaxExp => infinity, PrintCP => false, Nontrivial => false})
-
-FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
-(
-    deg:=taxicabNorm(a);
-    pos:=positions(a,k->(k>=deg/2));
-    if (pos!={}) then return(1/a_(pos_0)); 
-       -- if some multiplicity a_i is "too big", return 1/a_i
-    p:=S#"char";
-    den:=denom(2/deg);
-    local mult;
-    if (opt.Nontrivial) then mult = infinity
-    else
-    ( 
-    	if gcd(S#"char",den)==1 then mult = multOrder(p,den)
-	else
-	(
-	    F:=product(S#"polylist",a,(f,i)->f^i);
-	    if isFPTPoly(F,2/deg) then (return (2/deg))
-	    else mult = infinity
-	)
-    );    
-    rng:=S#"ring";
-    polys:=S#"polylist";
-    I:=S#"ideal";
-    ideals:={I};
-    e:=0;
-    dgt:=0;
-    u:=2*a/deg;
-    while (I != ideal(1_rng) and e < (opt.MaxExp) and e < mult) do 
-    (
-	e=e+1;
-	dgt=digit(e,u,p);
-	I=frobeniusPower(I,1):product(polys,dgt,(f,k)->f^k);
-	ideals=append(ideals,I)
-    );
-    if I!=ideal(1_rng) then 
-    (
-	if e == mult then (return (2/deg)) 
-	else error "Reached MaxExp."
-    );    
-    e0:=e-1;
-    S1:=setFTData(ideals_e0,polys);
-    cp:=findCPBelow(dgt/p,S1); 
-    	--if some coordinate of cp is 0, its magnification may not be a CP
-    while product(cp)==0 do 
-    (
-	e0=e0-1;
-        -- zoom out one step and look for CP again
-    	S1=setFTData(ideals_e0,polys);
-	cp=findCPBelow(cp/p+digit(e0+1,u,p)/p,S1) 
-    );
-    cp=cp/p^e0+truncation(e0,u,p); -- "zoom out"
-    if opt.PrintCP then print(toString cp);
-    max apply(cp,a,(c,k)->c/k)
-)
-
------------------------
-FPT2VarHomog = method(Options => {MaxExp => infinity, PrintCP => false})
-
---FPT2VarHomog(RingElement)
---FPT(F) computes the F-pure threshold of a form F in two variables. 
---KNOWN ISSUE: if the splitting field of F is too big, factor will not work.
-FPT2VarHomog (RingElement) :=  opt ->  F ->
-(    
-   if not isNonConstantBinaryForm(F) then (
-	error "FPT2VarHomog expects a nonconstant homogeneous polynomial in 2 variables."
-    );
-    -- because factoring is the weakness of this algorithm, we try to avoid it
-    -- by first checking if fpt=lct
-    deg:=(degree F)_0;
-    if isFPTPoly(F,2/deg) then return 2/deg;
-    R:=ring F;
-    vv:=R_*;
-    kk:=splittingField(F);
-    a:= symbol a;
-    b:= symbol b;
-    S:=kk[a,b];
-    G:=sub(F,{(vv#0)=>a,(vv#1)=>b});
-    (L,m):=toSequence transpose factorList(G);
-    FPT2VarHomogInternal(m,setFTData(S_*,L),MaxExp=>(opt.MaxExp),PrintCP=>(opt.PrintCP),Nontrivial=>true)
-)
-
---FPT2VarHomog(List,List)
---Given a list L={L_1,...,L_n} of linear forms in 2 variables and a list m={m_1,...,m_n}
---of multiplicities, FPT2VarHomog(L,m) returns the F-pure threshold of the polynomial 
---L_1^(m_1)*...*L_n^(m_n). 
-FPT2VarHomog (List,List) :=  opt -> (L,m) -> 
-    FPT2VarHomogInternal(m,setFTData(gens ring L_0,L),MaxExp=>(opt.MaxExp),PrintCP=>(opt.PrintCP))
-
-
-{*
-    Miscellaneous.
-*}
-
--- Some commands for dealing with vectors --
-
---canVector(i,n) returns the i-th canonical basis vector in dimension n
---Warning: for convenience, this uses Macaulay2's convention of indexing lists starting 
---with 0; so, for example, {1,0,0,0} is canVector(0,4), not canVector(1,4).
-canVector = method()
-
-canVector (ZZ,ZZ) := (i,n) -> 
-(
-    if ((i<0) or (i>=n)) 
-        then (error "canVector(i,n) expects integers i and n with 0<=i<n.");   
-    apply(n,j->if i==j then 1 else 0)
-)
- 
--- getNumAndDenom(u) takes a rational vector u and returns a pair (a,q), where a 
---is an integer vector and q an integer such that u=a/q.
-getNumAndDenom = method()
-
-getNumAndDenom (List) := u -> 
-(
-    den := lcm apply( u, denom );
-    a := apply( u, n-> lift( n*den, ZZ ) );
-    ( a, den )        
-)
-
---Computes the taxicab norm of a vector.
-taxicabNorm = method()
-
-taxicabNorm (List) := u -> sum( u, abs )
-
--- Factorization of polynomials and splitting fields --
-
---factorList(F) factors the RingElement F and returns a list of pairs of the form
---{factor,multiplicity}.
-factorList = method()
-
-factorList (RingElement) := F -> apply( toList( factor(F) ), toList )
-
---splittingField returns the splittingField of a polynomial over a finite field
-splittingField = method()
-
-splittingField (RingElement) := F -> 
-(
-    if not isPolynomialOverFiniteField(F) 
-        then (error "splittingField expects a polynomial over a finite field");
-    p:=char ring F;
-    ord:=(coefficientRing(ring F))#order;
-    factors:=first transpose factorList(F);
-    deg:=lcm select(flatten apply(factors,degree),i->i>0);
-    GF(p,deg*floorlog(p,ord))
-)
-
--- Some tests
-
---isBinaryForm(F) checks if F is a homogeneous polynomial in two variables.
---WARNING: what we are really testing is if the *ring* of F is a polynomial ring in two 
---variables, and not whether F explicitly involves two variables. (For example, if F=x+y 
---is an element of QQ[x,y,z], this test will return "false"; if G=x is an element of 
---QQ[x,y], this test will return "true".)
-isBinaryForm = method()
-
-isBinaryForm (RingElement) := F ->
-(
-    R:=ring F;
-    isPolynomialRing(R) and numgens(R)==2 and isHomogeneous(F)
-)
-
---isNonconstantBinaryForm(F) checks if F is a nonconstant homogeneous polynomial in two 
---variables. See warning under "isBinaryForm".
-isNonConstantBinaryForm = method()
-
-isNonConstantBinaryForm (RingElement) := F -> (isBinaryForm(F) and (degree(F))_0>0)
-
---isLinearBinaryForm(F) checks if F is a linearform in two variables. See warning 
---under "isBinaryForm".
-isLinearBinaryForm = method()
-
-isLinearBinaryForm (RingElement) := F -> (isBinaryForm(F) and (degree(F))_0==1)
-
---isPolynomialOverFiniteField(F) checks if F is a polynomial over a finite field.
-isPolynomialOverFiniteField = method()
-
-isPolynomialOverFiniteField (RingElement) := F ->
-(
-    R:=ring F;
-    kk:=coefficientRing(R);
-    try kk#order then (isPolynomialRing(R) and isField(kk))
-    	else false   
-)    

@@ -79,6 +79,7 @@ clearAll;
 -- Output: the list of all 1-codimensional vector subspaces of F^d.
 
 VECTORSPACES=new MutableHashTable; --Fix this!!!
+lv:=symbol lv;
 findAllOneDimensionalSubspaces = (F,d) ->(
 local i;
 local j;
@@ -138,6 +139,7 @@ FPureIdeals=method();
 
 -- Next procedure implements the 0th step of our algorithm.
 
+excludeList={};
 FPureIdeals(RingElement) := (u) ->(
 R:=ring(u);
 local L;
@@ -145,7 +147,9 @@ local K;
 K=boundLargestCompatible(ideal(1_R),u);
 L={};
 excludeList={};
-FPureIdealsInnards (u,K,L)
+answer:=FPureIdealsInnards (u,K,L);
+excludeList={};
+answer
 )
 
 -- Now, the recursive block of our method.
@@ -235,40 +239,6 @@ apply(G, g->
 answer
 );
 
-----------------------------------------------------------------------------------------
-
-isFPure=method();
-
--- The following method tests whether a given ideal is F-pure or not.
-
-isFPure(Ideal,RingElement) := (I,u) ->(
-I1:=ideal(u)*I;
-R:=ring(I);
-I2:=ethRoot(I1,ideal(0_R),1);
-(I2==I)
-);
-
--- The input list must be a list of ideals.
-
--- Specially devoted for debugging purposes.
-
-isFPure(List,RingElement) := (L,u) ->(
-local i;
-print(" ");
-apply(L,i->
-{
-           print(i,isFPure(i,u));
-           print(" ");
-});
-);
-
--- The input sequence must be a sequence of ideals.
-
--- Specially devoted for debugging purposes.
-
-isFPure(Sequence,RingElement) := (L,u) ->( isFpure(toList L,u));
-
-----------------------------------------------------------------------------------------
 
 boundLargestCompatible=method();
 
@@ -330,7 +300,7 @@ M
 );
 
 ---------------------- EXAMPLES--------------------
-
+{*
 exampleNCD=method();
 
 -- The input d must be an strictly positive integer.
@@ -671,3 +641,5 @@ u=last L;
 L=FPureIdeals(u);
 L
 );
+
+*}
