@@ -48,28 +48,44 @@ imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
 	im
 	);
 
-imageOfMap(Ideal,Ideal,BasicList) := (a,b,f) -> (
-	imageOfMap(a,b,f)
+imageOfMap(Ideal,Ideal,BasicList) := (a,b,g) -> (
+	imageOfMap(a,b,g)
 	);
 
-imageOfMap(Ring,Ring,Matrix) := (a,b,f) -> (
-	imageOfMap(ideal a, ideal b, f)
+imageOfMap(Ring,Ring,Matrix) := (R,S,f) -> (
+	imageOfMap(ideal R, ideal S, f)
 	);
 
-imageOfMap(Ring,Ring,BasicList) := (a,b,f) -> (
-        imageOfMap(ideal a, ideal b, f)
+imageOfMap(Ring,Ring,BasicList) := (R,S,g) -> (
+        imageOfMap(ideal R, ideal S, g)
 	);
 
-imageOfMap(RingMap) := (f) -> (
-        imageOfMap(target f, source f, first entries matrix f)
+imageOfMap(RingMap) := (p) -> (
+        imageOfMap(target p, source p, first entries matrix p)
 	);
 
 dimImage = method();
 
-dimImage(Ideal,Ideal,Matrix) := (a,b,f) ->(
+dimImage(Ideal,Ideal,Matrix) := (a,b,f) -> (
 	I := imageOfMap(a,b,f);
 	dim I - 1
 	-- substract 1 from the dimension of the image since in projective space
+	);
+
+dimImage(Ideal,Ideal,BasicList) := (a,b,g) -> (
+	dimImage(a,b,g)
+	);
+
+dimImage(Ring,Ring,Matrix) := (R,S,f) -> (
+	dimImage(ideal R, ideal S, f)
+	);
+
+dimImage(Ring,Ring,BasicList) := (R,S,g) -> (
+	dimImage(ideal R, ideal S, g)
+	);
+
+dimImage(RingMap) := (p) -> (
+	dimImage(target p, source p, first entries matrix p)
 	);
 
 baseLocusOfMap = method();
@@ -372,7 +388,14 @@ mapOntoImage(Ideal, Ideal, BasicList) := (a,b,l)->(
 isEmbedding = method(); --checks whether a map is a closed embedding.
 
 isEmbedding(Ideal, Ideal, BasicList) := (a1, b1, f1)->(
-)
+);
+
+isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
+);
+
+isEmbedding(RingMap) := (f1)->(
+        
+);
     
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
@@ -442,23 +465,40 @@ doc ///
 doc ///
 	Key 
 		imageOfMap
+		(imageOfMap,Ideal,Ideal,Matrix)
+		(imageOfMap,Ideal,Ideal,BasicList)
+		(imageOfMap,Ring,Ring,Matrix)
+		(imageOfMap,Ring,Ring,BasicList)
+		(imageOfMap,RingMap)
 	Headline
 		Finds defining equations for the image of a rational map
 	Usage
-		image = imageOfMap(a,b,f)
+		im = imageOfMap(a,b,f)
+		im = imageOfMap(a,b,g)
+		im = imageOfMap(R,S,f)
+		im = imageOfMap(R,S,g)
+		im = imageOfMap(p)
 	Inputs
 		a:Ideal
 			defining equations for X
 		b:Ideal
 			defining equations for Y
 		f:Matrix
-                        projective rational map given by polynomial represenative
+                        projective rational map given by polynomial representatives
+		g:BasicList
+			projective rational map given by polynomial representatives
+		R:Ring
+			coordinate ring of X
+		S:Ring
+			coordinate ring of Y
+		p:RingMap
+			projective rational map given by polynomial representatives
 	Outputs
 		im:Ideal
 			defining equations for the image of f
 	Description
 		Text
-			Defines the pullback map on the coordinate rings of X and Y. The kernel of this pullback map gives the image of the original map f
+			Defines the pullback map on the coordinate rings of X and Y. The kernel of this pullback map gives the image of the original map f. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these
 		Example
 			S = QQ[x,y,z]
 			a = ideal(x^2+y^2+z^2)
@@ -471,21 +511,90 @@ doc ///
 doc ///
         Key
                 dimImage
+		(dimImage,Ideal,Ideal,Matrix)
+		(dimImage,Ideal,Ideal,BasicList)
+		(dimImage,Ring,Ring,Matrix)
+		(dimImage,Ring,Ring,BasicList)
+		(dimImage,RingMap)
         Headline
                 Computes dimension of image of rational map of projective varieties
         Usage
                 dim = dimImage(a,b,f)
-        Inputs
+		dim = dimImage(a,b,g)
+		dim = dimImage(R,S,f)
+		dim = dimImage(R,S,g)
+		dim = dimImage(p)
+        Inputs 
                 a: Ideal
                         defining equations for X
                 b: Ideal
                         defining equations for Y
 		f:Matrix
                         projective rational map given by polynomial represenative
-        Outputs
+        	g:BasicList
+                        projective rational map given by polynomial representatives
+                R:Ring
+                        coordinate ring of X
+                S:Ring
+                        coordinate ring of Y
+                p:RingMap
+                        projective rational map given by polynomial representatives
+	Outputs
                 dim:ZZ
 			dimension of image
+	Description
+                Text
+                        Gives the dimension of the image of a rational map. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these
+                Example
+                        S = QQ[x,y,z]
+                        a = ideal(x^2+y^2+z^2)
+                        T = QQ[u,v]
+                        b = ideal(u^2+v^2)
+                        f = matrix{{x*y,y*z}}
+                        dimImage(a,b,f)
 ///
+
+
+doc ///
+        Key
+                mapOntoImage
+                (mapOntoImage, RingMap)
+                (mapOntoImage, Ideal, Ideal, BasicList)
+                (mapOntoImage, Ring, Ring, BasicList)
+        Headline
+                Given a map of rings, correspoing to $f : X -> Y$, this returns the map of rings corresponding to $f : X -> f(X)$.
+        Usage
+                h = mapOntoImage(f)
+                h = mapOntoImage(a,b,l)
+                h = mapOntoImage(R,S,l)                
+        Inputs
+                a:Ideal
+                        defining equations for X
+                b:Ideal
+                        defining equations for Y
+		l:BasicList
+                        projective rational map given by polynomial represenatives of the same degree
+                f:RingMap
+                        the ring map corresponding to $f : X -> Y$
+                R:Ring
+                        coordinate ring for X
+                S:Ring
+                        coordinate ring for Y
+                
+        Outputs
+                h:RingMap
+			the map of rings corresponding to $f : X -> f(X)$.  
+	Description
+	        Text
+	                This function is really simple, given $S -> R$, this just returns $S/kernel -> R$.  
+	        Example 
+	                R = QQ[x,y];
+	                S = QQ[a,b,c];
+	                f = map(R, S, {x^2, x*y, y^2});
+	                mapOntoImage(f)
+	                mapOntoImage(R,S,{x^2,x*y,y^2})
+///
+
 
 doc ///
     Key

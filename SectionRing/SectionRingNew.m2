@@ -174,3 +174,43 @@ mRegular(Ideal) := (I) -> ( 					--Returns the number m for which O_X(D) is m-re
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
+sectionRing = method();
+sectionRing(Ideal) := (I) -> (
+	R := ring(I);						--To Apply the Regularity Theorem of Mumford, the sheaf needs to be Globally Generated Sheaf	
+	l := globallyGenerated(I);
+	bound := l;
+	G = first entries gens I;
+	J_l = Hom(ideal(apply(G, z->z^l)),R);
+	j:=1;
+	while(j<l) do (						--Calculate regularity of each of the sheaves OO_X(D), ... , OO_X(l*D)
+		J_j = Hom(ideal(apply(G, z->z^j)),R);
+		bound = max(bound,l*(mRegular(sheaf(J_j),sheaf(J_l)))+j);
+		j = j+1;
+	);
+	bound = bound + 1;					--Use < as opposed to <=
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+	KK:= coefficientRing(R);
+	Z := dualToIdeal(I);
+	Shift := (Z#1)#0;
+	J_1 = reflexifyIdeal((Z#0));
+	F_1 = basis(Shift,J_1);
+	n_1 = numColumns(F_1);
+	F_1 = map(R^(numRows(F_1)),R^(n_1),F_1);
+	Map_1 = (gens J_1)*(F_1);
+	
+		
+
+
+
+
+
+
+
+
+
+
+
+
+);
+
+
