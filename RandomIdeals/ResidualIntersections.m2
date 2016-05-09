@@ -306,8 +306,37 @@ doc ///
    Key
     ResidualIntersections
    Headline
-    A package for residual intersections
+    Tests for the conditions used in the theory of residual intersections
    Description
+    Definition: If I \subset S is an ideal in a polynomial ring (or Gorenstein ring) and
+    a_1..a_s are elements of I, then K = (a_1..a_s):I is called an
+    s-residual intersection of I if the codimension of K is at least s.
+    
+    In the simplest case, s == codim I, the ideal K is said to be linked to I
+    if also I = (a_1..a_s):K; this is automatic when S/I is Cohen-Macaulay,
+    and in this case S/K is also Cohen-Macaulay; see Peskine-Szpiro,
+    Liaison des variétés algébriques. I. Invent. Math. 26 (1974), 271–302).
+
+    The theory for s>c, which has been used in algebraic geometry since the 19th century,
+    was initiated in a commutative algebra setting by Artin and Nagata in the paper
+    Residual intersections in Cohen-Macaulay rings. 
+    J. Math. Kyoto Univ. 12 (1972), 307–323.
+    
+    Craig Huneke (Strongly Cohen-Macaulay schemes and residual intersections,
+    Trans. Amer. Math. Soc. 277 (1983), no. 2, 739–763)
+    proved that an s-residual intersection K is Cohen-Macaulay
+    if I satisfies the G_d condition and
+    is strongly Cohen-Macaulay, and successive authors have weakened the latter
+    condition to sliding depth, and, most recently, Bernd Ulrich
+    (Artin-Nagata properties and reductions of ideals. 
+    Commutative algebra: syzygies, multiplicities, and 
+    birational algebra,
+    Contemp. Math., 159, 1994) showed that
+    the weaker condition
+    depth( S/(I^t) ) >= dim(S/I) - (t-1) for t = 1..s-codim I +1
+    suffices. All these properties are true if I is licci.
+    
+    This package implements tests for most of these properties.
    SeeAlso
 ///
 
