@@ -359,4 +359,9 @@ isVectScalar = L -> (
 
 convertScalarVect = (newS, L) -> (apply(L, z->sub(z, newS)));
 
+beginDocumentation();
+
+
+
+
 end
