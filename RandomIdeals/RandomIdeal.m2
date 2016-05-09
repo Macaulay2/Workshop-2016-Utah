@@ -260,7 +260,7 @@ randomSubset = (n,m) -> (
 randomAddition = method()
 randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     if #P == 0 then return {randomSubset(n,m+1)};
-    Plarge := select(P, D-> #D >= m); -- the facets big enough to be glued to
+    Plarge := select(P, D-> #D >= m+1); -- the facets big enough to be glued to
     if #Plarge == 0 then error "m is too large";
     t := false;
     D' := {null};
@@ -456,10 +456,12 @@ doc ///
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
      Description
           Text
-            This function randomly chooses a facet of size m+1 and checks whether the facet can be shellably added to the shelling. 
+            This function randomly chooses a facet of size {\tt m+1} and checks whether the facet can be shellably added to the shelling. 
 	    If it can be shellably added to the shelling, it is added to the shelling and the new shelling is returned. 
-	    Otherwise, the process repeats up to 20 times.  
-	    This function can be used to randomly construct non-pure shellable complexes. 
+	    Otherwise, the process repeats up to 20 times.
+          Text
+	    This function can be used to randomly construct non-pure shellable complexes.  A new {\tt m}-simplex can only be
+	    glued to previous simplices of dimension at least {\tt m}.  If all previous simplices are smaller, then the addition will fail.
           Example
             P={{1,2,3}}
 	    L=randomAddition(6,3,P)
