@@ -325,6 +325,9 @@ randomShellableIdealChain=method()
 randomShellableIdealChain(Ring,ZZ,ZZ) := (R,dimProj,deg)->(
     idealChainFromShelling(R,randomShelling(numgens R,dimProj,deg))
     )
+randomShellableIdealChain(Ring,ZZ) := (R,dimProj)->(
+    idealChainFromShelling(R,randomShelling(numgens R,dimProj))
+    )
 ///
 S = ZZ/101[x_0..x_5]
 I = randomShellableIdeal(S,2,5)
