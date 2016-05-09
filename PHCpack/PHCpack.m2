@@ -188,7 +188,7 @@ parseSolutions (String,Ring) := o -> (s,R) -> (
 
 parseIntermediateSolutions = (output,numsols,R) -> (
     L := get output;
-    rgx = "\\*{5} +path([[:digit:]]) +\\*+$";
+    rgx := "\\*{5} +path([[:digit:]]) +\\*+$";
     start := (regex(rgx,L))#0#0;
     linesL := lines substring(start,L);
     solsize := 0;
