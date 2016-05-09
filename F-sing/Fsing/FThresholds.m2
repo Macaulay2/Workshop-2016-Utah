@@ -1,9 +1,14 @@
 -- changes in order or arguments
 
--- internal functions: nu*, FTApproxList, FPTApproxList, FTHatApproxList, 
---     	       	       isFPTPoly, isFJumpingNumberPoly
+-- internal functions acted on:     nu*, FTApproxList, FPTApproxList, FTHatApproxList, 
+--     	       	       	       	    isFPTPoly, isFJumpingNumberPoly
 
--- external functions: divideFraction, findNumberBetween
+-- internal functions to do: guessFPT, estFPT
+
+-- external functions acted on: divideFraction, findNumberBetween, fastExp,
+--    	      	      	      	  frobeniusPower, genFrobeniusPower  
+
+-- external functions to do: ethRoot*, tau*, sigma*
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
@@ -26,7 +31,7 @@
 ----------------------------------------------------------------------------------
 -- FThreshold Estimates
 
--- Main functions: guessFPT, estFPT
+-- Main functions: PT, estFPT
 
 ----------------------------------------------------------------------------------
 -- FPT/F-Jumping number check
@@ -56,7 +61,7 @@ effPolyRad = ( f, J ) ->
 (
     if not isSubset( ideal( f ), radical( J ) ) then error "The polynomial is not contained in the radical of the ideal.";
     d := 1;
-    while not isSubset( ideal( fastExp( f, d ) ), J ) do d = d+1;
+    while not isSubset( ideal( fastExp( d, f ) ), J ) do d = d+1;
     d
 )
 
@@ -121,7 +126,7 @@ nuList( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this is a faster nuList c
 	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(ideal(fastExp(f,middle)), frobeniusPower( d, J ));
+			answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
@@ -190,7 +195,7 @@ nu( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this does a fast nu computati
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(ideal(fastExp(f,middle)), frobeniusPower( e, J ));
+		answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
