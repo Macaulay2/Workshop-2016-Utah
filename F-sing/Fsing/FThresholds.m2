@@ -57,32 +57,32 @@ effPolyRad = ( f, J ) ->
 
 nuList = method()
 
-nuList(Ideal, Ideal,  ZZ) := (I1, J1, e1) -> ( --this is a faster nuList computation, it tries to do a smart nu list computation
-	d1 := 0;
-	p1 := char ring I1;
+nuList( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this is a faster nuList computation, it tries to do a smart nu list computation
+	d := 0;
+	p := char ring I;
 	local top;--for the binary search
 	local bottom;--for the binary search
  	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down
 	
-	if isSubset(I1, radical(J1))==false then (print "Error: Nu Undefined")
+	if isSubset(I, radical(J))==false then (print "Error: Nu Undefined")
 	else(
 	myList := new MutableList;
-	nuPrev := effRad(I1,J1);
-	N := numgens(trim(J1));
-	top = nuPrev*(N*p1-1);
+	nuPrev := effRad(I,J);
+	N := numgens(trim(J));
+	top = nuPrev*(N*p-1);
 	bottom = 0;
 	
-	for d1 from 1 to e1 do (
+	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(I1^middle, frobeniusPower(J1, d1));
+			answer = isSubset(I^middle, frobeniusPower( d, J));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
-		myList#(d1-1) = nuPrev;
-		top = (nuPrev+1)*(N*p1-1);
-		bottom = p1*nuPrev;
+		myList#(d-1) = nuPrev;
+		top = (nuPrev+1)*(N*p-1);
+		bottom = p*nuPrev;
 	);
 	toList myList)
 )
@@ -90,38 +90,37 @@ nuList(Ideal, Ideal,  ZZ) := (I1, J1, e1) -> ( --this is a faster nuList computa
 -- Computes the list of values of nu_I^J(p^d) for d=1,..., e 
 -- when J = maximal ideal
 
-nuList( Ideal, ZZ ) := ( I, e ) -> nuList( I, maxIdeal( ring I ), e )
-
+nuList( ZZ, Ideal ) := ( e, I ) -> nuList( e, I, maxIdeal( ring I ) )
 
 -- Computes the list of values of nu_I^J(p^d) for d=1,..., e
 -- when I=(f) is a principal ideal
 
-nuList(RingElement, Ideal,  ZZ) := (f1, J1, e1) -> ( --this is a faster nuList computation for a polynomial, it tries to do a smart nu list computation
-	d1 := 0;
-	p1 := char ring f1;
+nuList( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this is a faster nuList computation for a polynomial, it tries to do a smart nu list computation
+	d := 0;
+	p := char ring f;
 	local top;--for the binary search
 	local bottom;--for the binary search
  	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down
 	
-	if isSubset(ideal(f1), radical(J1))==false then (print "Error: Nu Undefined")
+	if isSubset(ideal(f), radical(J))==false then (print "Error: Nu Undefined")
 	else(
 	myList := new MutableList;
-	nuPrev := effPolyRad(f1,J1);
-	N := numgens(trim(J1));
-	top = nuPrev*(N*p1-1);
+	nuPrev := effPolyRad(f,J);
+	N := numgens(trim(J));
+	top = nuPrev*(N*p-1);
 	bottom = 0;
 	
-	for d1 from 1 to e1 do (
+	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(ideal(fastExp(f1,middle)), frobeniusPower(J1, d1));
+			answer = isSubset(ideal(fastExp(f,middle)), frobeniusPower( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
-		myList#(d1-1) = nuPrev;
-		top = (nuPrev+1)*(N*p1-1);
-		bottom = p1*nuPrev;
+		myList#(d-1) = nuPrev;
+		top = (nuPrev+1)*(N*p-1);
+		bottom = p*nuPrev;
 	);
 	toList myList)
 )
@@ -130,30 +129,30 @@ nuList(RingElement, Ideal,  ZZ) := (f1, J1, e1) -> ( --this is a faster nuList c
 -- when I=(f) is a principal ideal
 -- and J=maximal ideal
 
-nuList( RingElement, ZZ ) := ( f, e ) -> nuList( f, maxIdeal( ring f ), e )
+nuList( ZZ, RingElement ) := ( e, f ) -> nuList( e, f, maxIdeal( ring f ) )
 
 -- Computes the value of (nu_I)^J(p^e)
 
 nu = method()
 
-nu(Ideal, Ideal, ZZ) := (I1, J1, e1) -> ( --this does a fast nu computation
-	p1 := char ring I1;
+nu( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this does a fast nu computation
+	p := char ring I;
 	local top;--for the binary search
 	local bottom;--for the binary search
 	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down 
-	if isSubset(I1, radical(J1))==false then (print "Error: Nu Undefined")
+	if isSubset(I, radical(J))==false then (print "Error: Nu Undefined")
 	else(
 	N := 0;
 	myList := new MutableList;
-	nuPrev := effRad(I1,J1);
-	N = numgens(trim(J1));
-	top = nuPrev*N*p1^e1-1;
+	nuPrev := effRad(I,J);
+	N = numgens(trim(J));
+	top = nuPrev*N*p^e-1;
 	bottom = 0;
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(I1^middle, frobeniusPower(J1, e1));
+		answer = isSubset(I^middle, frobeniusPower( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -162,30 +161,29 @@ nu(Ideal, Ideal, ZZ) := (I1, J1, e1) -> ( --this does a fast nu computation
 -- Computes the value of (nu_I)^J(p^e) 
 -- when J=maximal ideal
 
-nu( Ideal, ZZ ) := ( I, e ) -> nu( I, maxIdeal( ring I ), e )
-
+nu( ZZ, Ideal ) := ( e, I ) -> nu( e, I, maxIdeal( ring I ) )
 
 -- Computes the value of (nu_I)^J(p^e) 
 -- when I=(f) a principal ideal
 
-nu(RingElement, Ideal, ZZ) := (f1, J1, e1) -> ( --this does a fast nu computation for a polynomial
-	p1 := char ring f1;
+nu( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this does a fast nu computation for a polynomial
+	p := char ring f;
 	local top;--for the binary search
 	local bottom;--for the binary search
 	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down 
-	if isSubset(ideal(f1), radical(J1))==false then (print "Error: Nu Undefined")
+	if isSubset(ideal(f), radical(J))==false then (print "Error: Nu Undefined")
 	else(
 	N := 0;
 	myList := new MutableList;
-	nuPrev := effPolyRad(f1,J1);
-	N = numgens(trim(J1));
-	top = nuPrev*N*p1^e1-1;
+	nuPrev := effPolyRad(f,J);
+	N = numgens(trim(J));
+	top = nuPrev*N*p^e-1;
 	bottom = 0;
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(ideal(fastExp(f1,middle)), frobeniusPower(J1, e1));
+		answer = isSubset(ideal(fastExp(f,middle)), frobeniusPower( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -195,7 +193,7 @@ nu(RingElement, Ideal, ZZ) := (f1, J1, e1) -> ( --this does a fast nu computatio
 -- when I=(f) a principal ideal 
 -- and J=maximal ideal
 
-nu( RingElement, ZZ ) := ( f, e ) -> nu( f, maxIdeal( ring f ), e )
+nu( ZZ, RingElement ) := ( e, f ) -> nu( e, f, maxIdeal( ring f ) )
 
 -- isJToAInIToPe checks whether or not J^a is in I^(p^e).
 -- It seems to be much faster than raising J to a power.
@@ -219,7 +217,7 @@ binarySearch = ( I, J, e, int ) ->
 -- fixed and slightly streamlined 
 nuListAlt = method(); 
 
-nuListAlt( Ideal, Ideal, ZZ ) := ( I, J, n ) -> 
+nuListAlt( ZZ, Ideal, Ideal ) := ( n, I, J ) -> 
 ( 
     theList := { };
     p := char ring I;
@@ -234,30 +232,30 @@ nuListAlt( Ideal, Ideal, ZZ ) := ( I, J, n ) ->
     theList	    
 )
 
-nuListAlt( RingElement, Ideal, ZZ ) := ( f, J, n ) -> nuListAlt( ideal( f ), J, n )
+nuListAlt( ZZ, RingElement, Ideal ) := ( n, f, J ) -> nuListAlt( n, ideal( f ), J )
 
 -- nu lists with respect to the homogeneous maximal ideal
-nuListAlt( Ideal, ZZ ) := ( I, n ) -> nuListAlt( I, maxIdeal( ring I ), n )
+nuListAlt( ZZ, Ideal ) := ( n, I ) -> nuListAlt( n, I, maxIdeal( ring I ) )
 
-nuListAlt( RingElement, ZZ ) := ( f, n ) -> nuListAlt( f, maxIdeal( ring f ), n )
+nuListAlt( ZZ, RingElement ) := ( n, f ) -> nuListAlt( n, f, maxIdeal( ring f ) )
 
 -- nuAlt computes individual nus
 -- (it simply grabs the last element of a nuList)
 nuAlt = method();
 
-nuAlt( Ideal, Ideal, ZZ ) := ( I, J, e ) -> last nuListAlt( I, J, e )
+nuAlt( ZZ, Ideal, Ideal ) := ( e, I, J ) -> last nuListAlt( e, I, J )
 
-nuAlt( RingElement, Ideal, ZZ ) := ( f, J, e ) -> last nuListAlt( f, J, e )
+nuAlt( ZZ, RingElement, Ideal ) := ( e, f, J ) -> last nuListAlt( e, f, J )
 
 -- nu with respect to the homogeneous maximal ideal
-nuAlt( Ideal, ZZ ) := ( I, e ) -> nuAlt( I, maxIdeal( ring I ), e )
+nuAlt( ZZ, Ideal ) := ( e, I ) -> nuAlt( e, I, maxIdeal( ring I ) )
 
-nuAlt( RingElement, ZZ ) := ( f, e ) -> nuAlt( f, maxIdeal( ring f ), e )
+nuAlt( ZZ, RingElement ) := ( e, f ) -> nuAlt( e, f, maxIdeal( ring f ) )
 
 -- This is a different approach to nuList, that uses colon ideals. 
 nuListAlt1 = method();
 
-nuListAlt1( RingElement, Ideal, ZZ ) := ( f, J, n ) ->  
+nuListAlt1( ZZ, RingElement, Ideal ) := ( n, f, J ) ->  
 (
     p := char ring f;
     nu := effPolyRad( f, J ) - 1;  -- nu(p^0)
@@ -268,44 +266,42 @@ nuListAlt1( RingElement, Ideal, ZZ ) := ( f, J, n ) ->
 	    I = I: ideal( f^nu );
 	    nu = binarySearch( f, I, 1, { 0, p } );
 	    theList = append( theList, p*(last theList) + nu );
-	    I = frobeniusPower( I, 1 ); 
+	    I = frobeniusPower( 1, I ); 
 	)
     );
     theList
 )    
 
-nuListAlt1( RingElement, ZZ ) := ( f, n ) -> nuListAlt1( f, maxIdeal( ring f ), n )
-
+nuListAlt1( ZZ, RingElement ) := ( n, f ) -> nuListAlt1( n, f, maxIdeal( ring f ) )
 
 -- Computes the list of values of \(nuHat_I)^J(p^d) for d=1,..., e
 nuHatList = method()
 
-nuHatList(Ideal, Ideal,  ZZ) := (I1, J1, e1) -> ( --this is a faster nuList computation, it tries to do a smart nu list computation
-	d1 := 0;
-	p1 := char ring I1;
+nuHatList( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this is a faster nuList computation, it tries to do a smart nu list computation
+	d := 0;
+	p := char ring I;
 	local top;--for the binary search
 	local bottom;--for the binary search
  	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down
-    	if isSubset(I1, radical(J1))==false then (print "Error: NuHat Undefined")
+    	if isSubset(I, radical(J))==false then (print "Error: NuHat Undefined")
 	else(
 	myList := new MutableList;
-	nuPrev := effRad(I1,J1);
---	N = numgens(trim(J1));
-	top =nuPrev*p1;
+	nuPrev := effRad(I,J);
+--	N = numgens(trim(J));
+	top =nuPrev*p;
 	bottom = 0;
 	
-	
-	for d1 from 1 to e1 do (
+	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(genFrobeniusPower(I1,middle), frobeniusPower(J1,d1));
+			answer = isSubset(genFrobeniusPower( middle, I ), frobeniusPower( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
-		myList#(d1-1) = bottom;
-		top = p1*(nuPrev+1);
-		bottom = p1*nuPrev;
+		myList#(d-1) = bottom;
+		top = p*(nuPrev+1);
+		bottom = p*nuPrev;
 	);
 	toList myList)
 )
@@ -313,40 +309,39 @@ nuHatList(Ideal, Ideal,  ZZ) := (I1, J1, e1) -> ( --this is a faster nuList comp
 -- Computes the list of values of \(nuHat_I)^J(p^d) for d=1,..., e
 -- when for J=maximal ideal
 
-nuHatList( Ideal, ZZ ) := ( I, e ) -> nuHatList( I, maxIdeal( ring I ), e )
+nuHatList( ZZ, Ideal ) := ( e, I ) -> nuHatList( e, I, maxIdeal( ring I ) )
 
 -- Computes the list of values of \(nuHat_I)^J(p^d) for d=1,..., e
 -- when I=(f) is a principal ideal
 
-nuHatList( RingElement, Ideal, ZZ ) := ( f, J, e ) -> nuList( f, J, e ) 
+nuHatList( ZZ, RingElement, Ideal ) := ( e, f, J ) -> nuList( e, f, J ) 
 
 -- Computes the list of values of \(nuHat_I)^J(p^d) for d=1,..., e
 -- when I=(f) is a pricipal ideal and J=maximal ideal
  
-nuHatList( RingElement, ZZ ) := ( f, e ) -> nuList( f, e ) 
-
+nuHatList( ZZ, RingElement ) := ( e, f ) -> nuList( e, f ) 
 
 -- Computes values of \(nuHat_I)^J(p^e)
 
 nuHat = method()
 
-nuHat (Ideal, Ideal, ZZ) := (I1, J1, e1) -> ( --this does a fast nu computation
-	p1 := char ring I1;
+nuHat ( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this does a fast nu computation
+	p := char ring I;
 	local top;--for the binary search
 	local bottom;--for the binary search
 	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down
-    	if isSubset(I1, radical(J1))==false then (print "Error: NuHat Undefined")
+    	if isSubset(I, radical(J))==false then (print "Error: NuHat Undefined")
 	else(
 	myList := new MutableList;
-	nuPrev := effRad(I1,J1);
---	N = numgens(trim(J1));
-	top = nuPrev*p1^e1;
+	nuPrev := effRad(I,J);
+--	N = numgens(trim(J));
+	top = nuPrev*p^e;
 	bottom = 0;
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(genFrobeniusPower(I1, middle), frobeniusPower(J1,e1));
+		answer = isSubset(genFrobeniusPower( middle, I ), frobeniusPower( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -356,18 +351,18 @@ nuHat (Ideal, Ideal, ZZ) := (I1, J1, e1) -> ( --this does a fast nu computation
 -- Computes values of \(nuHat_I)^J(p^e)
 -- when J=maximal ideal
 
-nuHat( Ideal, ZZ ) := ( I, e ) -> nuHat( I, maxIdeal( ring I ), e )
+nuHat( ZZ, Ideal ) := ( e, I ) -> nuHat( e, I, maxIdeal( ring I ) )
 
 -- Computes  values of \(nuHat_I)^J(p^e)
 -- when I=(f) is a principal ideal
 
-nuHat( RingElement, Ideal, ZZ ) := ( f, J, e ) -> nu( f, J, e )
+nuHat( ZZ, RingElement, Ideal ) := ( e, f, J ) -> nu( e, f, J )
 
 -- Computes  values of \(nuHat_I)^J(p^e)
 -- when I=(f) is a principal ideal 
 -- and J=maximal ideal 
 
-nuHat( RingElement, ZZ ) := ( f, e ) -> nu( f, e )
+nuHat( ZZ, RingElement ) := ( e, f ) -> nu( e, f )
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
@@ -382,7 +377,7 @@ FPTApproxList = method();
 FPTApproxList (Ideal,ZZ) := (I,e) ->
 (
      p := char ring I;
-     nus := nuList(I,e);
+     nus := nuList(e,I);
      apply( nus, 1..e, (n,k) -> n/p^k )
 )
 
@@ -397,7 +392,7 @@ FTApproxList (Ideal,Ideal,ZZ) := (I,J,e) ->
 (
     if not isSubset( I, radical(J) ) then error "F-threshold undefined.";
      p := char ring I;
-     nus := nuList(I,J,e);
+     nus := nuList(e,I,J);
      apply( nus, 1..e, (n,k) -> n/p^k )
 )
 
@@ -417,9 +412,9 @@ FTHatApproxList (RingElement,Ideal,ZZ) := (f1,J1,e1) -> FTHatApproxList(ideal(f1
 
 
 --Guesses the FPT of ff.  It returns a list of all numbers in 
---the range suggested by nu(ff,e1) with maxDenom as the maximum denominator
+--the range suggested by nu(e1,ff) with maxDenom as the maximum denominator
 guessFPT ={OutputRange=>false}>>o -> (ff, e1, maxDenom) ->(
-     nn := nu(ff, e1);
+     nn := nu(e1,ff);
      pp := char ring ff;
      if (o.OutputRange == false) then 
           findNumberBetween({nn/(pp^e1-1), (nn+1)/(pp^e1)}, maxDenom)
@@ -460,7 +455,7 @@ estFPT={FinalCheck=> true, Verbose=> false, MultiThread=>false, DiagonalCheck=>t
      --compute nu's
      if (foundAnswer == false) then (
      	  pp:=char ring ff;
-     	  nn:=nu(ff,ee);
+     	  nn:=nu(ee,ff);
 	  if  (o.Verbose==true) then print "nu's have been computed";
 
      	  --if our nu's aren't fine enough, we just spit back some information
