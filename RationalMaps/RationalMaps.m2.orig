@@ -20,6 +20,7 @@ export{
 	"baseLocusOfMap",
 	"dimImage",
 	"isRegularMap",
+	"invertMap",
 	"isEmbedding",
 	"blowUpIdeals",
 	"relationType",
@@ -118,21 +119,11 @@ baseLocusOfMap(List) := (L) ->(
     baseLocusOfMap(matrix{L})
 );
 
-baseLocusOfMap(RingMap) := (ff) ->(
-    mm := sub(matrix ff, target ff);  
-    baseLocusOfMap(mm)
-);
-
 isRegularMap = method();
 
 isRegularMap(Matrix) := (L1) -> ( --L1 is a row matrix
     I:= baseLocusOfMap(L1);
     I == ideal 1_(ring I)
-);
-
-isRegularMap(RingMap) := (ff) ->(
-        I:=baseLocusOfMap(ff);
-        I == ideal 1_(ring I)
 );
 
  blowUpIdeals=method();
@@ -409,18 +400,6 @@ isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
 );
 
 isEmbedding(RingMap) := (f1)->(
-        f2 := mapOntoImage(f1);
-        flag := true;
-        try ( h := inverseOfMap(f2) ) then (
-                flag = isRegularMap(f2);
-                if (flag == true) then(
-                        flag = isRegularMap(h);
-                );                
-        )
-        else (
-                flag = false
-        );
-        flag
         
 );
     
@@ -490,6 +469,34 @@ doc ///
 ///                     
 
 doc ///
+<<<<<<< HEAD
+    Key 
+        imageOfMap
+    Headline
+        Finds defining equations for the image of a rational map
+    Usage
+        image = imageOfMap(a,b,f)
+    Inputs
+        a:Ideal
+            defining equations for X
+        b:Ideal
+            defining equations for Y
+        f:Matrix
+            projective rational map given by polynomial represenative
+    Outputs
+        im:Ideal
+            defining equations for the image of f
+    Description
+        Text
+            Defines the pullback map on the coordinate rings of X and Y. The kernel of this pullback map gives the image of the original map f
+        Example
+            S = QQ[x,y,z]
+            a = ideal(x^2+y^2+z^2)
+            T = QQ[u,v]
+            b = ideal(u^2+v^2)
+            f = matrix{{x*y,y*z}}
+            imageOfMap(a,b,f)
+=======
 	Key 
 		imageOfMap
 		(imageOfMap,Ideal,Ideal,Matrix)
@@ -533,6 +540,7 @@ doc ///
 			b = ideal(u^2+v^2)
 			f = matrix{{x*y,y*z}}
 			imageOfMap(a,b,f)
+>>>>>>> bec955313fc11ae1872ab8fd5757208b293a17af
 ///
 			
 doc ///
@@ -558,6 +566,11 @@ doc ///
                         defining equations for Y
                 f:Matrix
                         projective rational map given by polynomial represenative
+<<<<<<< HEAD
+        Outputs
+                dim:ZZ
+                    dimension of image
+=======
         	g:BasicList
                         projective rational map given by polynomial representatives
                 R:Ring
@@ -579,6 +592,7 @@ doc ///
                         b = ideal(u^2+v^2)
                         f = matrix{{x*y,y*z}}
                         dimImage(a,b,f)
+>>>>>>> bec955313fc11ae1872ab8fd5757208b293a17af
 ///
 
 
@@ -727,6 +741,31 @@ TEST ///
 	-------------------------------------
 
 	S = QQ[x,y,z]
+<<<<<<< HEAD
+    a = ideal(x^2+y^2+z^2)
+    T = QQ[u,v]
+    b = ideal(u^2+v^2)
+    f = matrix{{x*y,y*z}}
+    dim = dimImage(a,b,f)
+    assert(dim == -1)
+
+    S = QQ[x0,x1]
+    a = ideal(0*x0)
+    T = QQ[y0,y1,y2]
+    b = ideal(0*y1)
+    f = matrix{{x0^4,x0^2*x1^2,x1^4}}
+    dim = dimImage(a,b,f)
+    assert(im == 1)	
+
+    -- Since in Projective Space, check to make sure different representations give the same result
+    S = QQ[x,y]
+    a = ideal(0*x)
+    T = QQ[u,v]
+    b = ideal(0*v)
+    f1 = matrix{{x,y}}
+    f2 = matrix{{x^3*y^2,x^2*y^3}}
+    assert(dimImage(a,b,f1)==dimImage(a,b,f2))
+=======
         a = ideal(x^2+y^2+z^2)
         T = QQ[u,v]
         b = ideal(u^2+v^2)
@@ -742,14 +781,15 @@ TEST ///
         d = dimImage(a,b,f)
         assert(d == 1)	
 
-    -- Since in Projective Space, check to make sure different representations give the same result
-    S = QQ[x,y]
-    a = ideal(0*x)
-    T = QQ[u,v]
-    b = ideal(0*v)
-    f1 = matrix{{x,y}}
-    f2 = matrix{{x^3*y^2,x^2*y^3}}
-    assert(dimImage(a,b,f1)==dimImage(a,b,f2))
+	-- Since in Projective Space, check to make sure different representations give the same result
+        S = QQ[x,y]
+        a = ideal(0*x)
+        T = QQ[u,v]
+        b = ideal(0*v)
+        f1 = matrix{{x,y}}
+        f2 = matrix{{x^3*y^2,x^2*y^3}}
+        assert(dimImage(a,b,f1)==dimImage(a,b,f2))
+>>>>>>> bec955313fc11ae1872ab8fd5757208b293a17af
 
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------

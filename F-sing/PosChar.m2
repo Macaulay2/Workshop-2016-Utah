@@ -69,7 +69,7 @@ export{
     "findGeneratingMorphisms",     --MK
     "findHSLloci",                 --MK
     "findTestElementAmbient",
-    "FinalCheck",
+    "FinalCheck", -- FThresholds
     "findAllCompatibleIdeals", 	--- MK
     "findQGorGen",
     "finduOfIdeal",
@@ -108,9 +108,9 @@ export{
     "minimalCompatible", -- EthRoots.m2 
 ---    "Mstar",			--- MK
     "multOrder",
-    "MultiThread",
+    "MultiThread", --FThresholds
     "nonFInjectiveLocus",   --MK
-    "Nontrivial",
+    "Nontrivial", --SpecialFThresholds
     "nu", -- FThresholds.m2
     "nuAlt", -- FThresholds.m2
     "NuCheck", -- FThresholds.m2
@@ -120,8 +120,8 @@ export{
     "nuListAlt", -- FThresholds.m2
     "nuListAlt1", -- FThresholds.m2
     "num",
-    "Origin",
-    "OutputRange",
+    "Origin", --FThresholds
+    "OutputRange", -- FThresholds
     "paraTestModule",
     "paraTestModuleAmbient",
     "PrintCP",  -- FThresholds.m2

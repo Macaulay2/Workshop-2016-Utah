@@ -2,9 +2,18 @@ newPackage(
 	"RandomIdeal",
     	Version => "2.0", 
     	Date => "May 9, 2016",
-    	Authors => {
-	     {Name => "David Eisenbud", Email => "de@msri.org"}
-	     },
+        Authors => {
+	    {Name => "Katie Ansaldi",
+		Email => "kansaldi@gmail.com"},
+	    {Name => "David Eisenbud",
+         	Email => "de@msri.org",
+         	HomePage => "http://www.msri.org/~de"},
+     	    {Name => "Robert Krone",
+	 	Email => "rckrone@gmail.com",
+	 	HomePage => "http://rckr.one"},
+	    {Name => "Jay Yang",
+		Email => "jkelleyy@gmail.com"}
+	    },
     	HomePage => "http://www.msri.org/~de",
     	Headline => "a package for creating random ideals of various sorts",
 	AuxiliaryFiles => false, -- set to true if package comes with auxiliary files,
@@ -464,7 +473,8 @@ doc ///
 	    glued to previous simplices of dimension at least {\tt m}.  If all previous simplices are smaller, then the addition will fail.
           Example
             P={{1,2,3}}
-	    L=randomAddition(6,3,P)
+	    P=randomAddition(6,2,P)
+            P=randomAddition(6,1,P)
      Caveat
 	  If the input is not a shellable simplicial complex, the new complex will not be shellable. The function does not check whether the input is shellable.
      SeeAlso
