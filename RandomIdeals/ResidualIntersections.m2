@@ -624,6 +624,33 @@ doc ///
        koszulDepth
 ///
 
+------------------------------------------------------------
+-- DOCUMENTATION depthsOfPowers
+------------------------------------------------------------
+
+doc ///
+   Key
+      depthsOfPowers
+      (depthsOfPowers,ZZ,ZZ,Ideal)
+   Headline
+      needs description
+   Usage
+      L = depthsOfPowers(s,c,I)
+   Inputs
+      s:ZZ
+      c:ZZ
+      	  should be codim I
+      I:Ideal
+   Outputs
+      L:List
+   Description
+      Text
+      Example
+   Caveat
+   SeeAlso
+///
+
+
 
 
 end--

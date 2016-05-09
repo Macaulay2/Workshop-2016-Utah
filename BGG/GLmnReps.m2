@@ -11,7 +11,7 @@ newPackage(
     	DebuggingMode => false
     	)
     
-export{"characterLlambda", "characterKlambda", "bettiTableIlam", "hilbertFunctionLlambda"}
+export{"characterLlambda", "characterKlambda", "bettiTableIlambda", "hilbertFunctionLlambda"}
 
 --the character of the exterior algebra
 charE = method()
@@ -202,7 +202,7 @@ doc ///
        characterLlambda
        (characterLlambda,ZZ,ZZ,List)
     Headline
-       Compute the character of the irreducible {\tt gl(m|n)}-module corresponding to a partition lambda
+       Compute the character of the irreducible gl(m|n)-module corresponding to a partition lambda
     Usage
        c = characterLlambda(m,n,lambda)    
     Inputs
@@ -232,7 +232,83 @@ doc ///
     
     SeeAlso
       characterKlambda
-///  
+/// 
+
+doc ///
+    Key
+       bettiTableIlambda
+       (bettiTableIlambda,ZZ,ZZ,ZZ,List)
+       (bettiTableIlambda,ZZ,ZZ,List)	 
+    Headline
+        a function to compute the betti table of the GLm X GLn invariant ideal I_lambda
+    Usage
+        f = bettiTableIlambda(m,n,p,lam)
+        f = bettiTableIlambda(m,n,lam)
+    Inputs
+        m:ZZ
+        n:ZZ
+        p:ZZ 
+        lam:List 
+    Outputs
+        f:BettiTally
+    Description
+      Text
+         This function only works in positive characteristic. It takes as input integers
+         m,n,p, and a partition lam. It computes the betti table of the GLm X GLn invariant
+         ideal I_{lam} in characteristic p. 
+    
+      Example
+       m=2;
+       n=2;
+       p=101;
+       lam={2,1};
+       bettiTableIlambda(m,n,p,lam)
+      
+      Text
+       If a prime is not provided, the largest possible prime is automatically selected:
+       
+      Example
+       m=2;
+       n=3;
+       lam={3};
+       bettiTableIlambda(m,n,lam)
+///
+
+doc ///
+    Key
+       hilbertFunctionLlambda
+       (hilbertFunctionLlambda,ZZ,ZZ,List)	 
+    Headline
+        The hilbert function of the simple gl(m|n)-module L_{lambda}
+    Usage
+        f = hilbertFunctionLlambda(m,n,lam)
+    Inputs
+        m:ZZ
+        n:ZZ
+        lam:List 
+    Outputs
+        f:List
+    Description
+      Text
+         This function computes the hilbert function of the simple gl(m|n)-module L_{lambda} in
+	 all degrees for which it is not zero. 
+    
+      Example
+       m=2;
+       n=2;
+       lam={2,1};
+       hilbertFunctionLlambda(m,n,lam)
+      
+      Text
+       Another example:
+       
+      Example
+       m=3;
+       n=2;
+       lam={2,2};
+       hilbertFunctionLlambda(m,n,lam)
+///
+ 
 end
 
 restart
