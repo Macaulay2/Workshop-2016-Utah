@@ -512,7 +512,7 @@ doc ///
         Text
             Finds the inverse function of your birational map
     Caveat
-        Only works for irreducible varieties
+        Only works for irreducible varieties right now
         
 ///
 
@@ -551,29 +551,29 @@ TEST ///
 	-------------------------------------
 
 	S = QQ[x,y,z]
-        a = ideal(x^2+y^2+z^2)
-        T = QQ[u,v]
-        b = ideal(u^2+v^2)
-        f = matrix{{x*y,y*z}}
-        dim = dimImage(a,b,f)
-        assert(dim == -1)
+    a = ideal(x^2+y^2+z^2)
+    T = QQ[u,v]
+    b = ideal(u^2+v^2)
+    f = matrix{{x*y,y*z}}
+    dim = dimImage(a,b,f)
+    assert(dim == -1)
 
-        S = QQ[x0,x1]
-        a = ideal(0*x0)
-        T = QQ[y0,y1,y2]
-        b = ideal(0*y1)
-        f = matrix{{x0^4,x0^2*x1^2,x1^4}}
-        dim = dimImage(a,b,f)
-        assert(im == 1)	
+    S = QQ[x0,x1]
+    a = ideal(0*x0)
+    T = QQ[y0,y1,y2]
+    b = ideal(0*y1)
+    f = matrix{{x0^4,x0^2*x1^2,x1^4}}
+    dim = dimImage(a,b,f)
+    assert(im == 1)	
 
-	-- Since in Projective Space, check to make sure different representations give the same result
-        S = QQ[x,y]
-        a = ideal(0*x)
-        T = QQ[u,v]
-        b = ideal(0*v)
-        f1 = matrix{{x,y}}
-        f2 = matrix{{x^3*y^2,x^2*y^3}}
-        assert(dimImage(a,b,f1)==dimImage(a,b,f2))
+    -- Since in Projective Space, check to make sure different representations give the same result
+    S = QQ[x,y]
+    a = ideal(0*x)
+    T = QQ[u,v]
+    b = ideal(0*v)
+    f1 = matrix{{x,y}}
+    f2 = matrix{{x^3*y^2,x^2*y^3}}
+    assert(dimImage(a,b,f1)==dimImage(a,b,f2))
 
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
@@ -584,6 +584,11 @@ TEST ///
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(M))
 	
+    R = QQ[x,y,z]	
+	L = {x^2*y, x^2*z, x*y*z}
+	I = ideal(x*y, y*z, x*z)
+	assert(I == baseLocusOfMap(L))
+
 	-- reducible source
 
 	R = QQ[x,y,z]/(x*y)
@@ -606,6 +611,15 @@ TEST ///
     R = QQ[x,y,z]/(x^3 + y^3 - z^3)
     M = matrix{{y-z, x}}
     assert(isRegularMap(M) == false)
+
+
+	-------------------------------------
+	----- inverseOfMap  -----------------
+	-------------------------------------
+
+
+
+    
 
 /// 
 ----FUTURE PLANS------
