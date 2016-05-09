@@ -2,9 +2,18 @@ newPackage(
 	"RandomIdeal",
     	Version => "2.0", 
     	Date => "May 9, 2016",
-    	Authors => {
-	     {Name => "David Eisenbud", Email => "de@msri.org"}
-	     },
+        Authors => {
+	    {Name => "Katie Ansaldi",
+		Email => "kansaldi@gmail.com"},
+	    {Name => "David Eisenbud",
+         	Email => "de@msri.org",
+         	HomePage => "http://www.msri.org/~de"},
+     	    {Name => "Robert Krone",
+	 	Email => "rckrone@gmail.com",
+	 	HomePage => "http://rckr.one"},
+	    {Name => "Jay Yang",
+		Email => "jkelleyy@gmail.com"}
+	    },
     	HomePage => "http://www.msri.org/~de",
     	Headline => "a package for creating random ideals of various sorts",
 	AuxiliaryFiles => false, -- set to true if package comes with auxiliary files,
@@ -260,7 +269,7 @@ randomSubset = (n,m) -> (
 randomAddition = method()
 randomAddition(ZZ,ZZ,List) := (n,m,P) ->(
     if #P == 0 then return {randomSubset(n,m+1)};
-    Plarge := select(P, D-> #D >= m); -- the facets big enough to be glued to
+    Plarge := select(P, D-> #D >= m+1); -- the facets big enough to be glued to
     if #Plarge == 0 then error "m is too large";
     t := false;
     D' := {null};
@@ -373,14 +382,19 @@ doc ///
 	  m:ZZ
 	       the dimension of the facets
 	  k:ZZ
-	       the number of facets (if ommited, the number will be {\tt n} choose {\tt m+1})
+	       the number of facets (if omitted, the number will be {\tt n} choose {\tt m+1})
 	      
      Outputs
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.  If called with a Ring {\tt R} instead of an integer {\tt n}, each facet is represented by a square-free monomial instead of a list.
      Description
           Text
-              The function produces a random chain of shellable complexes.  
+              The function produces a list of facets of a random shellable simplicial complex.
+	      The order of the facets is a shelling.
+	  Text
+	      The alogorithm works by choosing one of the previous facets at random, and replacing one of its vertices with a new vertex chosen at random.
+	      If the choice meets the criteria of a shelling, that facet is added to list, otherwise it is discarded and the algorithm tries again.
+	      The first facet is chosen uniformly at random.
           Example
                P = randomShelling(6,3,10)
 	       Q = randomShelling(6,3)
@@ -451,10 +465,12 @@ doc ///
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
      Description
           Text
-            This function randomly chooses a facet of size m+1 and checks whether the facet can be shellably added to the shelling. 
+            This function randomly chooses a facet of size {\tt m+1} and checks whether the facet can be shellably added to the shelling. 
 	    If it can be shellably added to the shelling, it is added to the shelling and the new shelling is returned. 
-	    Otherwise, the process repeats up to 20 times.  
-	    This function can be used to randomly construct non-pure shellable complexes. 
+	    Otherwise, the process repeats up to 20 times.
+          Text
+	    This function can be used to randomly construct non-pure shellable complexes.  A new {\tt m}-simplex can only be
+	    glued to previous simplices of dimension at least {\tt m}.  If all previous simplices are smaller, then the addition will fail.
           Example
             P={{1,2,3}}
 	    L=randomAddition(6,3,P)

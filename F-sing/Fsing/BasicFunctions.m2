@@ -19,6 +19,7 @@
 denom = method(); 
 
 --Finds the denominator of a rational number.
+--denom is always positive.
 denom( QQ ) := x -> denominator x; 
 
 --Finds the denominator of an integer.
@@ -29,6 +30,7 @@ denom( ZZ ) := x -> 1;
 num = method(); 
 
 --Finds the numerator of a rational number.
+--Will be negative if x is negative.
 num( QQ ) := x -> numerator x; 
 
 --Finds the numerator of an integer.
@@ -92,7 +94,7 @@ divideFraction( ZZ, QQ ) := ( p, t ) ->
 
 --===================================================================================
      
---Finds the a/pp^e1 nearest t1 from above.
+--Finds the a/p^e nearest t from above.
 findNearPthPowerAbove = ( p, e, t ) -> 
 (
      ceiling(t*p^e)/p^e
@@ -100,7 +102,7 @@ findNearPthPowerAbove = ( p, e, t ) ->
 
 --===================================================================================
 
---Finds the a/pp^e1 nearest t1 from below.
+--Finds the a/p^e nearest t from below.
 findNearPthPowerBelow = ( p, e, t ) -> 
 (
      floor(t*p^e)/p^e
@@ -174,7 +176,8 @@ numberToPrimeFactorList = ( n )->
 
 --===================================================================================
 
---Returns a list of all proper factors of number.
+--Returns a list of all proper -- not one -- factors of number.
+--Has funny order...
 getFactorList = ( n ) ->
 (
      if (n < 1) then error "getFactorList: expected an integer greater than 1.";
@@ -244,46 +247,6 @@ findNumberBetween( ZZ, List ) := ( maxDenom, myInterv )->
 
 --===================================================================================
 
-basePExp = method(); 
-
---Computes the terminating base p expansion of an integer.
-basePExp( ZZ, ZZ ) := ( p, N ) ->
-(
-    if N < p then return {N};
-    prepend( N % p, basePExp(p, N // p))
-)
-
---Computes terminating base p expansion of an integer 
---from digits zero to e-1 (little-endian first).
-basePExp( ZZ, ZZ, ZZ ) := ( p, f, N ) ->
-(
-    e:=f-1;
-    E:=new MutableList;
-    scan(0..e,i-> 
-    	(
-     	    a := N//p^(e-i);
-     	    E#(e-i) = a;
-     	    N = N - (a)*p^(e-i);
-    	)
-    );
-    new List from E
-)
-
---Creates a list of the first e digits of the non-terminating base p expansion of x in [0,1].
-basePExp( ZZ, ZZ, QQ ) := ( p, e, x ) -> 
-(
-    if x < 0 or x > 1 then(
-	 error "basePExp: Expected x in [0,1]"
-     )
-     else(
-     	 L := new MutableList;
-     	 for i from 0 to e-1 do L#i = digit(p,i+1,x);
-     	 L
-     )
-)
-
---===================================================================================
-
 digit = method()
 
 --Gives the e-th digit of the non-terminating base p expansion of x in [0,1].
@@ -305,6 +268,55 @@ digit ( ZZ, ZZ, QQ ) := ( p, e, x) ->
 digit ( ZZ, ZZ, List ) := ( p, e, u ) -> 
 (
     apply(u,x->digit(p,e,x))
+)
+
+--===================================================================================
+
+basePExp = method(); 
+
+--Computes the terminating base p expansion of a positive integer.
+--Gives expansion in reverse...
+basePExp( ZZ, ZZ ) := ( p, N ) ->
+(
+    if N < 0 then(
+	 error "basePExp: Expected N to be positive"
+	 )
+    else(
+    	if N < p then return {N};
+    	prepend( N % p, basePExp(p, N // p))
+   )
+)
+
+--Computes terminating base p expansion of a positive integer 
+--from digits zero to f-1 (little-endian first).
+basePExp( ZZ, ZZ, ZZ ) := ( p, f, N ) ->
+(
+    if N < 0 then(
+	 error "basePExp: Expected N to be positive"
+	 )
+    else(
+    	e:=f-1;
+    	E:=new MutableList;
+    	scan(0..e,i-> 
+    	    (
+     	    	a := N//p^(e-i);
+     	    	E#(e-i) = a;
+     	    	N = N - (a)*p^(e-i);
+    		)
+    	    );
+    	new List from E
+    )
+)
+
+--Creates a list of the first e digits of the non-terminating base p expansion of x in [0,1].
+basePExp( ZZ, ZZ, QQ ) := ( p, e, x ) -> 
+(
+    if x < 0 or x > 1 then(
+	 error "basePExp: Expected x in [0,1]"
+     )
+     else(
+	 apply(e, i -> digit(p,i+1,x))
+     )
 )
 
 --===================================================================================
@@ -356,23 +368,31 @@ baseP1 = ( n, p, e )->
 --such that it suffices to check to see if x and y add without carrying in base p
 carryTest = ( p, w ) ->
 (
-     c := 0; for i from 0 to #w-1 do c = max(c, divideFraction(p,w#i)#1);
-     d := 1; for j from 0 to #w-1 do if (divideFraction(p, w#j)#2)!=0 then d = lcm(d,dividFraction(p,w#j)#2);
-     c+d+1
+     if w#0 < 0 or w#0 > 1 or w#1 < 0 or w#1 > 1 then(
+	 error "basePExp: Expected w in [0,1]^2"
+     )
+     else(
+     	 c := 0; for i from 0 to #w-1 do c = max(c, divideFraction(p,w#i)#1);
+     	 d := 1; for j from 0 to #w-1 do if (divideFraction(p, w#j)#2)!=0 then d = lcm(d,dividFraction(p,w#j)#2);
+     	 c+d+1
+     )
 )
 
 --Given a vector w={x,y} of rational integers in [0,1], returns the first spot 
 --e where the x and y carry in base p; i.e., 
 --(the e-th digit of x)+(the e-th digit of y) >= p
 firstCarry = ( p, w ) ->
-(     
-    i:=0;
-    d:=0;
-    carry:=0;
-    zeroTest := false;
-    for j from 0 to #w-1 do if w#j == 0 then zeroTest=true;
-    if zeroTest == true then carry = -1 else
-     (
+(   if w#0 < 0 or w#0 > 1 or w#1 < 0 or w#1 > 1 then(
+	 error "basePExp: Expected w in [0,1]^2"
+     )
+     else(
+    	 i:=0;
+    	 d:=0;
+    	 carry:=0;
+    	 zeroTest := false;
+    	 for j from 0 to #w-1 do if w#j == 0 then zeroTest=true;
+    	 if zeroTest == true then carry = -1 else
+     	 (
 	       i = 0; while d < p and i < carryTest(p,w) do 
 	       (
 	       	    i = i + 1;
@@ -380,20 +400,24 @@ firstCarry = ( p, w ) ->
 	   	);
       	       if i == carryTest(p,w) then i = -1;
       	       carry = i;
-      );
-      carry
+      	       );
+      	   carry
+    )
 )
 
 --===================================================================================
 
 --Returns a vector of the reciprocals of the entries of a vector.
+--Mutable list....
 reciprocal = ( w ) ->
 (
-     v := new MutableList from w;
-     for c from 0 to #w-1 do v#c = 1/w#c;
-     v
+     if product(w) == 0 then (
+	  error "reciprocal: entries of vector must be non-zero."
+      )
+     else(
+     apply(#w, i -> 1/(w#i))
+     )
 )
-
 --===================================================================================
 
 getCanVector = method()
@@ -434,8 +458,15 @@ taxicabNorm ( List ) := u ->
 --===================================================================================
 
 --Finds the x-intercept of a line passing through two points
-xInt = ( x1, y1, x2, y2 ) ->  x1-(y1/((y1-y2)/(x1-x2)))
- 
+xInt = ( x1, y1, x2, y2 ) ->
+(
+    if x1 == x2 then(
+	 error "xInt: x1==x2 no intersection"
+     )
+     else(
+     	 x1-(y1/((y1-y2)/(x1-x2)))
+     )
+)
 --===================================================================================
 
 --*************************************************
