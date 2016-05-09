@@ -679,7 +679,7 @@ isDiagonal = f -> product(exponents(f),v->#(positions(v,x->x!=0)))==1
 
 --Given input vectors v={a_1,...,a_n} and w={b_1,...,b_n}, gives the
 --corresponding vectors that omit all a_i and b_i such that a_i=b_i
-factorOutMonomial1 = (v,w) ->
+factorOutMonomial = (v,w) ->
 (
      diffCoords := positions(v-w,x->x!=0);
      (apply(diffCoords,i->v_i),apply(diffCoords,i->w_i))
@@ -689,9 +689,8 @@ factorOutMonomial1 = (v,w) ->
 --vector of the a_i for which a_i=b_i
 monomialFactor = (v,w) ->
 (
-     a := new MutableList;
-     c := 0; i := 0; for i from 0 to #v-1 do (if v#i == w#i then (a#c = v#i; c = c+1; ); );
-     a
+     equalCoords := positions(v-w,x->x==0);
+     apply(equalCoords,i->v_i)
 )
 
 --Given two vectors v={v0,v1} and w={w0,w1} in the real plane, finds 
@@ -791,9 +790,8 @@ polytopeDefiningPoints = (v,w) ->
 --outputs the one with the largest coordinate sum
 maxCoordinateSum = L ->
 (
-     K := new MutableList from {0,0};
-     for i from 0 to #L-1 do if (L#i)#0 + (L#i)#1 > K#0 + K#1 then K = {(L#i)#0, (L#i)#1};
-     K
+     maxSum :=max apply(L,sum);
+     first select(1,L,v->sum(v)==maxSum)
 )
 
 --Finds the "delta" in Daniel Hernandez's algorithm
@@ -877,12 +875,7 @@ binomialFPT = g ->
 )
 
 --Returns true if the polynomial is binomial.
-isBinomial = f ->
-(
-     alert := true;
-     if #(terms f)>2 then alert = false;
-     alert
-)
+isBinomial = f -> #(terms f)<=2
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
