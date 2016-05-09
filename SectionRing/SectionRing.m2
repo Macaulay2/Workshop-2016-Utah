@@ -1,3 +1,26 @@
+
+
+newPackage( "SectionRing",
+Version => "0.1", Date => "May 08 2016", Authors => {
+     {Name=> "Andrew Bydlon",
+     Email=> "thelongdivider@gmail.com",
+     HomePage => "http://www.math.utah.edu/~bydlon/"
+     },
+     {Name => "Karl Schwede",
+     Email=> "kschwede@gmail.com",
+     HomePage=> "http://www.math.utah.edu/~schwede"
+     }
+}, --this file is in the public domain
+Headline => "A package for computing the section ring of a Weil Divisor.", DebuggingMode => true, Reload=>true)
+
+export{
+	"globallyGenerated",
+	"isMRegular",
+	"mRegular",
+	"sectionRing",
+	"isVectScalar",
+	"convertScalarVect"
+}
 needsPackage "Divisor"
 
 dualToIdeal = method();
@@ -50,8 +73,8 @@ isMRegular = method();
 isMRegular(CoherentSheaf,CoherentSheaf,ZZ) := (F,G,m) ->(	--Outputs whether of not F is m-regular relative to G
 	V := variety(F);
 	dV := dim(V);
-	j=1;
-	bool = true;
+	j:=1;
+	bool := true;
 	while(j<(dV+1)) do (
 		if (bool == true) then(
 			if(m!=j) then(
@@ -67,7 +90,10 @@ isMRegular(CoherentSheaf,CoherentSheaf,ZZ) := (F,G,m) ->(	--Outputs whether of n
 );
 
 isMRegular(CoherentSheaf,ZZ) := (F,m) ->(		--Outputs whether F is m-regular (rel O_X(1))
-	V :variety(F);
+	local V;
+	local G;
+	local mRegularParticular;	
+	V = variety(F);
 	G = OO_V(1);
 	mRegularParticular(F,G,m)
 );
@@ -155,13 +181,40 @@ mRegular(Ideal) := (I) -> ( 					--Returns the number m for which O_X(D) is m-re
 
 sectionRing = method();
 sectionRing(Ideal) := (I) -> (
+	local A;
+	local F;
+	local G;
+	local J;
+	local V;
+	local L;
+	local Y;
+	local j;
+	local e;
+	local b;
+	local n;
+	local Map;
+	local Rel;
+	local KerT;
+	local Part;
+	local Ramb;
+	local Vect;
+	local bool;
+	local LengP;
+	local LengPa;
+	local numDegs;
+	local MapTot;
+	local TotMap;
+	local AdmPart;
+	local TotVect;
+	local myVars;
+	local myVarsData;
+	local NumCols;
+	local VectTot;
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 	R := ring(I);						--To Apply the Regularity Theorem of Mumford, the sheaf needs to be Globally Generated Sheaf
 	l := globallyGenerated(I);
-	j := 0;
-	L := 0;
 	bound := l;
-	G := first entries gens I;
+	G = first entries gens I;
 	J_l = Hom(ideal(apply(G, z->z^l)),R);
 	while(j<l) do (						--Calculate regularity of each of the sheaves OO_X(D), ... , OO_X(l*D)
 		J_j = Hom(ideal(apply(G, z->z^j)),R);
@@ -221,18 +274,6 @@ sectionRing(Ideal) := (I) -> (
 		Vect_c = transpose matrix{myVars#(c-1)};
 		c=c+1;
 	);
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
-	b := 0;							--zero-out internal variables
-	--LengPa := 0;
-	--LengP:=0;
-	--VectTot:=0;
-	--MapTot := 0;
-	--TotMap := 0;
-	--TotVect := 0;
-	--NumCols := 0;
-	--KerT:=0;
-	--Rel:=0;
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
 
 
 	j=2;
@@ -289,7 +330,7 @@ sectionRing(Ideal) := (I) -> (
 		KerT = generators ker(MapTot);		
 
 		NumCols = numColumns(KerT);
-		e := 0;
+		e = 0;
 			
 		while (e < NumCols) do (
 			L = flatten entries KerT_{e};
@@ -316,12 +357,10 @@ sectionRing(Ideal) := (I) -> (
 );
 
 isVectScalar = L -> (
-	Ramb = ring (L#0); 
+	Ramb := ring (L#0); 
 	all(L, z -> (degree(z) <= degree (sub(1, Ramb))) ) 
 );
 
 convertScalarVect = (newS, L) -> (apply(L, z->sub(z, newS)));
 
-removalOfVariablesInternal = (L,n,Variables) -> (
-	
-);
+end

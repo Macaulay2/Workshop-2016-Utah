@@ -1,9 +1,56 @@
----------------------------------------------------------------
---***********************************************************--
---Functions for computing \(nu_I)^J(p^e), \(nu_f)^J(p^e), and using  --
---these to compute estimates of FPTs.                        --
---***********************************************************--
----------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+----------------------------------------------------------------------------------
+-- CONTENTS
+----------------------------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+----------------------------------------------------------------------------------
+-- Nu computations
+
+-- Main functions: nuList, nu, nuListAlt, nuAlt, nuListAlt1, nuHatList, nuHat
+
+-- Auxiliary Functions: effRad, effPolyRad, isJToAInIToPe, binarySearch
+
+----------------------------------------------------------------------------------
+-- FThreshold Approxiations
+
+-- Main functions: FPTApproxList, FTApproxList, FTHatApproxList
+
+-- Auxiliary Functions: 
+
+----------------------------------------------------------------------------------
+-- FThreshold Estimates
+
+-- Main functions: guessFPT, estFPT
+
+-- Auxiliary Functions: 
+
+----------------------------------------------------------------------------------
+-- FPT/F-Jumping number check
+
+-- Main functions: isFPTPoly, isFJumpingNumberPoly
+
+-- Auxiliary Functions: 
+
+----------------------------------------------------------------------------------
+-- FPTs of special types of polynomials
+
+-- Main functions: diagonalFPT, binomialFPT, FPT2VarHomog, 
+
+-- Auxiliary Functions: isDiagonal, factorOutMonomial, monomialFactor
+--    twoIntersection, allIntersections, isInPolytope, isInInteriorPolytope,
+--    polytopeDefiningPoints, maxCoordinateSum, dCalculation, calculateEpsilon
+--    isBinomial, setFTData, isInUpperRegion, isInLowerRegion, 
+--    neighborInUpperRegion, isCP, findCPBelow, FPT2VarHomogInternal, canVector,
+--    getNumAndDenom, taxicabNorm, factorList, splittingField, isBinaryForm
+--    isNonConstantBinaryForm, isLinearBinaryForm, isPolynomialOverFiniteField
+
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+----------------------------------------------------------------------------------
+-- Functions for computing \(nu_I)^J(p^e), \(nu_f)^J(p^e)
+----------------------------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 -- If I is contained in Rad(J) then this finds the minimal N 
 -- such that I^N is contained in J
@@ -170,10 +217,6 @@ nu(RingElement, Ideal, ZZ) := (f1, J1, e1) -> ( --this does a fast nu computatio
 
 nu( RingElement, ZZ ) := ( f, e ) -> nu( f, maxIdeal( ring f ), e )
 
---***********************************************************--
---Some new functions for computing nus
---***********************************************************--
-
 -- isJToAInIToPe checks whether or not J^a is in I^(p^e).
 -- It seems to be much faster than raising J to a power.
 -- Allows tests with ridiculously large exponents
@@ -253,15 +296,8 @@ nuListAlt1( RingElement, Ideal, ZZ ) := ( f, J, n ) ->
 
 nuListAlt1( RingElement, ZZ ) := ( f, n ) -> nuListAlt1( f, maxIdeal( ring f ), n )
 
----------------------------------------------------------------
---***********************************************************--
---Functions for computing \nuHat_I(p^e), \nHatu_f(p^e), and  --
---using these to compute estimates of FThat's.                        --
---***********************************************************--
----------------------------------------------------------------
 
 -- Computes the list of values of \(nuHat_I)^J(p^d) for d=1,..., e
-
 nuHatList = method()
 
 nuHatList(Ideal, Ideal,  ZZ) := (I1, J1, e1) -> ( --this is a faster nuList computation, it tries to do a smart nu list computation
@@ -352,6 +388,12 @@ nuHat( RingElement, Ideal, ZZ ) := ( f, J, e ) -> nu( f, J, e )
 -- and J=maximal ideal 
 
 nuHat( RingElement, ZZ ) := ( f, e ) -> nu( f, e )
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+----------------------------------------------------------------------------------
+-- Functions for approximating, guessing, estimating F-Thresholds
+----------------------------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 --Approximates the F-pure Threshold
 --Gives a list of nu_I(p^d)/p^d for d=1,...,e
@@ -529,6 +571,12 @@ estFPT={FinalCheck=> true, Verbose=> false, MultiThread=>false, DiagonalCheck=>t
      answer
 )
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+----------------------------------------------------------------------------------
+-- Functions for checking if given numbers are F-jumping numbers
+----------------------------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 --isFPTPoly, determines if a given rational number is the FPT of a pair in a polynomial ring. 
 --if Origin is specified, it only checks at the origin. 
 
@@ -598,6 +646,12 @@ isFJumpingNumberPoly ={Verbose=> false}>> o -> (f1, t1) -> (
 	not (isSubset(mySigma, myTau))
 )
 
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+----------------------------------------------------------------------------------
+-- Functions for computing FPTs of diagonal polynomials
+----------------------------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 --Computes the F-pure threshold of a diagonal hypersurface 
 --x_1^(a_1) + ... +x_n^(a_n) using Daniel Hernandez' algorithm
@@ -613,50 +667,22 @@ diagonalFPT = f ->
      y
 )
 
---Given a polynomial f, outputs a list of multi-degrees (under the usual grading)
---of f as lists
-multiDegree = f ->
-(
-     variables := first entries vars ring f;
-     apply(terms f, g -> apply(#variables, i ->degree(variables#i,g)))
-)
-
 --Determines whether a polynomial f is diagonal; i.e., of the form 
---x_1^(a_1)+...+x_n^(a_n) (up to renumbering variables)
-isDiagonal = f ->
-(
-     d := multiDegree(f);
-     alert1 := true;
-     alert2 := true;
-     for i from 0 to #d-1 do
-     (
-	  for j from 0 to #(d#0)-1 do
-	  (
-	       if (d#i)#j!=0 and alert1==false then alert2=false;
-	       if (d#i)#j!=0 and alert1==true then alert1=false;
-	  );
-     alert1=true;
-     );
-     for j from 0 to #(d#0)-1 do
-     (
-	  for i from 0 to #d-1 do 
-	  (
-     	       if alert1==false and (d#i)#j!=0 then alert2=false;
-     	       if alert1==true and (d#i)#j!=0 then alert1=false;
-	  );
-     alert1=true;
-     );
-     alert2
-)
+--x_1^(a_1)+...+x_n^(a_n) 
+isDiagonal = f -> product(exponents(f),v->#(positions(v,x->x!=0)))==1
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+----------------------------------------------------------------------------------
+-- Functions for computing FPTs of binomials
+----------------------------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 --Given input vectors v={a_1,...,a_n} and w={b_1,...,b_n}, gives the
 --corresponding vectors that omit all a_i and b_i such that a_i=b_i
-factorOutMonomial = (v,w) ->
+factorOutMonomial1 = (v,w) ->
 (
-     v1 := new MutableList;
-     w1 := new MutableList;
-     c := 0; i := 0; for i from 0 to #v-1 do (if v#i != w#i then (v1#c = v#i; w1#c = w#i; c = c+1; ); );
-     (v1,w1)
+     diffCoords := positions(v-w,x->x!=0);
+     (apply(diffCoords,i->v_i),apply(diffCoords,i->w_i))
 )
 
 --Given input vectors v={a_1,...,a_n} and w={b_1,...,b_n}, gives the
@@ -823,8 +849,8 @@ calculateEpsilon = (P1,P2,v,w) ->
 binomialFPT = g ->
 (
      p := char ring g;
-     v := (multiDegree(g))#0;
-     w := (multiDegree(g))#1;
+     v := (exponents(g))#0;
+     w := (exponents(g))#1;
      FPT := 0;
      f := monomialFactor(v,w);
      x := factorOutMonomial(v,w);
@@ -858,12 +884,13 @@ isBinomial = f ->
      alert
 )
 
----------------------------------------------------------------------
---*****************************************************************--
---Functions for computing F-thresholds of forms in two variables   --
---over finite fields. Based on the work of Hernandez and Teixeira. -- 	                                           --                      
---*****************************************************************--
----------------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+----------------------------------------------------------------------------------
+-- Functions for computing FPTs of forms in two variables
+----------------------------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+-- Based on the work of Hernandez and Teixeira. -- 	                                           --                      
 
 {*
     Remark: At this point, only commands for computations of F-pure thresholds are

@@ -189,9 +189,7 @@ isLicci Ideal := opts -> I -> (
 isLicci(linkageBound(I, UseNormalModule => opts.UseNormalModule), I
     ))
 
-depth := profondeur;
-
-
+--depth but faster
 profondeur = method()
 profondeur(Ideal, Module) := (I,M) ->(
     --requires R to be an affine ring (eg NOT ZZ[x])
@@ -220,7 +218,7 @@ profondeur Ring := R -> profondeur R^1
 koszulDepth = method()
 koszulDepth(Ideal) := I -> (
     C := koszul mingens I;
-    for i in 0..(numColumns(mingens I)-codim I) list depth HH_i(C)
+    for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
     )
 
 isStronglyCM = method()
@@ -363,9 +361,53 @@ doc ///
     J=minimalRegularSequence(n,I)
    Inputs
     n:ZZ
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION maxGd
+------------------------------------------------------------
+
+doc ///
+   Key
+      maxGd
+      (maxGd,Ideal)    
+   Headline
+      maximum G_d of a monomial ideal
+   Usage
+      d = maxGd I
+   Inputs
+      I:Ideal
+         a monomial ideal
+   Outputs
+      d:ZZ
+         the maximum value of {\tt d} such that {\tt I} has property G_d (possibly infinity).
+   Description
+      Text
+      Example
+   Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
+   SeeAlso
+      numgensByCodim
+      residualCodims
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION genericArtinNagata
+------------------------------------------------------------
+
+doc ///
+   Key
+    genericArtinNagata
+    (genericArtinNagata,ZZ,Ideal)    
+   Headline
+    Generic Artin nagata
+   Usage
+    L = genericArtinNagata(n,I)
+   Inputs
+    n:ZZ
     I:Ideal
    Outputs
-    J:Ideal
+    L:List
    Description
     Text
      Produces an "efficient" regular sequence that is among a set of minimal generators of I
@@ -387,30 +429,78 @@ doc ///
    SeeAlso
 ///
 
-
-end--
-   
+------------------------------------------------------------
+-- DOCUMENTATION numgensByCodim
+------------------------------------------------------------
+doc ///
+   Key
+      numgensByCodim
+      (numgensByCodim,Ideal)
+      (numgensByCodim,Ideal,ZZ)
+   Headline
+      maximum number of generators of localizations of a monomial ideal
+   Usage
+      d = numgensByCodim(I,k)
+      L = numgensByCodim(I)
+   Inputs
+      I:Ideal
+         a monomial ideal
+      k:ZZ
+         an integer between 1 and the dimension of the ring
+   Outputs
+      d:ZZ
+         the maximum number of generators of {\tt I} localized at a prime {\tt P} of codimension {\tt k}.
+      L:List
+         a list of the numbers of generators for each codimension from 1 to the dimension of the ring
+   Description
+      Text
+         Because {\tt I} is monomial, we can check the number of generators of {\tt I} localized at a prime {\tt P} over only monomial primes {\tt P}.
+      Example
+         R = QQ[x_0..x_4];
+	 I = ideal{x_0^2,x_1*x_2,x_3*x_4^2}
+	 numgensByCodim(I,2)
+	 numgensByCodim I
+   Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
+   SeeAlso
+      residualCodims
+      maxGd
 ///
 restart
 loadPackage("ResidualIntersections", Reload =>true)
 uninstallPackage"ResidualIntersections"
 installPackage"ResidualIntersections"
+///
 
-viewHelp isLicci
-S = ZZ/101[x_0..x_3]
-installPackage "MCMApproximations"
-I = ideal(x_0*x_1,x_1^2, x_2^3, x_3^5)
-isLicci(3, codim I, I)
-linkageBound (I, UseNormalModule => false)
-linkageBound (I, UseNormalModule => true)
+------------------------------------------------------------
+-- DOCUMENTATION residualCodims
+------------------------------------------------------------
 
-I = minors(2, random(S^2, S^{4:-1}))
-isLicci(3, codim I, I)
-linkageBound (I, UseNormalModule => false)
-linkageBound (I, UseNormalModule => true)
+doc ///
+   Key
+      residualCodims
+      (residualCodims,Ideal)
+   Headline
+      a list of possible codimensions where...
+   Usage
+      L = residualCodims I
+   Inputs
+      I:Ideal
+         a monomial ideal
+   Outputs
+      L:List
+         a list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
+   Description
+      Text
+      Example
+   Caveat
+      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
+   SeeAlso
+      numgensByCodim
+      maxGd
+///
 
-I = minors(3, random(S^3, S^{-2,-3,-4,-4}));
-isLicci(3, codim I, I)
+end--
 
 linkageBound (I, UseNormalModule => false)
 time linkageBound (I, UseNormalModule => true)
@@ -424,5 +514,3 @@ loadPackage "RandomIdeal"
 J = idealChainFromSC randomChain(10,5,20);
 J/maxGd
 J/residualCodims
-
-///
