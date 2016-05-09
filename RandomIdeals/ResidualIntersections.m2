@@ -21,7 +21,7 @@ export {
 	"genericResidual",
 	"genericArtinNagata",
 	"numgensByCodim",
-	"maxGd",
+	"maxGs",
 	"residualCodims",
         "koszulDepth",
         "hasSlidingDepth",
@@ -252,7 +252,7 @@ hasSlidingDepth(Ideal) := (I) -> (
 -------------------------------------
 
 numgensByCodim = method()	
-numgensByCodim (Ideal,ZZ) := (J,k) -> (
+numgensByCodim (MonomialIdeal,ZZ) := (J,k) -> (
     R := ring J;
     n := numgens R;
     max for A in subsets(n,k) list (
@@ -263,19 +263,19 @@ numgensByCodim (Ideal,ZZ) := (J,k) -> (
 	)
     )
 
-numgensByCodim Ideal := J -> (
+numgensByCodim MonomialIdeal := J -> (
     n := numgens ring J;
     toList apply(n, i->numgensByCodim(J,i+1))
     )
 
 maxGs = method()
-maxGs Ideal := J -> (
+maxGs MonomialIdeal := J -> (
     for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i;
     infinity
     )
 
 residualCodims = method()
-residualCodims Ideal := J -> (
+residualCodims MonomialIdeal := J -> (
     toList select((codim J + 1..numgens ring J + 1), i->numgensByCodim(J,i-1) <= i)
     )
 
@@ -390,22 +390,19 @@ doc ///
 doc ///
    Key
       maxGs
-      (maxGs,Ideal)    
+      (maxGs,MonomialIdeal)    
    Headline
       maximum G_s of a monomial ideal
    Usage
       d = maxGs I
    Inputs
-      I:Ideal
-         a monomial ideal
+      I:MonomialIdeal
    Outputs
       d:ZZ
          the maximum value of {\tt s} such that {\tt I} has property G_s (possibly infinity).
    Description
       Text
       Example
-   Caveat
-      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
       residualCodims
@@ -453,16 +450,15 @@ doc ///
 doc ///
    Key
       numgensByCodim
-      (numgensByCodim,Ideal)
-      (numgensByCodim,Ideal,ZZ)
+      (numgensByCodim,MonomialIdeal)
+      (numgensByCodim,MonomialIdeal,ZZ)
    Headline
       maximum number of generators of localizations of a monomial ideal
    Usage
       d = numgensByCodim(I,k)
       L = numgensByCodim(I)
    Inputs
-      I:Ideal
-         a monomial ideal
+      I:MonomialIdeal
       k:ZZ
          an integer between 1 and the dimension of the ring
    Outputs
@@ -478,11 +474,9 @@ doc ///
 	 I = ideal{x_0^2,x_1*x_2,x_3*x_4^2}
 	 numgensByCodim(I,2)
 	 numgensByCodim I
-   Caveat
-      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       residualCodims
-      maxGd
+      maxGs
 ///
 
 ------------------------------------------------------------
@@ -492,14 +486,13 @@ doc ///
 doc ///
    Key
       residualCodims
-      (residualCodims,Ideal)
+      (residualCodims,MonomialIdeal)
    Headline
       a list of possible residual intersection codimensions
    Usage
       L = residualCodims I
    Inputs
-      I:Ideal
-         a monomial ideal
+      I:MonomialIdeal
    Outputs
       L:List
          a list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
@@ -515,7 +508,7 @@ doc ///
       It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
-      maxGd
+      maxGs
 ///
 
 end--
@@ -531,5 +524,5 @@ loadPackage "ResidualIntersections"
 loadPackage "RandomIdeal"
 installPackage "ResidualIntersections"
 J = idealChainFromSC randomChain(10,5,20);
-J/maxGd
+J/maxGs
 J/residualCodims
