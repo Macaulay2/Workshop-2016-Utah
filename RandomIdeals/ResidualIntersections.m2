@@ -17,11 +17,10 @@ export {
 	"minimalRegularSequence",
 	"linkageBound",
 	"UseNormalModule",
-	"randomRegularSequence",
 	"genericResidual",
 	"genericArtinNagata",
 	"numgensByCodim",
-	"maxGd",
+	"maxGs",
 	"residualCodims",
         "koszulDepth",
         "hasSlidingDepth",
@@ -237,11 +236,13 @@ profondeur Ring := R -> profondeur R^1
 
 koszulDepth = method()
 koszulDepth(Ideal) := I -> (
+    if I==0 then return {};
     C := koszul mingens I;
     for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
     )
 
-koszulDepth(Ideal,ZZ) := (I,k) -> (
+koszulDepth(ZZ,Ideal) := (k,I) -> (
+    if I==0 then return -1;
     C := koszul mingens I;
     profondeur HH_k(C)
     )
@@ -255,23 +256,23 @@ isStronglyCM(Ideal) := I -> (
 
 hasSlidingDepth = method()
 
-hasSlidingDepth(Ideal,ZZ) := (I,k) -> (
+hasSlidingDepth(ZZ,Ideal) := (k,I) -> (
     d := dim I;
     s := numColumns(mingens I)-codim I;
-    all(k+1, i -> (koszulDepth(I,s-i))>=d-i)
+    all(k+1, i -> (koszulDepth(s-i,I))>=d-i)
     )
 
-hasSlidingDepth(Ideal) := (I) -> (
+hasSlidingDepth(Ideal) := I -> (
     s := numColumns(mingens I)-codim I;
-    hasSlidingDepth(I,s)
+    hasSlidingDepth(s,I)
     )
 
 -------------------------------------
--- G_d Code
+-- G_s Code
 -------------------------------------
 
 numgensByCodim = method()	
-numgensByCodim (Ideal,ZZ) := (J,k) -> (
+numgensByCodim (MonomialIdeal,ZZ) := (J,k) -> (
     R := ring J;
     n := numgens R;
     max for A in subsets(n,k) list (
@@ -282,21 +283,33 @@ numgensByCodim (Ideal,ZZ) := (J,k) -> (
 	)
     )
 
-numgensByCodim Ideal := J -> (
+numgensByCodim MonomialIdeal := J -> (
     n := numgens ring J;
     toList apply(n, i->numgensByCodim(J,i+1))
     )
 
-maxGd = method()
-maxGd Ideal := J -> (
+maxGs = method()
+maxGs MonomialIdeal := J -> (
     for i from 1 to numgens ring J do if numgensByCodim(J,i) > i then return i;
     infinity
     )
 
 residualCodims = method()
-residualCodims Ideal := J -> (
+residualCodims MonomialIdeal := J -> (
     toList select((codim J + 1..numgens ring J + 1), i->numgensByCodim(J,i-1) <= i)
     )
+
+------------------------------------------------------------
+-- DOCUMENTATION ResidualIntersections
+------------------------------------------------------------
+doc ///
+   Key
+    ResidualIntersections
+   Headline
+    A package for residual intersections
+   Description
+   SeeAlso
+///
 
 ------------------------------------------------------------
 -- DOCUMENTATION isLicci
@@ -344,8 +357,6 @@ doc ///
     linkageBound I can be very large; linkageBound(I, UseNormalModule => true) can be slow.
    SeeAlso
     linkageBound
-    randomRegularSequence
-    randomLink
 ///
 ------------------------------------------------------------
 -- DOCUMENTATION UseNormalModule
@@ -422,38 +433,42 @@ doc ///
 doc ///
    Key
     minimalRegularSequence
-    (minimalRegularSequence,ZZ,Ideal)    
+    (minimalRegularSequence,ZZ,Ideal)
+    (minimalRegularSequence,Ideal)
    Headline
     finds a maximal regular sequence of minimal degree in an ideal
    Usage
     J=minimalRegularSequence(n,I)
+    J=minimalRegularSequence(I)
    Inputs
     n:ZZ
+    I:Ideal
 ///
 
 ------------------------------------------------------------
--- DOCUMENTATION maxGd
+-- DOCUMENTATION maxGs
 ------------------------------------------------------------
 
 doc ///
    Key
-      maxGd
-      (maxGd,Ideal)    
+      maxGs
+      (maxGs,MonomialIdeal)    
    Headline
-      maximum G_d of a monomial ideal
+      maximum G_s of a monomial ideal
    Usage
-      d = maxGd I
+      d = maxGs I
    Inputs
-      I:Ideal
-         a monomial ideal
+      I:MonomialIdeal
    Outputs
       d:ZZ
-         the maximum value of {\tt d} such that {\tt I} has property G_d (possibly infinity).
+         the maximum value of {\tt s} such that {\tt I} has property G_s (possibly infinity).
    Description
       Text
       Example
+      	  R = QQ[x_1,x_2,x_3];
+	  I = monomialIdeal(x_1^2,x_1*x_2,x_1*x_3,x_2^2,x_2*x_3);
+	  maxGs(I)
    Caveat
-      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       numgensByCodim
       residualCodims
@@ -501,16 +516,15 @@ doc ///
 doc ///
    Key
       numgensByCodim
-      (numgensByCodim,Ideal)
-      (numgensByCodim,Ideal,ZZ)
+      (numgensByCodim,MonomialIdeal)
+      (numgensByCodim,MonomialIdeal,ZZ)
    Headline
       maximum number of generators of localizations of a monomial ideal
    Usage
       d = numgensByCodim(I,k)
       L = numgensByCodim(I)
    Inputs
-      I:Ideal
-         a monomial ideal
+      I:MonomialIdeal
       k:ZZ
          an integer between 1 and the dimension of the ring
    Outputs
@@ -523,14 +537,12 @@ doc ///
          Because {\tt I} is monomial, we can check the number of generators of {\tt I} localized at a prime {\tt P} over only monomial primes {\tt P}.
       Example
          R = QQ[x_0..x_4];
-	 I = ideal{x_0^2,x_1*x_2,x_3*x_4^2}
+	 I = monomialIdeal{x_0^2,x_1*x_2,x_3*x_4^2}
 	 numgensByCodim(I,2)
 	 numgensByCodim I
-   Caveat
-      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
    SeeAlso
       residualCodims
-      maxGd
+      maxGs
 ///
 
 ------------------------------------------------------------
@@ -540,32 +552,214 @@ doc ///
 doc ///
    Key
       residualCodims
-      (residualCodims,Ideal)
+      (residualCodims,MonomialIdeal)
    Headline
       a list of possible residual intersection codimensions
    Usage
       L = residualCodims I
    Inputs
-      I:Ideal
-         a monomial ideal
+      I:MonomialIdeal
    Outputs
       L:List
          a list of integers {\tt s} such that {\tt I} localized at any prime of codimension {\tt s-1} has at most s generators.
+	 The range of values is {\tt codim I} + 1 and the dimension of the ring + 1.
    Description
       Text
-         For each {\tt s} computes the maximum of all monomial primes {\tt P} of codimension {\tt s-1} 
+         For each {\tt s} computes the maximum over all monomial primes {\tt P} with codimension {\tt s-1} 
 	 of the minimal size of a generating set of {\tt I} localized at {\tt P}.  If this number is 
 	 less than {\tt s}, then {\tt s} is included in the list.
       Text
-         The values {\tt s} returned are candidates for {\tt I} being an {\tt s}-rsidual intersection.
+         The values {\tt s} returned are candidates for {\tt I} possibly being an {\tt s}-rsidual intersection.
       Example
-   Caveat
-      It is not checked whether {\tt I} is in fact monomial, and the results will be incorrect otherwise.
+         R = QQ[a,b,c];
+	 I = monomialIdeal{a*b,b*c^2}
+	 residualCodims I
    SeeAlso
       numgensByCodim
-      maxGd
+      maxGs
 ///
 
+------------------------------------------------------------
+-- DOCUMENTATION isStronglyCM
+------------------------------------------------------------
+
+doc ///
+   Key
+      isStronglyCM
+      (isStronglyCM,Ideal)
+   Headline
+      Checks if the given ideal is Strongly Cohen Macaulay
+   Usage
+      b = isStronglyCM I
+   Inputs
+      I:Ideal
+   Outputs
+      b:Boolean
+         true if {\tt I} is Strongly Cohen Macaulay
+   Description
+      Text
+         Checks whether {\tt I} is Strongly Cohen Macaulay. We compute the depths of the Koszul homology by using {\tt koszulDepth} and compares it to {\tt codim I}.
+      Example
+         R = QQ[x_1..x_5];
+	 I = ideal{x_1*x_3,x_2*x_4,x_3*x_4,x_1*x_5,x_3*x_5};
+         isStronglyCM I
+   SeeAlso
+       koszulDepth
+       hasSlidingDepth
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION koszulDepth
+------------------------------------------------------------
+
+doc ///
+   Key
+      koszulDepth
+      (koszulDepth,Ideal)
+      (koszulDepth,ZZ,Ideal)
+   Headline
+      Computes the depths of the Koszul homology
+   Usage
+      L = koszulDepth I
+      d = koszulDepth(k,I)
+   Inputs
+      I:Ideal
+      k:ZZ
+         the homological index to compute
+   Outputs
+      L:List
+         a list of the depths of Kozul homology
+      d:ZZ
+         the depth of the k-th Koszul homology
+   Description
+      Text
+         The one parameter version computes the depths of the non-vanishing Koszul homology of {\tt I}.
+         The two parameter version computes only the depth of the {\tt k}-th Koszul homology.
+      Example
+         R = QQ[x_1..x_6];
+	 I = ideal{x_1*x_2,x_1*x_3,x_2*x_4*x_5,x_1*x_6,x_4*x_6,x_5*x_6};
+         koszulDepth I
+         koszulDepth(2,I)
+   SeeAlso
+       isStronglyCM
+       hasSlidingDepth
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION hasSlidingDepth
+------------------------------------------------------------
+
+doc ///
+   Key
+      hasSlidingDepth
+      (hasSlidingDepth,Ideal)
+      (hasSlidingDepth,ZZ,Ideal)
+   Headline
+      Checks if an ideal has the sliding depth property
+   Usage
+      b = hasSlidingDepth I
+      b = hasSlidingDepth(k,I)
+   Inputs
+      I:Ideal
+      k:ZZ
+   Outputs
+      b:Boolean
+         true if {\tt I} has sliding depth
+   Description
+      Text
+         This computes whether the ideal {\tt I} has sliding depth.
+      Text
+         For an ideal $I$ with minimal generating set ${\bf f}=(f_1,\ldots,f_n)$, we say $I$
+         has k-sliding depth if for all $i\leq k$ we have $depth(H_{n-codim(I)-i}({\bf f}))\geq dim I - i$.
+         Note that since $H_{n-codim(I)}({\bf f})$ is the canonical module which always has
+         depth equal to $dim I$, every ideal has 0-sliding depth. We say that a module has
+         sliding depth without a parameter if it has $(n-codim(I))$-sliding depth
+      Example
+         R = QQ[x_1..x_6];
+	 I = ideal{x_1*x_2,x_1*x_3,x_2*x_4*x_5,x_1*x_6,x_4*x_6,x_5*x_6};
+         hasSlidingDepth I
+         hasSlidingDepth(1,I)
+         hasSlidingDepth(2,I)
+   SeeAlso
+       isStronglyCM
+       koszulDepth
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION depthsOfPowers
+------------------------------------------------------------
+
+doc ///
+   Key
+      depthsOfPowers
+      (depthsOfPowers,ZZ,ZZ,Ideal)
+      (depthsOfPowers,ZZ,Ideal)
+   Headline
+      Computes depth of powers of an ideal
+   Usage
+      L = depthsOfPowers(s,c,I)
+      L = depthsOfPowers(s,I)
+   Inputs
+      s:ZZ
+      	  number of powers to compute
+      c:ZZ
+      	  (If omitted, it will use c = codim I)
+      I:Ideal
+   Outputs
+      L:List
+      	 The depths of the powers of I from 1 to s-c+1. 
+   Description
+      Text
+      	  Computes the depth of $S/I^k$ for $k$ from 1 to $s-c+1$.
+      Example
+      	  R = QQ[a,b,c,d,e,f];
+	  I = ideal (b*c, b*d, b*e, d*e, a*d*f, e*f);
+	  depthsOfPowers(6,3,I)
+   Caveat
+   SeeAlso
+///
+
+
+------------------------------------------------------------
+-- DOCUMENTATION genericResidual
+------------------------------------------------------------
+
+doc ///
+   Key
+      genericResidual
+      (genericResidual,ZZ,Ideal)
+   Headline
+      Computes generic residual intersections of an ideal
+   Usage
+      J = genericResidual(s,I)
+   Inputs
+      s:ZZ
+      I:Ideal
+   Outputs
+      J:Ideal
+   Description
+      Text
+      Example
+   Caveat
+   SeeAlso
+///
+
+TEST ///
+R = QQ[x_1..x_6];
+I = ideal{x_1*x_2,x_1*x_3,x_2*x_4*x_5,x_1*x_6,x_4*x_6,x_5*x_6};
+assert(koszulDepth I == {3,0,2,3})
+assert(koszulDepth(2,I) == 2)
+assert(not hasSlidingDepth I)
+assert(hasSlidingDepth(1,I))
+assert(not hasSlidingDepth(2,I))
+assert(not isStronglyCM I)
+///
+
+TEST ///
+R = QQ[x_1..x_5];
+I = ideal{x_1*x_3,x_2*x_4,x_3*x_4,x_1*x_5,x_3*x_5};
+assert(isStronglyCM I)
+///
 end--
 
 linkageBound (I, UseNormalModule => false)
@@ -581,5 +775,5 @@ uninstallPackage "ResidualIntersections"
 installPackage "ResidualIntersections"
 
 J = idealChainFromSC randomChain(10,5,20);
-J/maxGd
+J/maxGs
 J/residualCodims

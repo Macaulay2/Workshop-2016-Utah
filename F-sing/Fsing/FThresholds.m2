@@ -1,3 +1,15 @@
+-- changes in order or arguments
+
+-- internal functions acted on:     nu*, FTApproxList, FPTApproxList, FTHatApproxList, 
+--     	       	       	       	    isFPTPoly, isFJumpingNumberPoly
+
+-- internal functions to do: guessFPT, estFPT
+
+-- external functions acted on: divideFraction, findNumberBetween, fastExp,
+--    	      	      	      	  frobeniusPower, genFrobeniusPower  
+
+-- external functions to do: ethRoot*, tau*, sigma*
+
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
 -- CONTENTS
@@ -19,7 +31,7 @@
 ----------------------------------------------------------------------------------
 -- FThreshold Estimates
 
--- Main functions: guessFPT, estFPT
+-- Main functions: PT, estFPT
 
 ----------------------------------------------------------------------------------
 -- FPT/F-Jumping number check
@@ -49,7 +61,7 @@ effPolyRad = ( f, J ) ->
 (
     if not isSubset( ideal( f ), radical( J ) ) then error "The polynomial is not contained in the radical of the ideal.";
     d := 1;
-    while not isSubset( ideal( fastExp( f, d ) ), J ) do d = d+1;
+    while not isSubset( ideal( fastExp( d, f ) ), J ) do d = d+1;
     d
 )
 
@@ -114,7 +126,7 @@ nuList( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this is a faster nuList c
 	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(ideal(fastExp(f,middle)), frobeniusPower( d, J ));
+			answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
@@ -183,7 +195,7 @@ nu( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this does a fast nu computati
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(ideal(fastExp(f,middle)), frobeniusPower( e, J ));
+		answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -374,21 +386,21 @@ nuHat( ZZ, RingElement ) := ( e, f ) -> nu( e, f )
 --Gives a list of nu_I(p^d)/p^d for d=1,...,e
 FPTApproxList = method();
 
-FPTApproxList (Ideal,ZZ) := (I,e) ->
+FPTApproxList ( ZZ, Ideal ) := (e, I) ->
 (
      p := char ring I;
      nus := nuList(e,I);
      apply( nus, 1..e, (n,k) -> n/p^k )
 )
 
-FPTApproxList (RingElement,ZZ) := (f,e) -> FPTApproxList(ideal(f),e)
+FPTApproxList ( ZZ, RingElement ) := ( e, f ) -> FPTApproxList( e, ideal(f) )
 
 --Approximates the F-Threshold with respect to an ideal J
 --More specifically, this gives a list of nu_I^J(p^d)/p^d for d=1,...,e
 
 FTApproxList = method();
 
-FTApproxList (Ideal,Ideal,ZZ) := (I,J,e) ->
+FTApproxList ( ZZ, Ideal, Ideal ) := ( e, I, J ) ->
 (
     if not isSubset( I, radical(J) ) then error "F-threshold undefined.";
      p := char ring I;
@@ -396,20 +408,19 @@ FTApproxList (Ideal,Ideal,ZZ) := (I,J,e) ->
      apply( nus, 1..e, (n,k) -> n/p^k )
 )
 
-FTApproxList (RingElement,Ideal,ZZ) := (f1,J1,e1) -> FTApproxList(ideal(f1),J1,e1)
+FTApproxList ( ZZ, RingElement, Ideal ) := ( e, f, J ) -> FTApproxList( e, ideal(f), J )
 
 FTHatApproxList = method();
 
-FTHatApproxList (Ideal,Ideal,ZZ) := (I,J,e) ->
+FTHatApproxList ( ZZ, Ideal, Ideal ) := ( e, I, J ) ->
 (
     if not isSubset( I, radical(J) ) then error "F-threshold undefined.";
      p := char ring I;
-     nus := nuHatList(I,J,e);
+     nus := nuHatList( e, I, J );
      apply( nus, 1..e, (n,k) -> n/p^k )
 )
 
-FTHatApproxList (RingElement,Ideal,ZZ) := (f1,J1,e1) -> FTHatApproxList(ideal(f1),J1,e1)
-
+FTHatApproxList ( ZZ, RingElement, Ideal ) := ( e, f, J ) -> FTHatApproxList( e, ideal(f), J )
 
 --Guesses the FPT of ff.  It returns a list of all numbers in 
 --the range suggested by nu(e1,ff) with maxDenom as the maximum denominator
@@ -417,9 +428,9 @@ guessFPT ={OutputRange=>false}>>o -> (ff, e1, maxDenom) ->(
      nn := nu(e1,ff);
      pp := char ring ff;
      if (o.OutputRange == false) then 
-          findNumberBetween({nn/(pp^e1-1), (nn+1)/(pp^e1)}, maxDenom)
+          findNumberBetween( maxDenom, {nn/(pp^e1-1), (nn+1)/(pp^e1)} )
      else
-          {{ nn/(pp^e1-1), (nn+1)/(pp^e1)}, findNumberBetween({nn/(pp^e1-1), (nn+1)/(pp^e1)}, maxDenom)}
+          {{ nn/(pp^e1-1), (nn+1)/(pp^e1)}, findNumberBetween( maxDenom, {nn/(pp^e1-1), (nn+1)/(pp^e1)} )}
 )
 
 --F-pure threshold estimation, at the origin
@@ -555,42 +566,46 @@ estFPT={FinalCheck=> true, Verbose=> false, MultiThread=>false, DiagonalCheck=>t
 --isFPTPoly, determines if a given rational number is the FPT of a pair in a polynomial ring. 
 --if Origin is specified, it only checks at the origin. 
 
-isFPTPoly ={Verbose=> false,Origin=>false}>> o -> (f1, t1) -> (
-	pp := char ring f1;
-	if (o.Origin == true) then org := ideal(vars (ring f1));
-	funList := divideFraction(t1, pp);
-	--this writes t1 = a/(p^b(p^c-1))
-	aa := funList#0;
-	bb := funList#1;
-	cc := funList#2;
-	mySigma := ideal(f1);
-	myTau := ideal(sub(1, ring f1));
-	myA := aa;
+FPT2VarHomogInternal = method(Options => {MaxExp => infinity, PrintCP => false, Nontrivial => false})
+
+FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
+
+
+isFPTPoly = method( Options => {Verbose=> false,Origin=>false} )
+isFPTPoly ( QQ, RingElement ) := o -> ( t, f ) -> 
+(
+	p := char ring f;
+	if (o.Origin == true) then org := ideal(vars (ring f));
+	--this writes t = a/(p^b(p^c-1))
+	(a,b,c) := toSequence divideFraction( p, t );
+	mySigma := ideal(f);
+	myTau := ideal(sub(1, ring f));
+	myA := a;
 	myA2 := 0;
 	
-	if (cc != 0) then (
-		myA = floor(aa / (pp^cc - 1));
-		myTau = tauPoly( f1, (aa%(pp^cc-1))/(pp^cc-1) )
+	if (c != 0) then (
+		myA = floor(a / (p^c - 1));
+		myTau = tauPoly( f, (a%(p^c-1))/(p^c-1) )
 	);
 	
 	if (o.Verbose==true) then print "higher tau Computed";
 
 	--first we check whether this is even a jumping number.
-	if (cc == 0) then (
-		myA2 = aa-1;
-		mySigma = sigmaAOverPEMinus1Poly(f1, (pp-1), 1)
+	if (c == 0) then (
+		myA2 = a-1;
+		mySigma = sigmaAOverPEMinus1Poly(f, (p-1), 1)
 	)
 	else (
-		myA2 = floor((aa-1)/(pp^cc-1));
-		mySigma = (sigmaAOverPEMinus1Poly(f1, ((aa-1)%(pp^cc-1))+1, cc))
+		myA2 = floor((a-1)/(p^c-1));
+		mySigma = (sigmaAOverPEMinus1Poly(f, ((a-1)%(p^c-1))+1, c))
 	);
 	if (o.Verbose==true) then print "higher sigma Computed";
 
 	returnValue := false;
 	
-	if ( isSubset(ideal(sub(1, ring f1)), ethRootSafe(f1, mySigma, myA2, bb) )) then (
-		if (o.Verbose==true) then print "we know t1 <= FPT";
-		if (not isSubset(ideal(sub(1, ring f1)), ethRootSafe(f1, myTau, myA, bb) ))  then returnValue = true 
+	if ( isSubset(ideal(sub(1, ring f)), ethRootSafe(f, mySigma, myA2, b) )) then (
+		if (o.Verbose==true) then print "we know t <= FPT";
+		if (not isSubset(ideal(sub(1, ring f)), ethRootSafe(f, myTau, myA, b) ))  then returnValue = true 
 	);
 		
 	returnValue
@@ -600,22 +615,22 @@ isFPTPoly ={Verbose=> false,Origin=>false}>> o -> (f1, t1) -> (
 --***************************************************************************
 --This needs to be speeded up, like the above function
 --***************************************************************************
-isFJumpingNumberPoly ={Verbose=> false}>> o -> (f1, t1) -> (
-	pp := char ring f1;
-	funList := divideFraction(t1, pp);
-	--this writes t1 = a/(p^b(p^c-1))
-	aa := funList#0;
-	bb := funList#1;
-	cc := funList#2;
-	mySigma := ideal(f1);
-	myTau := ethRoot(tauPoly(f1, t1*pp^bb), bb);
+
+isFJumpingNumberPoly = method( Options => {Verbose=> false} )
+
+isFJumpingNumberPoly ( QQ, RingElement ) := o -> ( t, f ) -> 
+	p := char ring f;
+	--this writes t = a/(p^b(p^c-1))
+	(a,b,c) := toSequence divideFraction( p, t );
+	mySigma := ideal(f);
+	myTau := ethRoot(tauPoly(f, t*p^b), b);
 	if (o.Verbose==true) then print "higher tau Computed";
 
 	--first we check whether this is even a jumping number.
-	if (cc == 0) then
-		mySigma = ethRoot((ideal(f1^(aa-1)))*((sigmaAOverPEMinus1Poly(f1, (pp-1), 1))), bb)
+	if (c == 0) then
+		mySigma = ethRoot((ideal(f^(a-1)))*((sigmaAOverPEMinus1Poly(f, (p-1), 1))), b)
 	else 
-		mySigma = ethRoot((sigmaAOverPEMinus1Poly(f1, aa, cc)),bb);
+		mySigma = ethRoot((sigmaAOverPEMinus1Poly(f, a, c)),b);
 	if (o.Verbose==true) then print "sigma Computed";
 
 	not (isSubset(mySigma, myTau))
