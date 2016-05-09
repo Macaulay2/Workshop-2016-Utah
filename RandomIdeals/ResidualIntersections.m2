@@ -222,7 +222,7 @@ koszulDepth(Ideal) := I -> (
     for i in 0..(numColumns(mingens I)-codim I) list profondeur HH_i(C)
     )
 
-koszulDepth(Ideal,ZZ) := (I,k) -> (
+koszulDepth(ZZ,Ideal) := (k,I) -> (
     C := koszul mingens I;
     profondeur HH_k(C)
     )
@@ -236,15 +236,15 @@ isStronglyCM(Ideal) := I -> (
 
 hasSlidingDepth = method()
 
-hasSlidingDepth(Ideal,ZZ) := (I,k) -> (
+hasSlidingDepth(ZZ,Ideal) := (k,I) -> (
     d := dim I;
     s := numColumns(mingens I)-codim I;
-    all(k+1, i -> (koszulDepth(I,s-i))>=d-i)
+    all(k+1, i -> (koszulDepth(s-i,I))>=d-i)
     )
 
-hasSlidingDepth(Ideal) := (I) -> (
+hasSlidingDepth(Ideal) := I -> (
     s := numColumns(mingens I)-codim I;
-    hasSlidingDepth(I,s)
+    hasSlidingDepth(s,I)
     )
 
 -------------------------------------
@@ -515,6 +515,116 @@ doc ///
       numgensByCodim
       maxGs
 ///
+
+------------------------------------------------------------
+-- DOCUMENTATION isStronglyCM
+------------------------------------------------------------
+
+doc ///
+   Key
+      isStronglyCM
+      (isStronglyCM,Ideal)
+   Headline
+      Checks if the given ideal is Strongly Cohen Macaulay
+   Usage
+      b = isStronglyCM I
+   Inputs
+      I:Ideal
+         an ideal
+   Outputs
+      b:Boolean
+         true if {\tt I} is Strongly Cohen Macaulay
+   Description
+      Text
+         Checks whether {\tt I} is Strongly Cohen Macaulay. We compute the depths of the Koszul homology by using {\tt koszulDepth} and compares it to {\tt codim I}.
+      Example
+         R = QQ[x_0..x_2];
+	 I = ideal{x_0*x_1,x_1*x_2};
+         isStronglyCM I
+   SeeAlso
+       koszulDepth
+       hasSlidingDepth
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION koszulDepth
+------------------------------------------------------------
+
+doc ///
+   Key
+      koszulDepth
+      (koszulDepth,Ideal)
+      (koszulDepth,ZZ,Ideal)
+   Headline
+      Computes the depths of the Koszul homology
+   Usage
+      L = koszulDepth I
+      d = koszulDepth(k,I)
+   Inputs
+      I:Ideal
+         an ideal
+      k:ZZ
+         the homological index to compute
+   Outputs
+      L:List
+         a list of the depths of Kozul homology
+      d:ZZ
+         the depth of the k-th Koszul homology
+   Description
+      Text
+         The one parameter version computes the depths of the non-vanishing Koszul homology of {\tt I}.
+         The two parameter version computes only the depth of the {\tt k}-th Koszul homology.
+      Example
+         R = QQ[x_0..x_2];
+	 I = ideal{x_0*x_1,x_1*x_2};
+         koszulDepth I
+         koszulDepth(1,I)
+   SeeAlso
+       isStronglyCM
+       hasSlidingDepth
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION hasSlidingDepth
+------------------------------------------------------------
+
+doc ///
+   Key
+      hasSlidingDepth
+      (hasSlidingDepth,Ideal)
+      (hasSlidingDepth,ZZ,Ideal)
+   Headline
+      Checks if an ideal has the sliding depth property
+   Usage
+      b = hasSlidingDepth I
+      b = hasSlidingDepth(k,I)
+   Inputs
+      I:Ideal
+         an ideal
+      k:ZZ
+   Outputs
+      b:Boolean
+         if {\tt I} has sliding depth
+   Description
+      Text
+         This computes whether the ideal {\tt I} has sliding depth.
+      Text
+         For an ideal $I$ with minimal generating set ${\bf f}=(f_1,\ldots,f_n)$, we say $I$
+         has k-sliding depth if for all $i\leq k$ we have $depth(H_{n-codim(I)-i}({\bf f}))\geq dim I - i$.
+         Note that since $H_{n-codim(I)}({\bf f})$ is the canonical module which always has
+         depth equal to $dim I$, every ideal has 0-sliding depth. We say that a module has
+         sliding depth without a parameter if it has $(n-codim(I))$-sliding depth
+      Example
+         R = QQ[x_0..x_2];
+	 I = ideal{x_0*x_1,x_1*x_2};
+         hasSlidingDepth I
+         hasSlidingDepth(0,I)
+   SeeAlso
+       isStronglyCM
+       koszulDepth
+///
+
+
 
 end--
 insta
