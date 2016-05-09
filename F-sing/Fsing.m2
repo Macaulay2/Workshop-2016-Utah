@@ -40,6 +40,9 @@ Headline => "A package for calculations of singularities in positive characteris
 DebuggingMode => true, 
 Reload => true 
 )
+
+
+--- *** I SORTED THESE ALPHABETICALLY TO FINDMY WAY AROUND *** MK
 export{
 --IntegerComputations (IntegerComps.m2)
 	"floorlog",
@@ -49,30 +52,33 @@ export{
     "ascendIdealSafe",
     "ascendIdealSafeList",
     "AscentCount",
+	"basePExpMaxE",
     "BinomialCheck",
     "binomialFPT",
     "canVector",
     "DiagonalCheck", 
     "diagonalFPT",
+	"dividFraction",
     "estFPT",
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
     "fancyEthRoot",	
-	"generatingRoot", ---MK
-	"FFiniteSupport", ---MK
-	"generatingMorphism", ---MK
-	"findGeneratingMorphisms", ---MK
 --F-thresholds computations (FThresholds.m2)
     "factorList",    
     "findAllCompatibleIdeals", ---MK	
     "findCPBelow",
+	"FFiniteSupport", ---MK
+	"findGeneratingMorphisms", ---MK
+	"frobeniusPower",
     "FPTApproxList",     
     "FPT2VarHomog",     
     "FPT2VarHomogInternal",
 	"FPureIdeals",
     "FTApproxList",
     "FTHatApproxList", 
+	"generatingMorphism", ---MK
+	"generatingRoot", ---MK
     "guessFPT",
     "isBinomial",
     "isCP",
@@ -114,19 +120,25 @@ load "./Fsing/IntegerComps.m2"
 
 load "./Fsing/EthRoots.m2"
 
-load "./Fsing/FThresholds.m2"
 
-load "./Fsing/SpecialFThresholds.m2"
+load "./Fsing/generatingMorphism.m2"
+
 
 load "./Fsing/compatiblySplit.m2"
 
-load "./Fsing/generatingMorphism.m2"
 
 load "./Fsing/FPure.m2"
 
 load "./Fsing/FFiniteSupport.m2"
 
 load "./Fsing/parameterTestIdeal.m2"
+
+
+load "./Fsing/FThresholds.m2"
+
+load "./Fsing/SpecialFThresholds.m2"
+
+
 
 load "./Fsing/FsingDocs.m2"
 
