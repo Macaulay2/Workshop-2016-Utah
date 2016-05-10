@@ -326,14 +326,14 @@ truncatedBasePExp = method()
 --Gives the e-th truncation of the non-terminating base p expansion of a rational number.
 truncatedBasePExp ( ZZ, ZZ, QQ ) := ( p, e, x ) -> 
 (
-    if x<0 then (error "truncation: Expected x>0")
+    if x<0 then (error "truncatedBasePExp: Expected x>0")
     else (ceiling(p^e*x)-1)/p^e    	
 )
 
 --truncation threads over lists.
 truncatedBasePExp ( ZZ, ZZ, List) := (p,e,u) -> 
 (
-    apply(u,x->truncation(p,e,x))
+    apply(u,x->truncatedBasePExp(p,e,x))
 )
 
 --===================================================================================
