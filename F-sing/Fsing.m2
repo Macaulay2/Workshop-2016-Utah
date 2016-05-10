@@ -55,6 +55,7 @@ export{
 	"basePExpMaxE",
     "BinomialCheck",
     "binomialFPT",
+	"boundLargestCompatible", ---MK
     "canVector",
     "DiagonalCheck", 
     "diagonalFPT",
@@ -169,5 +170,5 @@ load "./Fsing/generatingMorphismDoc.m2"
 
 load "./Fsing/parameterTestIdealDoc.m2"
 
-load "./Fsing/Fpure.m2"
+load "./Fsing/FpureDoc.m2"
 
