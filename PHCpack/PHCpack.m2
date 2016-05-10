@@ -169,59 +169,125 @@ parseSolutions (String,Ring) := o -> (s,R) -> (
   --      carrying also other diagnostic information about each.
   oldprec := defaultPrecision;
   defaultPrecision = o.Bits;
-  L := get s; 
-  L = replace("=", "=>", L);
+  L := get s;
+  L = replace("([[:alnum:]]+) *=", ///"\1"=>///,  L);
   L = replace("I", "ii", L);
   L = replace("E\\+","e",L);
   L = replace("E", "e", L);
-  L = replace("time", "\"time\"", L);
-  L = replace("rco", "\"rco\"", L);
-  L = replace("multiplicity", "\"mult\"", L); 
-  L = replace("\\bres\\b", "\"residual\"", L);
-  L = replace("\\bresolution\\b", "\"residual\"", L);
-  -- because M2 automatically thinks "res"=resolution   	  
+  L = replace(///"multiplicity"///, ///"mult"///, L); 
+  L = replace(///"res"///, ///"residual"///, L);
   sols := toList apply(value L, sol->new HashTable from toList sol);
   defaultPrecision = oldprec;
-  apply(sols, sol->point( {apply(gens R, v->sol#v)} | outputToPoint sol ))
+  apply(sols, sol->point( {apply(gens R, v->sol#(toString v))} | outputToPoint sol ))
 )
 
+-------------------------------------
+-- The below method doesn't work unless you do simultaneous tracking, but a bug in the output of phc -p (option 2 for intermediate points) prevents that from working.
+-------------------------------------
+-- parseIntermediateSolutionsOLD = method()
+-- parseIntermediateSolutionsOLD (String,ZZ,Ring) := (output,numsols,R) -> (
+--     L := get output;
+--     rgx := "\\*{5} +path([[:digit:]]) +\\*+$";
+--     start := (regex(rgx,L))#0#0;
+--     linesL := lines substring(start,L);
+--     solsize := 0;
+--     for i from 1 to #linesL-1 do (
+--         if match("^\\*",linesL#i) then (
+--             solsize = i;
+--             break;
+--             ););
+--     << "got solution size : " << solsize << endl;
+--     chunksize := numsols*solsize;
+--     chunks := {};
+--     while match(rgx,linesL#0) do (
+--         chunks = append(chunks,take(linesL,chunksize));
+--         linesL = drop(linesL,chunksize);
+--     );
+--     << #chunks << endl;
+--     << "first chunks "<< netList chunks#0 << endl << netList chunks#10 << endl;
+--     chunksNew := for chunk in chunks list (
+--         for l in chunk list (
+--             replace(rgx,"solution \\1 :",l);
+--         );
+--     );
+--     chunks = chunksNew;
+--     << #chunks << endl;
+--     << "first chunk again" << netList chunks#0 << endl;
+--     for chunk in chunks list (
+--         --fname := getFilename();
+--         fname := "this.that";
+--         f := openOut fname;  
+--         for sol in chunk do (
+--             for l in sol do (
+--                 f << toString(l) << endl;
+--             );
+--         );
+--         close f;
+--         foutname := fname | ".sols";
+--         run("phc -z "|fname|" "|foutname);
+--         parseSolutions(get foutname,R)
+--     )
+-- )
 
-parseIntermediateSolutions = (output,numsols,R) -> (
-    L := get output;
-    rgx := "\\*{5} +path([[:digit:]]) +\\*+$";
-    start := (regex(rgx,L))#0#0;
-    linesL := lines substring(start,L);
-    solsize := 0;
-    for i from 1 to #linesL do (
-        if match("^\\*",linesL#i) then (
-            solsize = i;
+
+parseIntermediateSolutions = method()
+parseIntermediateSolutions (String,Ring) := (output,R) -> (
+    linesL := lines get output;
+    start := 0;
+    (loc,len) := (regex(".*([[:digit:]])+$",linesL#0))#1;
+    numvars := value(substring(loc,loc+len,linesL#0));
+    for i from 0 to #linesL-1 do (
+        if "OUTPUT INFORMATION DURING CONTINUATION :" == linesL#i then (
+            start = i;
             break;
-            ););
-    chunksize := numsols*solsize;
-    chunks := {};
-    while match(rgx,linesL#0) do (
-        chunks = append(chunks,take(linesL,chunksize));
-        linesL = drop(linesL,chunksize);
-    );
-    chunks = for chunk in chunks list (
-        for l in chunk list (
-            replace(rgx,"solution \\1 :",l);
         );
     );
-    for chunk in chunks list (
-        --fname := getFilename();
-        fname := "this.that";
-        f := openOut fname;  
-        for sol in chunk do (
-            for l in sol do (
-                f << toString(l) << endl;
-            );
+    solsize := 0;
+    for i from start+3 to #linesL-1 do (
+        if match("^== err ",linesL#i) then (
+            solsize = i-start-3 + 1;
+            break;
         );
+    );
+    << "got solution size : " << solsize << endl;
+    filename := getFilename();
+    << filename << endl;
+    f := openOut filename;
+    i := start+3;
+    parsefiles := {};
+    numlines := 0;
+    while(i<#linesL-1) do (
+        line := linesL#i;
+        if match("^t :", line) then (f << "solution 1 : " << endl;);
+        if match("== [[:digit:]] ", line) then (
+            i = i + solsize + 1;
+            close f;
+            foutname := filename | ".sols";
+            parsefiles = append(parsefiles, (filename,numlines // solsize));
+            filename = getFilename();
+            f = openOut filename;
+            numlines=0;
+            continue;
+        );
+        f << line << endl;
+        i = i + 1;
+        numlines = numlines + 1;
+    );
+    close f;
+    
+    results := {};
+    for pf in parsefiles do (
+        oldf := openIn pf#0;
+        f = openOut(pf#0 | ".final"); 
+        f << "THE SOLUTIONS :" << endl;
+        f << pf#1 << " " << numvars << endl;
+        f << "===========================================================================" << endl;
+        f << get oldf;
         close f;
-        foutname := fname | ".sols";
-        run("phc -z "|fname|" "|foutname);
-        parseSolutions(get foutname,R)
-    )
+        run("phc -z "|pf#0|".final "|pf#0|".sols");
+        results = append(results,parseSolutions(pf#0|".sols",R));
+    );
+    results
 )
 
 pointsToFile = method(TypicalValue => Nothing, Options => {Append => false})
@@ -1722,11 +1788,13 @@ loadPackage "PHCpack"
 R = CC[x,y]
 f =  {x^3*y^5 + y^2 + x^2*y, x*y + x^2 - 1};
 I = ideal f;
-m = mixedVolume(f)
-(mv,sv) = mixedVolume(f,StableMixedVolume => true)
+--(mv,smv,q,qsols) = mixedVolume(f,StableMixedVolume=>true,StartSystem=>true)
+(mv,q,qsols) = mixedVolume(f,StartSystem=>true)
+fsols = trackPaths(f,q,qsols, interactive=>true, saveSettingsPath=>"settings.phc")
+fsols = trackPaths(f,q,qsols, loadSettingsPath=>"settings.phc")
+--m = mixedVolume(f)
+--(mv,sv) = mixedVolume(f,StableMixedVolume => true)
 --mv = mixedVolume(f,interactive=>true)
-(mv,smv,q,qsols) = mixedVolume(f,StableMixedVolume=>true,StartSystem=>true)
-(mv,smv,q,qsols) = mixedVolume(f,interactive=>true)
+--(mv,smv,q,qsols) = mixedVolume(f,interactive=>true)
 --mixedVolume(f,interactive=>true)
 --fsols = trackPaths(f,q,qsols)
-fsols = trackPaths(f,q,qsols, interactive=>true)

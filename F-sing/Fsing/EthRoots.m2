@@ -1,3 +1,22 @@
+-- changes in argument order:
+
+-- INTERNAL: 
+
+-- ethRoot: (I,e) -> (e,I), (f, I, a, e) -> (e,a,f,I), (f, I, a, e) -> (e,a,f,I), (Matrix, ZZ) -> (ZZ, Matrix), 
+--    	    (Ideal, ZZ, ZZ),  (I,m,e) -> ( e, m, I ) 
+
+-- eR: gone
+
+-- ethRootSafe: (f,I,a,e) -> (e,a,f,I), (f,a,e) -> (e,a,f)
+		
+-- ethRootSafeList: (fList,I,aList,e) -> (e,aList,fList,I), (fList,aList,e) -> (e,aList,fList)
+
+-- mEthRoot, mEthRootOneElement: (A,e) -> (e,A)
+
+-- fancyEthRoot (I,m,e) -> (e, m, I)
+
+-- EXTERNAL: basePExpMaxE
+
 --*************************************************
 --*************************************************
 --This file is used for doing the [1/p^e] operation
@@ -9,192 +28,184 @@
 --*************************************************
 --*************************************************
 
-ethRoot = method(); --- MK
+ethRoot = method(Options => {EthRootStrategy => Substitution});
+--ethRoot takes two strategy options: Substitution and MonomialBasis
+--The second strategy seems to generally be faster for computing I^[1/p^e] when e = 1, especially for polynomials of
+--high degree, but slower for larger e. 
 
-
--- Computes I^{[1/p^e]}, for an ideal I in a polynomial ring over ZZ/p 
--- or a GaloisField. The real meat of the function is ethRootInternal. 
-ethRoot(Ideal,ZZ) := (Im,e) -> (
-     J := Im;
-     success := false;
-     count := 0;
-     try J = ethRootInternal(J,e) then success = true else (
---     print "blew a buffer";
-	 while(count < e) do (	 	
-	      J = ethRootInternal(J, 1);
-	      count = count + 1
-	 )
-     );
-     J
+ethRoot ( ZZ, Ideal ) := Ideal => opts -> (e,I) -> (
+    if (not e >= 0) then (error "ethRoot: Expected second argument to be a nonnegative integer.");
+    R := ring I;
+    if (class R =!= PolynomialRing) then (error "ethRoot: Expected an ideal in a PolynomialRing.");
+    p := char R;
+    k := coefficientRing(R);
+    if ((k =!= ZZ/p) and (class(k) =!= GaloisField)) then (error "ethRoot: Expected the coefficient field to be ZZ/p or a GaloisField.");
+    q := k#order;
+    --Gets the cardinality of the base field.
+    G := I_*;
+    --Produces a list of the generators of I.
+    if #G == 0 then ideal(0_R) 
+    else if opts.EthRootStrategy == MonomialBasis then (
+	L := sum( apply( G, f -> ethRootMonStrat(e,p,q,k,f,R) ) );
+	L = first entries mingens L;
+	ideal(L)
+	)
+    else ethRootSubStrat(e,p,q,k,I,R)  
 )
 
+-----------------------------------------------------------------------------
 
-ethRoot(MonomialIdeal, ZZ ) := ( I, e ) ->
-(
+ethRoot ( ZZ, MonomialIdeal ) := Ideal => opts -> (e,I) -> (
      R := ring I;
      p := char R;
      G := I_*;
-     if #G == 0 then ideal( 0_R ) else ideal( apply( G, j -> R_((exponents(j))#0//p^e )))
+     if #G == 0 then ideal( 0_R ) else ideal( apply( G, f -> R_((exponents(f))#0//p^e )))
+)
+-----------------------------------------------------------------------------
+
+ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootSafe ( e, a, f, I ) ---MK
+
+-----------------------------------------------------------------------------
+
+ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootSafe ( e, a, f ) ---MK
+
+-----------------------------------------------------------------------------
+
+ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> fancyEthRoot( e, m, I )  --- MK
+
+-----------------------------------------------------------------------------
+
+ethRoot ( RingElement, ZZ, ZZ ) := opts -> ( f, a, e ) -> ethRoot( ideal( f ), a, e )
+
+-----------------------------------------------------------------------------
+
+ethRoot ( ZZ, Matrix ) := opts -> (e, A) -> mEthRoot (e,A)  --- MK
+
+-----------------------------------------------------------------------------
+-- MACHINERY
+-----------------------------------------------------------------------------
+
+getFieldGenRoot = (e,p,q,k) -> (
+    s := floorLog(p,q);
+    --Gets the exponent s such that q = p^s.
+    a := (gens k)#0;
+    a^(p^(s-e%s))
+    --Gets the p^e-th root of the cyclic generator a for the field extension k over ZZ/p.  If 1,a,..,a^t is a basis for k over
+    --ZZ/p and c = c_0 + c_1a + .. + c_ta^t in k, then replacing a with its p^e-th root in the preceding expansion using 
+    --substitute(c,a => getFieldGenRoot(e,p,q,k)) yields the p^e-th root of c.
+)
+
+
+-----------------------------------------------------------------------------
+
+ethRootMonStrat = (e,p,q,k,f,R) -> (
+    expDecomp := apply(exponents(f),exponent->{coefficient(R_exponent,f)*R_(exponent //p^e),exponent%p^e});
+    --Gets the exponent vectors of each monomial X^u of the polynomial f, and associates to u the two-element list whose
+    --first entry is cX^v and second entry is w, where c is the coefficient of X^u in f and u = p^e*v + w. 
+    if q > p then expDecomp = apply(expDecomp, pair -> {substitute(pair#0,(gens k)#0 => getFieldGenRoot(e,p,q,k)),pair#1});
+    remainders := partition(x-> x#1, expDecomp);
+    --Sorts the preceding list of two-element lists into a hash table with keys the remainder w of the exponent vector.
+    --The value of each key is a list of two-element lists {cX^v,w} with the same remainder.
+    remainders = applyValues(remainders,v->apply(v,w->(w#0)));
+    --Forgets the second entry of each two-element list in the preceding hash table.
+    remainders = applyValues(remainders,v->sum(v));
+    --Adds together all the terms for each key w in the hash table to get the coefficient of the basis monomial X^w
+    --for R over R^(p^e).
+    return ideal(values(remainders))
+)
+
+-----------------------------------------------------------------------------
+
+ethRootSubStrat = (e,p,q,k,I,R) -> (
+    n := numgens R;
+    Rvars := R_*;
+    Y := local Y;
+    S := k(monoid[(Rvars | toList(Y_1..Y_n)), MonomialOrder=>ProductOrder{n,n},MonomialSize=>64]);
+    --Produces a polynomial ring with twice as many variables as R.  The peculiar notation in the previous two lines
+    --is required to ensure that the variables of S are hidden from the user.  In particular, the variables in R_* are
+    --still recognized as variables of R and not S, and the code will not break if the variables in R happen to be called
+    --Y_i also.  
+    Svars := S_*;
+    J := ideal(apply(n,i->Svars#(n+i) - Svars#i^(p^e)));
+    H := apply((substitute(I,S))_*, f -> f % J);
+    --If we denote the variables in R as X_1 .. X_n, then this replaces each occurrence of X_i^(p^e) in the polynomial f
+    --with a Y_i.
+    L := sum(H, f -> ideal((coefficients(f,Variables => Rvars))#1));
+    --Peals off the coefficients of the basis polynomials for R over R^(p^e) as polynomials in the Y_i, and produces the
+    --ideal generated by these coefficient polynomials.
+    L = first entries mingens L;
+    subRelations := apply(n,i->Svars#(n+i) => Svars#i);
+    if q > p then subRelations = subRelations|{(gens k)#0 => getFieldGenRoot(e,p,q,k)};
+    L = apply(L, g ->substitute(g,subRelations));
+    --Pushes the ideal of coefficient polynomials down to R by substituting Y_i => X_i.
+    --q := k#order;
+    --Gets the size of the base field.
+    substitute(ideal L, R)
 )
 
 --This tries to compute (f^a*I)^{[1/p^e]} in such a way that we don't blow exponent buffers.  It can be much faster as well.
 --We should probably just use it.  It relies on the fact that (f^(ap+b))^{[1/p^2]} = (f^a(f^b)^{[1/p]})^{[1/p]}.
 ethRootSafe = method(); 
 
-ethRootSafe( RingElement, Ideal, ZZ, ZZ ) := ( f, I, a, e ) -> (
-	R1 := ring I;
-	p1 := char R1;
+ethRootSafe( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> (
+	R := ring I;
+	p := char R;
 	
-	aRem := a%(p1^e);
-	aQuot := floor(a/p1^e);
+	aRem := a%(p^e);
+	aQuot := floor(a/p^e);
 	
-	expOfA := basePExpMaxE(aRem,p1,e); --this gives "a base p", with the left-most term the smallest "endian".
+	expOfA := basePExp(p,e,aRem); --this gives "a base p", with the left-most term the smallest "endian".
 	
 	IN1 := I;
 	
 	if (e > 0) then (
 		IN1 = IN1*ideal(f^(expOfA#0));
-		IN1 = ethRoot(IN1, 1);
+		IN1 = ethRoot( 1, IN1 );
 		i := 1;
 	
 		while(i < #expOfA) do (
-			IN1 = ethRoot( IN1*ideal(f^(expOfA#i)), 1);
+			IN1 = ethRoot( 1, IN1*ideal(f^(expOfA#i)) );
 			i = i + 1;
 		)
 	);
 	IN1*ideal(f^(aQuot))
 )
 
-ethRootSafe( RingElement, ZZ, ZZ ) := ( f, a, e ) -> 
-    ethRootSafe( f, ideal( 1_(ring f) ), a, e )
+ethRootSafe( ZZ, ZZ, RingElement ) := ( e, a, f ) -> 
+    ethRootSafe( e, a, f, ideal( 1_(ring f) ) )
 
 --This tries to compute (f1^a1*f2^a2*...fk^ak*I)^{[1/p^e]} in such a way that we don't blow exponent buffers.  It can be much faster as well.
 ethRootSafeList = method();
 
-ethRootSafeList( List, Ideal, List, ZZ ) := ( elmtList, I1, aList, e1 ) -> (
-	   R1 := ring I1;
-        p1 := char R1;
+ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
+        R := ring I;
+        p := char R;
         
-        aListRem := apply(aList, z1 -> z1%(p1^e1) );
-        aListQuot := apply(aList, z1 -> floor(z1/p1^e1) );
+        aListRem := aList % p^e;
+        aListQuot := aList // p^e;
         
-        expOfaList := apply(aListRem, z1-> basePExpMaxE(z1, p1, e1) );
+        expOfaList := apply(aListRem, z -> basePExp( p, e, z ) );
         
-        aPowerList := apply(elmtList, expOfaList, (f1, z1) -> f1^(z1#0));
+        aPowerList := apply(elmtList, expOfaList, (f, z) -> f^(z#0));
         
-        IN1 := I1*ideal(fold(times, aPowerList));
-        if (e1 > 0) then (
-                IN1 = ethRoot(IN1, 1);
+        IN1 := I*ideal(product(aPowerList));
+        if (e > 0) then (
+                IN1 = ethRoot( 1, IN1 );
                 i := 1;
-                while(i < e1) do (
-                        aPowerList = apply(elmtList, expOfaList, (f1, z1) -> f1^(z1#i));
-                        IN1 = ethRoot( IN1*ideal(fold(times, aPowerList)), 1);
+                while(i < e) do (
+                        aPowerList = apply(elmtList, expOfaList, (f, z) -> f^(z#i));
+                        IN1 = ethRoot( 1, IN1*ideal(product(aPowerList)) );
                         i = i + 1;
                 )
         );
-        aPowerList = apply(elmtList, aListQuot, (f1, z1) -> f1^z1);
-        IN1*ideal(fold(times, aPowerList))
+        aPowerList = apply(elmtList, aListQuot, (f, z) -> f^z);
+        IN1*ideal(product(aPowerList))
 )
 
-ethRootSafeList( List, List, ZZ ) := ( F, a, e ) ->
-    ethRootSafeList( F, ideal( 1_( ring( F#0 ) ) ), a, e )
+ethRootSafeList( ZZ, List, List ) := ( e, a, F ) ->
+    ethRootSafeList( e, a, F, ideal( 1_( ring( F#0 )  ) ) )
 	
-ethRoot(RingElement, Ideal, ZZ, ZZ) := (f, I, a, e) -> ethRootSafe (f, I, a, e) ---MK
-
-ethRootInternal = (I,e) -> (
-     if (not isIdeal(I)) then (error "ethRoot: Expected first argument to be an ideal.");
-     if (not e >= 0) then (error "ethRoot: Expected second argument to be a nonnegative integer.");
-     R:=ring(I); --Ambient ring
-     if (class R =!= PolynomialRing) then (error "ethRoot: Expected an ideal in a PolynomialRing.");
-     p:=char(R); --characteristic
-     kk:=coefficientRing(R); --base field
-     if ((kk =!= ZZ/p) and (class(kk) =!= GaloisField)) then (error "ethRoot: Expected the coefficient field to be ZZ/p or a GaloisField.");
-     var:=R_*; --the variables (henceforth denoted X_i)
-     n:=#var; --number of variables
-     Y:=local Y;
-     newvar := var | toList(Y_1..Y_n);
-     S:=kk(monoid[newvar, MonomialOrder=>ProductOrder{n,n},MonomialSize=>64]);
-         -- brand new ring, with a variable Y_i for each X_i
-     J:=matrix {toList apply(n, i->newvar#(n+i)-newvar#(i)^(p^e))}; 
-         -- J = (Y_i-X_i^(p^e)) 
-     rules:=toList apply(n, i->newvar#(n+i)=>substitute(var#(i),S)); 
-         -- {Y_i =>X_i} 
-     G:=first entries compress((gens substitute(I,S)) % J);
-     	 -- replaces X_i^(p^e) with Y_i 
-     L:=sum(G,t->ideal((coefficients(t,Variables=>var))#1));	 
-     L=first entries mingens L;
-     L=apply(L, t->substitute(t,rules));
-     q:=kk#order;
-     if (q > p) then 
-     (
-	 a:=(gens kk)#0;
-	 e0:=floorlog(p,q); 
-	 root:=a^(p^(e0-(e%e0)));
-     	 L=apply(L,t->substitute(t,a=>root));
-	     -- substitute generator of kk with its p^e-th root
-     );
-     substitute(ideal L,R)
-)
-
-
---A short version of ethRoot
-eR = (I1,e1)-> (ethRoot(I1,e1) )
-
-{*
---- GONE to IntegerComps
----------------------------------------------------------------------------------------
---- The following code was written in order to more quickly compute eth roots of (f^n*I)
---- It is used in fancyEthRoot
-----------------------------------------------------------------------------------------
---- Find all ORDERED partitions of n with k parts
-allPartitions = (n,k)->
-(
-	PP0:=matrix{ toList(1..k) };
-	PP:=mutableMatrix PP0;
-	allPartitionsInnards (n,k,PP,{})
-)
-
-allPartitionsInnards = (n,k,PP,answer)->
-(
-	local i;
-	if (k==1) then 
-	{
-		PP_(0,k-1)=n;
-		answer=append(answer,first entries (PP));
-	}
-	else
-	{
-		for i from 1 to n-(k-1) do
-		{
-			PP_(0,k-1)=i;
-			answer=allPartitionsInnards (n-i,k-1,PP,answer)	;	
-		};
-	};
-	answer
-)
-
-
-
-
---- write n=a*p^e+a_{e-1} p^{e-1} + \dots + a_0 where 0\leq e_j <p 
-baseP1 = (n,p,e)->
-(
-	a:=n//(p^e);
-	answer:=1:a;
-	m:=n-a*(p^e);
-	f:=e-1; 
-	while (f>=0) do
-	{
-		d:=m//(p^f);
-		answer=append(answer,d);
-		m=m-d*(p^f);
-		f=f-1;
-	};
-	answer
-)	
-*}
-
-fancyEthRoot = (I,m,e) ->
+fancyEthRoot = (e,m,I) ->
 (
 	G:=first entries mingens I;
 	k:=#G;
@@ -213,17 +224,13 @@ fancyEthRoot = (I,m,e) ->
 			g:=1_R;
 			for l from 0 to k-1 do g=g*(G#l)^((U#l)#j); 
 			a=ideal(g)*a;
-			if (i<e) then a=ethRoot(a ,1);
+			if (i<e) then a=ethRoot( 1, a );
 ---print(g,answer);
 		};
 		answer=answer+a;
 	});
 	ideal(mingens(answer))
 )
-
-ethRoot (Ideal, ZZ, ZZ) := (I,m,e) -> fancyEthRoot (I,m,e)  --- MK
-
-ethRoot( RingElement, ZZ, ZZ ) := ( f, a, e ) -> ethRoot( ideal( f ), a, e )
 
 
 ----------------------------------------------------------------
@@ -248,7 +255,7 @@ ascendIdeal = (Jk, hk, ek) -> (
      while (isSubset(IN, IP) == false) do(
      	  IP = IN;
 --	  error "help";
-	  IN = eR(ideal(hk)*IP, ek)+IP
+	  IN = ethRoot(ek,ideal(hk)*IP)+IP
      );
 
      --trim the output
@@ -266,7 +273,7 @@ ascendIdealSafe = (Jk, hk, ak, ek) -> (
      while (isSubset(IN, IP) == false) do(
      	  IP = IN;
 --	  error "help";
-	  	IN = ethRootSafe(hk, IP, ak, ek)+IP
+	  	IN = ethRootSafe( ek, ak, hk, IP )+IP
      );
 
      --trim the output
@@ -287,7 +294,7 @@ ascendIdealSafeList ={AscentCount=>false} >> o ->  (Jk, hkList, akList, ek) -> (
 	while (isSubset(IN, IP) == false) do(
 		i1 = i1 + 1; --
 		IP = IN;
-		IN = ethRootSafeList( hkList, IP, akList, ek) + IP
+		IN = ethRootSafeList( ek, akList, hkList, IP ) + IP
 	);
 	
 	--trim the output
@@ -335,7 +342,7 @@ apply(t, i->
 answer
 )
 
-mEthRootOfOneElement= (v,e) ->(
+mEthRootOfOneElement= (e,v) ->(
 	local i; local j;
 	local d;
 	local w;
@@ -390,14 +397,10 @@ mEthRootOfOneElement= (v,e) ->(
 	answer
 )
 
-
-
-
-
-mEthRoot = (A,e) ->(
+mEthRoot = (e,A) ->(
 	local i;
 	local answer;
-	answer1:=apply(1..(rank source A), i->mEthRootOfOneElement (A_{i-1},e));
+	answer1:=apply(1..(rank source A), i->mEthRootOfOneElement (e, A_{i-1}));
 	if (#answer1==0) then 
 	{
 		answer=A;
@@ -411,7 +414,6 @@ mEthRoot = (A,e) ->(
 )	
 
 
-ethRoot (Matrix, ZZ) := (A,e) -> mEthRoot (A,e)  --- MK
 
 
 
@@ -441,7 +443,7 @@ Mstar = (A,U,e) ->(
 		while (f) do
 		{
 			f=false;
-			A1:=mEthRoot(mingens image ((U^Ne)*lastA),e);
+			A1:=mEthRoot(e, mingens image ((U^Ne)*lastA));
 			A1=A1 | lastA;
 			t1:=compress ((A1))%((lastA));
 			if (t1!=0) then 

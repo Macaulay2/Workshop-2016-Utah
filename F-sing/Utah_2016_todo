@@ -1,0 +1,10 @@
+These are a couple of couple of things we noticed that still need to be done as of the end of Utah 2016 workshop
+
+1)  Add to Fthresholds.m2 a binary search function that at present is called multiple times (see the file for more details).
+
+2) Consolidate (e.g., make a method called "testIdeal" that combines all of the specialized function) and clean up "testIdeals.m2"
+
+3)  Genearlize ethRootSafe from (ZZ, ZZ, RingElement, Ideal) to (ZZ, ZZ, Ideal, Ideal) by replacing f^a with I^[a], where the later is an integral generalized Frobenius power.
+
+
+

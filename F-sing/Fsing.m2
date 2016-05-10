@@ -43,52 +43,42 @@ Reload => true
 
 
 --- *** I SORTED THESE ALPHABETICALLY TO FIND MY WAY AROUND *** MK
+--- *** Reorganized by subpackages, so we know where to find stuff *** PT
+
 export{
 --IntegerComputations (IntegerComps.m2)
-	"floorlog",
-	"multOrder",
+    "floorlog",
+    "multOrder",
+    "taxicabNorm",
+    "divideFraction",
+    "getCanVector",
+
 --ethRootFunctions (EthRoots.m2)
     "ascendIdeal", 
     "ascendIdealSafe",
     "ascendIdealSafeList",
     "AscentCount",
-	"basePExpMaxE",
-    "BinomialCheck",
-    "binomialFPT",
-    "canVector",
-    "DiagonalCheck", 
-    "diagonalFPT",
-	"dividFraction",
-    "estFPT",
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
-    "fancyEthRoot",	
+    "EthRootStrategy",    
+    "fancyEthRoot",
+    "minimalCompatible",
+    "MonomialBasis",	
+    "Substitution",
+    
 --F-thresholds computations (FThresholds.m2)
-    "factorList",    
-    "findAllCompatibleIdeals", ---MK	
-    "findCPBelow",
-	"FFiniteSupport", ---MK
-	"findGeneratingMorphisms", ---MK
-	"frobeniusPower",
+    "BinomialCheck",
+    "DiagonalCheck", 
+    "estFPT",
+    "FinalCheck",    
     "FPTApproxList",     
-    "FPT2VarHomog",     
-    "FPT2VarHomogInternal",
-	"FPureIdeals",
     "FTApproxList",
     "FTHatApproxList", 
-	"generatingMorphism", ---MK
-	"generatingRoot", ---MK
     "guessFPT",
-    "isBinomial",
-    "isCP",
-    "isDiagonal",
     "isFJumpingNumberPoly",
     "isFPTPoly",
-    "isInLowerRegion",
-    "isInUpperRegion",
-    "MaxExp",
-    "minimalCompatible",
+    "MultiThread",    
     "nu",
     "nuAlt",
     "NuCheck",
@@ -97,12 +87,41 @@ export{
     "nuList",
     "nuListAlt",
     "nuListAlt1",
+    "Origin",
+    "OutputRange",
+
+--F-thresholds of special families of polynomials (SpecialFThresholds.m2)
+    "binomialFPT",
+    "diagonalFPT",
+    "factorList",    
+    "findCPBelow",
+    "FPT2VarHomog",     
+    "FPT2VarHomogInternal",
+    "isBinomial",
+    "isCP",
+    "isDiagonal",
+    "isInLowerRegion",
+    "isInUpperRegion",
+    "MaxExp",
+    "Nontrivial",    
     "PrintCP",
     "setFTData",
     "splittingField",
-    "taxicabNorm",
-    "paraTestModule", ---MK
-    "paraTestModuleAmbient" ---MK
+
+-- Other
+
+       "findAllCompatibleIdeals", ---MK	
+    
+	"findTestElementAmbient", ---Karl
+	"FFiniteSupport", ---MK
+	"findGeneratingMorphisms", ---MK
+	"FPureIdeals",
+	"frobeniusPower",
+ 	"FullMap", ---Karl
+	"generatingMorphism", ---MK
+	"generatingRoot", ---MK
+   "paraTestModule", ---MK
+    "paraTestModuleAmbient" ---MK  
 }
 
 --*************************************************
@@ -116,10 +135,9 @@ export{
 --*************************************************
 --*************************************************
 
-load "./Fsing/IntegerComps.m2"
+load "./Fsing/BasicFunctions.m2"
 
 load "./Fsing/EthRoots.m2"
-
 
 load "./Fsing/generatingMorphism.m2"
 
@@ -130,6 +148,8 @@ load "./Fsing/compatiblySplit.m2"
 load "./Fsing/FPure.m2"
 
 load "./Fsing/FFiniteSupport.m2"
+
+
 
 load "./Fsing/parameterTestIdeal.m2"
 
@@ -159,5 +179,4 @@ load "./Fsing/generatingMorphismDoc.m2"
 load "./Fsing/parameterTestIdealDoc.m2"
 
 load "./Fsing/Fpure.m2"
-
 
