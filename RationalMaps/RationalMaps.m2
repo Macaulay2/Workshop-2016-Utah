@@ -234,16 +234,18 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 isSameDegree=method();
 isSameDegree(BasicList):=(L)->(
-   n:=#L;
-   flag := true;
-   if n!=0 then (
-       d:=degree L#0;
-       i := 0;
-       while ((i < n) and (flag == true)) do(
-	   if (isHomogeneous(L#i) == false) then flag = false;
-	   if (degree(L#i) != d) then flag = false;
-       	   i = i+1;
-       );
+    n:=#L;
+    flag := true;
+    if n!=0 then (
+        d:=max(apply(L,zz->degree zz));
+        i := 0;
+        while ((i < n) and (flag == true)) do(
+	    if (isHomogeneous(L#i) == false) then flag = false;
+        if ((L#i) != sub(0, ring(L#i))) then (
+	        if (degree(L#i) != d) then flag = false;
+	    );
+       	i = i+1;     	  
+        );
     );  
     flag
 );
@@ -260,43 +262,16 @@ isBirationalMap = method();
 --defining ideal of Y = im
 --list of elements = bm
 isBirationalMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
-    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
     R:=ring di;
     S:=ring im;
-    im1 := idealOfImageOfMap(di, im, bm);
-    if (im1 == im) then (
-        K:=coefficientRing R;
---In the following lines we remove the linear parts of the ideal di and 
---modify our map bm
-        Rlin:=(ambient ring di)/di;
-        Rlin2 := minimalPresentation(Rlin);
-        phi:=Rlin.minimalPresentationMap;    
-        Rlin1:=target phi;
-        di1:=ideal Rlin1;
-        bm0:=phi(matrix{bm});
-        bm1:=flatten first entries bm0;
- --From here the situation is under the assumption that the variety is not contained in any hyperplane.
-        r:=numgens ambient Rlin1;
-        Jr:= blowUpIdeals(di1,bm1);
-        n:=numgens Jr;
-        L:={};
-        for i from 0 to (n-1) do (
-	    if  (degree Jr_i)_0==1 then L=append(L, Jr_i);
-	);
-       JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
-       vS:=gens ambient S;
-   --print "we got here.";
-       g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
-     --  print "we got there.";
-       barJD:=g(JD);
-     --  print barJD;
-       jdd:=(numgens ambient Rlin1)-1;
-   --print jdd;
-       not(isSubset(minors(jdd,barJD),im1))
-   )
-   else(
-       false
-   )
+    im1 := idealOfImageOfMap(di, im, bm); 
+    if (dim ((im1*S^1)/(im*S^1)) == 0) then(
+        isBirationalOntoImage(di,im1,bm)
+    )
+    else(
+        false
+    )
+
 );    
 
 isBirationalMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
@@ -318,19 +293,51 @@ isBirationalMap(RingMap) :=(f)->(
   --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 isBirationalOntoImage = method();
+--TODO: KARL -- have a flag so that im1 is assumed to be im (ie, don't saturate or do any checks).
 
 isBirationalOntoImage(Ideal,Ideal, BasicList) :=(di,im,bm)->(
-      tar:=idealOfImageOfMap(di,im, bm);
-      isBirationalMap(di,tar,bm)
-      );
+    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    R:=ring di;
+    S:=ring im;
+    im1 := saturate idealOfImageOfMap(di, im, bm);
+
+    K:=coefficientRing R;
+--In the following lines we remove the linear parts of the ideal di and 
+--modify our map bm
+    Rlin:=(ambient ring di)/di;
+    Rlin2 := minimalPresentation(Rlin);
+    phi:=Rlin.minimalPresentationMap;    
+    Rlin1:=target phi;
+    di1:=ideal Rlin1;
+    bm0:=phi(matrix{bm});
+    bm1:=flatten first entries bm0;
+ --From here the situation is under the assumption that the variety is not contained in any hyperplane.
+    r:=numgens ambient Rlin1;
+    Jr:= blowUpIdeals(di1,bm1);
+    n:=numgens Jr;
+    L:={};
+    for i from 0 to (n-1) do (
+        if  (degree Jr_i)_0==1 then L=append(L, Jr_i);
+    );
+    JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
+    vS:=gens ambient S;
+   --print "we got here.";
+    g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
+     --  print "we got there.";
+    barJD:=g(JD);
+     --  print barJD;
+    jdd:=(numgens ambient Rlin1)-1;
+   --print jdd;
+    not(isSubset(minors(jdd,barJD),im1))
+);
   
- isBirationalOntoImage(Ring,Ring,BasicList) := (R1, S1, bm)->(
-    isBirationalMap(ideal R1, ideal S1, bm)
-    ); 
+isBirationalOntoImage(Ring,Ring,BasicList) := (R1, S1, bm)->(
+    isBirationalOntoImage(ideal R1, ideal S1, bm)
+); 
 
 isBirationalOntoImage(RingMap) :=(f)->(
     isBirationalOntoImage(target f, source f, first entries matrix f)
-    );
+);
     
     
     --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -983,7 +990,7 @@ TEST /// --test #14
         R=QQ[x,y,z];
         S=QQ[a,b,c];
         h = map(R,S,{y*z,x*z,x*y});
-        assert(isRegularMap(h) == false
+        assert(isRegularMap(h) == false)
 ///
 
 TEST /// -- test #15
