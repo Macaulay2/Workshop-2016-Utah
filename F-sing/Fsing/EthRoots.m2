@@ -333,7 +333,7 @@ minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
 
 getExponents=(f)->(
 answer:={};
-t:=terms(f);
+t:=terms(first first entries f);
 apply(t, i->
 {
 	exps:=first exponents(i);
@@ -360,9 +360,11 @@ mEthRootOfOneElement= (e,v) ->(
 	B:={};
 	for i from 1 to alpha do
 	{
-		vi:=v_(i-1);
+		vi:=v^{i-1};
+---print("i=",i);
+---print("vi=",vi);
 		C:=getExponents(vi);
----print(vi,C);
+---print(C);
 		apply(C, c->
 		{
 			lambda:=c#0;
