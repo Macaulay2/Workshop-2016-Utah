@@ -43,61 +43,48 @@ Reload => true
 
 
 --- *** I SORTED THESE ALPHABETICALLY TO FIND MY WAY AROUND *** MK
+--- *** Reorganized by subpackages, so we know where to find stuff *** PT
+
 export{
 --IntegerComputations (IntegerComps.m2)
-	"floorlog",
-	"multOrder",
+    "floorlog",
+    "multOrder",
+    "taxicabNorm",
+    "divideFraction",
+    "getCanVector",
+
 --ethRootFunctions (EthRoots.m2)
     "ascendIdeal", 
     "ascendIdealSafe",
     "ascendIdealSafeList",
     "AscentCount",
-	"basePExpMaxE",
-    "BinomialCheck",
-    "binomialFPT",
-	"boundLargestCompatible", ---MK
-    "canVector",
-    "DiagonalCheck", 
-    "diagonalFPT",
-	"dividFraction",
-    "estFPT",
+    "boundLargestCompatible", ---MK
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
     "EthRootStrategy",    
     "fancyEthRoot",
+    "minimalCompatible",
     "MonomialBasis",	
     "Substitution",
-    --F-thresholds computations (FThresholds.m2)
-    "factorList",    
+    
+--Frobenius Powers (frobeniusPowers.m2)
+    "fastExp"
+    "frobeniusPower"
+    "genFrobeniusPower"     
+    
+--F-thresholds computations (FThresholds.m2)
+    "BinomialCheck",
+    "DiagonalCheck", 
+    "estFPT",
     "FinalCheck",    
-    "findAllCompatibleIdeals", ---MK	
-    "findCPBelow",
-	"findTestElementAmbient", ---Karl
-	"FFiniteSupport", ---MK
-	"findGeneratingMorphisms", ---MK
-	"frobeniusPower",
     "FPTApproxList",     
-    "FPT2VarHomog",     
-    "FPT2VarHomogInternal",
-	"FPureIdeals",
-   "FTApproxList",
+    "FTApproxList",
     "FTHatApproxList", 
-	"FullMap", ---Karl
-	"generatingMorphism", ---MK
-	"generatingRoot", ---MK
     "guessFPT",
-    "isBinomial",
-    "isCP",
-    "isDiagonal",
     "isFJumpingNumberPoly",
     "isFPTPoly",
-    "isInLowerRegion",
-    "isInUpperRegion",
-    "MaxExp",
-    "minimalCompatible",
     "MultiThread",    
-    "Nontrivial",    
     "nu",
     "nuAlt",
     "NuCheck",
@@ -108,12 +95,54 @@ export{
     "nuListAlt1",
     "Origin",
     "OutputRange",
+
+--F-thresholds of special families of polynomials (SpecialFThresholds.m2)
+    "binomialFPT",
+    "diagonalFPT",
+    "factorList",    
+    "findCPBelow",
+    "FPT2VarHomog",     
+    "FPT2VarHomogInternal",
+    "isBinomial",
+    "isCP",
+    "isDiagonal",
+    "isInLowerRegion",
+    "isInUpperRegion",
+    "MaxExp",
+    "Nontrivial",    
     "PrintCP",
     "setFTData",
     "splittingField",
-    "taxicabNorm",
-    "paraTestModule", ---MK
-    "paraTestModuleAmbient" ---MK
+
+-- testIdeals.m2
+    "findQGorGen",
+    "findTestElementAmbient",
+    "tauAOverPEMinus1Poly",
+    "tauGor", --needs optimization
+    "tauGorAmb",--needs optimization
+    "tauNonPrincipalAOverPEPoly",    
+    "tauPoly",
+    "tauQGor",    
+    "tauQGorAmb",--needs optimization
+
+
+-- Other.m2
+
+
+
+-- Other
+       "findAllCompatibleIdeals", ---MK	
+    
+	"findTestElementAmbient", ---Karl
+	"FFiniteSupport", ---MK
+	"findGeneratingMorphisms", ---MK
+	"FPureIdeals",
+	"frobeniusPower",
+ 	"FullMap", ---Karl
+	"generatingMorphism", ---MK
+	"generatingRoot", ---MK
+   "paraTestModule", ---MK
+    "paraTestModuleAmbient" ---MK  
 }
 
 --*************************************************
@@ -151,6 +180,9 @@ load "./Fsing/FThresholds.m2"
 load "./Fsing/SpecialFThresholds.m2"
 
 
+load "./Fsing/testIdeals.m2"
+
+load "./Fsing/Other.m2"
 
 load "./Fsing/FsingDocs.m2"
 

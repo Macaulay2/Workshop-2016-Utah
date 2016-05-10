@@ -20,7 +20,7 @@ newPackage(
 	    --"PolymakeInterface"
         })
 
-export {"vertexIndices","dualFaces","matrixFromString","findInteriors","findPolarDual","faceIndices","polarDualFace","latticePointFaces"}
+export {"vertexIndices","dualFaces","matrixFromString","findInteriors","findPolarDual","faceIndices","polarDualFace","latticePointFaces","hodgeOfCYToricDivisor"}
 
 -- Code here
 matrixFromString = method()
@@ -155,9 +155,9 @@ polarDualFace(Polyhedron,List) := (P,f) -> (
     );
 
 {*hodgeOfCYToricDivisor = method();
-hodgeOfCYToricDivisor(Polyhedron,n) := (p,n) -> (
-    n := transpose n; 
-    f := faces(4,p);
+hodgeOfCYToricDivisor(Polyhedron,List) := (p,n) -> (
+    n := transpose matrix {n}
+    f := fa
     vlist := for p in f list vertices p;
     v := vertexIndices(P);
     n1 := v#n;
@@ -175,6 +175,17 @@ hodgeOfCYToricDivisor(Polyhedron,n) := (p,n) -> (
     	hodgenums := {1 + #pts, 0,0};
     hodgenums
     );*}
+
+hodgeOfCYToricDivisor = method();
+hodgeOfCYToricDivisor(Polyhedron,List) := (P,l) -> (
+    l1 := transpose matrix{l};
+    lp := latticePointFaces(P);
+    n := #interiorLatticePoints(polar P,polarDualFace(P,lp#0#l1#0));
+    if lp#0#l1#1 == 0 then {1,0,n} 
+      else if lp#0#l1#1 == 1 then {1,n,0}
+      else if lp#0#l1#1 == 2 then {1+n,0,0}
+    )
+
 
 {*dualFaces(ZZ,Polyhedron) := (n,P) -> (
     Pv := polar P;
@@ -227,17 +238,9 @@ str = ///    1    0    0    0   -1    1    0    0    0    1   -1    1   -2
 M = matrixFromString str
 P = convexHull M
 v = vertexIndices(P)
-v#{0,0,0,1}
-P1 = polar P
-findPolarDual({1},P,P1)
-positions(entries (transpose (vertices P) * (vertices P1)_1), x -> all(x, x1 -> x1 == -1))
-positions(entries (transpose (vertices P) * (vertices P1)_1), x-> all (x,x1->x1==-1))
-(entries transpose vertices P)#1
+l = latticePoints P
+l = select(l,p->p!= 0)
+lp = for p in l list flatten entries lift(p,ZZ)
 hodgeOfCYToricDivisor(P,{0,0,0,1})
-apply(faces(4,P),vertices)
-polarFace (faces(2,P))#1
-entries transpose vertices P
-findInteriors(0,P)
-#(latticePoints P)
-peek P
-latticePointFaces(P)
+for p in lp list p => hodgeOfCYToricDivisor(P,p)
+hashTable oo
