@@ -1,7 +1,7 @@
 needsPackage "RandomIdeal"
 needsPackage "ResidualIntersections"
 runLicci := (R,d,k) -> (
-    L = apply(100,i->randomShelling(#R,d,k));
+    L = apply(100,i->randomShelling(numgens R,d,k));
     LI = apply(L,P -> idealFromShelling(R,P) );
     Licci = apply(LI,isLicci);
     (L,LI,Licci)
