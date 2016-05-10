@@ -8,6 +8,6 @@ These are a couple of couple of things we noticed that still need to be done as 
 
 4) An similalr method appears in ascendIdeal, ethRootSafe, GenealizedFrobeniusPower(QQ, Ideal), and taupoly(QQ, RingElement.  More precisely, the loop to compute (f^a I)^[1/p^e] using the base p expansion of a comes up a bunch.  We should probably uniformize this.
 
-5) Consider removing baseP1 and replacing it with one of the other base-p expansions. Otherwise it needs to have test cases.
+5) In BasicFunctions consider removing baseP1 and replacing it with one of the other base-p expansions. Otherwise it needs to have test cases.
 
 6) Think about carryTest in BasicFunctions, it is only used in firstCarry, which seems to give the right answer, but the code seems like it may be able to be cleaned up.
