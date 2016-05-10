@@ -590,12 +590,12 @@ doc ///
                 Text
                         Gives the dimension of the image of a rational map. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these
                 Example
-                        S = QQ[x,y,z]
-                        a = ideal(x^2+y^2+z^2)
-                        T = QQ[u,v]
-                        b = ideal(u^2+v^2)
-                        f = matrix{{x*y,y*z}}
-                        dimImage(a,b,f)
+                        S = QQ[x,y,z,w];
+			b = ideal(x*y-z*w);
+			R = QQ[u,v];
+			a = ideal(sub(0,R));
+			f = matrix {{u,0,v,0}};
+			dimImage(a,b,f)
 ///
 
 
@@ -916,6 +916,13 @@ TEST /// --test #13
         S=QQ[a,b];  
         h = map(R, S, {x,y});
         assert(isRegularMap(h) == false)      
+///
+
+TEST /// --test #14
+        R=QQ[x,y,z];
+        S=QQ[a,b,c];
+        h = map(R,S,{y*z,x*z,x*y});
+        assert(isRegularMap(h) == false
 ///
 
 	-------------------------------------
