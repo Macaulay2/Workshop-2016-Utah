@@ -157,7 +157,7 @@ export{
 	"FFiniteSupport", ---MK
 	"findGeneratingMorphisms", ---MK
 	"FPureIdeals",
-	"frobeniusPower",
+
  	"FullMap", ---Karl
 	"generatingMorphism", ---MK
 	"generatingRoot", ---MK
