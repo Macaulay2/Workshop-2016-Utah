@@ -918,6 +918,13 @@ TEST /// --test #13
         assert(isRegularMap(h) == false)      
 ///
 
+TEST /// --test #14
+        R=QQ[x,y,z];
+        S=QQ[a,b,c];
+        h = map(R,S,{y*z,x*z,x*y});
+        assert(isRegularMap(h) == false
+///
+
 	-------------------------------------
 	----- inverseOfMap  -----------------
 	-------------------------------------
