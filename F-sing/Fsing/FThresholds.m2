@@ -1,4 +1,4 @@
--- changes in order or arguments
+-- CHANGES IN ORDERS OF ARGUMENTS
 
 -- internal functions acted on:     nu*, FTApproxList, FPTApproxList, FTHatApproxList, 
 --     	       	       	       	    isFPTPoly, isFJumpingNumberPoly
@@ -9,6 +9,11 @@
 --    	      	      	      	  frobeniusPower, genFrobeniusPower  
 
 -- external functions to do: ethRoot*, tau*, sigma*
+
+-- TO DO:
+
+-- There is a lot of repeated code here, in the computations of nus
+-- (the code of certain binary search is repeated at least 4 times). Clean up!
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
@@ -566,11 +571,6 @@ estFPT={FinalCheck=> true, Verbose=> false, MultiThread=>false, DiagonalCheck=>t
 --isFPTPoly, determines if a given rational number is the FPT of a pair in a polynomial ring. 
 --if Origin is specified, it only checks at the origin. 
 
-FPT2VarHomogInternal = method(Options => {MaxExp => infinity, PrintCP => false, Nontrivial => false})
-
-FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
-
-
 isFPTPoly = method( Options => {Verbose=> false,Origin=>false} )
 isFPTPoly ( QQ, RingElement ) := o -> ( t, f ) -> 
 (
@@ -619,6 +619,7 @@ isFPTPoly ( QQ, RingElement ) := o -> ( t, f ) ->
 isFJumpingNumberPoly = method( Options => {Verbose=> false} )
 
 isFJumpingNumberPoly ( QQ, RingElement ) := o -> ( t, f ) -> 
+(
 	p := char ring f;
 	--this writes t = a/(p^b(p^c-1))
 	(a,b,c) := toSequence divideFraction( p, t );

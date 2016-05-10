@@ -4,7 +4,7 @@
 
 -- internal functions acted to do:
 
--- external functions acted on: floorlog -> floorLog, digit, truncation, 
+-- external functions acted on: floorlog -> floorLog, digit, truncation -->  truncatedBasePExp, 
 --   firstCarry, canVector -> getCanVector, isFPTPoly, fastExp, frobeniusPower
 
 -- external functions to do: 
@@ -39,7 +39,7 @@ diagonalFPT = f ->
      w := apply(terms f, g->first degree(g));
      y := 0; if firstCarry(p,reciprocal(w))==-1 then for i from 0 to #w-1 do y = y + 1/w#i else
      (
-	  x := 0; for c from 0 to #w-1 do x = x + truncation( p, firstCarry(p,reciprocal(w))-1, 1/w#c ); 
+	  x := 0; for c from 0 to #w-1 do x = x + truncatedBasePExp( p, firstCarry(p,reciprocal(w))-1, 1/w#c ); 
 	  y = x+1/p^(firstCarry(p,reciprocal(w))-1);
      );
      y
@@ -238,10 +238,10 @@ binomialFPT = g ->
 	  if L == -1 then FPT = Q#0+Q#1 else
      	  (
      	       d := dCalculation(Q,L-1,p);
-     	       P := (truncation(p,d,Q#0),  truncation(p,d,Q#1));
+     	       P := (truncatedBasePExp(p,d,Q#0), truncatedBasePExp(p,d,Q#1));
      	       P1 := {P#0, P#1+1/p^d};
      	       P2 := {P#0+1/p^d,P#1};
-     	       FPT = truncation(p,L-1,Q#0+Q#1);
+     	       FPT = truncatedBasePExp(p,L-1,Q#0+Q#1);
      	       if calculateEpsilon(P1,P2, v, w) != -1 then FPT = FPT +  calculateEpsilon(P1, P2, v, w);
      	  );
      );
@@ -439,7 +439,7 @@ FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
     	S1=setFTData(ideals_e0,polys);
 	cp=findCPBelow(cp/p+digit(p,e0+1,u)/p,S1) 
     );
-    cp=cp/p^e0+truncation(p,e0,u); -- "zoom out"
+    cp=cp/p^e0+truncatedBasePExp(p,e0,u); -- "zoom out"
     if opt.PrintCP then print(toString cp);
     max apply(cp,a,(c,k)->c/k)
 )

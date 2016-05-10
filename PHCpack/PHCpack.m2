@@ -169,20 +169,16 @@ parseSolutions (String,Ring) := o -> (s,R) -> (
   --      carrying also other diagnostic information about each.
   oldprec := defaultPrecision;
   defaultPrecision = o.Bits;
-  L := get s; 
-  L = replace("=", "=>", L);
+  L := get s;
+  L = replace("([[:alnum:]]+) *=", ///"\1"=>///,  L);
   L = replace("I", "ii", L);
   L = replace("E\\+","e",L);
   L = replace("E", "e", L);
-  L = replace("time", "\"time\"", L);
-  L = replace("rco", "\"rco\"", L);
-  L = replace("multiplicity", "\"mult\"", L); 
-  L = replace("\\bres\\b", "\"residual\"", L);
-  L = replace("\\bresolution\\b", "\"residual\"", L);
-  -- because M2 automatically thinks "res"=resolution   	  
+  L = replace(///"multiplicity"///, ///"mult"///, L); 
+  L = replace(///"res"///, ///"residual"///, L);
   sols := toList apply(value L, sol->new HashTable from toList sol);
   defaultPrecision = oldprec;
-  apply(sols, sol->point( {apply(gens R, v->sol#v)} | outputToPoint sol ))
+  apply(sols, sol->point( {apply(gens R, v->sol#(toString v))} | outputToPoint sol ))
 )
 
 -------------------------------------
