@@ -270,7 +270,7 @@ isBirationalMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
     R:=ring di;
     S:=ring im;
     im1 := idealOfImageOfMap(di, im, bm); 
-    if (dim ((im1*S^1)/(im*S^1)) == 0) then(
+    if (dim ((im1*S^1)/(im*S^1)) <= 0) then(
         isBirationalOntoImage(di,im1,bm)
     )
     else(
@@ -991,7 +991,7 @@ TEST /// --test #9
 	-------------------------------------
 TEST /// --test #10
 	R = QQ[x,y,z,w]/(x*y - z*w)
-	M = matrix{{1, 0, 0}}
+	M = matrix{{sub(1,R), 0, 0}}
 	assert(isRegularMap(M))
 ///
 
@@ -1031,6 +1031,26 @@ TEST /// -- test #15
     f = {a, b, c};
     assert(isRegularMap(matrix{{a,b,c}}) == true)
 ///
+
+	-------------------------------------
+	----- isBirationalOntoImage  --------
+	-------------------------------------
+	
+TEST /// --test #16 (a map from the blowup of P^2 at a point to P^20
+    P5 = QQ[a..f];
+    M = matrix{{a,b,c},{d,e,f}};
+    blowUpSubvar = P5/(minors(2, M) + ideal(b-d));
+    f = {a, b, c};
+    assert(isBirationalOntoImage(blowUpSubvar, QQ[x,y,z], f) == true)
+///
+
+TEST /// --test #17 (quadratic cremona transformation)
+    R = QQ[x,y,z];
+    S = QQ[a,b,c];
+    f = map(R, S, {y*z, x*z, x*y});
+    assert(isBirationalOntoImage(f) == true)
+///
+
 
 	-------------------------------------
 	----- inverseOfMap  -----------------
