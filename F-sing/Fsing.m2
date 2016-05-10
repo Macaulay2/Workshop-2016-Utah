@@ -80,8 +80,7 @@ export{
     "FPT2VarHomog",     
     "FPT2VarHomogInternal",
 	"FPureIdeals",
-	"frobeniusPower",
-    "FTApproxList",
+   "FTApproxList",
     "FTHatApproxList", 
 	"FullMap", ---Karl
 	"generatingMorphism", ---MK
