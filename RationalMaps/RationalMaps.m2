@@ -1033,7 +1033,7 @@ TEST /// -- test #15
 	----- isBirationalOntoImage  --------
 	-------------------------------------
 	
-TEST /// --test #16 (a map from the blowup of P^2 at a point to P^20
+TEST /// --test #16 (a map from the blowup of P^2 at a point back down to P^2)
     P5 = QQ[a..f];
     M = matrix{{a,b,c},{d,e,f}};
     blowUpSubvar = P5/(minors(2, M) + ideal(b-d));
@@ -1048,7 +1048,65 @@ TEST /// --test #17 (quadratic cremona transformation)
     assert(isBirationalOntoImage(f) == true)
 ///
 
+TEST /// --test #18 (map P^1 to P^2)
+    R = QQ[x,y];
+    S = QQ[a,b,c];
+    f = map(R, S, {x,y,0});
+    assert(isBirationalOntoImage(f) == true)
+///
 
+TEST /// --test #19 (let's map an elliptic curve onto P^1)
+    R = QQ[x,y,z]/(x^3+y^3-z^3);
+    S = QQ[a,b];
+    f = map(R, S, {x, y-z});
+    assert(isBirationalOntoImage(f) == false)
+///
+
+TEST /// --test #20 (map P^2\pt -> P^1)
+    R = QQ[x,y,z];
+    S = QQ[a,b];
+    f = map(R, S, {x,y});
+    assert(isBirationalOntoImage(f) == false)
+///
+
+TEST /// --test #21 (3rd veronese embedding of P^1)
+    R = QQ[x,y];
+    S = QQ[a,b,c,d];
+    f = map(R, S, {x^3,x^2*y,x*y^2,x^3});
+    assert(isBirationalOntoImage(f) == true)
+///
+
+	-------------------------------------
+	----- isBirationalMap  --------------
+	-------------------------------------
+
+TEST /// --test #22 (quadratic cremona)
+    R = QQ[x,y,z];
+    S = QQ[a,b,c];
+    f = map(R, S, {y*z, x*z, x*y});
+    assert(isBirationalMap(f) == true)
+///
+
+TEST /// --test #23 (map P^1 to P^2)
+    R = QQ[x,y];
+    S = QQ[a,b,c];
+    f = map(R, S, {x,y,0});
+    assert(isBirationalMap(f) == false)
+///
+
+TEST /// --test #24 (let's map an elliptic curve onto P^1)
+    R = QQ[x,y,z]/(x^3+y^3-z^3);
+    S = QQ[a,b];
+    f = map(R, S, {x, y-z});
+    assert(isBirationalOntoImage(f) == false)
+///
+
+TEST /// --test #25 (3rd veronese embedding of P^1)
+    R = QQ[x,y];
+    S = QQ[a,b,c,d];
+    f = map(R, S, {x^3,x^2*y,x*y^2,x^3});
+    assert(isBirationalOntoImage(f) == true)
+///
 	-------------------------------------
 	----- inverseOfMap  -----------------
 	-------------------------------------
