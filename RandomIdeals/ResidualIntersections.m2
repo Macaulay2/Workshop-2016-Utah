@@ -717,6 +717,7 @@ doc ///
    SeeAlso
        isStronglyCM
        koszulDepth
+       depthsOfPowers
 ///
 
 ------------------------------------------------------------
@@ -751,6 +752,8 @@ doc ///
 	  depthsOfPowers(6,3,I)
    Caveat
    SeeAlso
+      hasSlidingDepth
+      genericArtinNagata
 ///
 
 
