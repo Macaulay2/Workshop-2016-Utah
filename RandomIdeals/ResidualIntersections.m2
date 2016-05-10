@@ -381,13 +381,12 @@ doc ///
      Every perfect codimension 2 ideal (nxn minors of an (nx(n+1) matrix) is licci,
      but other ideals of minors are generally not, as illustrated below.
     Example
-     setRandomSeed 0     
-     needsPackage "RandomIdeal"
-     needsPackage "ResidualIntersections"
+     setRandomSeed 0
      S = ZZ/32003[x_0..x_6]
-     L = idealChainFromShelling(S,randomShelling(7,3,8))
-     apply(L, I-> {linkageBound I, linkageBound(I, UseNormalModule =>true)})
-     scan(L, I ->print isLicci(I, UseNormalModule => true))
+     I = monomialIdeal (x_3,x_1*x_4,x_0*x_5,x_1*x_5)
+     linkageBound I
+     linkageBound(I, UseNormalModule => true)
+     isLicci(I, UseNormalModule => true);
    Caveat
     linkageBound I can be very large; linkageBound(I, UseNormalModule => true) can be slow.
    SeeAlso
