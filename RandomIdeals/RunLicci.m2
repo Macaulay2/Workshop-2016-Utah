@@ -1,3 +1,18 @@
-L = apply(100,i->randomShelling(5,1))
-LI = apply(100,i->idealFromShelling(L_i))
-Licci = apply(100,i->isLicci(LI_i))
+needsPackage "RandomIdeal"
+needsPackage "ResidualIntersections"
+runLicci := (R,d,k) -> (
+    L = apply(100,i->randomShelling(numgens R,d,k));
+    LI = apply(L,P -> idealFromShelling(R,P) );
+    Licci = apply(LI,isLicci);
+    (L,LI,Licci)
+    )
+
+getLicciStats := (L,LI,Licci) -> (
+    #select(Licci, i -> i)
+    )
+
+end--
+
+R=QQ[x_1..x_5]
+(L,LI,Licci) = runLicci(R,1,5)
+getLicciStats(L,LI,Licci)
