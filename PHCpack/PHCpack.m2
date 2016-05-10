@@ -704,7 +704,7 @@ constructEmbedding (List, ZZ) := o->  (system, dimension) -> (
   for f in {PHCinputFile, PHCoutputFile, PHCbatchFile, PHCsessionFile} do if fileExists f then removeFile f;
   
   systemToFile(system,PHCinputFile);
-  s := concatenate("1\ny\n",PHCinputFile);
+  s := concatenate("1\n0\ny\n",PHCinputFile);
   s = concatenate(s,"\n",PHCoutputFile);
   s = concatenate(s,"\n");
   s = concatenate(s,toString(dimension));
