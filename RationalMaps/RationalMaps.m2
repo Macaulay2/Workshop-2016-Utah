@@ -16,7 +16,7 @@ Version => "0.1", Date => "May 7th, 2016", Authors => {
 Headline => "A package for working with rational maps.", DebuggingMode => true, Reload=>true)
 export{
 	"isBirationalMap",
-	"imageOfMap",
+	"idealOfImageOfMap",
 	"baseLocusOfMap",
 	"dimImage",
 	"isRegularMap",
@@ -37,36 +37,43 @@ export{
 --************************************************************--
 ----------------------------------------------------------------
 
-imageOfMap = method();
 
-imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
-	h := map((ring a)/a,(ring b)/b,f);
+--***Karl:  I dislike how this returns stuff.   The image of a map is not an ideal.  Hence I renamed it
+idealOfImageOfMap = method();
+
+idealOfImageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
+	h := map((ring a)/a, ring b ,f);
 	-- the image of f is the same as the kernel of its pullback on the 
 	-- coordinate rings. h is this pullback
-	im := ker h;
+        idealOfImageOfMap(h)
+	);
+
+idealOfImageOfMap(Ideal,Ideal,BasicList) := (a,b,g) -> (
+	h:=map((ring a)/a, ring b ,g);
+	idealOfImageOfMap(h)
+	);
+
+idealOfImageOfMap(Ring,Ring,Matrix) := (R,S,f) -> (
+	h := map(R,S,f);
+	idealOfImageOfMap(h)	
+	);
+
+idealOfImageOfMap(Ring,Ring,BasicList) := (R,S,g) -> (
+        h := map(R,S,g);
+        idealOfImageOfMap(h)
+	);
+
+idealOfImageOfMap(RingMap) := (p) -> (
+        --idealOfImageOfMap(target p, source p, first entries matrix p)
+        h := map(target p, ambient source p,p);
+        im := ker h;
 	im
-	);
-
-imageOfMap(Ideal,Ideal,BasicList) := (a,b,g) -> (
-	imageOfMap(a,b,g)
-	);
-
-imageOfMap(Ring,Ring,Matrix) := (R,S,f) -> (
-	imageOfMap(ideal R, ideal S, f)
-	);
-
-imageOfMap(Ring,Ring,BasicList) := (R,S,g) -> (
-        imageOfMap(ideal R, ideal S, g)
-	);
-
-imageOfMap(RingMap) := (p) -> (
-        imageOfMap(target p, source p, first entries matrix p)
 	);
 
 dimImage = method();
 
 dimImage(Ideal,Ideal,Matrix) := (a,b,f) -> (
-	I := imageOfMap(a,b,f);
+	I := idealOfImageOfMap(a,b,f);
 	dim I - 1
 	-- substract 1 from the dimension of the image since in projective space
 	);
@@ -287,7 +294,7 @@ isBirationalMap(RingMap) :=(f)->(
 isBirationalOntoImage = method();
 
 isBirationalOntoImage(Ideal,Ideal, BasicList) :=(di,im,bm)->(
-      tar:=imageOfMap(di,im, bm);
+      tar:=idealOfImageOfMap(di,im, bm);
       isBirationalMap(di,tar,bm)
       );
   
@@ -403,12 +410,12 @@ mapOntoImage(Ideal, Ideal, BasicList) := (a,b,l)->(
 isEmbedding = method(); --checks whether a map is a closed embedding.
 
 isEmbedding(Ideal, Ideal, BasicList) := (a1, b1, f1)->(
-        newMap = map((ring a1)/a1, (ring b1)/b1, f1);
+        newMap := map((ring a1)/a1, (ring b1)/b1, f1);
         isEmbedding(newMap)
 );
 
 isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
-        newMap=map(R1,S1,f1);
+        newMap:=map(R1,S1,f1);
         isEmbedding(newMap)
 );
 
@@ -495,20 +502,20 @@ doc ///
 
 doc ///
 	Key 
-		imageOfMap
-		(imageOfMap,Ideal,Ideal,Matrix)
-		(imageOfMap,Ideal,Ideal,BasicList)
-		(imageOfMap,Ring,Ring,Matrix)
-		(imageOfMap,Ring,Ring,BasicList)
-		(imageOfMap,RingMap)
+		idealOfImageOfMap
+		(idealOfImageOfMap,Ideal,Ideal,Matrix)
+		(idealOfImageOfMap,Ideal,Ideal,BasicList)
+		(idealOfImageOfMap,Ring,Ring,Matrix)
+		(idealOfImageOfMap,Ring,Ring,BasicList)
+		(idealOfImageOfMap,RingMap)
 	Headline
-		Finds defining equations for the image of a rational map
+		Finds defining equations for the image of a rational map between varieties or schemes
 	Usage
-		im = imageOfMap(a,b,f)
-		im = imageOfMap(a,b,g)
-		im = imageOfMap(R,S,f)
-		im = imageOfMap(R,S,g)
-		im = imageOfMap(p)
+		im = idealOfImageOfMap(a,b,f)
+		im = idealOfImageOfMap(a,b,g)
+		im = idealOfImageOfMap(R,S,f)
+		im = idealOfImageOfMap(R,S,g)
+		im = idealOfImageOfMap(p)
 	Inputs
 		a:Ideal
 			defining equations for X
@@ -529,14 +536,14 @@ doc ///
 			defining equations for the image of f
 	Description
 		Text
-			Defines the pullback map on the coordinate rings of X and Y. The kernel of this pullback map gives the image of the original map f. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these
+			Given $f : X->Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these.  In particular, this function returns an ideal defining a subset of the  the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
 		Example
-			S = QQ[x,y,z]
-			a = ideal(x^2+y^2+z^2)
-			T = QQ[u,v]
-			b = ideal(u^2+v^2)
-			f = matrix{{x*y,y*z}}
-			imageOfMap(a,b,f)
+			S = QQ[x,y,z,w];
+			b = ideal(x*y-z*w);
+			R = QQ[u,v];
+			a = ideal(sub(0,R));
+			f = matrix {{u,0,v,0}};
+			idealOfImageOfMap(a,b,f)
 ///
 			
 doc ///
@@ -780,27 +787,37 @@ doc ///
         
 ///
 
+--******************************************
+--******************************************
+--******TESTS TESTS TESTS TESTS TESTS*******
+--******************************************
+--******************************************
+
 TEST ///
 	------------------------------------
-	------- Tests for imageOfMap -------
+	------- Tests for idealOfImageOfMap -------
 	------------------------------------   
-
+--Karl: I have no idea why this kernel should be (u^4, u*v^3)
 	S = QQ[x,y,z]
         a = ideal(x^2+y^2+z^2)
         T = QQ[u,v]
         b = ideal(u^2+v^2)
         f = matrix{{x*y,y*z}}
-        im = imageOfMap(a,b,f)  
-	assert(image == ideal(v^4,u*v^3))
+        im = idealOfImageOfMap(a,b,f)  
+	assert(im == ideal(v^4,u*v^3))
+///
 
+TEST ///
 	S = QQ[x0,x1]
 	a = ideal(0*x0)
 	T = QQ[y0,y1,y2]
 	b = ideal(0*y1)
 	f = matrix{{x0^4,x0^2*x1^2,x1^4}}
-	im = imageOfMap(a,b,f)
+	im = idealOfImageOfMap(a,b,f)
 	assert(im == ideal(y2^2-y1*y^3))
+///
 
+TEST ///
 	-- Since in Projective Space, check to make sure different representations give the same result
 	S = QQ[x,y]
 	a = ideal(0*x)
@@ -808,8 +825,10 @@ TEST ///
 	b = ideal(0*v)
 	f1 = matrix{{x,y}}
 	f2 = matrix{{x^3*y^2,x^2*y^3}}
-	assert(imageOfMap(a,b,f1)==imageOfMap(a,b,f2))
+	assert(idealOfImageOfMap(a,b,f1)==idealOfImageOfMap(a,b,f2))
+///
 
+TEST ///
 	-------------------------------------
 	------ Tests for dimImage -----------
 	-------------------------------------
@@ -821,7 +840,9 @@ TEST ///
         f = matrix{{x*y,y*z}}
         d = dimImage(a,b,f)
         assert(d == -1)
+///
 
+TEST ///        
         S = QQ[x0,x1]
         a = ideal(0*x0)
         T = QQ[y0,y1,y2]
@@ -829,7 +850,9 @@ TEST ///
         f = matrix{{x0^4,x0^2*x1^2,x1^4}}
         d = dimImage(a,b,f)
         assert(d == 1)	
+///
 
+TEST ///
     -- Since in Projective Space, check to make sure different representations give the same result
     S = QQ[x,y]
     a = ideal(0*x)
@@ -838,43 +861,55 @@ TEST ///
     f1 = matrix{{x,y}}
     f2 = matrix{{x^3*y^2,x^2*y^3}}
     assert(dimImage(a,b,f1)==dimImage(a,b,f2))
+///
+
 
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
 	-------------------------------------
-
+TEST ///	
     R = QQ[x,y,z]	
 	M = matrix{{x^2*y, x^2*z, x*y*z}}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(M))
-	
+///
+
+TEST ///	
     R = QQ[x,y,z]	
 	L = {x^2*y, x^2*z, x*y*z}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(L))
+///
 
+TEST ///
 	-- reducible source
-
 	R = QQ[x,y,z]/(x*y)
 	M = matrix{{x^2, x*y, y^2}}
 	I = ideal(x,y)
 	assert(I == baseLocusOfMap(M))
+///
+
 
 	-------------------------------------
 	----- isRegularMap -----------------
 	-------------------------------------
-
+TEST ///
 	R = QQ[x,y,z,w]/(x*y - z*w)
 	M = matrix{{1, 0, 0}}
 	assert(isRegularMap(M))
+///
 
+TEST ///
     R = QQ[x,y]/(x*y)
     M = matrix{{x,y}}
     assert(isRegularMap(M))
+///
 
+TEST ///
     R = QQ[x,y,z]/(x^3 + y^3 - z^3)
     M = matrix{{y-z, x}}
     assert(isRegularMap(M) == false)
+///
 
 
 	-------------------------------------
@@ -884,7 +919,6 @@ TEST ///
 
 
     
-
-/// 
+ 
 ----FUTURE PLANS------
 
