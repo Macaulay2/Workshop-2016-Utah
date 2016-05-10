@@ -113,7 +113,7 @@ doc ///
       R = CC[x,y,z];
       L = { z*(x+y), z*(x-y) };
       WitSets = cascade(L)
-      W=first WitSets#1
+      W=first WitSets#2
     
     Text
       The function {\tt cascade} extends the ring of the inputted system 
