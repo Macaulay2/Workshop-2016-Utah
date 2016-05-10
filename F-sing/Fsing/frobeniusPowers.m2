@@ -1,3 +1,11 @@
+-- CHANGES IN ORDERS OF ARGUMENTS
+
+--fastExp(N,f)  from (f,N)
+--frobeniusPower(e,I) from (I,e)
+--generalizedFrobeniusPower(e,I) from (I,e)
+
+
+
 --*************************************************
 --*************************************************
 --This file is used for taking various types of 
