@@ -102,10 +102,9 @@ dimImage(RingMap) := (p) -> (
 baseLocusOfMap = method();
 
 baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
-    --maybe check all the maps in L1 are of the same degree?
+    if numRows L1 > 1 then error "Expected a row matrix"
+    if isSameDegree( first entries L1  )==false then error "Expected a matrix of homogenous elements of the same degree";
 
-    --just need to convert L1 to a basic list, I guess
-    --if isSameDegree(L1)==false then error "Expected a matrix of homogenous elements of the same degree";
     M:= gens ker transpose presentation image L1;
     -- this matrix gives all the "equivalent"
     -- ways to write the map in question (e.g. (xy : xz) is 
@@ -121,7 +120,7 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     saturate fold(L, plus)
     -- these two commands create an ideal for the base 
     -- locus from the information
-    -- given in the matrix above. We take the saturation to get
+    -- given in the submodule above. We take the saturation to get
     -- the biggest ideal that gives the same variety. 
     
 );
@@ -138,6 +137,11 @@ baseLocusOfMap(RingMap) := (ff) ->(
 isRegularMap = method();
 
 isRegularMap(Matrix) := (L1) -> ( --L1 is a row matrix
+    I:= baseLocusOfMap(L1);
+    I == ideal 1_(ring I)
+);
+
+isRegularMap(List) := (L1) -> ( 
     I:= baseLocusOfMap(L1);
     I == ideal 1_(ring I)
 );
@@ -189,7 +193,7 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
  relationType=method();
- --this function computes the "relation tye" of an ideal in a ring R.
+ --this function computes the "relation type" of an ideal in a ring R.
  --Let R be the ring given bythe  ideal a and L be a list of elements in R.
  --the relation type is the biggest degree in terms of new variables in the
  --defining ideal of the rees algebra of I over R. 
@@ -215,7 +219,7 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
      
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  dgi=method();
- --this function compute the degeneration index of an ideal a which is the 
+ --this function computes the degeneration index of an ideal a which is the 
  --number of t linear generators among the generators of a.
  --dgi measures the number of hyperPlanes which cut the variety
  -- defined by a.
@@ -226,11 +230,11 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
      n:=numgens a;
      d:=0;
      for i from 0 to n-1 do (
-	 if (a_i != sub(0, S)) then (
-	     if (degree a_i)=={1} then d=d+1
-	 );
+         if (a_i != sub(0, S)) then (
+             if (degree a_i)=={1} then d=d+1
+         );
      );
-     d);
+ d);
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 isSameDegree=method();
 isSameDegree(BasicList):=(L)->(
@@ -747,6 +751,10 @@ doc ///
 doc ///
     Key
         isRegularMap
+        (isRegularMap, Matrix)
+        (isRegularMap, List)
+        (isRegularMap, RingMap)
+
     Headline
         Checks whether a map to projective space is regular
     Usage
