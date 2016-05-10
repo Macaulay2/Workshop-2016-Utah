@@ -1,67 +1,7 @@
 
--- Authors: Alberto F. Boix and Mordechai Katzman.
-
--- Email addresses: alberto.fernandezb@upf.edu (A. F. Boix), M.Katzman@sheffield.ac.uk (M. Katzman).
-
--- Funding: A. F. Boix is currently partially supported by MTM2010-20279-C02-01.
-
--- M. Katzman is supported by EPSRC grant EP/I031405/1.
-
--- Website of A. F. Boix: http://atlas.mat.ub.edu/personals/aboix/
-
--- Website of M. Katzman: http://www.katzman.staff.shef.ac.uk/
-
--- It is worth mentioning that this package is still being tested.
-
--- So, please report any bug to any of the precedent mail addresses.
-
--- Package based on the implementation of the algorithm which is the main
-
--- result of the following journal article:
-
--- Alberto F. Boix and M. Katzman, An algorithm for producing F-pure ideals.
-
--- Arch. Math. 103 (2014), 421-433.
-
--- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
---
---  This program is free software; you can redistribute it and/or modify
---  it under the terms of the GNU General Public License as published by
---  the Free Software Foundation; either version 2 of the License, or (at
---  your option) any later version.
---
---  This program is distributed in the hope that it will be useful, but
---  WITHOUT ANY WARRANTY; without even the implied warranty of
---  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
---  General Public License for more details.
---
---  You should have received a copy of the GNU General Public License along
---  with this program; if not, write to the Free Software Foundation, Inc.,
---  59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
---
--- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 clearAll;
 
--- ethRoot the implementation of the I_e() operation as described in
-
--- various papers, e.g. 
-
--- M Katzman, Parameter test ideals of Cohen Macaulay rings,
--- Compos. Math. volume 144, no. 4, 933--948, 2008.
-
--- Also in: 
--- J. Alvarez-Montaner, M. Blickle and G. Lyubeznik, Generators of D-modules in positive characteristic.
--- Math. Res. Lett., 12 (4): 459-473, 2005. 
-
--- Input:
--- ideals A and B of the same polynomial ring R OVER A FINITE FIELD OF PRIME CHARACTERISTIC.
--- a positive integer e
--- a prime p which is the characteristic of R
-
--- Output:
--- the smallest ideal J of R containing B with the property that A is in J^{[p^e]}
 
 
 -------------------------------------------------------------------------------------------------------------------------------------
@@ -80,7 +20,7 @@ clearAll;
 
 VECTORSPACES=new MutableHashTable; --Fix this!!!
 lv:=symbol lv;
-findAllOneDimensionalSubspaces = (F,d) ->(
+findAllOneDimensionalSubspaces := (F,d) ->(
 local i;
 local j;
 local L;
@@ -113,7 +53,7 @@ L
 
 ----------------------------------------------------------------------------------------
 
-findOrthogonalComplement = (v) ->(
+findOrthogonalComplement := (v) ->(
 substitute(gens kernel transpose v, coefficientRing(ring(v)))
 )
 
@@ -139,68 +79,50 @@ FPureIdeals=method();
 
 -- Next procedure implements the 0th step of our algorithm.
 
-excludeList={};
 FPureIdeals(RingElement) := (u) ->(
 R:=ring(u);
-local L;
-local K;
-K=boundLargestCompatible(ideal(1_R),u);
-L={};
-excludeList={};
-answer:=FPureIdealsInnards (u,K,L);
-excludeList={};
+K:=boundLargestCompatible(ideal(1_R),u);
+L:={};
+excludeList:={};
+answer:=FPureIdealsInnards (u,K,L,excludeList);
 answer
 )
 
 -- Now, the recursive block of our method.
 
-FPureIdealsInnards = (u,K,L) ->(
+FPureIdealsInnards = (u,K,L,excludeList) ->(
 R:=ring(u);
-local V;
-local K0;
-local K2;
-local M;
 local T;
-local f;
-local d;
-local v;
-local v1;
-local I0;
-local I1;
 excludeList= unique append(excludeList,K);
 if ((not any(L,T -> T == K))) then L=append(L,K);
--- print(last L);
--- print(" ");
--- print(#L);
--- print(" ");
-K0=ideal(vars(R))*K;
-M= (K/K0);
+K0:=ideal(vars(R))*K;
+M:= (K/K0);
 G:=mingens M;
-d=rank source G;
+d:=rank source G;
 if (d>0) then
 {
          if (d>1) then
          {
-                  V=findAllOneDimensionalSubspaces(coefficientRing(R),d);
+                  V:=findAllOneDimensionalSubspaces(coefficientRing(R),d);
                   V=apply(V, v->findOrthogonalComplement(v));
                   apply(V, v->
                   {
-                           v1=G*v;
-                           I0=ideal(v1)+K0;
-                           I1=boundLargestCompatible( I0, u);
+                           v1:=G*v;
+                           I0:=ideal(v1)+K0;
+                           I1:=boundLargestCompatible( I0, u);
                            if ((not any(L,T-> T==I1))) then L=append(L,I1);
                            if (not any(excludeList,T -> T == I1)) then
                            {
-                                   L=unique(L | FPureIdealsInnards (u,I1,L));
+                                   L=unique(L | FPureIdealsInnards (u,I1,L,excludeList));
                            };
                   });
          }
          else
          {
-             K2=boundLargestCompatible(K0,u);
+             K2:=boundLargestCompatible(K0,u);
              if (not any(excludeList,T -> T == K2)) then
              {
-                     L=unique(L | FPureIdealsInnards (u,K2,L));
+                     L=unique(L | FPureIdealsInnards (u,K2,L,excludeList));
              };
          };
 };
@@ -210,17 +132,8 @@ L
 ---------------------- MORE AUXILIAR METHODS --------------------------------
 
 
-gauge=method();
 
--- The following procedure compute the infinity norm of the ideal I.
-
--- Input: ideal I inside a polynomial ring.
-
--- Output: the infinity norm of I; namely, the maximum infinity norm
-
--- over a set of minimal generators of I.
-
-gauge(Ideal) := (I) ->(
+gauge := (I) ->(
 local g;
 local e;
 local T;
@@ -274,29 +187,6 @@ while (f) do
 	answer=P1;
 };
 answer
-);
-
----------------------- SOME ADDITIONAL AUXILIAR METHODS -------------------
-
-findAllFPurePrimes=method();
-
--- Input: a list L of ideals. The output is only the list of prime ideals
-
--- of the starting list L.
-
-findAllFPurePrimes(List):= (L)->(
-local M;
-M={};
-local i;
-R:=ring(L#0);
-apply(L,i->
-{
-           if (i!= ideal(0_R)) then
-           {
-                   if (isPrime i) then M=append(M,i);
-           };
-});
-M
 );
 
 ---------------------- EXAMPLES--------------------

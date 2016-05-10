@@ -20,7 +20,7 @@ newPackage(
 	    --"PolymakeInterface"
         })
 
-export {"vertexIndices","dualFaces","matrixFromString","findInteriors","findPolarDual","faceIndices","polarDualFace","latticePointFaces"}
+export {"vertexIndices","dualFaces","matrixFromString","findInteriors","findPolarDual","faceIndices","polarDualFace","latticePointFaces","hodgeOfCYToricDivisor","h11OfCY","h21OfCY"}
 
 -- Code here
 matrixFromString = method()
@@ -154,32 +154,35 @@ polarDualFace(Polyhedron,List) := (P,f) -> (
     positions(entries (transpose (vpolar) * (vp)_f), x -> all(x, x1 -> x1 == -1))
     );
 
-{*hodgeOfCYToricDivisor = method();
-hodgeOfCYToricDivisor(Polyhedron,n) := (p,n) -> (
-    n := transpose n; 
-    f := faces(4,p);
-    vlist := for p in f list vertices p;
-    v := vertexIndices(P);
-    n1 := v#n;
-    pts := findPolarDual({n1},p,polar p) - 
-    if member(n,vlist) then pts := interiorLatticePoints polar findPolarDual({n1},p,polar p);
-    	hodgenums := {1,0,#pts};
-    f1 := faces(3,p);
-    f1list := for p1 in f1 list interiorLatticePoints p1;
-    for i in f1list do if member(n,i) then pts := interiorLatticePoints polar findPolarDual({n1},p,polar p);
-    	hodgenums := {1,#pts,0};
-    i := position(f1list, 
-    f2 := faces(2,p);
-    f2list := for p2 in f2 list interiorLatticePoints p2;
-    for i in p2 if member(n,i) then pts := interiorLatticePoints polar findPolarDual({n1},p,polar p);
-    	hodgenums := {1 + #pts, 0,0};
-    hodgenums
-    );*}
+hodgeOfCYToricDivisor = method();
+hodgeOfCYToricDivisor(Polyhedron,List) := (P,l) -> (
+    l1 := transpose matrix{l};
+    lp := latticePointFaces(P);
+    n := #interiorLatticePoints(polar P,polarDualFace(P,lp#0#l1#0));
+    if lp#0#l1#1 == 0 then {1,0,n} 
+      else if lp#0#l1#1 == 1 then {1,n,0}
+      else if lp#0#l1#1 == 2 then {1+n,0,0}
+    )
 
-{*dualFaces(ZZ,Polyhedron) := (n,P) -> (
-    Pv := polar P;
-    
-    );*}
+h11OfCY = method()
+h11OfCY(Polyhedron) := (P) -> (
+    np := #(latticePoints polar P);
+    l := for f in faces(1,polar P) list #(interiorLatticePoints f);
+    t := sum l;
+    l1 := for f in faces(2, polar P) list (#(interiorLatticePoints f))*(#(interiorLatticePoints(P,polarDualFace(polar P,faceIndices(polar P,f)))));
+    t1 := sum l1;
+    np - 5 - t + t1
+    );
+
+h21OfCY = method()
+h21OfCY(Polyhedron) := (P) -> (
+    np := #(latticePoints P);
+    l := for f in faces(1,P) list #(interiorLatticePoints f);
+    t := sum l;
+    l1 := for f in faces(2,P) list (#(interiorLatticePoints f))*(#(interiorLatticePoints(polar P,polarDualFace(P,faceIndices(P,f)))));
+    t1 := sum l1;
+    np - 5 - t + t1
+    );
     
 beginDocumentation()
 
@@ -220,24 +223,21 @@ TEST ///
     );*}
 restart
 loadPackage "ToricCompleteIntersections"
-str = ///    1    0    0    0   -1    1    0    0    0    1   -1    1   -2
-    0    1    0    0    1   -1    0    1    1   -1    1   -2    0
-    0    0    1    0    1   -1    0    1    0    0   -1   -2    2
-    0    0    0    1   -1    1   -1   -1   -1    1    1    0   -1///
+str = ///    1    0    0    0  -11   -3   -1   -3
+    0    1    0    0   -6   -2   -2   -6
+    0    0    1    0   -2   -2   -2   -2
+    0    0    0    1   -2    2    4    6 ///
 M = matrixFromString str
 P = convexHull M
 v = vertexIndices(P)
-v#{0,0,0,1}
-P1 = polar P
-findPolarDual({1},P,P1)
-positions(entries (transpose (vertices P) * (vertices P1)_1), x -> all(x, x1 -> x1 == -1))
-positions(entries (transpose (vertices P) * (vertices P1)_1), x-> all (x,x1->x1==-1))
-(entries transpose vertices P)#1
+l = latticePoints P
+l = select(l,p->p!= 0)
+lp = for p in l list flatten entries lift(p,ZZ)
 hodgeOfCYToricDivisor(P,{0,0,0,1})
-apply(faces(4,P),vertices)
-polarFace (faces(2,P))#1
-entries transpose vertices P
-findInteriors(0,P)
-#(latticePoints P)
-peek P
+for p in lp list p => hodgeOfCYToricDivisor(P,p)
+hashTable oo
 latticePointFaces(P)
+new HashTable from first oo
+findInteriors(P)
+h11OfCY(P)
+h21OfCY(P)

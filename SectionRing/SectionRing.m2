@@ -281,7 +281,7 @@ sectionRing(Ideal) := (I) -> (
 		a:=0;
 		AdmPart_j = {};					--Creates a list of admissable partitions, given that there are variables only
 		while (a<LengP) do(					--in sufficiently small degree
-			if(Part_j#a#0 < bound) then (
+			if((Part_j#a#0 < bound) and ((Part_j#a)#(#(Part_j#a)-1) + (Part_j#a)#(#(Part_j#a)-2) > min(bound,j)-1)) then (		--and (# (Part_j#a) < 3)
 				AdmPart_j = AdmPart_j | {(Part_j)#a}; 
 			);
 			a=a+1;
@@ -340,10 +340,14 @@ sectionRing(Ideal) := (I) -> (
 		); 
 		j=j+1;
 	);
+	--1/0;    --debugging purposes
 
-	
+	--VarName := opt.VariableName;
+
+	--BetterS := KK[VarName_1..VarName_numVars];
+	--BetterMap := map(BetterS,S,toList(VarName_1..VarName_numVars));
 	BetterS := KK[A_1..A_numVars];
-	BetterMap := map(BetterS,S,toList(A_1..A_numVars));
+	BetterMap := map(BetterS,S,toList(A_1..A_numVars));	
 	BetterRelIdeal := BetterMap(RelIdeal);	
 	SR := minimalPresentation(BetterS/BetterRelIdeal)
 );
