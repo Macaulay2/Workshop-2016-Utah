@@ -506,6 +506,46 @@ doc ///
             isBirationalMap(Pi)
 ///                     
 
+doc /// 
+        Key
+		isBirationalOntoImage
+		(isBirationalOntoImage, Ideal, Ideal, BasicList)
+		(isBirationalOntoImage, Ring, Ring, BasicList)
+		(isBirationalOntoImage, RingMap)
+        Headline
+                Checks if a map X -> Y between projective varieties is birational onto f(X).
+        Usage
+                val = isBirationalMap(a,b,f)
+                val = isBirationalMap(R,S,f)
+		val = isBirationalMap(Pi)
+	Inputs
+                a:Ideal
+                        defining equations for X		
+                b:Ideal
+                        defining equations for Y
+                f:BasicList
+                        A list of where to send the variables in the ring of b, to in the ring of a.
+                R:Ring
+                        the homogeneous coordinate ring of X
+                S:Ring
+                        the homogeneous coordinate ring of Y
+                Pi:RingMap
+                        A ring map S to R corresponding to X mapping to Y
+        Outputs
+                val:Boolean
+                        true if the map is birational, false if otherwise
+        Description
+                Text   
+                        This checks whether $f : X \to Y$ is birational onto its image.  For instance
+                Example
+                        R=QQ[x,y,z];
+                        S=QQ[a,b,c];
+                        Pi = map(R, S, {x*y, x*z, y*z});
+                        isBirationalMap(Pi)
+                Text
+///                     
+
+
 doc ///
 	Key 
 		idealOfImageOfMap
