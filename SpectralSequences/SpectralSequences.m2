@@ -68,7 +68,7 @@ export {
    "pageMap", 
    "page" ,
   "prunningMaps", "edgeComplex",
-  "filteredHomologyObject", "associatedGradedHomologyObject", "changeOfRingsTor", "pushFwdChainComplex"  
+  "filteredHomologyObject", "associatedGradedHomologyObject", "netPage"  
   }
 
 
@@ -501,6 +501,28 @@ new Page := Page => (cl) -> (
      C)
 ring Page := C -> C.ring
 degree Page := C -> C.dd.degree
+
+
+netPage = method()
+netPage (Page,List,List) := (E,mins,maxs) -> (
+    newmaxQ := maxs#1;
+    newminQ := mins#1;
+    newmaxP := maxs#0;
+    newminP := mins#0;
+    P := page E;
+    L := select(keys P, i -> class i === List and P#i !=0);
+    maxQ := max(apply(L, i -> i#1));
+    minQ := min(apply(L, i -> i#1)); 
+    maxP := max(apply(L, i -> i#0));
+    minP := min(apply(L,i -> i#0));
+    finalmaxQ := min {newmaxQ,maxQ};
+    finalminQ := max {newminQ,minQ};
+    finalmaxP := min {newmaxP,maxP};
+    finalminP := max {newminP,minP}; 
+    K := while finalmaxQ >= finalminQ list makeRow(finalmaxP, finalminP, finalmaxQ, P) do (finalmaxQ = finalmaxQ - 1);
+   -- netList(K, Boxes => false)
+   netList K
+    )
 
 net Page := E -> (
     L := select(keys E, i -> class i === List and E#i !=0);
@@ -951,23 +973,23 @@ associatedGradedHomologyObject(ZZ,ZZ,FilteredComplex) := (p,n,K) -> (
 -----------------------------------------------------------
 -- change of rings scratch experimental code --
 
-pushFwdChainComplex = method()
-pushFwdChainComplex(ChainComplex,RingMap) := (C,f) -> (
-    D := new ChainComplex;
-    D.ring = source f;
-    for i from min C to max C do
-    D.dd _i = pushFwd(C.dd_i,f);    
-    D
-    )
+--pushFwdChainComplex = method()
+--pushFwdChainComplex(ChainComplex,RingMap) := (C,f) -> (
+--    D := new ChainComplex;
+--    D.ring = source f;
+--    for i from min C to max C do
+--    D.dd _i = pushFwd(C.dd_i,f);    
+--    D
+--    )
 
-changeOfRingsTor = method()
-changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
-    -- f : R --> S, N an S module, M an R module
-    F := complete res N;
-    FR := pushFwdChainComplex(F,f);
-    G := complete res M;
-    spectralSequence((G) ** (filteredComplex FR) )
-    )
+-- changeOfRingsTor = method()
+-- changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
+--    -- f : R --> S, N an S module, M an R module
+--    F := complete res N;
+--    FR := pushFwdChainComplex(F,f);
+--    G := complete res M;
+--    spectralSequence((G) ** (filteredComplex FR) )
+--    )
 
 -----------------------------------------------------------
 -----------------------------------------------------------
@@ -2154,6 +2176,28 @@ doc ///
 ///	       
 
 --- functions and methods --- 
+
+doc ///
+          Key
+       	   spots
+          Headline
+	       which spots does the given chain complex has a module.
+     	  Usage
+	       s = spots L
+	  Inputs
+	       L:ChainComplex  
+	          	  
+	  Outputs
+	       s:List 
+	  Description
+	       Text
+	       	   Returns a list of all the spots where the given chain complex has a module.
+    	  SeeAlso
+	      		      
+///
+
+
+
   doc ///
           Key
        	    filteredComplex
@@ -2784,6 +2828,60 @@ doc ///
      	   "Examples of filtered complexes and spectral sequences"            
      ///
  
+
+
+doc ///
+     Key 
+          (netPage, Page, List, List)
+     Headline 
+         display a small portion of a given Spectral Sequence page
+     Usage 
+         E' = netPage (E,{minP,minQ},{maxP,maxQ})
+     Inputs 
+	  E: Page
+	  L1: List
+	  -- A list {minP,minQ}, the bottom left corner coordinates that we intend to display
+	  L2: List
+	   -- A list {maxP,maxQ}, the top right corner coordinates that we intend to display
+     Outputs
+          E': Net
+     Description	  
+     	  Text
+	     Produces the portion of a given spectral sequence page that lies in the square
+	   with given bottom right and top left coordinates. 
+	  Text
+	  Example
+	    R = QQ[x];
+	    S = R/ideal"x2";
+	    N = S^1/ideal"x";
+	    M = R^1/R_0;
+	    C = res M;
+	    C' = C ** S;
+	    D = res(N,LengthLimit => 10);
+	    E0 = C' ** (filteredComplex D);
+	    E = prune spectralSequence E0;
+ 	  Text
+	     The E_2 page has nonzero E_2^{p,q} when 0 <= p <= 10 and 0 <= q <= 1,
+	     so we may ask to restrict the display to 2 <= p <= 6 and 0 <= q <= 1.
+	   
+	    netPage(E_2,{2,0},{6,1})
+	  Text
+	       If we ask for a square that is too large, only the relevant portion of the page will be displayed.
+	  Example
+	    R = QQ[x];
+	    S = R/ideal"x2";
+	    N = S^1/ideal"x";
+	    M = R^1/R_0;
+	    C = res M;
+	    C' = C ** S;
+	    D = res(N,LengthLimit => 10);
+	    E0 = C' ** (filteredComplex D);
+	    E = prune spectralSequence E0;
+	    netPage(E_2,{-5,0},{7,1})
+     SeeAlso 
+	  (net, Page)
+    /// 
+
     
      doc ///
      Key
