@@ -5,7 +5,7 @@ Authors => {
      {Name => "Erin Bela",
      Email=> "ebela@nd.edu"
      },
-     {Name => "DJ Bruce",
+     {Name => "David J. Bruce",
      Email => "djbruce@math.wisc.edu",
      HomePage => "http://www.math.wisc.edu/~djbruce/"
      },
@@ -38,7 +38,8 @@ Authors => {
 },
 Headline => "A package for calculations of singularities in positive characteristic", 
 DebuggingMode => true, 
-Reload => true 
+Reload => true,
+AuxiliaryFiles=>true 
 )
 
 
@@ -46,18 +47,29 @@ Reload => true
 --- *** Reorganized by subpackages, so we know where to find stuff *** PT
 
 export{
---IntegerComputations (IntegerComps.m2)
-    "floorlog",
-    "multOrder",
-    "taxicabNorm",
+--BasicFunctions (BasicFunctions.m2)
+    "carryTest",  
+    "basePExp",    
+    "digit", 	   
+    "denom",   
     "divideFraction",
+    "firstCarry", 
+    "floorlog",
+    "fracPart", 
     "getCanVector",
-
+    "getNumAndDenom", 
+    "maxIdeal", 
+    "multOrder",
+    "num",
+    "taxicabNorm",
+    "truncatedBasePExp",
+    
 --ethRootFunctions (EthRoots.m2)
     "ascendIdeal", 
     "ascendIdealSafe",
     "ascendIdealSafeList",
     "AscentCount",
+    "boundLargestCompatible", ---MK
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
@@ -66,6 +78,14 @@ export{
     "minimalCompatible",
     "MonomialBasis",	
     "Substitution",
+    
+--Frobenius Powers (frobeniusPowers.m2)
+    "fastExp",
+    "frobeniusPower",
+    "genFrobeniusPower",    
+    "gfpStrategy",
+    "Naive", 
+    "Safe", 
     
 --F-thresholds computations (FThresholds.m2)
     "BinomialCheck",
@@ -108,15 +128,39 @@ export{
     "setFTData",
     "splittingField",
 
--- Other
+-- testIdeals.m2
+    "findQGorGen",
+    "findTestElementAmbient",
+    "tauAOverPEMinus1Poly",
+    "tauGor", --needs optimization
+    "tauGorAmb",--needs optimization
+    "tauNonPrincipalAOverPEPoly",    
+    "tauPoly",
+    "tauQGor",    
+    "tauQGorAmb",--needs optimization
 
+
+-- Other.m2
+    "frobenius", 
+    "fSig",
+    "HSL", 
+    "imageOfRelativeCanonical",
+    "imageOfTrace", --doesn't work! 
+    "isFPure",  
+    "isFRegularPoly",  
+    "isFRegularQGor",  
+    "isMapSplit",
+    "isSharplyFPurePoly",
+    "sigmaAOverPEMinus1Poly", 
+    "sigmaQGorAmb", --needs optimization  
+    "sigmaAOverPEMinus1QGor",  --needs optimization 
+ 
+-- Other
        "findAllCompatibleIdeals", ---MK	
     
-	"findTestElementAmbient", ---Karl
 	"FFiniteSupport", ---MK
 	"findGeneratingMorphisms", ---MK
 	"FPureIdeals",
-	"frobeniusPower",
  	"FullMap", ---Karl
 	"generatingMorphism", ---MK
 	"generatingRoot", ---MK
@@ -141,6 +185,7 @@ load "./Fsing/EthRoots.m2"
 
 load "./Fsing/generatingMorphism.m2"
 
+load "./Fsing/frobeniusPowers.m2"
 
 load "./Fsing/compatiblySplit.m2"
 
@@ -159,6 +204,9 @@ load "./Fsing/FThresholds.m2"
 load "./Fsing/SpecialFThresholds.m2"
 
 
+load "./Fsing/testIdeals.m2"
+
+load "./Fsing/Other.m2"
 
 load "./Fsing/FsingDocs.m2"
 
@@ -178,5 +226,5 @@ load "./Fsing/generatingMorphismDoc.m2"
 
 load "./Fsing/parameterTestIdealDoc.m2"
 
-load "./Fsing/Fpure.m2"
+load "./Fsing/FpureDoc.m2"
 

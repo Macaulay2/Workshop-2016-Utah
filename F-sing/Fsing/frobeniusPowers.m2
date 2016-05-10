@@ -30,20 +30,20 @@ fastExp = (N,f) ->
 
 --Outputs the p^e-th Frobenius power of an ideal, or the p^e-th (entry-wise) Frobenius power of a matrix.
 
-frobeniusPower = method()
+frobeniusPower = method();
 
 frobeniusPower(ZZ,Ideal) := (e,I) ->
 (
      R := ring I;
      p := char R;
      G := I_*;
-     if #G==0 then ideal(0_R) else ideal(apply(G, j -> fastExp(j,p^e)))
+     if #G==0 then ideal(0_R) else ideal(apply(G, j -> fastExp(p^e,j)))
 )
 
 frobeniusPower(ZZ,Matrix) := (e,M) ->
 (
     p:=char ring M;
-    matrix apply(entries M,u -> apply(u, j -> fastExp(j,p^e)))
+    matrix apply(entries M,u -> apply(u, j -> fastExp(p^e,j)))
 )
 
 --------------------------------------------------------------------------------------------------------
@@ -69,8 +69,7 @@ while (isSubset(L,K)==false) do
 
 --Outputs the generalized Frobenius power of an ideal; either the N-th Frobenius power of N/p^e-th one.
 
-genFrobeniusPower = method(Options => {gfpStrategy => Naive})
-
+genFrobeniusPower = method(Options => {gfpStrategy => Naive});
 
 --Computes the integral generalized Frobenius power I^[N]
 genFrobeniusPower(ZZ,Ideal) := opts -> (N,I) -> 
@@ -107,7 +106,7 @@ genFrobeniusPower(ZZ,ZZ,Ideal) := opts -> (e,N,I) ->
 --Computes the generalized Frobenius power I^[t] for a rational number t 
 genFrobeniusPower(QQ,Ideal) := (t,I) ->
 (
-    p = char ring I;
+    p := char ring I;
     L := divideFraction(p,t); 
     a := L#0; b := L#1; c := L#2;     --write t = a/(p^b*(p^c-1))
     if c==0 then return genFrobeniusPower(b,a,I)  --if c = 0, call simpler function
