@@ -13,6 +13,7 @@ newPackage ( "ResidualIntersections",
 	{Name => "Jay Yang",
 	    Email => "jkelleyy@gmail.com"}
 	},
+    PackageImports => {"MCMApproximations"},
     Headline => "Package for studying conditions associated to Residual Intersection theory",
     Reload => true,
     DebuggingMode => true
@@ -47,12 +48,11 @@ depthsOfPowers(ZZ,Ideal) := (s,I) -> depthsOfPowers(s,codim I, I)
 --generic Artin-Nagata Code
 genericArtinNagata = method()
 genericArtinNagata(ZZ,Ideal) := (s,I) -> (
-    needsPackage "MCMApproximations";
     S := ring I;
     K := genericResidual(s,I);
     s' := codim K;
     if s' === s then 
-      codepth := numgens (ring K) - depth ((ring K)^1/K)
+      codepth := numgens (ring K) - profondeur ((ring K)^1/K)
     else codepth = -1;
     {s',codepth,K}
     )
@@ -214,31 +214,6 @@ installPackage("RandomIdeal")
      
      (codim I)*(degree I)
 ///
---depth but faster
-profondeur = method()
-profondeur(Ideal, Module) := (I,M) ->(
-    --requires R to be an affine ring (eg NOT ZZ[x])
-    R := ring M;
-    d := max(1,dim M); -- d=0 causes a crash
-    if not isCommutative R then error"profondeur undefined for noncommutative rings";
-    F := M**dual res (R^1/I, LengthLimit => d);
-    i := 0;
-    while HH_i F == 0 do i=i-1;
-    -i)
-
-profondeur Module := M -> (
-    --profondeur of a module with respect to the max ideal, via finite proj dim
-    --gives error if the ultimate coeficient ring of R = ring M is not a field.
-    R := ring M;
-    if not isCommutative R then error"profondeur undefined for noncommutative rings";
-    (S,F) := flattenRing R;
-    if not isField coefficientRing S then error"input must be a module over an affine ring";
-    S0 := ring presentation S;
-    r := F*map(S,S0);
-    MM := pushForward(r,M);
-    numgens S0 - pdim MM)
-
-profondeur Ring := R -> profondeur R^1
 
 koszulDepth = method()
 koszulDepth(Ideal) := I -> (
@@ -742,6 +717,7 @@ doc ///
    SeeAlso
        isStronglyCM
        koszulDepth
+       depthsOfPowers
 ///
 
 ------------------------------------------------------------
@@ -776,6 +752,8 @@ doc ///
 	  depthsOfPowers(6,3,I)
    Caveat
    SeeAlso
+      hasSlidingDepth
+      genericArtinNagata
 ///
 
 
