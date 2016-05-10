@@ -38,7 +38,8 @@ Authors => {
 },
 Headline => "A package for calculations of singularities in positive characteristic", 
 DebuggingMode => true, 
-Reload => true 
+Reload => true,
+AuxiliaryFiles=>true 
 )
 
 
@@ -47,12 +48,22 @@ Reload => true
 
 export{
 --IntegerComputations (IntegerComps.m2)
-    "floorlog",
-    "multOrder",
-    "taxicabNorm",
+    "carryTest",  
+    "basePExp",    
+    "digit", 	   
+    "denom",   
     "divideFraction",
+    "firstCarry", 
+    "floorlog",
+    "fracPart", 
     "getCanVector",
-
+    "getNumAndDenom", 
+    "maxIdeal", 
+    "multOrder",
+    "num",
+    "taxicabNorm",
+    "truncatedBasePExp",
+    
 --ethRootFunctions (EthRoots.m2)
     "ascendIdeal", 
     "ascendIdealSafe",
@@ -144,11 +155,9 @@ export{
 -- Other
        "findAllCompatibleIdeals", ---MK	
     
-	"findTestElementAmbient", ---Karl
 	"FFiniteSupport", ---MK
 	"findGeneratingMorphisms", ---MK
 	"FPureIdeals",
-	"frobeniusPower",
  	"FullMap", ---Karl
 	"generatingMorphism", ---MK
 	"generatingRoot", ---MK

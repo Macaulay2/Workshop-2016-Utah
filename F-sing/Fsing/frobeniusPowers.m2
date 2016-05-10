@@ -69,8 +69,7 @@ while (isSubset(L,K)==false) do
 
 --Outputs the generalized Frobenius power of an ideal; either the N-th Frobenius power of N/p^e-th one.
 
-genFrobeniusPower = method(Options => {gfpStrategy => Naive})
-
+genFrobeniusPower = method(Options => {gfpStrategy => Naive});
 
 --Computes the integral generalized Frobenius power I^[N]
 genFrobeniusPower(ZZ,Ideal) := opts -> (N,I) -> 
