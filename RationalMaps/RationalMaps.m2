@@ -102,7 +102,7 @@ dimImage(RingMap) := (p) -> (
 baseLocusOfMap = method();
 
 baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
-    if numRows L1 > 1 then error "Expected a row matrix"
+    if numRows L1 > 1 then error "Expected a row matrix";
     if isSameDegree( first entries L1  )==false then error "Expected a matrix of homogenous elements of the same degree";
 
     M:= gens ker transpose presentation image L1;
@@ -349,7 +349,7 @@ inverseOfMap = method();
 
 --X = Proj R
 --Y = Proj S
---This madfp is given by a list of elements in R, all homogeneous
+--This map is given by a list of elements in R, all homogeneous
 --of the same degree.  
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
@@ -759,14 +759,27 @@ doc ///
         Checks whether a map to projective space is regular
     Usage
         b = isRegularMap(M)
+        b = isRegularMap(L)
+        b = isRegularMap(f)
     Inputs
         M: Matrix
             Row matrix whose entries correspond to the coordinates of your map to projective space
+        L: List
+            A list whose entries correspond to the coordinates of your map to projective space
+        f: RingMap
+            A ring map corresponding to a map of projective varieties.
     Outputs
         b: Boolean
     Description
         Text
             This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring.
+        Example
+            P5 = QQ[a..f];
+            M = matrix{{a,b,c},{d,e,f}};
+            segreProduct = P5/minors(2, M);
+            blowUpSubvar = segreProduct/ideal(b - d);
+            f = {a, b, c};
+            isRegularMap({a,b,c})
 ///  
 
 doc ///
