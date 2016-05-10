@@ -16,7 +16,7 @@ Version => "0.1", Date => "May 7th, 2016", Authors => {
 Headline => "A package for working with rational maps.", DebuggingMode => true, Reload=>true)
 export{
 	"isBirationalMap",
-	"imageOfMap",
+	"idealOfImageOfMap",
 	"baseLocusOfMap",
 	"dimImage",
 	"isRegularMap",
@@ -37,55 +37,67 @@ export{
 --************************************************************--
 ----------------------------------------------------------------
 
-imageOfMap = method();
 
-imageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
-	h := map((ring a)/a,(ring b)/b,f);
+--***Karl:  I dislike how this returns stuff.   The image of a map is not an ideal.  Hence I renamed it
+idealOfImageOfMap = method();
+
+idealOfImageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
+	h := map((ring a)/a, ring b ,f);
 	-- the image of f is the same as the kernel of its pullback on the 
 	-- coordinate rings. h is this pullback
-	im := ker h;
+        idealOfImageOfMap(h)
+	);
+
+idealOfImageOfMap(Ideal,Ideal,BasicList) := (a,b,g) -> (
+	h:=map((ring a)/a, ring b ,g);
+	idealOfImageOfMap(h)
+	);
+
+idealOfImageOfMap(Ring,Ring,Matrix) := (R,S,f) -> (
+	h := map(R,S,f);
+	idealOfImageOfMap(h)	
+	);
+
+idealOfImageOfMap(Ring,Ring,BasicList) := (R,S,g) -> (
+        h := map(R,S,g);
+        idealOfImageOfMap(h)
+	);
+
+idealOfImageOfMap(RingMap) := (p) -> (
+        --idealOfImageOfMap(target p, source p, first entries matrix p)
+        h := map(target p, ambient source p,p);
+        im := ker h;
 	im
-	);
-
-imageOfMap(Ideal,Ideal,BasicList) := (a,b,g) -> (
-	imageOfMap(a,b,g)
-	);
-
-imageOfMap(Ring,Ring,Matrix) := (R,S,f) -> (
-	imageOfMap(ideal R, ideal S, f)
-	);
-
-imageOfMap(Ring,Ring,BasicList) := (R,S,g) -> (
-        imageOfMap(ideal R, ideal S, g)
-	);
-
-imageOfMap(RingMap) := (p) -> (
-        imageOfMap(target p, source p, first entries matrix p)
 	);
 
 dimImage = method();
 
 dimImage(Ideal,Ideal,Matrix) := (a,b,f) -> (
-	I := imageOfMap(a,b,f);
-	dim I - 1
-	-- substract 1 from the dimension of the image since in projective space
+        h := map( (ring a)/a, (ring b)/b, f);
+        dimImage(h)
+        	-- substract 1 from the dimension of the image since in projective space
 	);
 
 dimImage(Ideal,Ideal,BasicList) := (a,b,g) -> (
-	dimImage(a,b,g)
-	);
+        h := map( (ring a)/a, (ring b)/b, g);
+        dimImage(h) 
+       	);
 
 dimImage(Ring,Ring,Matrix) := (R,S,f) -> (
-	dimImage(ideal R, ideal S, f)
+        h := map( R, S, f);
+        dimImage(h) 
 	);
 
 dimImage(Ring,Ring,BasicList) := (R,S,g) -> (
-	dimImage(ideal R, ideal S, g)
-	);
+        h := map( R, S, g);
+        dimImage(h) 
+        );
 
 dimImage(RingMap) := (p) -> (
-	dimImage(target p, source p, first entries matrix p)
-	);
+	--dimImage(target p, source p, first entries matrix p)
+	I := idealOfImageOfMap(p);
+	(dim I) - 1
+);
 
 baseLocusOfMap = method();
 
@@ -287,7 +299,7 @@ isBirationalMap(RingMap) :=(f)->(
 isBirationalOntoImage = method();
 
 isBirationalOntoImage(Ideal,Ideal, BasicList) :=(di,im,bm)->(
-      tar:=imageOfMap(di,im, bm);
+      tar:=idealOfImageOfMap(di,im, bm);
       isBirationalMap(di,tar,bm)
       );
   
@@ -302,7 +314,7 @@ isBirationalOntoImage(RingMap) :=(f)->(
     
     --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    nonZeroMinor=method();
+nonZeroMinor=method();
 nonZeroMinor(Matrix,ZZ):=(M,ra)->(
     cc:=numColumns(M);
     ro:=numRows(M);
@@ -323,6 +335,7 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
 flatten nzlist);  
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
   
   
   
@@ -403,9 +416,13 @@ mapOntoImage(Ideal, Ideal, BasicList) := (a,b,l)->(
 isEmbedding = method(); --checks whether a map is a closed embedding.
 
 isEmbedding(Ideal, Ideal, BasicList) := (a1, b1, f1)->(
+        newMap := map((ring a1)/a1, (ring b1)/b1, f1);
+        isEmbedding(newMap)
 );
 
 isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
+        newMap:=map(R1,S1,f1);
+        isEmbedding(newMap)
 );
 
 isEmbedding(RingMap) := (f1)->(
@@ -491,20 +508,20 @@ doc ///
 
 doc ///
 	Key 
-		imageOfMap
-		(imageOfMap,Ideal,Ideal,Matrix)
-		(imageOfMap,Ideal,Ideal,BasicList)
-		(imageOfMap,Ring,Ring,Matrix)
-		(imageOfMap,Ring,Ring,BasicList)
-		(imageOfMap,RingMap)
+		idealOfImageOfMap
+		(idealOfImageOfMap,Ideal,Ideal,Matrix)
+		(idealOfImageOfMap,Ideal,Ideal,BasicList)
+		(idealOfImageOfMap,Ring,Ring,Matrix)
+		(idealOfImageOfMap,Ring,Ring,BasicList)
+		(idealOfImageOfMap,RingMap)
 	Headline
-		Finds defining equations for the image of a rational map
+		Finds defining equations for the image of a rational map between varieties or schemes
 	Usage
-		im = imageOfMap(a,b,f)
-		im = imageOfMap(a,b,g)
-		im = imageOfMap(R,S,f)
-		im = imageOfMap(R,S,g)
-		im = imageOfMap(p)
+		im = idealOfImageOfMap(a,b,f)
+		im = idealOfImageOfMap(a,b,g)
+		im = idealOfImageOfMap(R,S,f)
+		im = idealOfImageOfMap(R,S,g)
+		im = idealOfImageOfMap(p)
 	Inputs
 		a:Ideal
 			defining equations for X
@@ -525,14 +542,14 @@ doc ///
 			defining equations for the image of f
 	Description
 		Text
-			Defines the pullback map on the coordinate rings of X and Y. The kernel of this pullback map gives the image of the original map f. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these
+			Given $f : X->Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these.  In particular, this function returns an ideal defining a subset of the  the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
 		Example
-			S = QQ[x,y,z]
-			a = ideal(x^2+y^2+z^2)
-			T = QQ[u,v]
-			b = ideal(u^2+v^2)
-			f = matrix{{x*y,y*z}}
-			imageOfMap(a,b,f)
+			S = QQ[x,y,z,w];
+			b = ideal(x*y-z*w);
+			R = QQ[u,v];
+			a = ideal(sub(0,R));
+			f = matrix {{u,0,v,0}};
+			idealOfImageOfMap(a,b,f)
 ///
 			
 doc ///
@@ -622,25 +639,109 @@ doc ///
 	                mapOntoImage(R,S,{x^2,x*y,y^2})
 ///
 
+doc ///
+        Key
+                isEmbedding
+                (isEmbedding, RingMap)
+                (isEmbedding, Ideal, Ideal, BasicList)
+                (isEmbedding, Ring, Ring, BasicList)
+        Headline
+                Given a map of rings, correspoing to $f : X -> Y$, this determines if this map embeds $X$ as a closed subscheme into $Y$.
+        Usage
+                val = isEmbedding(f)
+                val = isEmbedding(a,b,l)
+                val = isEmbedding(R,S,l)                
+        Inputs
+                a:Ideal
+                        defining equations for X
+                b:Ideal
+                        defining equations for Y
+		l:BasicList
+                        projective rational map given by polynomial represenatives of the same degree
+                f:RingMap
+                        the ring map corresponding to $f : X -> Y$
+                R:Ring
+                        coordinate ring for X
+                S:Ring
+                        coordinate ring for Y
+                
+        Outputs
+                val:Boolean
+			true if the map is an embedding, otherwise false.
+	Description
+	        Text
+	                Consider the Veronese embedding.
+	        Example 
+	                R = QQ[x,y];
+	                S = QQ[a,b,c];
+	                f = map(R, S, {x^2, x*y, y^2});
+	                isEmbedding(f)
+	        Text
+	                Now consider the projection from a point on the plane to the line at infinity.
+	        Example
+	                R=QQ[x,y,z];
+	                S=QQ[a,b];
+	                f=map(R, S, {y,z});
+	                isEmbedding(f)
+	        Text 
+	                That is obviously not an embedding.  It is even not an embedding when we restrict to a quadratic curve, even though it is a regular map.
+	        Example
+	                R=QQ[x,y,z]/(x^2+y^2-z^2);
+	                S=QQ[a,b];
+	                f=map(R,S, {y,z});
+	                isRegularMap(f)
+	                isEmbedding(f)
+///
+
+
 
 doc ///
     Key
         baseLocusOfMap
         (baseLocusOfMap, Matrix)
         (baseLocusOfMap, List)
+        (baseLocusOfMap, RingMap)
     Headline
         Computes base locus of a map from a projective variety to projective space
     Usage
         I = baseLocusOfMap(M)
         I = baseLocusOfMap(L)
+        I = baseLocusOfMap(h)
     Inputs
         M: Matrix
             Row matrix whose entries correspond to the coordinates of your map to projective space.
         L: List
-            A list whose entries correspond to the coordinates of your map to projective space
+            A list whose entries correspond to the coordinates of your map to projective space.
+        h: RingMap
+            A ring map corresponding to a map of projective varieties.
     Outputs
         I: Ideal
-            The saturated defining ideal of the baselocus
+            The saturated defining ideal of the baselocus of the corresponding maps.
+    Description
+        Text
+            This defines the locus where a given map of projective varieties is not defined.  For instance, consider the following rational map from $P^2$ to $P^1$
+        Example
+            R = QQ[x,y,z];
+            S = QQ[a,b];
+            f = map(R, S, {x,y});
+            baseLocusOfMap(f)
+        Text
+            Observe it is not defined at the point [0:0:1], which is exactly what one expects.  However, we can restrict the map to a curve on $P^2$ and then it will be defined everywhere.
+        Example
+            R=QQ[x,y,z]/(y^2*z-x*(x-z)*(x+z));
+            S=QQ[a,b];
+            f=map(R,S,{x,y});
+            baseLocusOfMap(f)
+        Text
+            Let us next consider the quadratic Cremona transformation.
+        Example
+            R=QQ[x,y,z];
+            S=QQ[a,b,c];
+            f=map(R,S,{y*z,x*z,x*y});
+            J=baseLocusOfMap(f)
+            minimalPrimes J
+        Text
+            The base locus is exactly the three points one expects.
 ///
 
 doc ///
@@ -657,7 +758,7 @@ doc ///
         b: Boolean
     Description
         Text
-            This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring
+            This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring.
 ///  
 
 doc ///
@@ -692,48 +793,56 @@ doc ///
         
 ///
 
-TEST ///
+--******************************************
+--******************************************
+--******TESTS TESTS TESTS TESTS TESTS*******
+--******************************************
+--******************************************
+
+TEST /// --test #1
 	------------------------------------
-	------- Tests for imageOfMap -------
+	------- Tests for idealOfImageOfMap -------
 	------------------------------------   
+	S = QQ[x,y,z,w];
+	b = ideal(x*y-z*w);
+	R = QQ[u,v];
+	a = ideal(sub(0,R));
+	f = matrix {{u,0,v,0}};
+	im = idealOfImageOfMap(a,b,f);
+	assert (im == ideal(y,w))
+///
 
-	S = QQ[x,y,z]
-        a = ideal(x^2+y^2+z^2)
-        T = QQ[u,v]
-        b = ideal(u^2+v^2)
-        f = matrix{{x*y,y*z}}
-        im = imageOfMap(a,b,f)  
-	assert(image == ideal(v^4,u*v^3))
+TEST /// --test #2
+	S = QQ[x0,x1];
+	T = QQ[y0,y1,y2];
+	f = map(S,T,{x0^4,x0^2*x1^2,x1^4});
+	im = idealOfImageOfMap(f);
+	assert(im == ideal(y1^2-y0*y2))
+///
 
-	S = QQ[x0,x1]
-	a = ideal(0*x0)
-	T = QQ[y0,y1,y2]
-	b = ideal(0*y1)
-	f = matrix{{x0^4,x0^2*x1^2,x1^4}}
-	im = imageOfMap(a,b,f)
-	assert(im == ideal(y2^2-y1*y^3))
-
+TEST /// --test #3
 	-- Since in Projective Space, check to make sure different representations give the same result
-	S = QQ[x,y]
-	a = ideal(0*x)
-	T = QQ[u,v]
-	b = ideal(0*v)
-	f1 = matrix{{x,y}}
-	f2 = matrix{{x^3*y^2,x^2*y^3}}
-	assert(imageOfMap(a,b,f1)==imageOfMap(a,b,f2))
+	S = QQ[x,y];
+	T = QQ[u,v];
+	f1 = map(S,T,{x,y});
+	f2 = map(S,T,{x^3*y^2,x^2*y^3});	
+	assert(idealOfImageOfMap(f1)==idealOfImageOfMap(f2))
+///
 
+TEST /// --test #4
 	-------------------------------------
 	------ Tests for dimImage -----------
 	-------------------------------------
 
-	S = QQ[x,y,z]
-        a = ideal(x^2+y^2+z^2)
-        T = QQ[u,v]
-        b = ideal(u^2+v^2)
-        f = matrix{{x*y,y*z}}
-        d = dimImage(a,b,f)
-        assert(d == -1)
+	S = QQ[x,y,z];
+        a = ideal(x^2+y^2+z^2);
+        T = QQ[u,v];
+        f = map(S, T, {x*y,y*z});
+        d = dimImage(f);
+        assert(d == 1)
+///
 
+TEST /// --test #5
         S = QQ[x0,x1]
         a = ideal(0*x0)
         T = QQ[y0,y1,y2]
@@ -741,7 +850,9 @@ TEST ///
         f = matrix{{x0^4,x0^2*x1^2,x1^4}}
         d = dimImage(a,b,f)
         assert(d == 1)	
+///
 
+TEST /// --test #6
     -- Since in Projective Space, check to make sure different representations give the same result
     S = QQ[x,y]
     a = ideal(0*x)
@@ -750,44 +861,62 @@ TEST ///
     f1 = matrix{{x,y}}
     f2 = matrix{{x^3*y^2,x^2*y^3}}
     assert(dimImage(a,b,f1)==dimImage(a,b,f2))
+///
+
 
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
 	-------------------------------------
-
+TEST ///	--test #7
     R = QQ[x,y,z]	
 	M = matrix{{x^2*y, x^2*z, x*y*z}}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(M))
-	
+///
+
+TEST ///	--test #8
     R = QQ[x,y,z]	
 	L = {x^2*y, x^2*z, x*y*z}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(L))
+///
 
+TEST /// --test #9
 	-- reducible source
-
 	R = QQ[x,y,z]/(x*y)
 	M = matrix{{x^2, x*y, y^2}}
 	I = ideal(x,y)
 	assert(I == baseLocusOfMap(M))
+///
+
 
 	-------------------------------------
 	----- isRegularMap -----------------
 	-------------------------------------
-
+TEST /// --test #10
 	R = QQ[x,y,z,w]/(x*y - z*w)
 	M = matrix{{1, 0, 0}}
 	assert(isRegularMap(M))
+///
 
+TEST /// --test #11
     R = QQ[x,y]/(x*y)
     M = matrix{{x,y}}
     assert(isRegularMap(M))
+///
 
+TEST /// --test #12
     R = QQ[x,y,z]/(x^3 + y^3 - z^3)
-    M = matrix{{y-z, x}}
-    assert(isRegularMap(M) == false)
+    M = matrix{{(y-z)*x, x^2}}
+    assert(isRegularMap(M) == true)
+///
 
+TEST /// --test #13
+        R=QQ[x,y,z];
+        S=QQ[a,b];  
+        h = map(R, S, {x,y});
+        assert(isRegularMap(h) == false)      
+///
 
 	-------------------------------------
 	----- inverseOfMap  -----------------
@@ -796,7 +925,6 @@ TEST ///
 
 
     
-
-/// 
+ 
 ----FUTURE PLANS------
 

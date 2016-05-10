@@ -337,12 +337,6 @@ randomShellableIdealChain(Ring,ZZ,ZZ) := (R,dimProj,deg)->(
 randomShellableIdealChain(Ring,ZZ) := (R,dimProj)->(
     idealChainFromShelling(R,randomShelling(numgens R,dimProj))
     )
-///
-S = ZZ/101[x_0..x_5]
-I = randomShellableIdeal(S,2,5)
-dim I == 3
-degree I == 5
-///
 
 randomShelling(Ring,ZZ,ZZ) := (R,m,k) -> listsToMonomials(randomShelling(numgens R,m,k),R)
 randomShelling(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomShelling(numgens R,m),R)
@@ -355,6 +349,634 @@ randomShelling(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomShelling(numgens
 listsToMonomials = (P,R) -> apply(P, D->product apply(D,d->R_d))
 monomialsToLists = (L,R) -> apply(L, m->select(numgens ring m, i->((listForm m)#0#0#i > 0)))
 
+
+beginDocumentation()
+
+doc ///
+Key 
+     RandomIdeal
+Headline 
+     A package to construct various sorts of random ideals
+Description
+ Text
+     This package can be used to make experiments, trying many ideals, perhaps
+     over small fields. For example...what would you expect the regularities of
+     "typical" monomial ideals with 10 generators of degree 3 in 6 variables to be?
+     Try a bunch of examples -- it's fast.
+     Here we do only 500 -- this takes about a second on a fast machine --
+     but with a little patience, thousands can be done conveniently.
+ Example
+     setRandomSeed(currentTime())
+     kk=ZZ/101;
+     S=kk[vars(0..5)];
+     time tally for n from 1 to 500 list regularity randomMonomialIdeal(10:3,S)
+ Text
+     How does this compare with the case of binomial ideals? or pure binomial ideals?
+     We invite the reader to experiment, replacing "randomMonomialIdeal" above with
+     "randomBinomialIdeal" or "randomPureBinomialIdeal", or taking larger numbers
+     of examples. Click the link "Finding Extreme Examples" below to see
+     some other, more elaborate ways to search. 
+SeeAlso
+     "Finding Extreme Examples"
+     randomIdeal
+     randomMonomialIdeal
+     randomSquareFreeMonomialIdeal
+     randomSquareFreeStep
+     randomBinomialIdeal
+     randomPureBinomialIdeal
+     randomSparseIdeal
+     randomElementsFromIdeal
+     randomMonomial
+     squareFree
+     regSeq
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomMonomial
+------------------------------------------------------------
+doc ///
+Key 
+   randomMonomial
+   (randomMonomial, ZZ, Ring)
+Headline 
+   Choose a random monomial of given degree in a given ring
+Usage 
+   m = randomMonomial(d,S)
+Inputs 
+   d: ZZ
+       non-negative
+   S: Ring
+       polynomial ring
+Outputs
+   m: RingElement
+       monomial of S
+Description
+ Text
+    Chooses a random monomial.
+ Example
+    setRandomSeed(currentTime())
+    kk=ZZ/101
+    S=kk[a,b,c]
+    randomMonomial(3,S)
+SeeAlso
+ randomMonomialIdeal
+ randomSquareFreeMonomialIdeal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomSquareFreeMonomialIdeal
+------------------------------------------------------------
+doc ///
+Key
+  randomSquareFreeMonomialIdeal
+  (randomSquareFreeMonomialIdeal, List, Ring)
+  (randomSquareFreeMonomialIdeal, Sequence, Ring)
+Headline
+  random square-free monomial ideal with given degree generators
+Usage
+  I = randomSquareFreeMonomialIdeal(L,S)
+Inputs
+  L:List
+   or sequence of non-negative integers
+  S:Ring
+   Polynomial ring
+Outputs
+  I:Ideal
+   square-free monomial ideal with generators of specified degrees
+Description
+ Text
+  Choose a random square-free monomial
+  ideal whose generators have the degrees 
+  specified by the list or squence L.
+ Example
+  setRandomSeed(currentTime())
+  kk=ZZ/101
+  S=kk[a..e]
+  L={3,5,7}
+  randomSquareFreeMonomialIdeal(L, S)
+  randomSquareFreeMonomialIdeal(5:2, S)
+Caveat 
+  The ideal is constructed degree by degree, starting from the lowest degree
+  specified. If there are not enough monomials of the next specified degree that
+  are not already in the ideal, the function prints a warning and returns an ideal
+  containing all the generators of that degree.
+SeeAlso
+  randomMonomial
+  randomMonomialIdeal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomSquareFreeStep
+------------------------------------------------------------
+doc ///
+Key
+  randomSquareFreeStep
+  (randomSquareFreeStep, MonomialIdeal) 
+  (randomSquareFreeStep, Ideal) 
+  (randomSquareFreeStep, List) 
+  [randomSquareFreeStep,AlexanderProbability]
+Headline
+ A step in a random walk with uniform distribution over all monomial ideals
+Usage
+  M = randomSquareFreeStep(I)
+  M = randomSquareFreeStep(I, AlexanderProbability => p)  
+  M = randomSquareFreeStep(L)
+  M  = randomSquareFreeStep(L, AlexanderProbability => p)
+Inputs
+  I:Ideal
+   square-free monomial Ideal or MonomialIdeal
+  L:List
+   {I,Igens,ISocgens} where I is a square-free MonomialIdeal,
+   Igens is a List of its minimal generators,
+   ISocgens is a List of the minimal generators of the socle mod I.
+Outputs
+  M:List
+   {J,Jgens,JSocgens} where J is a square-free MonomialIdeal,
+   Jgens is a List of its minimal generators,
+   JSocgens is a List of the minimal generators of the socle mod J.
+Description
+  Text
+   With probability p the routine takes the Alexander dual of I;
+   the default value of p is .05, and it can be set with the option
+   AlexanderProbility.
+  
+   Otherwise uses the Metropolis algorithm to produce a random walk on the space
+   of square-free ideals. Note that there are a LOT of square-free ideals;
+   these are the Dedekind numbers, and the sequence (with 1,2,3,4,5,6,7,8 variables) 
+   begins
+   3,6,20,168,7581, 7828354, 2414682040998, 56130437228687557907788.
+   (see the Online Encyclopedia of Integer Sequences for more information).
+   Given I in a polynomial ring S, we make a list
+   ISocgens of the square-free minimal monomial generators of the socle of S/(squares+I)
+   and a list of minimal generators Igens of I. A candidate "next" ideal J is formed as follows:
+   We choose randomly from the 
+   union of these lists; if a socle element is chosen, it's added to I; if
+   a minimal generator is chosen, it's replaced by the square-free part of
+   the maximal ideal times it.
+   the chance of making the given move is then 1/(#ISocgens+#Igens), and
+   the chance of making the move back would be the similar quantity for J,
+   so we make the move or not depending on whether 
+   random RR < (nJ+nSocJ)/(nI+nSocI) or not; here random RR is
+   a random number in [0,1].
+  Example
+   setRandomSeed(currentTime())
+   S=ZZ/2[vars(0..3)]
+   J = monomialIdeal"ab,ad, bcd"
+   randomSquareFreeStep J
+  Text
+   With 4 variables and 168 possible monomial ideals, a run of 5000
+   takes less than 6 seconds on a reasonably fast machine. With
+   10 variables a run of 1000 takes about 2 seconds.
+  Example
+   setRandomSeed(1)
+   rsfs = randomSquareFreeStep
+   J = monomialIdeal 0_S
+   time T=tally for t from 1 to 5000 list first (J=rsfs(J,AlexanderProbability => .01));
+   #T
+   T
+   J
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION AlexanderProbability
+------------------------------------------------------------
+doc ///
+Key
+  AlexanderProbability
+Headline
+  option to randomSquareFreeStep
+Usage
+  M = randomSquareFreeStep(L, AlexanderProbability => p)
+Inputs
+  p: RR
+   real number between 0 and 1.
+Description
+ Text
+  Controls how often the Alexander dual is taken
+SeeAlso
+  randomSquareFreeStep
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION squareFree
+------------------------------------------------------------
+doc ///
+Key
+  squareFree  
+Headline
+  ideal of all square-free monomials of given degree
+Usage
+  I = squareFree(d,S)
+Inputs
+  d:ZZ
+   positive
+  S:Ring
+   Polynomial ring
+Outputs
+  I:Ideal
+   all square-free monomials of degree d
+Description
+ Example
+  kk=ZZ/101
+  S=kk[a..e]
+  squareFree(3, S)
+SeeAlso
+  randomSquareFreeMonomialIdeal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION squareFree
+------------------------------------------------------------
+doc ///
+Key
+  (squareFree, ZZ, Ring)
+Headline
+  ideal of all square-free monomials of given degree
+Usage
+  I = squareFree(d,S)
+Inputs
+  d:ZZ
+   positive
+  S:Ring
+   Polynomial ring
+Outputs
+  I:Ideal
+   all square-free monomials of degree d
+Description
+ Example
+  kk=ZZ/101
+  S=kk[a..e]
+  squareFree(3, S)
+SeeAlso
+  randomSquareFreeMonomialIdeal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION regSeq
+------------------------------------------------------------
+doc ///
+Key
+  regSeq
+  (regSeq, List, Ring)
+  (regSeq, Sequence, Ring)  
+Headline
+  regular sequence of powers of the variables, in given degrees
+Usage
+  I = regSeq(L,S)
+Inputs
+  L:List
+   or sequence of positive integers
+  S:Ring
+   Polynomial ring
+Outputs
+  I:Ideal
+   generated by the given powers of the variables
+Description
+ Example
+  kk=ZZ/101
+  S=kk[a..e]
+  regSeq((2,3,4),S)
+Caveat
+ If the number of elements of L differs from the number of
+ variables in the ring, the length of the regular sequence
+ will be the minimum of the two.
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomIdeal
+------------------------------------------------------------
+doc ///
+Key
+  randomIdeal
+  (randomIdeal, List, Matrix)
+  (randomIdeal, Sequence, Matrix)
+Headline
+  randomIdeal made from a given set of monomials
+Usage
+  I = randomIdeal(L,m)
+Inputs
+  L:List
+   or sequence of positive integers
+  m: Matrix
+   1xn matrix of homogeneous polynomials in a ring S
+Outputs
+  I:Ideal
+   generated by random linear combinations of degrees given by L of the given polynomials
+Description
+ Text
+  This function composes m with a random map from a free module with degrees
+  specified by L to the source of m.
+ Example
+  kk=ZZ/101
+  S=kk[a..e]
+  L={3,3,4,6}
+  m = matrix{{a^3,b^4+c^4,d^5}}
+  I=randomIdeal(L,m)
+SeeAlso
+ randomMonomialIdeal
+ randomSquareFreeMonomialIdeal
+ randomMonomial
+ randomBinomialIdeal
+ randomPureBinomialIdeal
+ randomElementsFromIdeal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomBinomialIdeal
+------------------------------------------------------------
+doc ///
+Key
+  randomBinomialIdeal
+  (randomBinomialIdeal, List, Ring)
+  (randomBinomialIdeal, Sequence, Ring)
+Headline
+  randomBinomialIdeal with binomials of given degrees
+Usage
+  I = randomBinomialIdeal(L,S)
+Inputs
+  L:List
+   or sequence of positive integers
+  S: Ring
+   Polynomial ring
+Outputs
+  I:Ideal
+   generated by random binomials of the given degrees
+Description
+ Example
+  kk=ZZ/101
+  S=kk[a..e]
+  L={3,3,4,6}
+  I=randomBinomialIdeal(L,S)
+Caveat
+  The binomials are generated one at a time, and there is no checking to
+  see whether the ideal returned is minally generated by fewer elements,
+  so the number of minimal generators may not be what you expect.
+SeeAlso
+ randomIdeal
+ randomMonomialIdeal
+ randomSquareFreeMonomialIdeal
+ randomMonomial
+ randomPureBinomialIdeal
+ randomElementsFromIdeal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomPureBinomialIdeal
+------------------------------------------------------------
+doc ///
+Key
+  randomPureBinomialIdeal
+  (randomPureBinomialIdeal, List, Ring)
+  (randomPureBinomialIdeal, Sequence, Ring)
+Headline
+  randomPureBinomialIdeal with binomials of given degrees
+Usage
+  I = randomPureBinomialIdeal(L,S)
+Inputs
+  L:List
+   or sequence of positive integers
+  S: Ring
+   Polynomial ring
+Outputs
+  I:Ideal
+   generated by random pure binomials (that is, differences of monomials without coefficients)  of the given degrees
+Description
+ Text
+ Example
+  kk=ZZ/101
+  S=kk[a..e]
+  L={3,3,4,6}
+  I=randomPureBinomialIdeal(L,S)
+Caveat
+  The binomials are generated one at a time, and there is no checking to
+  see whether the ideal returned is minally generated by fewer elements,
+  so the number of minimal generators may not be what you expect.
+SeeAlso
+ randomIdeal
+ randomMonomialIdeal
+ randomSquareFreeMonomialIdeal
+ randomMonomial
+ randomBinomialIdeal
+ randomElementsFromIdeal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomSparseIdeal
+------------------------------------------------------------
+doc ///
+Key
+  randomSparseIdeal
+  (randomSparseIdeal, Matrix, ZZ, ZZ)
+Headline
+  randomSparseIdeal made from a given set of monomials
+Usage
+  I = randomSparseIdeal(B,s,n)
+Inputs
+  B:Matrix
+   1xn matrix of monomials
+  s: ZZ
+   positive integer, the number of terms in the generators of I
+  n: ZZ
+   positive integer, the number of generators of I
+Outputs
+  I:Ideal
+   generated by n polynomials, each a random linear combination of s monomials 
+Description
+ Text
+  Each generator of I is formed by randomly choosing s (the sparsity) entries 
+  of the matrix B and taking a random linear combinations with coefficients in
+  the (ultimate) coefficient ring of S, the ring in which the monomials lie.
+ Example
+  kk=ZZ/101
+  S=kk[a..e]
+  L={3,3,4,6}
+  B = matrix{{a^3,b^4,d^5,a*b*c,e}}
+  I=randomSparseIdeal(B,3,2)
+SeeAlso
+ randomIdeal
+ randomMonomialIdeal
+ randomSquareFreeMonomialIdeal
+ randomMonomial
+ randomBinomialIdeal
+ randomPureBinomialIdeal
+ randomElementsFromIdeal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomElementsFromIdeal
+------------------------------------------------------------
+doc ///
+Key
+  randomElementsFromIdeal
+  (randomElementsFromIdeal,List, Ideal)
+Headline
+  Chooses random elements of given degrees in a given ideal.
+Usage
+  I = randomElementsFromIdeal(L,I)
+Inputs
+  L:List
+   of integers
+  I:Ideal
+   that should be homogeneous
+Outputs
+  I:Ideal
+   generated by (at most) n homogeneous polynomials that are random linear combination of the
+   generators of I, with degrees specified by the list L
+Description
+ Example
+  kk=ZZ/101
+  S=kk[a..c]
+  L={3,3,4,6}
+  I = ideal(a^3,b^3, c^3)
+  J=randomElementsFromIdeal(L,I)
+SeeAlso
+ "Finding Extreme Examples"
+ randomIdeal
+ randomMonomialIdeal
+ randomSquareFreeMonomialIdeal
+ randomMonomial
+ randomBinomialIdeal
+ randomPureBinomialIdeal
+///
+
+------------------------------------------------------------
+-- DOCUMENTATION randomMonomialIdeal
+------------------------------------------------------------
+doc ///
+Key
+  randomMonomialIdeal
+  (randomMonomialIdeal, List, Ring)
+  (randomMonomialIdeal, Sequence, Ring)
+Headline
+  random monomial ideal with given degree generators
+Usage
+  I = randomMonomialIdeal(L,S)
+Inputs
+  L:List
+   or sequence of non-negative integers
+  S:Ring
+   Polynomial ring
+Outputs
+  I:Ideal
+   monomial ideal with generators of specified degrees
+Description
+ Text
+  Choose a random ideal whose generators have the degrees specified by the list or squence L.
+ Example
+  kk=ZZ/101
+  S=kk[a..e]
+  L={3,5,7}
+  randomMonomialIdeal(L, S)
+  randomMonomialIdeal(5:2, S)
+Caveat 
+  The ideal is constructed degree by degree, starting from the lowest degree
+  specified. If there are not enough monomials of the next specified degree that
+  are not already in the ideal, the function prints a warning and returns an ideal
+  containing all the generators of that degree.
+SeeAlso
+  randomMonomial
+  randomSquareFreeMonomialIdeal
+///
+
+
+
+doc ///
+Key
+  "Finding Extreme Examples"
+Headline
+  Ways to use random ideals to search for (counter)-examples
+Description
+ Text
+  A common use of Macaulay2 is to look for extreme or particularly
+  interesting examples. Here are some examples of how this may be done.
+   
+  Supposing first that some space of examples is finite; for
+  example, we might be interested in monomial ideals with a certain
+  number of generators of a certain degree d. Suppose, to be concrete,
+  that we want to compare the
+  maximum degree of a first syzygy with the regularity of the ideal,
+  and also with the maximum degree of the last syzygy. (To make the 
+  comparison interesting, it seems reasonable to subtract i from the maximum
+  degree of an i-th syzygy.)
+ Text
+  We may have no idea where to look for extreme examples, and it seems
+  that examples with small numbers of variables and generators may not
+  show the range of phenomena that actually occur. In large degree there
+  may be too many examples to search systematically; so instead we may
+  choose many examples at random, and hope to see a pattern. 
+   
+  Here is a simple example
+  First we tally the projective dimensions of 500
+  random square-free monomial ideals (what's the average?), then 
+  looking how big the difference between the regularity of R/I and the
+  "relation degree"-2 can be. It turns out this the differences are rather
+  small, only 1 in a typical run of 5000. So one might look for ideals with
+  a difference of 2, as in the following (in a real run, one would make
+  the number of iterations much bigger; here we keep it small so
+  that Macaulay2 doesn't take too long to build it's documentation files.)
+ Example
+  kk=ZZ/101
+  S=kk[vars(0..5)]
+  L=for n from 1 to 100 list res randomSquareFreeMonomialIdeal(10:3,S);
+  tally apply(L, F -> length F)
+  tally apply(L, F -> regularity F - ((max flatten degrees F_2) - 2))
+  L=for n from 1 to 500 list res randomSquareFreeMonomialIdeal(10:3,S);
+  scan(L, F -> if 1<(regularity F - (max flatten degrees F_2) + 2) then print F.dd_1)
+ Text
+  A typical problem might be to find how high the regularity of R/I can
+  be when R has reasonably few variables, and the degrees of the generators of
+  I are reasonably small; despite the wild examples of Mayr-Mayer, we don't
+  know how to make examples with large regularity without letting the
+  number of variables become large. The following program computes
+  "rep" examples of random ideals with monomial and binomial generators,
+  and prints any whose regularity exceeds the number "bound"
+
+    
+  looper = (rep,bound, L1, L2) -> (for i from 1 to rep do (
+  if i % 1000 == 0 then << "." << flush;
+  J := randomMonomialIdeal(L1,S) + randomBinomialIdeal(L2,S);
+  m := regularity coker gens J;
+  if m >= bound then << "reg " << m << " " << toString J << endl;))
+
+
+  For example:
+  kk=ZZ/2
+  S=kk[a,b,c,d]
+  looper(30000,10,{4},{4,4}) -- finds examples with on monomial of degree 4
+  and 2 binomials of degree 4. The largest largest regularity it has found
+  (and the largest I know for an ideal in 4 variables of degree 4) is 14.
+  Here is an example it found:
+  ideal(a*b^3,a^4+b^4,b*c^3+a*d^3)
+   
+  Similarly:
+  
+  looper(30000,10,{4,4},{4}) -- looks for examples with
+  2 monomials and 1 binomial of degree 4. Suggestively, the
+  largest regularity it found was also 14:
+  betti res ideal(c^4,b^4,a^3*c+b*d^3) -- reg 14
+ Text   
+  A more sophisticated and difficult situation arises when the space
+  of examples is not necessarily finite (except over a finite field) but
+  is a unirational
+  variety (such as the space of ideals generated by (at most) a certain
+  number of forms of certain given degrees, or the space of smooth curves
+  of genus g for some g <= 14) one may be able to do a search for random
+  examples, taking a rational parametrization of the space of examples
+  and plugging in random inputs.
+   
+  If the "interesting" examples live in
+  a subvariety whose codimension is small, then, working over a small field
+  (say 2,3, or 5 elements) one might hope to see elements of the subvariety
+  "not too rarely". This principle has been used to good effect for example
+  by (Caviglia and Decker-Schreyer, ****--Schreyer). 
+SeeAlso
+  randomIdeal
+  randomMonomialIdeal
+  randomSquareFreeMonomialIdeal
+  randomMonomial
+  randomBinomialIdeal
+  randomPureBinomialIdeal
+///
 
 ------------------------------------------------------------
 -- DOCUMENTATION randomShelling
@@ -499,13 +1121,13 @@ doc ///
 	  I = idealFromShelling(S,P)
      Inputs
 	  S:Ring
-	      (If omitted, it will use {\tt S=QQ[x_0..x_(n-1)]} where {\tt n} is the maximum integer in the lists of {\tt P}.  
+	      (If omitted, it will use {\tt S=QQ[x_0..x_(n-1)]} where {\tt n} is the maximum integer in the lists of {\tt P}.)
           P:List
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
 	  S:Ring
 	      (If omitted, it will use {\tt S=QQ[x_0..x_(n-1)]} where {\tt n} is the maximum integer in the lists of {\tt P}.  
      Outputs
-          I:Ideal
+          I:MonomialIdeal
 	      generated by the monomials representing the minimal nonfaces of {\tt P}
      Description
       Text
@@ -540,7 +1162,7 @@ doc ///
 	       A list of lists of integers.  Each list of integers is a facet of the complex and the order is a shelling.
      Outputs
           L:List
-	      a list of ideals
+	      a list of monomial ideals
      Description
           Text  
 	     Outputs the Stanley-Reisner ideal for each successive simplicial complex formed by truncating the shelling. 
@@ -586,7 +1208,7 @@ doc ///
 	 idealFromShelling
 	 idealChainFromShelling
 	 randomShellableIdealChain
-///         
+///
 
 ------------------------------------------------------------
 -- DOCUMENTATION randomShellableIdealChain
@@ -610,7 +1232,7 @@ doc ///
 	      the degree of the smallest ideal
      Outputs
           L:List
-	      list of Stanley-Riesner ideals of the simplicial comlexes of the truncations of the shelling.
+	      list of Stanley-Riesner ideals of the simplicial complexes of the truncations of the shelling.
      Description
      	  Text  
           Example
@@ -623,643 +1245,7 @@ doc ///
 	 idealFromShelling
 	 idealChainFromShelling
 	 randomShellableIdeal
-///         
-
-
-TEST///
-assert(#randomShelling(5,2,6)==6)
-assert(#randomShelling(5,2)==binomial(5,3))
-R=QQ[x1,x2,x3,x4,x5];
-assert(#randomShelling(R,2,6)==6)
 ///
-
-
-TEST///
-assert(isShelling({}))
-assert(isShelling({{1,2,3}}))
-assert(isShelling({{1,2,3},{2,3,4}}))
-assert(isShelling(randomShelling(5,3,5)))
---non pure shellings
-assert(isShelling({{1,2,3},{2,4}}))
-assert(isShelling({{1},{2}}))
-assert(not isShelling({{1,3},{2,4}}))
-assert(isShelling({{1,2},{3}}))
-assert(not isShelling({{3},{1,2}}))
-///
-
-
-TEST///
-setRandomSeed(0);
-assert(#randomAddition(6,3,{{1,2,3}})==2)
-assert(#randomAddition(6,3,{{1,2,3,4}})==2)
-///
-
-TEST///
-needsPackage "SimplicialComplexes"
-needsPackage "SimplicialDecomposability"
-R=QQ[x1,x2,x3,x4,x5];
-assert(isShellable simplicialComplex randomShelling(R,2,6))
-///
-
-
-
-
-beginDocumentation()
-
-
-doc ///
-Key 
-     RandomIdeal
-Headline 
-     A package to construct various sorts of random ideals
-Description
- Text
-     This package can be used to make experiments, trying many ideals, perhaps
-     over small fields. For example...what would you expect the regularities of
-     "typical" monomial ideals with 10 generators of degree 3 in 6 variables to be?
-     Try a bunch of examples -- it's fast.
-     Here we do only 500 -- this takes about a second on a fast machine --
-     but with a little patience, thousands can be done conveniently.
- Example
-     setRandomSeed(currentTime())
-     kk=ZZ/101;
-     S=kk[vars(0..5)];
-     time tally for n from 1 to 500 list regularity randomMonomialIdeal(10:3,S)
- Text
-     How does this compare with the case of binomial ideals? or pure binomial ideals?
-     We invite the reader to experiment, replacing "randomMonomialIdeal" above with
-     "randomBinomialIdeal" or "randomPureBinomialIdeal", or taking larger numbers
-     of examples. Click the link "Finding Extreme Examples" below to see
-     some other, more elaborate ways to search. 
-SeeAlso
-     "Finding Extreme Examples"
-     randomIdeal
-     randomMonomialIdeal
-     randomSquareFreeMonomialIdeal
-     randomSquareFreeStep
-     randomBinomialIdeal
-     randomPureBinomialIdeal
-     randomSparseIdeal
-     randomElementsFromIdeal
-     randomMonomial
-     squareFree
-     regSeq
-///
-
-
-doc ///
-Key 
-   randomMonomial
-   (randomMonomial, ZZ, Ring)
-Headline 
-   Choose a random monomial of given degree in a given ring
-Usage 
-   m = randomMonomial(d,S)
-Inputs 
-   d: ZZ
-       non-negative
-   S: Ring
-       polynomial ring
-Outputs
-   m: RingElement
-       monomial of S
-Description
- Text
-    Chooses a random monomial.
- Example
-    setRandomSeed(currentTime())
-    kk=ZZ/101
-    S=kk[a,b,c]
-    randomMonomial(3,S)
-SeeAlso
- randomMonomialIdeal
- randomSquareFreeMonomialIdeal
-///
-
-
-doc ///
-Key
-  randomSquareFreeMonomialIdeal
-  (randomSquareFreeMonomialIdeal, List, Ring)
-  (randomSquareFreeMonomialIdeal, Sequence, Ring)
-Headline
-  random square-free monomial ideal with given degree generators
-Usage
-  I = randomSquareFreeMonomialIdeal(L,S)
-Inputs
-  L:List
-   or sequence of non-negative integers
-  S:Ring
-   Polynomial ring
-Outputs
-  I:Ideal
-   square-free monomial ideal with generators of specified degrees
-Description
- Text
-  Choose a random square-free monomial
-  ideal whose generators have the degrees 
-  specified by the list or squence L.
- Example
-  setRandomSeed(currentTime())
-  kk=ZZ/101
-  S=kk[a..e]
-  L={3,5,7}
-  randomSquareFreeMonomialIdeal(L, S)
-  randomSquareFreeMonomialIdeal(5:2, S)
-Caveat 
-  The ideal is constructed degree by degree, starting from the lowest degree
-  specified. If there are not enough monomials of the next specified degree that
-  are not already in the ideal, the function prints a warning and returns an ideal
-  containing all the generators of that degree.
-SeeAlso
-  randomMonomial
-  randomMonomialIdeal
-///
-
-doc ///
-Key
-  randomSquareFreeStep
-  (randomSquareFreeStep, MonomialIdeal) 
-  (randomSquareFreeStep, Ideal) 
-  (randomSquareFreeStep, List) 
-  [randomSquareFreeStep,AlexanderProbability]
-Headline
- A step in a random walk with uniform distribution over all monomial ideals
-Usage
-  M = randomSquareFreeStep(I)
-  M = randomSquareFreeStep(I, AlexanderProbability => p)  
-  M = randomSquareFreeStep(L)
-  M  = randomSquareFreeStep(L, AlexanderProbability => p)
-Inputs
-  I:Ideal
-   square-free monomial Ideal or MonomialIdeal
-  L:List
-   {I,Igens,ISocgens} where I is a square-free MonomialIdeal,
-   Igens is a List of its minimal generators,
-   ISocgens is a List of the minimal generators of the socle mod I.
-Outputs
-  M:List
-   {J,Jgens,JSocgens} where J is a square-free MonomialIdeal,
-   Jgens is a List of its minimal generators,
-   JSocgens is a List of the minimal generators of the socle mod J.
-Description
-  Text
-   With probability p the routine takes the Alexander dual of I;
-   the default value of p is .05, and it can be set with the option
-   AlexanderProbility.
-  
-   Otherwise uses the Metropolis algorithm to produce a random walk on the space
-   of square-free ideals. Note that there are a LOT of square-free ideals;
-   these are the Dedekind numbers, and the sequence (with 1,2,3,4,5,6,7,8 variables) 
-   begins
-   3,6,20,168,7581, 7828354, 2414682040998, 56130437228687557907788.
-   (see the Online Encyclopedia of Integer Sequences for more information).
-   Given I in a polynomial ring S, we make a list
-   ISocgens of the square-free minimal monomial generators of the socle of S/(squares+I)
-   and a list of minimal generators Igens of I. A candidate "next" ideal J is formed as follows:
-   We choose randomly from the 
-   union of these lists; if a socle element is chosen, it's added to I; if
-   a minimal generator is chosen, it's replaced by the square-free part of
-   the maximal ideal times it.
-   the chance of making the given move is then 1/(#ISocgens+#Igens), and
-   the chance of making the move back would be the similar quantity for J,
-   so we make the move or not depending on whether 
-   random RR < (nJ+nSocJ)/(nI+nSocI) or not; here random RR is
-   a random number in [0,1].
-  Example
-   setRandomSeed(currentTime())
-   S=ZZ/2[vars(0..3)]
-   J = monomialIdeal"ab,ad, bcd"
-   randomSquareFreeStep J
-  Text
-   With 4 variables and 168 possible monomial ideals, a run of 5000
-   takes less than 6 seconds on a reasonably fast machine. With
-   10 variables a run of 1000 takes about 2 seconds.
-  Example
-   setRandomSeed(1)
-   rsfs = randomSquareFreeStep
-   J = monomialIdeal 0_S
-   time T=tally for t from 1 to 5000 list first (J=rsfs(J,AlexanderProbability => .01));
-   #T
-   T
-   J
-///
-
-
-doc ///
-Key
-  AlexanderProbability
-Headline
-  option to randomSquareFreeStep
-Usage
-  M = randomSquareFreeStep(L, AlexanderProbability => p)
-Inputs
-  p: RR
-   real number between 0 and 1.
-Description
- Text
-  Controls how often the Alexander dual is taken
-SeeAlso
-  randomSquareFreeStep
-///
-
-
-doc ///
-Key
-  squareFree  
-Headline
-  ideal of all square-free monomials of given degree
-Usage
-  I = squareFree(d,S)
-Inputs
-  d:ZZ
-   positive
-  S:Ring
-   Polynomial ring
-Outputs
-  I:Ideal
-   all square-free monomials of degree d
-Description
- Example
-  kk=ZZ/101
-  S=kk[a..e]
-  squareFree(3, S)
-SeeAlso
-  randomSquareFreeMonomialIdeal
-///
-
-doc ///
-Key
-  (squareFree, ZZ, Ring)
-Headline
-  ideal of all square-free monomials of given degree
-Usage
-  I = squareFree(d,S)
-Inputs
-  d:ZZ
-   positive
-  S:Ring
-   Polynomial ring
-Outputs
-  I:Ideal
-   all square-free monomials of degree d
-Description
- Example
-  kk=ZZ/101
-  S=kk[a..e]
-  squareFree(3, S)
-SeeAlso
-  randomSquareFreeMonomialIdeal
-///
-
-doc ///
-Key
-  regSeq
-  (regSeq, List, Ring)
-  (regSeq, Sequence, Ring)  
-Headline
-  regular sequence of powers of the variables, in given degrees
-Usage
-  I = regSeq(L,S)
-Inputs
-  L:List
-   or sequence of positive integers
-  S:Ring
-   Polynomial ring
-Outputs
-  I:Ideal
-   generated by the given powers of the variables
-Description
- Example
-  kk=ZZ/101
-  S=kk[a..e]
-  regSeq((2,3,4),S)
-Caveat
- If the number of elements of L differs from the number of
- variables in the ring, the length of the regular sequence
- will be the minimum of the two.
-///
-
-doc ///
-Key
-  randomIdeal
-  (randomIdeal, List, Matrix)
-  (randomIdeal, Sequence, Matrix)
-Headline
-  randomIdeal made from a given set of monomials
-Usage
-  I = randomIdeal(L,m)
-Inputs
-  L:List
-   or sequence of positive integers
-  m: Matrix
-   1xn matrix of homogeneous polynomials in a ring S
-Outputs
-  I:Ideal
-   generated by random linear combinations of degrees given by L of the given polynomials
-Description
- Text
-  This function composes m with a random map from a free module with degrees
-  specified by L to the source of m.
- Example
-  kk=ZZ/101
-  S=kk[a..e]
-  L={3,3,4,6}
-  m = matrix{{a^3,b^4+c^4,d^5}}
-  I=randomIdeal(L,m)
-SeeAlso
- randomMonomialIdeal
- randomSquareFreeMonomialIdeal
- randomMonomial
- randomBinomialIdeal
- randomPureBinomialIdeal
- randomElementsFromIdeal
-///
-
-doc ///
-Key
-  randomBinomialIdeal
-  (randomBinomialIdeal, List, Ring)
-  (randomBinomialIdeal, Sequence, Ring)
-Headline
-  randomBinomialIdeal with binomials of given degrees
-Usage
-  I = randomBinomialIdeal(L,S)
-Inputs
-  L:List
-   or sequence of positive integers
-  S: Ring
-   Polynomial ring
-Outputs
-  I:Ideal
-   generated by random binomials of the given degrees
-Description
- Example
-  kk=ZZ/101
-  S=kk[a..e]
-  L={3,3,4,6}
-  I=randomBinomialIdeal(L,S)
-Caveat
-  The binomials are generated one at a time, and there is no checking to
-  see whether the ideal returned is minally generated by fewer elements,
-  so the number of minimal generators may not be what you expect.
-SeeAlso
- randomIdeal
- randomMonomialIdeal
- randomSquareFreeMonomialIdeal
- randomMonomial
- randomPureBinomialIdeal
- randomElementsFromIdeal
-///
-
-doc ///
-Key
-  randomPureBinomialIdeal
-  (randomPureBinomialIdeal, List, Ring)
-  (randomPureBinomialIdeal, Sequence, Ring)
-Headline
-  randomPureBinomialIdeal with binomials of given degrees
-Usage
-  I = randomPureBinomialIdeal(L,S)
-Inputs
-  L:List
-   or sequence of positive integers
-  S: Ring
-   Polynomial ring
-Outputs
-  I:Ideal
-   generated by random pure binomials (that is, differences of monomials without coefficients)  of the given degrees
-Description
- Text
- Example
-  kk=ZZ/101
-  S=kk[a..e]
-  L={3,3,4,6}
-  I=randomPureBinomialIdeal(L,S)
-Caveat
-  The binomials are generated one at a time, and there is no checking to
-  see whether the ideal returned is minally generated by fewer elements,
-  so the number of minimal generators may not be what you expect.
-SeeAlso
- randomIdeal
- randomMonomialIdeal
- randomSquareFreeMonomialIdeal
- randomMonomial
- randomBinomialIdeal
- randomElementsFromIdeal
-///
-
-doc ///
-Key
-  randomSparseIdeal
-  (randomSparseIdeal, Matrix, ZZ, ZZ)
-Headline
-  randomSparseIdeal made from a given set of monomials
-Usage
-  I = randomSparseIdeal(B,s,n)
-Inputs
-  B:Matrix
-   1xn matrix of monomials
-  s: ZZ
-   positive integer, the number of terms in the generators of I
-  n: ZZ
-   positive integer, the number of generators of I
-Outputs
-  I:Ideal
-   generated by n polynomials, each a random linear combination of s monomials 
-Description
- Text
-  Each generator of I is formed by randomly choosing s (the sparsity) entries 
-  of the matrix B and taking a random linear combinations with coefficients in
-  the (ultimate) coefficient ring of S, the ring in which the monomials lie.
- Example
-  kk=ZZ/101
-  S=kk[a..e]
-  L={3,3,4,6}
-  B = matrix{{a^3,b^4,d^5,a*b*c,e}}
-  I=randomSparseIdeal(B,3,2)
-SeeAlso
- randomIdeal
- randomMonomialIdeal
- randomSquareFreeMonomialIdeal
- randomMonomial
- randomBinomialIdeal
- randomPureBinomialIdeal
- randomElementsFromIdeal
-///
-
-
-doc ///
-Key
-  randomElementsFromIdeal
-  (randomElementsFromIdeal,List, Ideal)
-Headline
-  Chooses random elements of given degrees in a given ideal.
-Usage
-  I = randomElementsFromIdeal(L,I)
-Inputs
-  L:List
-   of integers
-  I:Ideal
-   that should be homogeneous
-Outputs
-  I:Ideal
-   generated by (at most) n homogeneous polynomials that are random linear combination of the
-   generators of I, with degrees specified by the list L
-Description
- Example
-  kk=ZZ/101
-  S=kk[a..c]
-  L={3,3,4,6}
-  I = ideal(a^3,b^3, c^3)
-  J=randomElementsFromIdeal(L,I)
-SeeAlso
- "Finding Extreme Examples"
- randomIdeal
- randomMonomialIdeal
- randomSquareFreeMonomialIdeal
- randomMonomial
- randomBinomialIdeal
- randomPureBinomialIdeal
-///
-
-
-doc ///
-Key
-  randomMonomialIdeal
-  (randomMonomialIdeal, List, Ring)
-  (randomMonomialIdeal, Sequence, Ring)
-Headline
-  random monomial ideal with given degree generators
-Usage
-  I = randomMonomialIdeal(L,S)
-Inputs
-  L:List
-   or sequence of non-negative integers
-  S:Ring
-   Polynomial ring
-Outputs
-  I:Ideal
-   monomial ideal with generators of specified degrees
-Description
- Text
-  Choose a random ideal whose generators have the degrees specified by the list or squence L.
- Example
-  kk=ZZ/101
-  S=kk[a..e]
-  L={3,5,7}
-  randomMonomialIdeal(L, S)
-  randomMonomialIdeal(5:2, S)
-Caveat 
-  The ideal is constructed degree by degree, starting from the lowest degree
-  specified. If there are not enough monomials of the next specified degree that
-  are not already in the ideal, the function prints a warning and returns an ideal
-  containing all the generators of that degree.
-SeeAlso
-  randomMonomial
-  randomSquareFreeMonomialIdeal
-///
-
-
-
-doc ///
-Key
-  "Finding Extreme Examples"
-Headline
-  Ways to use random ideals to search for (counter)-examples
-Description
- Text
-  A common use of Macaulay2 is to look for extreme or particularly
-  interesting examples. Here are some examples of how this may be done.
-   
-  Supposing first that some space of examples is finite; for
-  example, we might be interested in monomial ideals with a certain
-  number of generators of a certain degree d. Suppose, to be concrete,
-  that we want to compare the
-  maximum degree of a first syzygy with the regularity of the ideal,
-  and also with the maximum degree of the last syzygy. (To make the 
-  comparison interesting, it seems reasonable to subtract i from the maximum
-  degree of an i-th syzygy.)
- Text
-  We may have no idea where to look for extreme examples, and it seems
-  that examples with small numbers of variables and generators may not
-  show the range of phenomena that actually occur. In large degree there
-  may be too many examples to search systematically; so instead we may
-  choose many examples at random, and hope to see a pattern. 
-   
-  Here is a simple example
-  First we tally the projective dimensions of 500
-  random square-free monomial ideals (what's the average?), then 
-  looking how big the difference between the regularity of R/I and the
-  "relation degree"-2 can be. It turns out this the differences are rather
-  small, only 1 in a typical run of 5000. So one might look for ideals with
-  a difference of 2, as in the following (in a real run, one would make
-  the number of iterations much bigger; here we keep it small so
-  that Macaulay2 doesn't take too long to build it's documentation files.)
- Example
-  kk=ZZ/101
-  S=kk[vars(0..5)]
-  L=for n from 1 to 100 list res randomSquareFreeMonomialIdeal(10:3,S);
-  tally apply(L, F -> length F)
-  tally apply(L, F -> regularity F - ((max flatten degrees F_2) - 2))
-  L=for n from 1 to 500 list res randomSquareFreeMonomialIdeal(10:3,S);
-  scan(L, F -> if 1<(regularity F - (max flatten degrees F_2) + 2) then print F.dd_1)
- Text
-  A typical problem might be to find how high the regularity of R/I can
-  be when R has reasonably few variables, and the degrees of the generators of
-  I are reasonably small; despite the wild examples of Mayr-Mayer, we don't
-  know how to make examples with large regularity without letting the
-  number of variables become large. The following program computes
-  "rep" examples of random ideals with monomial and binomial generators,
-  and prints any whose regularity exceeds the number "bound"
-
-    
-  looper = (rep,bound, L1, L2) -> (for i from 1 to rep do (
-  if i % 1000 == 0 then << "." << flush;
-  J := randomMonomialIdeal(L1,S) + randomBinomialIdeal(L2,S);
-  m := regularity coker gens J;
-  if m >= bound then << "reg " << m << " " << toString J << endl;))
-
-
-  For example:
-  kk=ZZ/2
-  S=kk[a,b,c,d]
-  looper(30000,10,{4},{4,4}) -- finds examples with on monomial of degree 4
-  and 2 binomials of degree 4. The largest largest regularity it has found
-  (and the largest I know for an ideal in 4 variables of degree 4) is 14.
-  Here is an example it found:
-  ideal(a*b^3,a^4+b^4,b*c^3+a*d^3)
-   
-  Similarly:
-  
-  looper(30000,10,{4,4},{4}) -- looks for examples with
-  2 monomials and 1 binomial of degree 4. Suggestively, the
-  largest regularity it found was also 14:
-  betti res ideal(c^4,b^4,a^3*c+b*d^3) -- reg 14
- Text   
-  A more sophisticated and difficult situation arises when the space
-  of examples is not necessarily finite (except over a finite field) but
-  is a unirational
-  variety (such as the space of ideals generated by (at most) a certain
-  number of forms of certain given degrees, or the space of smooth curves
-  of genus g for some g <= 14) one may be able to do a search for random
-  examples, taking a rational parametrization of the space of examples
-  and plugging in random inputs.
-   
-  If the "interesting" examples live in
-  a subvariety whose codimension is small, then, working over a small field
-  (say 2,3, or 5 elements) one might hope to see elements of the subvariety
-  "not too rarely". This principle has been used to good effect for example
-  by (Caviglia and Decker-Schreyer, ****--Schreyer). 
-SeeAlso
-  randomIdeal
-  randomMonomialIdeal
-  randomSquareFreeMonomialIdeal
-  randomMonomial
-  randomBinomialIdeal
-  randomPureBinomialIdeal
-///
-
 
 TEST ///
 S=ZZ/101[a..e]
@@ -1290,7 +1276,46 @@ J = ideal"ab,ad, bcd"
 assert( (randomSquareFreeStep J) === {monomialIdeal map((S)^1,(S)^{{-2},{-2}},{{a*b, a*d}}),{a*b,a*d},{b*c*d,a*c}} );
 ///
 
+TEST///
+assert(#randomShelling(5,2,6)==6)
+assert(#randomShelling(5,2)==binomial(5,3))
+R=QQ[x1,x2,x3,x4,x5];
+assert(#randomShelling(R,2,6)==6)
+///
 
+TEST///
+assert(isShelling({}))
+assert(isShelling({{1,2,3}}))
+assert(isShelling({{1,2,3},{2,3,4}}))
+assert(isShelling(randomShelling(5,3,5)))
+--non pure shellings
+assert(isShelling({{1,2,3},{2,4}}))
+assert(isShelling({{1},{2}}))
+assert(not isShelling({{1,3},{2,4}}))
+assert(isShelling({{1,2},{3}}))
+assert(not isShelling({{3},{1,2}}))
+///
+
+
+TEST///
+setRandomSeed(0);
+assert(#randomAddition(6,2,{{1,2,3}})==2)
+assert(#randomAddition(6,2,{{1,2,3,4}})==2)
+///
+
+TEST///
+needsPackage "SimplicialComplexes"
+needsPackage "SimplicialDecomposability"
+R=QQ[x1,x2,x3,x4,x5];
+assert(isShellable simplicialComplex randomShelling(R,2,6))
+///
+
+TEST///
+S = ZZ/101[x_0..x_5];
+I = randomShellableIdeal(S,2,5);
+assert(dim I == 3)
+assert(degree I == 5)
+///
 
 
 end--  
