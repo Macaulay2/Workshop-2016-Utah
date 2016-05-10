@@ -350,9 +350,9 @@ carryTest = ( p, w ) ->
      if w#0 < 0 or w#0 > 1 or w#1 < 0 or w#1 > 1 then(
 	 error "basePExp: Expected w in [0,1]^2"
      )
-     else(
-     	 c := 0; for i from 0 to #w-1 do c = max(c, divideFraction(p,w#i)#1);
-     	 d := 1; for j from 0 to #w-1 do if (divideFraction(p, w#j)#2)!=0 then d = lcm(d,dividFraction(p,w#j)#2);
+     else( 
+     	 c := 0; for i from 0 to #w-1 do c = max(c, (divideFraction(p, w#i))#1);
+     	 d := 1; for j from 0 to #w-1 do if ((divideFraction(p, w#j))#2)!=0 then d = lcm(d,(divideFraction(p,w#j))#2);
      	 c+d+1
      )
 )
