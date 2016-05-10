@@ -43,60 +43,42 @@ Reload => true
 
 
 --- *** I SORTED THESE ALPHABETICALLY TO FIND MY WAY AROUND *** MK
+--- *** Reorganized by subpackages, so we know where to find stuff *** PT
+
 export{
 --IntegerComputations (IntegerComps.m2)
-	"floorlog",
-	"multOrder",
+    "floorlog",
+    "multOrder",
+    "taxicabNorm",
+    "divideFraction",
+    "getCanVector",
+
 --ethRootFunctions (EthRoots.m2)
     "ascendIdeal", 
     "ascendIdealSafe",
     "ascendIdealSafeList",
     "AscentCount",
-	"basePExpMaxE",
-    "BinomialCheck",
-    "binomialFPT",
-    "canVector",
-    "DiagonalCheck", 
-    "diagonalFPT",
-	"dividFraction",
-    "estFPT",
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
     "EthRootStrategy",    
     "fancyEthRoot",
+    "minimalCompatible",
     "MonomialBasis",	
     "Substitution",
-    --F-thresholds computations (FThresholds.m2)
-    "factorList",    
+    
+--F-thresholds computations (FThresholds.m2)
+    "BinomialCheck",
+    "DiagonalCheck", 
+    "estFPT",
     "FinalCheck",    
-    "findAllCompatibleIdeals", ---MK	
-    "findCPBelow",
-	"findTestElementAmbient", ---Karl
-	"FFiniteSupport", ---MK
-	"findGeneratingMorphisms", ---MK
-	"frobeniusPower",
     "FPTApproxList",     
-    "FPT2VarHomog",     
-    "FPT2VarHomogInternal",
-	"FPureIdeals",
     "FTApproxList",
     "FTHatApproxList", 
-	"FullMap", ---Karl
-	"generatingMorphism", ---MK
-	"generatingRoot", ---MK
     "guessFPT",
-    "isBinomial",
-    "isCP",
-    "isDiagonal",
     "isFJumpingNumberPoly",
     "isFPTPoly",
-    "isInLowerRegion",
-    "isInUpperRegion",
-    "MaxExp",
-    "minimalCompatible",
     "MultiThread",    
-    "Nontrivial",    
     "nu",
     "nuAlt",
     "NuCheck",
@@ -107,12 +89,39 @@ export{
     "nuListAlt1",
     "Origin",
     "OutputRange",
+
+--F-thresholds of special families of polynomials (SpecialFThresholds.m2)
+    "binomialFPT",
+    "diagonalFPT",
+    "factorList",    
+    "findCPBelow",
+    "FPT2VarHomog",     
+    "FPT2VarHomogInternal",
+    "isBinomial",
+    "isCP",
+    "isDiagonal",
+    "isInLowerRegion",
+    "isInUpperRegion",
+    "MaxExp",
+    "Nontrivial",    
     "PrintCP",
     "setFTData",
     "splittingField",
-    "taxicabNorm",
-    "paraTestModule", ---MK
-    "paraTestModuleAmbient" ---MK
+
+-- Other
+
+       "findAllCompatibleIdeals", ---MK	
+    
+	"findTestElementAmbient", ---Karl
+	"FFiniteSupport", ---MK
+	"findGeneratingMorphisms", ---MK
+	"FPureIdeals",
+	"frobeniusPower",
+ 	"FullMap", ---Karl
+	"generatingMorphism", ---MK
+	"generatingRoot", ---MK
+   "paraTestModule", ---MK
+    "paraTestModuleAmbient" ---MK  
 }
 
 --*************************************************
