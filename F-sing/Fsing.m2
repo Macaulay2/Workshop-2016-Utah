@@ -154,7 +154,6 @@ export{
 -- Other
        "findAllCompatibleIdeals", ---MK	
     
-	"findTestElementAmbient", ---Karl
 	"FFiniteSupport", ---MK
 	"findGeneratingMorphisms", ---MK
 	"FPureIdeals",
