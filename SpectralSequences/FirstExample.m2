@@ -1,4 +1,4 @@
-needsPackage "SpectralSequences"
+unineedsPackage "SpectralSequences"
 
 tensor(RingMap,ChainComplex) := ChainComplex => 
 opts -> (f,C) -> (
@@ -30,10 +30,12 @@ C = res M;
 C' = C ** S;
 D = res(N,LengthLimit => 10);
 E0 = C' ** (filteredComplex D);
-E = prune spectralSequence E0
+E = prune spectralSequence E0;
 E_infinity
 E_2 .dd_{1,0}
 
+viewHelp netPage
+netPage(E_3,{3,0},{5,1})
 -- Example 2
 restart
 load "FirstExample.m2"
