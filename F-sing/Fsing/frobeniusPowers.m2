@@ -106,7 +106,7 @@ genFrobeniusPower(ZZ,ZZ,Ideal) := opts -> (e,N,I) ->
 --Computes the generalized Frobenius power I^[t] for a rational number t 
 genFrobeniusPower(QQ,Ideal) := (t,I) ->
 (
-    p = char ring I;
+    p := char ring I;
     L := divideFraction(p,t); 
     a := L#0; b := L#1; c := L#2;     --write t = a/(p^b*(p^c-1))
     if c==0 then return genFrobeniusPower(b,a,I)  --if c = 0, call simpler function
