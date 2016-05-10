@@ -281,7 +281,7 @@ sectionRing(Ideal) := (I) -> (
 		a:=0;
 		AdmPart_j = {};					--Creates a list of admissable partitions, given that there are variables only
 		while (a<LengP) do(					--in sufficiently small degree
-			if((Part_j#a#0 < bound) and ((Part_j#a)#(#(Part_j#a)-1) + (Part_j#a)#(#(Part_j#a)-2) >= bound) then (		--and (# (Part_j#a) < 3)
+			if((Part_j#a#0 < bound) and ((Part_j#a)#(#(Part_j#a)-1) + (Part_j#a)#(#(Part_j#a)-2) > bound-1)) then (		--and (# (Part_j#a) < 3)
 				AdmPart_j = AdmPart_j | {(Part_j)#a}; 
 			);
 			a=a+1;
