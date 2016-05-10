@@ -478,7 +478,6 @@ doc ///
     Text
      This finds a maximal regular sequence of minimal degree in {\tt I}.
      This is done by using random linear combinations of the generators.
-     As a consequence, the output is not deterministic
     Example
      setRandomSeed(0);
      S := ZZ/101[a,b,c];
@@ -492,6 +491,10 @@ doc ///
    Inputs
     n:ZZ
     I:Ideal
+   Caveat
+    As a consequence of the randomness, the output is not deterministic
+    and may not be a maximal regular sequence. The result is always a
+    regular sequence.
 ///
 
 ------------------------------------------------------------
