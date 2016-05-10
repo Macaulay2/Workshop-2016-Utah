@@ -7,3 +7,7 @@ These are a couple of couple of things we noticed that still need to be done as 
 3)  Genearlize ethRootSafe from (ZZ, ZZ, RingElement, Ideal) to (ZZ, ZZ, Ideal, Ideal) by replacing f^a with I^[a], where the later is an integral generalized Frobenius power.
 
 4) An similalr method appears in ascendIdeal, ethRootSafe, GenealizedFrobeniusPower(QQ, Ideal), and taupoly(QQ, RingElement.  More precisely, the loop to compute (f^a I)^[1/p^e] using the base p expansion of a comes up a bunch.  We should probably uniformize this.
+
+5) Consider removing baseP1 and replacing it with one of the other base-p expansions. Otherwise it needs to have test cases.
+
+6) 

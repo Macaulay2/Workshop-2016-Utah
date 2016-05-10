@@ -30,7 +30,7 @@ fastExp = (N,f) ->
 
 --Outputs the p^e-th Frobenius power of an ideal, or the p^e-th (entry-wise) Frobenius power of a matrix.
 
-frobeniusPower = method()
+frobeniusPower = method();
 
 frobeniusPower(ZZ,Ideal) := (e,I) ->
 (

@@ -262,21 +262,42 @@ isBirationalMap = method();
 isBirationalMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
     if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
     R:=ring di;
-    r:=numgens ambient R;
-    K:=coefficientRing R;
-    Jr:= blowUpIdeals(di,bm);
-    n:=numgens Jr;
-    L:={};
-    for i from 0 to (n-1) do if  (degree Jr_i)_0==1 then
-      L=append(L, Jr_i);
-   JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
-   S:=ring im;
-   vS:=gens ambient S;
-   g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
-   barJD:=g(JD);
-   jdd:=(numgens ambient R)-1+dgi(di);
-   not(isSubset(minors(jdd,barJD),im))
-   );    
+    S:=ring im;
+    im1 := idealOfImageOfMap(di, im, bm);
+    if (im1 == im) then (
+        K:=coefficientRing R;
+--In the following lines we remove the linear parts of the ideal di and 
+--modify our map bm
+        Rlin:=(ambient ring di)/di;
+        Rlin2 := minimalPresentation(Rlin);
+        phi:=Rlin.minimalPresentationMap;    
+        Rlin1:=target phi;
+        di1:=ideal Rlin1;
+        bm0:=phi(matrix{bm});
+        bm1:=flatten first entries bm0;
+ --From here the situation is under the assumption that the variety is not contained in any hyperplane.
+        r:=numgens ambient Rlin1;
+        Jr:= blowUpIdeals(di1,bm1);
+        n:=numgens Jr;
+        L:={};
+        for i from 0 to (n-1) do (
+	    if  (degree Jr_i)_0==1 then L=append(L, Jr_i);
+	);
+       JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
+       vS:=gens ambient S;
+   --print "we got here.";
+       g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
+     --  print "we got there.";
+       barJD:=g(JD);
+     --  print barJD;
+       jdd:=(numgens ambient Rlin1)-1;
+   --print jdd;
+       not(isSubset(minors(jdd,barJD),im1))
+   )
+   else(
+       false
+   )
+);    
 
 isBirationalMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
     isBirationalMap(ideal R1, ideal S1, bm)

@@ -411,7 +411,7 @@ xInt = ( x1, y1, x2, y2 ) ->
 --- The following code was written in order to more quickly compute eth roots of (f^n*I)
 --- It is used in fancyEthRoot
 ----------------------------------------------------------------------------------------
---- Find all ORDERED partitions of n with k parts
+--- Find all ORDERED partitions of n with k parts.
 allPartitions = ( n, k )->
 (
 	PP0:=matrix{ toList(1..k) };
@@ -419,6 +419,7 @@ allPartitions = ( n, k )->
 	allPartitionsInnards (n,k,PP,{})
 )
 
+--- Used for allPartitions.
 allPartitionsInnards = ( n, k, PP, answer)->
 (
 	local i;
