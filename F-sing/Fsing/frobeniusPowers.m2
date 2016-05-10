@@ -37,13 +37,13 @@ frobeniusPower(ZZ,Ideal) := (e,I) ->
      R := ring I;
      p := char R;
      G := I_*;
-     if #G==0 then ideal(0_R) else ideal(apply(G, j -> fastExp(j,p^e)))
+     if #G==0 then ideal(0_R) else ideal(apply(G, j -> fastExp(p^e,j)))
 )
 
 frobeniusPower(ZZ,Matrix) := (e,M) ->
 (
     p:=char ring M;
-    matrix apply(entries M,u -> apply(u, j -> fastExp(j,p^e)))
+    matrix apply(entries M,u -> apply(u, j -> fastExp(p^e,j)))
 )
 
 --------------------------------------------------------------------------------------------------------
