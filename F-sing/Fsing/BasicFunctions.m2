@@ -116,54 +116,8 @@ findNearPthPowerBelow = ( p, e, t ) ->
 
 --===================================================================================
 
---Returns the digits in nn which are nonzero in binary 
---for example, 5 in binary is 101, so this would return {0,2}
---the second term tells me where to start the count, so passing
---5,0 gives {0,2} but 5,1 is sent to {1,3}.  i should be
---used only for recursive purposes
-getNonzeroBinaryDigits = ( i, n ) -> 
-(
-    halfsies := n//2;
-    val1 := n%2;
-    val2 := false; 
-    if (halfsies > 0) then val2 = (getNonzeroBinaryDigits(i+1,n//2));
-    if ( (val1 != 0) and (not (val2 === false))) then (
-	 flatten {i, val2}
-    )
-    else if (val1 != 0) then (
-	 {i}
-    )
-    else if ( not (val2 === false)) then (
-	 flatten {val2}
-    )
-    else(
-	 false
-    )
-)
-
---===================================================================================
-
-
-getSublistOfList = method();
-
---Returns the entries of myList specified by their position.
-getSublistOfList( List, List ) := ( entryList, myList ) -> 
-(
-     if entryList == {} then(
-	  error "getSublistOfList expected non-empty list" 
-	  )
-     else(
-	 apply(#entryList, i->myList#(entryList#i))
-    )
-)
-
---===================================================================================
-
 --Returns the power set of a  list removing the emptyset.  
-nontrivialPowerSet = ( myList ) ->
-(
-     apply(2^(#myList)-1, i-> getSublistOfList(getNonzeroBinaryDigits(0,i+1),myList))
-)
+nontrivialPowerSet = L -> delete({},subsets L)
 
 --===================================================================================
 
@@ -233,7 +187,7 @@ findNumberBetween( ZZ, List ) := ( maxDenom, myInterv )->
 	  if ((divisionChecks#(i-1)) == true) then --if we need to do a computation..
 	      outList = join(outList,findNumberBetweenWithDenom(i,myInterv));
 	  factorList := getFactorList(i);
-     	  apply(#factorList, j-> (divisionChecks#( (factorList#j)-1) = false) );
+     	  apply(factorList, j-> (divisionChecks#(j-1) = false) );
 	  i = i - 1;
      );
      sort(toList set outList)
@@ -285,27 +239,6 @@ basePExp( ZZ, ZZ ) := ( p, N ) ->
     	if N < p then return {N};
     	prepend( N % p, basePExp(p, N // p))
    )
-)
-
---Computes terminating base p expansion of a positive integer 
---from digits zero to f-1 (little-endian first).
-basePExp( ZZ, ZZ, ZZ ) := ( p, f, N ) ->
-(
-    if N < 0 then(
-	 error "basePExp: Expected N to be positive"
-	 )
-    else(
-    	e:=f-1;
-    	E:=new MutableList;
-    	scan(0..e,i-> 
-    	    (
-     	    	a := N//p^(e-i);
-     	    	E#(e-i) = a;
-     	    	N = N - (a)*p^(e-i);
-    		)
-    	    );
-    	new List from E
-    )
 )
 
 --Creates a list of the first e digits of the non-terminating base p expansion of x in [0,1].
@@ -366,14 +299,15 @@ baseP1 = ( n, p, e )->
 
 --Given a vector w={x,y}, x and y rational in [0,1], returns a number of digits 
 --such that it suffices to check to see if x and y add without carrying in base p
+--Think about this. (Only is used for firstCarry.
 carryTest = ( p, w ) ->
 (
      if w#0 < 0 or w#0 > 1 or w#1 < 0 or w#1 > 1 then(
 	 error "basePExp: Expected w in [0,1]^2"
      )
-     else(
-     	 c := 0; for i from 0 to #w-1 do c = max(c, divideFraction(p,w#i)#1);
-     	 d := 1; for j from 0 to #w-1 do if (divideFraction(p, w#j)#2)!=0 then d = lcm(d,dividFraction(p,w#j)#2);
+     else( 
+     	 c := 0; for i from 0 to #w-1 do c = max(c, (divideFraction(p, w#i))#1);
+     	 d := 1; for j from 0 to #w-1 do if ((divideFraction(p, w#j))#2)!=0 then d = lcm(d,(divideFraction(p,w#j))#2);
      	 c+d+1
      )
 )
@@ -381,6 +315,7 @@ carryTest = ( p, w ) ->
 --Given a vector w={x,y} of rational integers in [0,1], returns the first spot 
 --e where the x and y carry in base p; i.e., 
 --(the e-th digit of x)+(the e-th digit of y) >= p
+-- counting is weird...
 firstCarry = ( p, w ) ->
 (   if w#0 < 0 or w#0 > 1 or w#1 < 0 or w#1 > 1 then(
 	 error "basePExp: Expected w in [0,1]^2"
@@ -415,7 +350,7 @@ reciprocal = ( w ) ->
 	  error "reciprocal: entries of vector must be non-zero."
       )
      else(
-     apply(#w, i -> 1/(w#i))
+     apply(w, i -> 1/i)
      )
 )
 --===================================================================================
@@ -477,7 +412,7 @@ xInt = ( x1, y1, x2, y2 ) ->
 --- The following code was written in order to more quickly compute eth roots of (f^n*I)
 --- It is used in fancyEthRoot
 ----------------------------------------------------------------------------------------
---- Find all ORDERED partitions of n with k parts
+--- Find all ORDERED partitions of n with k parts.
 allPartitions = ( n, k )->
 (
 	PP0:=matrix{ toList(1..k) };
@@ -485,6 +420,7 @@ allPartitions = ( n, k )->
 	allPartitionsInnards (n,k,PP,{})
 )
 
+--- Used for allPartitions.
 allPartitionsInnards = ( n, k, PP, answer)->
 (
 	local i;
@@ -505,3 +441,15 @@ allPartitionsInnards = ( n, k, PP, answer)->
 )
 
 --===================================================================================
+
+--*************************************************
+--Basic Manipulations with Rings 
+--*************************************************
+--===================================================================================
+
+maxIdeal = method()
+
+-- maxIdeal returns the ideal generated by the variables of a polynomial ring
+maxIdeal ( PolynomialRing ) := R -> monomialIdeal R_*
+
+

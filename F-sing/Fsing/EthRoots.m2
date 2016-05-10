@@ -2,7 +2,8 @@
 
 -- INTERNAL: 
 
--- ethRoot: (I,e) -> (e,I), (f, I, a, e) -> (e,a,f,I), (Matrix, ZZ) -> (ZZ, Matrix)
+-- ethRoot: (I,e) -> (e,I), (f, I, a, e) -> (e,a,f,I), (f, I, a, e) -> (e,a,f,I), (Matrix, ZZ) -> (ZZ, Matrix), 
+--    	    (Ideal, ZZ, ZZ),  (I,m,e) -> ( e, m, I ) 
 
 -- eR: gone
 
@@ -12,7 +13,9 @@
 
 -- mEthRoot, mEthRootOneElement: (A,e) -> (e,A)
 
--- EXTERNAL: basePExpMaxE
+-- fancyEthRoot (I,m,e) -> (e, m, I)
+
+-- EXTERNAL: basePExp
 
 --*************************************************
 --*************************************************
@@ -64,11 +67,15 @@ ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootSafe 
 
 -----------------------------------------------------------------------------
 
-ethRoot (Ideal, ZZ, ZZ) := opts -> (I,m,e) -> fancyEthRoot (I,m,e)  --- MK
+ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootSafe ( e, a, f ) ---MK
 
 -----------------------------------------------------------------------------
 
-ethRoot( RingElement, ZZ, ZZ ) := opts -> ( f, a, e ) -> ethRoot( ideal( f ), a, e )
+ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> fancyEthRoot( e, m, I )  --- MK
+
+-----------------------------------------------------------------------------
+
+ethRoot ( RingElement, ZZ, ZZ ) := opts -> ( f, a, e ) -> ethRoot( ideal( f ), a, e )
 
 -----------------------------------------------------------------------------
 
@@ -147,7 +154,7 @@ ethRootSafe( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> (
 	aRem := a%(p^e);
 	aQuot := floor(a/p^e);
 	
-	expOfA := basePExp(p,e,aRem); --this gives "a base p", with the left-most term the smallest "endian".
+	expOfA := basePExp(p,aRem); --this gives digits of aRem base p as a list, left-endian first 
 	
 	IN1 := I;
 	
@@ -177,7 +184,7 @@ ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
         aListRem := aList % p^e;
         aListQuot := aList // p^e;
         
-        expOfaList := apply(aListRem, z -> basePExp( p, e, z ) );
+        expOfaList := apply(aListRem, z -> basePExp( p, z ) );
         
         aPowerList := apply(elmtList, expOfaList, (f, z) -> f^(z#0));
         
@@ -198,7 +205,7 @@ ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
 ethRootSafeList( ZZ, List, List ) := ( e, a, F ) ->
     ethRootSafeList( e, a, F, ideal( 1_( ring( F#0 )  ) ) )
 	
-fancyEthRoot = (I,m,e) ->
+fancyEthRoot = (e,m,I) ->
 (
 	G:=first entries mingens I;
 	k:=#G;
