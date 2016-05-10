@@ -42,6 +42,3 @@
 
 + Renamed canVector to getCanVector.
 + Worried about use of lists as vectors…
-
-- partitions, 
-- baseP1

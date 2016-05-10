@@ -13,6 +13,7 @@ newPackage ( "ResidualIntersections",
 	{Name => "Jay Yang",
 	    Email => "jkelleyy@gmail.com"}
 	},
+    PackageImports => {"MCMApproximations"},
     Headline => "Package for studying conditions associated to Residual Intersection theory",
     Reload => true,
     DebuggingMode => true
@@ -47,12 +48,11 @@ depthsOfPowers(ZZ,Ideal) := (s,I) -> depthsOfPowers(s,codim I, I)
 --generic Artin-Nagata Code
 genericArtinNagata = method()
 genericArtinNagata(ZZ,Ideal) := (s,I) -> (
-    needsPackage "MCMApproximations";
     S := ring I;
     K := genericResidual(s,I);
     s' := codim K;
     if s' === s then 
-      codepth := numgens (ring K) - depth ((ring K)^1/K)
+      codepth := numgens (ring K) - profondeur ((ring K)^1/K)
     else codepth = -1;
     {s',codepth,K}
     )
@@ -214,31 +214,6 @@ installPackage("RandomIdeal")
      
      (codim I)*(degree I)
 ///
---depth but faster
-profondeur = method()
-profondeur(Ideal, Module) := (I,M) ->(
-    --requires R to be an affine ring (eg NOT ZZ[x])
-    R := ring M;
-    d := max(1,dim M); -- d=0 causes a crash
-    if not isCommutative R then error"profondeur undefined for noncommutative rings";
-    F := M**dual res (R^1/I, LengthLimit => d);
-    i := 0;
-    while HH_i F == 0 do i=i-1;
-    -i)
-
-profondeur Module := M -> (
-    --profondeur of a module with respect to the max ideal, via finite proj dim
-    --gives error if the ultimate coeficient ring of R = ring M is not a field.
-    R := ring M;
-    if not isCommutative R then error"profondeur undefined for noncommutative rings";
-    (S,F) := flattenRing R;
-    if not isField coefficientRing S then error"input must be a module over an affine ring";
-    S0 := ring presentation S;
-    r := F*map(S,S0);
-    MM := pushForward(r,M);
-    numgens S0 - pdim MM)
-
-profondeur Ring := R -> profondeur R^1
 
 koszulDepth = method()
 koszulDepth(Ideal) := I -> (
@@ -314,36 +289,36 @@ doc ///
    Headline
     Tests for the conditions used in the theory of residual intersections
    Description
-    Definition: If I \subset S is an ideal in a polynomial ring (or Gorenstein ring) and
-    a_1..a_s are elements of I, then K = (a_1..a_s):I is called an
-    s-residual intersection of I if the codimension of K is at least s.
+    Text
+     Definition: If $I \subset S$ is an ideal in a polynomial ring (or Gorenstein ring) and
+     $a_1\ldots a_s$ are elements of $I$, then $K = (a_1..a_s):I$ is called an
+     s-residual intersection of $I$ if the codimension of $K$ is at least $s$.
     
-    In the simplest case, s == codim I, the ideal K is said to be linked to I
-    if also I = (a_1..a_s):K; this is automatic when S/I is Cohen-Macaulay,
-    and in this case S/K is also Cohen-Macaulay; see Peskine-Szpiro,
-    Liaison des variétés algébriques. I. Invent. Math. 26 (1974), 271–302).
+     In the simplest case, $s == codim I$, the ideal $K$ is said to be linked to $I$
+     if also $I = (a_1..a_s):K$; this is automatic when $S/I$ is Cohen-Macaulay,
+     and in this case $S/K$ is also Cohen-Macaulay; see Peskine-Szpiro,
+     Liaison des variétés algébriques. I. Invent. Math. 26 (1974), 271–302).
 
-    The theory for s>c, which has been used in algebraic geometry since the 19th century,
-    was initiated in a commutative algebra setting by Artin and Nagata in the paper
-    Residual intersections in Cohen-Macaulay rings. 
-    J. Math. Kyoto Univ. 12 (1972), 307–323.
+     The theory for $s>c$, which has been used in algebraic geometry since the 19th century,
+     was initiated in a commutative algebra setting by Artin and Nagata in the paper
+     Residual intersections in Cohen-Macaulay rings. 
+     J. Math. Kyoto Univ. 12 (1972), 307–323.
     
-    Craig Huneke (Strongly Cohen-Macaulay schemes and residual intersections,
-    Trans. Amer. Math. Soc. 277 (1983), no. 2, 739–763)
-    proved that an s-residual intersection K is Cohen-Macaulay
-    if I satisfies the G_d condition and
-    is strongly Cohen-Macaulay, and successive authors have weakened the latter
-    condition to sliding depth, and, most recently, Bernd Ulrich
-    (Artin-Nagata properties and reductions of ideals. 
-    Commutative algebra: syzygies, multiplicities, and 
-    birational algebra,
-    Contemp. Math., 159, 1994) showed that
-    the weaker condition
-    depth( S/(I^t) ) >= dim(S/I) - (t-1) for t = 1..s-codim I +1
-    suffices. All these properties are true if I is licci.
+     Craig Huneke (Strongly Cohen-Macaulay schemes and residual intersections,
+     Trans. Amer. Math. Soc. 277 (1983), no. 2, 739–763)
+     proved that an s-residual intersection $K$ is Cohen-Macaulay
+     if $I$ satisfies the $G_d$ condition and
+     is strongly Cohen-Macaulay, and successive authors have weakened the latter
+     condition to sliding depth, and, most recently, Bernd Ulrich
+     (Artin-Nagata properties and reductions of ideals. 
+     Commutative algebra: syzygies, multiplicities, and 
+     birational algebra,
+     Contemp. Math., 159, 1994) showed that
+     the weaker condition
+     $depth( S/(I^t) ) >= dim(S/I) - (t-1)$ for $t = 1..s-codim I +1$
+     suffices. All these properties are true if $I$ is licci.
     
-    This package implements tests for most of these properties.
-   SeeAlso
+     This package implements tests for most of these properties.
 ///
 
 ------------------------------------------------------------
@@ -381,13 +356,12 @@ doc ///
      Every perfect codimension 2 ideal (nxn minors of an (nx(n+1) matrix) is licci,
      but other ideals of minors are generally not, as illustrated below.
     Example
-     setRandomSeed 0     
-     needsPackage "RandomIdeal"
-     needsPackage "ResidualIntersections"
+     setRandomSeed 0
      S = ZZ/32003[x_0..x_6]
-     L = idealChainFromShelling(S,randomShelling(7,3,8))
-     apply(L, I-> {linkageBound I, linkageBound(I, UseNormalModule =>true)})
-     scan(L, I ->print isLicci(I, UseNormalModule => true))
+     I = monomialIdeal (x_3,x_1*x_4,x_0*x_5,x_1*x_5)
+     linkageBound I
+     linkageBound(I, UseNormalModule => true)
+     isLicci(I, UseNormalModule => true);
    Caveat
     linkageBound I can be very large; linkageBound(I, UseNormalModule => true) can be slow.
    SeeAlso
@@ -475,9 +449,27 @@ doc ///
    Usage
     J=minimalRegularSequence(n,I)
     J=minimalRegularSequence(I)
+   Description
+    Text
+     This finds a maximal regular sequence of minimal degree in {\tt I}.
+     This is done by using random linear combinations of the generators.
+    Example
+     setRandomSeed(0);
+     S := ZZ/101[a,b,c];
+     I := ideal"cb,b2,ab,a2";
+     c := codim I
+     minimalRegularSequence(c, I)
+     I = ideal"cb,b2,a2";
+     minimalRegularSequence I
+     I = ideal"ab,ac,bc";
+     minimalRegularSequence I
    Inputs
     n:ZZ
     I:Ideal
+   Caveat
+    As a consequence of the randomness, the output is not deterministic
+    and may not be a maximal regular sequence. The result is always a
+    regular sequence.
 ///
 
 ------------------------------------------------------------
@@ -499,6 +491,9 @@ doc ///
          the maximum value of {\tt s} such that {\tt I} has property G_s (possibly infinity).
    Description
       Text
+      	  An ideal I in a ring R hs the G_s property if for every prime P of R that contains I and has codimension $k< s$, the ideal I_P in R_P can be generated by at most $k$ elments.
+	  
+	  This function returns the largest $s$ such that $I$ satisfies the G_s property. If I satisfies G_s for every s, the function returns infinity.
       Example
       	  R = QQ[x_1,x_2,x_3];
 	  I = monomialIdeal(x_1^2,x_1*x_2,x_1*x_3,x_2^2,x_2*x_3);
@@ -633,7 +628,11 @@ doc ///
          true if {\tt I} is Strongly Cohen Macaulay
    Description
       Text
-         Checks whether {\tt I} is Strongly Cohen Macaulay. We compute the depths of the Koszul homology by using {\tt koszulDepth} and compares it to {\tt codim I}.
+         Checks whether {\tt I} is Strongly Cohen Macaulay.
+         
+         Given an ideal $I=(f_1,\ldots,f_n)$, $I$ is Strongly Cohen Macaulay if every non-zero
+         Koszul homology module $H_i((f_1,\ldots,f_n))$ is itself Cohen Macaulay. This can be checked
+         by computing the depth of the Koszul homology and comparing it to $codim I$
       Example
          R = QQ[x_1..x_5];
 	 I = ideal{x_1*x_3,x_2*x_4,x_3*x_4,x_1*x_5,x_3*x_5};
@@ -718,6 +717,7 @@ doc ///
    SeeAlso
        isStronglyCM
        koszulDepth
+       depthsOfPowers
 ///
 
 ------------------------------------------------------------
@@ -752,6 +752,8 @@ doc ///
 	  depthsOfPowers(6,3,I)
    Caveat
    SeeAlso
+      hasSlidingDepth
+      genericArtinNagata
 ///
 
 
@@ -774,7 +776,16 @@ doc ///
       J:Ideal
    Description
       Text
+       If $I \subset S$ is an ideal in a polynomial ring (or Gorenstein ring) and
+       $a_1\ldots a_s$ are elements of $I$, then $K = (a_1..a_s):I$ is called an
+       s-residual intersection of $I$ if the codimension of $K$ is at least $s$.
+       
+       To compute a generic residual intersection, the function forms an ideal L generated by s random linear combinations of the generators of I. It returns the ideal L:I. 
       Example
+       S = ZZ/101[a,b,c];
+       I = ideal(a^2,a*b,b^2,b*c);
+       genericResidual(2,I)
+       genericResidual(1,I)
    Caveat
    SeeAlso
 ///

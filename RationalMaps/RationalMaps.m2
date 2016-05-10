@@ -28,7 +28,8 @@ export{
 	"isBirationalOntoImage",
 	"nonZeroMinor",
 	"inverseOfMap",
-	"mapOntoImage"
+	"mapOntoImage",
+    "sameMapToPn" -- Dan: maybe we shouldn't export this
 }
 
 ----------------------------------------------------------------
@@ -73,34 +74,38 @@ idealOfImageOfMap(RingMap) := (p) -> (
 dimImage = method();
 
 dimImage(Ideal,Ideal,Matrix) := (a,b,f) -> (
-	I := idealOfImageOfMap(a,b,f);
-	dim I - 1
-	-- substract 1 from the dimension of the image since in projective space
+        h := map( (ring a)/a, (ring b)/b, f);
+        dimImage(h)
+        	-- substract 1 from the dimension of the image since in projective space
 	);
 
 dimImage(Ideal,Ideal,BasicList) := (a,b,g) -> (
-	dimImage(a,b,g)
-	);
+        h := map( (ring a)/a, (ring b)/b, g);
+        dimImage(h) 
+       	);
 
 dimImage(Ring,Ring,Matrix) := (R,S,f) -> (
-	dimImage(ideal R, ideal S, f)
+        h := map( R, S, f);
+        dimImage(h) 
 	);
 
 dimImage(Ring,Ring,BasicList) := (R,S,g) -> (
-	dimImage(ideal R, ideal S, g)
-	);
+        h := map( R, S, g);
+        dimImage(h) 
+        );
 
 dimImage(RingMap) := (p) -> (
-	dimImage(target p, source p, first entries matrix p)
-	);
+	--dimImage(target p, source p, first entries matrix p)
+	I := idealOfImageOfMap(p);
+	(dim I) - 1
+);
 
 baseLocusOfMap = method();
 
 baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
-    --maybe check all the maps in L1 are of the same degree?
+    if numRows L1 > 1 then error "Expected a row matrix";
+    if isSameDegree( first entries L1  )==false then error "Expected a matrix of homogenous elements of the same degree";
 
-    --just need to convert L1 to a basic list, I guess
-    --if isSameDegree(L1)==false then error "Expected a matrix of homogenous elements of the same degree";
     M:= gens ker transpose presentation image L1;
     -- this matrix gives all the "equivalent"
     -- ways to write the map in question (e.g. (xy : xz) is 
@@ -116,7 +121,7 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     saturate fold(L, plus)
     -- these two commands create an ideal for the base 
     -- locus from the information
-    -- given in the matrix above. We take the saturation to get
+    -- given in the submodule above. We take the saturation to get
     -- the biggest ideal that gives the same variety. 
     
 );
@@ -133,6 +138,11 @@ baseLocusOfMap(RingMap) := (ff) ->(
 isRegularMap = method();
 
 isRegularMap(Matrix) := (L1) -> ( --L1 is a row matrix
+    I:= baseLocusOfMap(L1);
+    I == ideal 1_(ring I)
+);
+
+isRegularMap(List) := (L1) -> ( 
     I:= baseLocusOfMap(L1);
     I == ideal 1_(ring I)
 );
@@ -184,7 +194,7 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
  relationType=method();
- --this function computes the "relation tye" of an ideal in a ring R.
+ --this function computes the "relation type" of an ideal in a ring R.
  --Let R be the ring given bythe  ideal a and L be a list of elements in R.
  --the relation type is the biggest degree in terms of new variables in the
  --defining ideal of the rees algebra of I over R. 
@@ -210,7 +220,7 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
      
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  dgi=method();
- --this function compute the degeneration index of an ideal a which is the 
+ --this function computes the degeneration index of an ideal a which is the 
  --number of t linear generators among the generators of a.
  --dgi measures the number of hyperPlanes which cut the variety
  -- defined by a.
@@ -221,24 +231,26 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
      n:=numgens a;
      d:=0;
      for i from 0 to n-1 do (
-	 if (a_i != sub(0, S)) then (
-	     if (degree a_i)=={1} then d=d+1
-	 );
+         if (a_i != sub(0, S)) then (
+             if (degree a_i)=={1} then d=d+1
+         );
      );
-     d);
+ d);
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 isSameDegree=method();
 isSameDegree(BasicList):=(L)->(
-   n:=#L;
-   flag := true;
-   if n!=0 then (
-       d:=degree L#0;
-       i := 0;
-       while ((i < n) and (flag == true)) do(
-	   if (isHomogeneous(L#i) == false) then flag = false;
-	   if (degree(L#i) != d) then flag = false;
-       	   i = i+1;
-       );
+    n:=#L;
+    flag := true;
+    if n!=0 then (
+        d:=max(apply(L,zz->degree zz));
+        i := 0;
+        while ((i < n) and (flag == true)) do(
+	    if (isHomogeneous(L#i) == false) then flag = false;
+        if ((L#i) != sub(0, ring(L#i))) then (
+	        if (degree(L#i) != d) then flag = false;
+	    );
+       	i = i+1;     	  
+        );
     );  
     flag
 );
@@ -255,23 +267,17 @@ isBirationalMap = method();
 --defining ideal of Y = im
 --list of elements = bm
 isBirationalMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
-    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
     R:=ring di;
-    r:=numgens ambient R;
-    K:=coefficientRing R;
-    Jr:= blowUpIdeals(di,bm);
-    n:=numgens Jr;
-    L:={};
-    for i from 0 to (n-1) do if  (degree Jr_i)_0==1 then
-      L=append(L, Jr_i);
-   JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
-   S:=ring im;
-   vS:=gens ambient S;
-   g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
-   barJD:=g(JD);
-   jdd:=(numgens ambient R)-1+dgi(di);
-   not(isSubset(minors(jdd,barJD),im))
-   );    
+    S:=ring im;
+    im1 := idealOfImageOfMap(di, im, bm); 
+    if (dim ((im1*S^1)/(im*S^1)) == 0) then(
+        isBirationalOntoImage(di,im1,bm)
+    )
+    else(
+        false
+    )
+
+);    
 
 isBirationalMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
     isBirationalMap(ideal R1, ideal S1, bm)
@@ -292,24 +298,56 @@ isBirationalMap(RingMap) :=(f)->(
   --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 isBirationalOntoImage = method();
+--TODO: KARL -- have a flag so that im1 is assumed to be im (ie, don't saturate or do any checks).
 
 isBirationalOntoImage(Ideal,Ideal, BasicList) :=(di,im,bm)->(
-      tar:=idealOfImageOfMap(di,im, bm);
-      isBirationalMap(di,tar,bm)
-      );
+    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    R:=ring di;
+    S:=ring im;
+    im1 := saturate idealOfImageOfMap(di, im, bm);
+
+    K:=coefficientRing R;
+--In the following lines we remove the linear parts of the ideal di and 
+--modify our map bm
+    Rlin:=(ambient ring di)/di;
+    Rlin2 := minimalPresentation(Rlin);
+    phi:=Rlin.minimalPresentationMap;    
+    Rlin1:=target phi;
+    di1:=ideal Rlin1;
+    bm0:=phi(matrix{bm});
+    bm1:=flatten first entries bm0;
+ --From here the situation is under the assumption that the variety is not contained in any hyperplane.
+    r:=numgens ambient Rlin1;
+    Jr:= blowUpIdeals(di1,bm1);
+    n:=numgens Jr;
+    L:={};
+    for i from 0 to (n-1) do (
+        if  (degree Jr_i)_0==1 then L=append(L, Jr_i);
+    );
+    JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
+    vS:=gens ambient S;
+   --print "we got here.";
+    g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
+     --  print "we got there.";
+    barJD:=g(JD);
+     --  print barJD;
+    jdd:=(numgens ambient Rlin1)-1;
+   --print jdd;
+    not(isSubset(minors(jdd,barJD),im1))
+);
   
- isBirationalOntoImage(Ring,Ring,BasicList) := (R1, S1, bm)->(
-    isBirationalMap(ideal R1, ideal S1, bm)
-    ); 
+isBirationalOntoImage(Ring,Ring,BasicList) := (R1, S1, bm)->(
+    isBirationalOntoImage(ideal R1, ideal S1, bm)
+); 
 
 isBirationalOntoImage(RingMap) :=(f)->(
     isBirationalOntoImage(target f, source f, first entries matrix f)
-    );
+);
     
     
     --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    nonZeroMinor=method();
+nonZeroMinor=method();
 nonZeroMinor(Matrix,ZZ):=(M,ra)->(
     cc:=numColumns(M);
     ro:=numRows(M);
@@ -333,13 +371,14 @@ flatten nzlist);
   
   
   
+  
 inverseOfMap = method();
 
 --this checks whether a map X -> Y is birational.
 
 --X = Proj R
 --Y = Proj S
---This madfp is given by a list of elements in R, all homogeneous
+--This map is given by a list of elements in R, all homogeneous
 --of the same degree.  
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
@@ -438,6 +477,12 @@ isEmbedding(RingMap) := (f1)->(
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
  
+ sameMapToPn = method(); --checks whether to rational maps to Pn are the same. Assumes domain is irreducible
+
+ sameMapToPn(List, List) := (L1, L2) -> (
+    theRing := ring first L1;
+    rank matrix(frac(theRing), {L1, L2}) == 1
+ );
 
 --****************************************************--
 --*****************Documentation**********************--
@@ -499,6 +544,46 @@ doc ///
             Pi = map(R, S, {x, y-z});
             isBirationalMap(Pi)
 ///                     
+
+doc /// 
+        Key
+		isBirationalOntoImage
+		(isBirationalOntoImage, Ideal, Ideal, BasicList)
+		(isBirationalOntoImage, Ring, Ring, BasicList)
+		(isBirationalOntoImage, RingMap)
+        Headline
+                Checks if a map X -> Y between projective varieties is birational onto f(X).
+        Usage
+                val = isBirationalMap(a,b,f)
+                val = isBirationalMap(R,S,f)
+		val = isBirationalMap(Pi)
+	Inputs
+                a:Ideal
+                        defining equations for X		
+                b:Ideal
+                        defining equations for Y
+                f:BasicList
+                        A list of where to send the variables in the ring of b, to in the ring of a.
+                R:Ring
+                        the homogeneous coordinate ring of X
+                S:Ring
+                        the homogeneous coordinate ring of Y
+                Pi:RingMap
+                        A ring map S to R corresponding to X mapping to Y
+        Outputs
+                val:Boolean
+                        true if the map is birational, false if otherwise
+        Description
+                Text   
+                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image.
+                Example
+                        R=QQ[x,y,z];
+                        S=QQ[a,b,c];
+                        Pi = map(R, S, {x*y, x*z, y*z});
+                        isBirationalMap(Pi)
+                Text
+///                     
+
 
 doc ///
 	Key 
@@ -584,12 +669,12 @@ doc ///
                 Text
                         Gives the dimension of the image of a rational map. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these
                 Example
-                        S = QQ[x,y,z]
-                        a = ideal(x^2+y^2+z^2)
-                        T = QQ[u,v]
-                        b = ideal(u^2+v^2)
-                        f = matrix{{x*y,y*z}}
-                        dimImage(a,b,f)
+                        S = QQ[x,y,z,w];
+			b = ideal(x*y-z*w);
+			R = QQ[u,v];
+			a = ideal(sub(0,R));
+			f = matrix {{u,0,v,0}};
+			dimImage(a,b,f)
 ///
 
 
@@ -741,18 +826,35 @@ doc ///
 doc ///
     Key
         isRegularMap
+        (isRegularMap, Matrix)
+        (isRegularMap, List)
+        (isRegularMap, RingMap)
+
     Headline
         Checks whether a map to projective space is regular
     Usage
         b = isRegularMap(M)
+        b = isRegularMap(L)
+        b = isRegularMap(f)
     Inputs
         M: Matrix
             Row matrix whose entries correspond to the coordinates of your map to projective space
+        L: List
+            A list whose entries correspond to the coordinates of your map to projective space
+        f: RingMap
+            A ring map corresponding to a map of projective varieties.
     Outputs
         b: Boolean
     Description
         Text
             This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring.
+        Example
+            P5 = QQ[a..f];
+            M = matrix{{a,b,c},{d,e,f}};
+            segreProduct = P5/minors(2, M);
+            blowUpSubvar = segreProduct/ideal(b - d);
+            f = {a, b, c};
+            isRegularMap({a,b,c})
 ///  
 
 doc ///
@@ -793,132 +895,169 @@ doc ///
 --******************************************
 --******************************************
 
-TEST ///
+TEST /// --test #1
 	------------------------------------
 	------- Tests for idealOfImageOfMap -------
 	------------------------------------   
---Karl: I have no idea why this kernel should be (u^4, u*v^3)
-	S = QQ[x,y,z]
-        a = ideal(x^2+y^2+z^2)
-        T = QQ[u,v]
-        b = ideal(u^2+v^2)
-        f = matrix{{x*y,y*z}}
-        im = idealOfImageOfMap(a,b,f)  
-	assert(im == ideal(v^4,u*v^3))
+	S = QQ[x,y,z,w];
+	b = ideal(x*y-z*w);
+	R = QQ[u,v];
+	a = ideal(sub(0,R));
+	f = matrix {{u,0,v,0}};
+	im = idealOfImageOfMap(a,b,f);
+	assert (im == ideal(y,w))
 ///
 
-TEST ///
-	S = QQ[x0,x1]
-	a = ideal(0*x0)
-	T = QQ[y0,y1,y2]
-	b = ideal(0*y1)
-	f = matrix{{x0^4,x0^2*x1^2,x1^4}}
-	im = idealOfImageOfMap(a,b,f)
-	assert(im == ideal(y2^2-y1*y^3))
+TEST /// --test #2
+	S = QQ[x0,x1];
+	T = QQ[y0,y1,y2];
+	f = map(S,T,{x0^4,x0^2*x1^2,x1^4});
+	im = idealOfImageOfMap(f);
+	assert(im == ideal(y1^2-y0*y2))
 ///
 
-TEST ///
+TEST /// --test #3
 	-- Since in Projective Space, check to make sure different representations give the same result
-	S = QQ[x,y]
-	a = ideal(0*x)
-	T = QQ[u,v]
-	b = ideal(0*v)
-	f1 = matrix{{x,y}}
-	f2 = matrix{{x^3*y^2,x^2*y^3}}
-	assert(idealOfImageOfMap(a,b,f1)==idealOfImageOfMap(a,b,f2))
+	S = QQ[x,y];
+	T = QQ[u,v];
+	f1 = map(S,T,{x,y});
+	f2 = map(S,T,{x^3*y^2,x^2*y^3});	
+	assert(idealOfImageOfMap(f1)==idealOfImageOfMap(f2))
 ///
 
-TEST ///
+TEST /// --test #4
 	-------------------------------------
 	------ Tests for dimImage -----------
 	-------------------------------------
 
-	S = QQ[x,y,z]
-        a = ideal(x^2+y^2+z^2)
-        T = QQ[u,v]
-        b = ideal(u^2+v^2)
-        f = matrix{{x*y,y*z}}
-        d = dimImage(a,b,f)
-        assert(d == -1)
+	S = QQ[x,y,z,w];
+	b = ideal(x*y-z*w);
+	R = QQ[u,v];
+	a = ideal(sub(0,R));
+	f = matrix {{u,0,v,0}};
+	d = dimImage(a,b,f);
+	assert (d == 1)
 ///
 
-TEST ///        
-        S = QQ[x0,x1]
-        a = ideal(0*x0)
-        T = QQ[y0,y1,y2]
-        b = ideal(0*y1)
-        f = matrix{{x0^4,x0^2*x1^2,x1^4}}
-        d = dimImage(a,b,f)
+TEST /// --test #5
+        S = QQ[x0,x1];
+        T = QQ[y0,y1,y2];
+        f = map(S,T,{x0^4,x0^2*x1^2,x1^4});
+        d = dimImage(f);
         assert(d == 1)	
 ///
 
-TEST ///
+TEST /// --test #6
     -- Since in Projective Space, check to make sure different representations give the same result
-    S = QQ[x,y]
-    a = ideal(0*x)
-    T = QQ[u,v]
-    b = ideal(0*v)
-    f1 = matrix{{x,y}}
-    f2 = matrix{{x^3*y^2,x^2*y^3}}
-    assert(dimImage(a,b,f1)==dimImage(a,b,f2))
+    S = QQ[x,y];
+    T = QQ[u,v];
+    f1 = map(S,T,{x,y});
+    f2 = map(S,T,{x^3*y^2,x^2*y^3});
+    assert(dimImage(f1)==dimImage(f2))
 ///
 
 
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
 	-------------------------------------
-TEST ///	
+TEST ///	--test #7
     R = QQ[x,y,z]	
 	M = matrix{{x^2*y, x^2*z, x*y*z}}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(M))
 ///
 
-TEST ///	
+TEST ///	--test #8
     R = QQ[x,y,z]	
 	L = {x^2*y, x^2*z, x*y*z}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(L))
 ///
 
-TEST ///
+TEST /// --test #9
 	-- reducible source
+
 	R = QQ[x,y,z]/(x*y)
 	M = matrix{{x^2, x*y, y^2}}
 	I = ideal(x,y)
 	assert(I == baseLocusOfMap(M))
+
+    -- we should have a test for when that kernel is not a cyclic module
 ///
 
 
 	-------------------------------------
 	----- isRegularMap -----------------
 	-------------------------------------
-TEST ///
+TEST /// --test #10
 	R = QQ[x,y,z,w]/(x*y - z*w)
 	M = matrix{{1, 0, 0}}
 	assert(isRegularMap(M))
 ///
 
-TEST ///
+TEST /// --test #11
     R = QQ[x,y]/(x*y)
     M = matrix{{x,y}}
     assert(isRegularMap(M))
 ///
 
-TEST ///
+TEST /// --test #12
     R = QQ[x,y,z]/(x^3 + y^3 - z^3)
-    M = matrix{{y-z, x}}
-    assert(isRegularMap(M) == false)
+    M = matrix{{(y-z)*x, x^2}}
+    assert(isRegularMap(M) == true)
 ///
 
+TEST /// --test #13
+        R=QQ[x,y,z];
+        S=QQ[a,b];  
+        h = map(R, S, {x,y});
+        assert(isRegularMap(h) == false)      
+///
+
+TEST /// --test #14
+        R=QQ[x,y,z];
+        S=QQ[a,b,c];
+        h = map(R,S,{y*z,x*z,x*y});
+        assert(isRegularMap(h) == false)
+///
+
+TEST /// -- test #15
+    -- projection from the blow up of P2 to P2
+
+    P5 = QQ[a..f];
+    M = matrix{{a,b,c},{d,e,f}};
+    segreProduct = P5/minors(2, M);
+    blowUpSubvar = segreProduct/ideal(b - d);
+    f = {a, b, c};
+    assert(isRegularMap(matrix{{a,b,c}}) == true)
+///
 
 	-------------------------------------
 	----- inverseOfMap  -----------------
 	-------------------------------------
 
+--TEST ///
+    -- Let's find the inverse of the projection map from
+    -- the blow up of P^2 to P^2
 
+    -- the blow up of P^2 is a projective variety in P^5: 
+--    P5 = QQ[a..f]
+--    M = matrix{{a,b,c},{d,e,f}}
+--    segreProduct = P5/minors(2, M)
+--    blowUpSubvar = segreProduct/ideal(b - d)
+--    f = {a, b, c}
+--    assert(isBirationalMap(blowUpSubvar, QQ[x,y,z], f) == true)
+--    assert(inverseOfMap(blowUpSubvar, QQ[x,y,z], f) == map(blowUpSubVar, QQ[x,y,z], {a, b, c}) -- I think?
+--    assert(baseLocusOfMap(inverseOfMap(blowUpSubvar, QQ[x,y,z], f)) == ideal(x,y)) -- I think?
+--///
 
-    
- 
+TEST ///
+    R =  QQ[a..d];
+    I = ideal(a*d - b*c);
+    S = QQ[x,y,z];
+    J = ideal 0_S;
+    f = inverseOfMap(I, J, {a,b,c});
+    assert(sameMapToPn(first entries matrix f, {x^2, x*y, x*z, y*z}))
+/// 
 ----FUTURE PLANS------
 
