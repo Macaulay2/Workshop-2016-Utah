@@ -10,4 +10,4 @@ These are a couple of couple of things we noticed that still need to be done as 
 
 5) Consider removing baseP1 and replacing it with one of the other base-p expansions. Otherwise it needs to have test cases.
 
-6) 
+6) Think about carryTest in BasicFunctions, it is only used in firstCarry, which seems to give the right answer, but the code seems like it may be able to be cleaned up.

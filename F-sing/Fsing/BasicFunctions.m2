@@ -299,6 +299,7 @@ baseP1 = ( n, p, e )->
 
 --Given a vector w={x,y}, x and y rational in [0,1], returns a number of digits 
 --such that it suffices to check to see if x and y add without carrying in base p
+--Think about this. (Only is used for firstCarry.
 carryTest = ( p, w ) ->
 (
      if w#0 < 0 or w#0 > 1 or w#1 < 0 or w#1 > 1 then(
