@@ -474,6 +474,21 @@ doc ///
    Usage
     J=minimalRegularSequence(n,I)
     J=minimalRegularSequence(I)
+   Description
+    Text
+     This finds a maximal regular sequence of minimal degree in {\tt I}.
+     This is done by using random linear combinations of the generators.
+     As a consequence, the output is not deterministic
+    Example
+     setRandomSeed(0);
+     S := ZZ/101[a,b,c];
+     I := ideal"cb,b2,ab,a2";
+     c := codim I
+     minimalRegularSequence(c, I)
+     I = ideal"cb,b2,a2";
+     minimalRegularSequence I
+     I = ideal"ab,ac,bc";
+     minimalRegularSequence I
    Inputs
     n:ZZ
     I:Ideal
