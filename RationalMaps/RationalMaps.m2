@@ -73,26 +73,31 @@ idealOfImageOfMap(RingMap) := (p) -> (
 dimImage = method();
 
 dimImage(Ideal,Ideal,Matrix) := (a,b,f) -> (
-	I := idealOfImageOfMap(a,b,f);
-	dim I - 1
-	-- substract 1 from the dimension of the image since in projective space
+        h := map( (ring a)/a, (ring b)/b, f);
+        dimImage(h)
+        	-- substract 1 from the dimension of the image since in projective space
 	);
 
 dimImage(Ideal,Ideal,BasicList) := (a,b,g) -> (
-	dimImage(a,b,g)
-	);
+        h := map( (ring a)/a, (ring b)/b, g);
+        dimImage(h) 
+       	);
 
 dimImage(Ring,Ring,Matrix) := (R,S,f) -> (
-	dimImage(ideal R, ideal S, f)
+        h := map( R, S, f);
+        dimImage(h) 
 	);
 
 dimImage(Ring,Ring,BasicList) := (R,S,g) -> (
-	dimImage(ideal R, ideal S, g)
-	);
+        h := map( R, S, g);
+        dimImage(h) 
+        );
 
 dimImage(RingMap) := (p) -> (
-	dimImage(target p, source p, first entries matrix p)
-	);
+	--dimImage(target p, source p, first entries matrix p)
+	I := idealOfImageOfMap(p);
+	(dim I) - 1
+);
 
 baseLocusOfMap = method();
 
@@ -793,56 +798,50 @@ doc ///
 --******************************************
 --******************************************
 
-TEST ///
+TEST /// --test #1
 	------------------------------------
 	------- Tests for idealOfImageOfMap -------
 	------------------------------------   
---Karl: I have no idea why this kernel should be (u^4, u*v^3)
-	S = QQ[x,y,z]
-        a = ideal(x^2+y^2+z^2)
-        T = QQ[u,v]
-        b = ideal(u^2+v^2)
-        f = matrix{{x*y,y*z}}
-        im = idealOfImageOfMap(a,b,f)  
-	assert(im == ideal(v^4,u*v^3))
+	S = QQ[x,y,z,w];
+	b = ideal(x*y-z*w);
+	R = QQ[u,v];
+	a = ideal(sub(0,R));
+	f = matrix {{u,0,v,0}};
+	im = idealOfImageOfMap(a,b,f);
+	assert (im == ideal(y,w))
 ///
 
-TEST ///
-	S = QQ[x0,x1]
-	a = ideal(0*x0)
-	T = QQ[y0,y1,y2]
-	b = ideal(0*y1)
-	f = matrix{{x0^4,x0^2*x1^2,x1^4}}
-	im = idealOfImageOfMap(a,b,f)
-	assert(im == ideal(y2^2-y1*y^3))
+TEST /// --test #2
+	S = QQ[x0,x1];
+	T = QQ[y0,y1,y2];
+	f = map(S,T,{x0^4,x0^2*x1^2,x1^4});
+	im = idealOfImageOfMap(f);
+	assert(im == ideal(y1^2-y0*y2))
 ///
 
-TEST ///
+TEST /// --test #3
 	-- Since in Projective Space, check to make sure different representations give the same result
-	S = QQ[x,y]
-	a = ideal(0*x)
-	T = QQ[u,v]
-	b = ideal(0*v)
-	f1 = matrix{{x,y}}
-	f2 = matrix{{x^3*y^2,x^2*y^3}}
-	assert(idealOfImageOfMap(a,b,f1)==idealOfImageOfMap(a,b,f2))
+	S = QQ[x,y];
+	T = QQ[u,v];
+	f1 = map(S,T,{x,y});
+	f2 = map(S,T,{x^3*y^2,x^2*y^3});	
+	assert(idealOfImageOfMap(f1)==idealOfImageOfMap(f2))
 ///
 
-TEST ///
+TEST /// --test #4
 	-------------------------------------
 	------ Tests for dimImage -----------
 	-------------------------------------
 
-	S = QQ[x,y,z]
-        a = ideal(x^2+y^2+z^2)
-        T = QQ[u,v]
-        b = ideal(u^2+v^2)
-        f = matrix{{x*y,y*z}}
-        d = dimImage(a,b,f)
-        assert(d == -1)
+	S = QQ[x,y,z];
+        a = ideal(x^2+y^2+z^2);
+        T = QQ[u,v];
+        f = map(S, T, {x*y,y*z});
+        d = dimImage(f);
+        assert(d == 1)
 ///
 
-TEST ///        
+TEST /// --test #5
         S = QQ[x0,x1]
         a = ideal(0*x0)
         T = QQ[y0,y1,y2]
@@ -852,7 +851,7 @@ TEST ///
         assert(d == 1)	
 ///
 
-TEST ///
+TEST /// --test #6
     -- Since in Projective Space, check to make sure different representations give the same result
     S = QQ[x,y]
     a = ideal(0*x)
@@ -867,21 +866,21 @@ TEST ///
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
 	-------------------------------------
-TEST ///	
+TEST ///	--test #7
     R = QQ[x,y,z]	
 	M = matrix{{x^2*y, x^2*z, x*y*z}}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(M))
 ///
 
-TEST ///	
+TEST ///	--test #8
     R = QQ[x,y,z]	
 	L = {x^2*y, x^2*z, x*y*z}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(L))
 ///
 
-TEST ///
+TEST /// --test #9
 	-- reducible source
 	R = QQ[x,y,z]/(x*y)
 	M = matrix{{x^2, x*y, y^2}}
@@ -893,24 +892,30 @@ TEST ///
 	-------------------------------------
 	----- isRegularMap -----------------
 	-------------------------------------
-TEST ///
+TEST /// --test #10
 	R = QQ[x,y,z,w]/(x*y - z*w)
 	M = matrix{{1, 0, 0}}
 	assert(isRegularMap(M))
 ///
 
-TEST ///
+TEST /// --test #11
     R = QQ[x,y]/(x*y)
     M = matrix{{x,y}}
     assert(isRegularMap(M))
 ///
 
-TEST ///
+TEST /// --test #12
     R = QQ[x,y,z]/(x^3 + y^3 - z^3)
-    M = matrix{{y-z, x}}
-    assert(isRegularMap(M) == false)
+    M = matrix{{(y-z)*x, x^2}}
+    assert(isRegularMap(M) == true)
 ///
 
+TEST /// --test #13
+        R=QQ[x,y,z];
+        S=QQ[a,b];  
+        h = map(R, S, {x,y});
+        assert(isRegularMap(h) == false)      
+///
 
 	-------------------------------------
 	----- inverseOfMap  -----------------
