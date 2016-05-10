@@ -78,31 +78,31 @@ export{
     "FPT2VarHomog", -- FThresholds.m2    
     "FPT2VarHomogInternal", -- FThresholds.m2
     "fracPart",
-    "frobenius",
+    "frobenius", --Other
     "frobeniusPower",  --frobeniousPowers.m2 
-    "fSig",
+    "fSig", -- Other
     "FTApproxList",  -- FThresholds.m2
     "FTHatApproxList",  -- FThresholds.m2
     "FullMap",--specifies whether the full data should be returned
     "getNumAndDenom",
     "genFrobeniusPower",   --frobeniousPowers.m2 
     "guessFPT",  -- FThresholds.m2
-    "HSL",
-    "imageOfRelativeCanonical",
-    "imageOfTrace", --doesn't work!
+    "HSL", --Other
+    "imageOfRelativeCanonical", -- Other
+    "imageOfTrace", --doesn't work! -- Other
     "isBinomial",  -- FThresholds.m2
     "isCP",  -- FThresholds.m2
     "isDiagonal",  -- FThresholds.m2
     "isFJumpingNumberPoly",  -- FThresholds.m2
     "isFPTPoly",  -- FThresholds.m2
-    "isFPure",
-    "isFRegularPoly",
-    "isFRegularQGor",
+    "isFPure", -- Other
+    "isFRegularPoly", -- Other
+    "isFRegularQGor", -- Other
     "isInLowerRegion",  -- FThresholds.m2
     "isInUpperRegion",  -- FThresholds.m2
 --    "isJToAInIToPe",
-    "isSharplyFPurePoly",
-    "isMapSplit",
+    "isSharplyFPurePoly", -- Other
+    "isMapSplit", -- Other
     "MaxExp",  -- FThresholds.m2
     "maxIdeal", -- BasicFunctions
     "minimalCompatible", -- EthRoots.m2 
@@ -126,9 +126,9 @@ export{
     "paraTestModuleAmbient",
     "PrintCP",  -- FThresholds.m2
     "setFTData",  -- FThresholds.m2
-    "sigmaAOverPEMinus1Poly", 
-    "sigmaQGorAmb", --needs optimization
-    "sigmaAOverPEMinus1QGor",      --needs optimization
+    "sigmaAOverPEMinus1Poly", -- Other
+    "sigmaQGorAmb", --needs optimization -- Other
+    "sigmaAOverPEMinus1QGor",      --needs optimization --Other
     "splittingField",  -- FThresholds.m2
     "tauPoly", -- testIdeals
     "tauNonPrincipalAOverPEPoly", -- testIdeals

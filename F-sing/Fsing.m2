@@ -126,9 +126,20 @@ export{
 
 
 -- Other.m2
-
-
-
+    "frobenius", 
+    "fSig",
+    "HSL", 
+    "imageOfRelativeCanonical",
+    "imageOfTrace", --doesn't work! 
+    "isFPure",  
+    "isFRegularPoly",  
+    "isFRegularQGor",  
+    "isMapSplit",
+    "isSharplyFPurePoly",
+    "sigmaAOverPEMinus1Poly", 
+    "sigmaQGorAmb", --needs optimization  
+    "sigmaAOverPEMinus1QGor",  --needs optimization 
+ 
 -- Other
        "findAllCompatibleIdeals", ---MK	
     
