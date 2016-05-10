@@ -1,0 +1,55 @@
+
+To do for RandomIdeal.m2
+now has the shelling code
+
+add to RandomIdeal random Borel-fixed ideal
+documentation of the shelling functions
+tests of ...
+
+make prepare and testNewSimplex non-exported.
+
+-----------
+ResidualIntersections
+now has licci code
+
+add tests for
+Gd (output: #gens at each codim. Also a version to turn this into d's for which Gd holds?)
+strongly CM
+sliding depth
+depths of powers
+generic Artin-Nagata
+
+input-output: store examples in a file.
+
+documentation and tests
+
+-----
+
+Code Review Comments:
+
+Add definitions/references for what a shelling is
+
+Add an explanation/overview of shelling.
+
+Improve/change the Description section.
+
+randomAddition should mention non-pure + edit/rewrite caveat to say that we don't check shellability
+
+add a bunch of seeAlso references
+    randomAddition and randomChain should reference eachother
+
+
+improve randomChain documentation
+    change randomChain to randomShelling
+    add more text/examples describing the code.
+
+spellcheck everything
+
+add examples/desc to randomShellableIdeal
+    link to randomChain/randomShelling and randomShellableIdealChain
+
+add randomShellableIdealChaing
+
+
+Add depthsOfPowersOfIdeals code
+Add slidingDepth code

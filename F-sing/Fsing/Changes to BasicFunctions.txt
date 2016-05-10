@@ -1,0 +1,44 @@
++ Changed floorlog to floorLog
+
++ Made basePExp a method.
++ Changed order of input for basePExp from (N,p) to (p,N)
++ Absorbed basePExpMaxE into a function in the method basePExp
++ Changed order of old basePExpMaxE from (N,p,e1) to (p,e1,N)
+
+
++ Made divideFraction into a method.
++ Changed order of input for divideFraction to (pp,t1) from (t1,pp).
+
++ Made findNumberBetween into a method.
++ Made findNumberBetweenWithDenom into a method.
++ Changed input order for findNumberBetweenWithDenom to (myDenom, myInterv) from (myInterv, myDenom) .
++ Changed input order for findNumberBetweenWithDenom to (maxDenom, myInterv) from (myInterv, maxDenom).
+
++ Deleted aPower. Made redundant by including into divideFraction.
++ Deleted bPower. Made redundant by divideFraction.
+
++ Made getSublistOfList a method.
++ Changed input order of getSublistofList to (entryList, myList) from (myList, entryList).
+
++ Changed order of input for digit to (p,e,x) from (e,x,p).
++ Changed order of input for digit to (p,e,u) from (e,u,p).
+
++ Changed name of truncation to truncatedBasePExp.
++ Changed order of input for truncation to (p,e,x) from (e,x,p)
++ Changed order of input for truncation (lists) to (p,e,u) from (e,u,p)
+
++ Merged truncationBaseP into the method basePExp.
++ Changed order of input for truncationBaseP to (p,e,x) from (e,x,p).
+
++ Added error messages to digit, basePExp, truncation
+
++ Changed order of input for carryTest to (p, w) from (w, p).
++ Changed order of input for firstCarry to (p, w) from (w, p).
+
++ Changed order of input for getNonzeroBinaryDigits to (i,n) from (n,i).
+
++ Changed order of findNearPthPowerBelow to (p,e,t) from (t,p,e).
++ Changed order of findNearPthPowerAbove to (p,e,t) from (t,p,e).
+
++ Renamed canVector to getCanVector.
++ Worried about use of lists as vectors…
