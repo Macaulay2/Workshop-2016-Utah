@@ -622,25 +622,109 @@ doc ///
 	                mapOntoImage(R,S,{x^2,x*y,y^2})
 ///
 
+doc ///
+        Key
+                isEmbedding
+                (isEmbedding, RingMap)
+                (isEmbedding, Ideal, Ideal, BasicList)
+                (isEmbedding, Ring, Ring, BasicList)
+        Headline
+                Given a map of rings, correspoing to $f : X -> Y$, this determines if this map embeds $X$ as a closed subscheme into $Y$.
+        Usage
+                val = isEmbedding(f)
+                val = isEmbedding(a,b,l)
+                val = isEmbedding(R,S,l)                
+        Inputs
+                a:Ideal
+                        defining equations for X
+                b:Ideal
+                        defining equations for Y
+		l:BasicList
+                        projective rational map given by polynomial represenatives of the same degree
+                f:RingMap
+                        the ring map corresponding to $f : X -> Y$
+                R:Ring
+                        coordinate ring for X
+                S:Ring
+                        coordinate ring for Y
+                
+        Outputs
+                val:Boolean
+			true if the map is an embedding, otherwise false.
+	Description
+	        Text
+	                Consider the Veronese embedding.
+	        Example 
+	                R = QQ[x,y];
+	                S = QQ[a,b,c];
+	                f = map(R, S, {x^2, x*y, y^2});
+	                isEmbedding(f)
+	        Text
+	                Now consider the projection from a point on the plane to the line at infinity.
+	        Example
+	                R=QQ[x,y,z];
+	                S=QQ[a,b];
+	                f=map(R, S, {y,z});
+	                isEmbedding(f)
+	        Text 
+	                That is obviously not an embedding.  It is even not an embedding when we restrict to a quadratic curve, even though it is a regular map.
+	        Example
+	                R=QQ[x,y,z]/(x^2+y^2-z^2);
+	                S=QQ[a,b];
+	                f=map(R,S, {y,z});
+	                isRegularMap(f)
+	                isEmbedding(f)
+///
+
+
 
 doc ///
     Key
         baseLocusOfMap
         (baseLocusOfMap, Matrix)
         (baseLocusOfMap, List)
+        (baseLocusOfMap, RingMap)
     Headline
         Computes base locus of a map from a projective variety to projective space
     Usage
         I = baseLocusOfMap(M)
         I = baseLocusOfMap(L)
+        I = baseLocusOfMap(h)
     Inputs
         M: Matrix
             Row matrix whose entries correspond to the coordinates of your map to projective space.
         L: List
-            A list whose entries correspond to the coordinates of your map to projective space
+            A list whose entries correspond to the coordinates of your map to projective space.
+        h: RingMap
+            A ring map corresponding to a map of projective varieties.
     Outputs
         I: Ideal
-            The saturated defining ideal of the baselocus
+            The saturated defining ideal of the baselocus of the corresponding maps.
+    Description
+        Text
+            This defines the locus where a given map of projective varieties is not defined.  For instance, consider the following rational map from $P^2$ to $P^1$
+        Example
+            R = QQ[x,y,z];
+            S = QQ[a,b];
+            f = map(R, S, {x,y});
+            baseLocusOfMap(f)
+        Text
+            Observe it is not defined at the point [0:0:1], which is exactly what one expects.  However, we can restrict the map to a curve on $P^2$ and then it will be defined everywhere.
+        Example
+            R=QQ[x,y,z]/(y^2*z-x*(x-z)*(x+z));
+            S=QQ[a,b];
+            f=map(R,S,{x,y});
+            baseLocusOfMap(f)
+        Text
+            Let us next consider the quadratic Cremona transformation.
+        Example
+            R=QQ[x,y,z];
+            S=QQ[a,b,c];
+            f=map(R,S,{y*z,x*z,x*y});
+            J=baseLocusOfMap(f)
+            minimalPrimes J
+        Text
+            The base locus is exactly the three points one expects.
 ///
 
 doc ///
@@ -657,7 +741,7 @@ doc ///
         b: Boolean
     Description
         Text
-            This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring
+            This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring.
 ///  
 
 doc ///
