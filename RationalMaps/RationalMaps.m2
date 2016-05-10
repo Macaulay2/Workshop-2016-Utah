@@ -28,7 +28,8 @@ export{
 	"isBirationalOntoImage",
 	"nonZeroMinor",
 	"inverseOfMap",
-	"mapOntoImage"
+	"mapOntoImage",
+    "sameMapToPn" -- Dan: maybe we shouldn't export this
 }
 
 ----------------------------------------------------------------
@@ -102,10 +103,9 @@ dimImage(RingMap) := (p) -> (
 baseLocusOfMap = method();
 
 baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
-    --maybe check all the maps in L1 are of the same degree?
+    if numRows L1 > 1 then error "Expected a row matrix";
+    if isSameDegree( first entries L1  )==false then error "Expected a matrix of homogenous elements of the same degree";
 
-    --just need to convert L1 to a basic list, I guess
-    --if isSameDegree(L1)==false then error "Expected a matrix of homogenous elements of the same degree";
     M:= gens ker transpose presentation image L1;
     -- this matrix gives all the "equivalent"
     -- ways to write the map in question (e.g. (xy : xz) is 
@@ -121,7 +121,7 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     saturate fold(L, plus)
     -- these two commands create an ideal for the base 
     -- locus from the information
-    -- given in the matrix above. We take the saturation to get
+    -- given in the submodule above. We take the saturation to get
     -- the biggest ideal that gives the same variety. 
     
 );
@@ -138,6 +138,11 @@ baseLocusOfMap(RingMap) := (ff) ->(
 isRegularMap = method();
 
 isRegularMap(Matrix) := (L1) -> ( --L1 is a row matrix
+    I:= baseLocusOfMap(L1);
+    I == ideal 1_(ring I)
+);
+
+isRegularMap(List) := (L1) -> ( 
     I:= baseLocusOfMap(L1);
     I == ideal 1_(ring I)
 );
@@ -189,7 +194,7 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
  relationType=method();
- --this function computes the "relation tye" of an ideal in a ring R.
+ --this function computes the "relation type" of an ideal in a ring R.
  --Let R be the ring given bythe  ideal a and L be a list of elements in R.
  --the relation type is the biggest degree in terms of new variables in the
  --defining ideal of the rees algebra of I over R. 
@@ -215,7 +220,7 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
      
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  dgi=method();
- --this function compute the degeneration index of an ideal a which is the 
+ --this function computes the degeneration index of an ideal a which is the 
  --number of t linear generators among the generators of a.
  --dgi measures the number of hyperPlanes which cut the variety
  -- defined by a.
@@ -226,11 +231,11 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
      n:=numgens a;
      d:=0;
      for i from 0 to n-1 do (
-	 if (a_i != sub(0, S)) then (
-	     if (degree a_i)=={1} then d=d+1
-	 );
+         if (a_i != sub(0, S)) then (
+             if (degree a_i)=={1} then d=d+1
+         );
      );
-     d);
+ d);
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 isSameDegree=method();
 isSameDegree(BasicList):=(L)->(
@@ -373,7 +378,7 @@ inverseOfMap = method();
 
 --X = Proj R
 --Y = Proj S
---This madfp is given by a list of elements in R, all homogeneous
+--This map is given by a list of elements in R, all homogeneous
 --of the same degree.  
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
@@ -472,6 +477,12 @@ isEmbedding(RingMap) := (f1)->(
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
  
+ sameMapToPn = method(); --checks whether to rational maps to Pn are the same. Assumes domain is irreducible
+
+ sameMapToPn(List, List) := (L1, L2) -> (
+    theRing := ring first L1;
+    rank matrix(frac(theRing), {L1, L2}) == 1
+ );
 
 --****************************************************--
 --*****************Documentation**********************--
@@ -815,18 +826,35 @@ doc ///
 doc ///
     Key
         isRegularMap
+        (isRegularMap, Matrix)
+        (isRegularMap, List)
+        (isRegularMap, RingMap)
+
     Headline
         Checks whether a map to projective space is regular
     Usage
         b = isRegularMap(M)
+        b = isRegularMap(L)
+        b = isRegularMap(f)
     Inputs
         M: Matrix
             Row matrix whose entries correspond to the coordinates of your map to projective space
+        L: List
+            A list whose entries correspond to the coordinates of your map to projective space
+        f: RingMap
+            A ring map corresponding to a map of projective varieties.
     Outputs
         b: Boolean
     Description
         Text
             This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring.
+        Example
+            P5 = QQ[a..f];
+            M = matrix{{a,b,c},{d,e,f}};
+            segreProduct = P5/minors(2, M);
+            blowUpSubvar = segreProduct/ideal(b - d);
+            f = {a, b, c};
+            isRegularMap({a,b,c})
 ///  
 
 doc ///
@@ -996,11 +1024,11 @@ TEST /// --test #14
 TEST /// -- test #15
     -- projection from the blow up of P2 to P2
 
-    P5 = QQ[a..f]
-    M = matrix{{a,b,c},{d,e,f}}
-    segreProduct = P5/minors(2, M)
-    blowUpSubvar = segreProduct/ideal(b - d)
-    f = {a, b, c}
+    P5 = QQ[a..f];
+    M = matrix{{a,b,c},{d,e,f}};
+    segreProduct = P5/minors(2, M);
+    blowUpSubvar = segreProduct/ideal(b - d);
+    f = {a, b, c};
     assert(isRegularMap(matrix{{a,b,c}}) == true)
 ///
 
@@ -1008,11 +1036,11 @@ TEST /// -- test #15
 	----- inverseOfMap  -----------------
 	-------------------------------------
 
+--TEST ///
     -- Let's find the inverse of the projection map from
     -- the blow up of P^2 to P^2
 
     -- the blow up of P^2 is a projective variety in P^5: 
-
 --    P5 = QQ[a..f]
 --    M = matrix{{a,b,c},{d,e,f}}
 --    segreProduct = P5/minors(2, M)
@@ -1021,7 +1049,15 @@ TEST /// -- test #15
 --    assert(isBirationalMap(blowUpSubvar, QQ[x,y,z], f) == true)
 --    assert(inverseOfMap(blowUpSubvar, QQ[x,y,z], f) == map(blowUpSubVar, QQ[x,y,z], {a, b, c}) -- I think?
 --    assert(baseLocusOfMap(inverseOfMap(blowUpSubvar, QQ[x,y,z], f)) == ideal(x,y)) -- I think?
-    
- 
+--///
+
+TEST ///
+    R =  QQ[a..d];
+    I = ideal(a*d - b*c);
+    S = QQ[x,y,z];
+    J = ideal 0_S;
+    f = inverseOfMap(I, J, {a,b,c});
+    assert(sameMapToPn(first entries matrix f, {x^2, x*y, x*z, y*z}))
+/// 
 ----FUTURE PLANS------
 
