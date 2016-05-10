@@ -89,7 +89,7 @@ doc ///
      Headline
         Tries to guess the FPT in a really naive way (this should be improved).
      Usage
-     	  guessFPT(f,e,d) 
+     	 guessFPT(f,e,d) 
      Inputs
      	 f:RingElement
          e:ZZ
@@ -108,11 +108,11 @@ doc ///
      Headline
         Checks whether a given number is an F-jumping number
      Usage
-     	  isFJumpingNumberPoly(t,f,Verbose=>V)  
+     	 isFJumpingNumberPoly(t,f,Verbose=>V)  
      Inputs
-	 	t:QQ
-         	f:RingElement
-		V:Boolean
+         t:QQ
+         f:RingElement
+	 V:Boolean
      Outputs
         :Boolean
      Description
@@ -120,7 +120,6 @@ doc ///
 	     Returns true if t is an F-jumping number, otherwise it returns false.
 ///
 
-{*
 doc ///
      Key
      	isFPTPoly 
@@ -129,7 +128,7 @@ doc ///
         Checks whether a given number is the FPT
      Usage
      	  isFPTPoly(t,f,Verbose=>V,Origin=>W)  
-    Inputs
+     Inputs
  	 	t:QQ
         	f:RingElement
 		V:Boolean
@@ -140,9 +139,7 @@ doc ///
      	Text
 	     Returns true if t is the FPT, otherwise it returns false.  If Origin is true, it only checks it at the homogeneous maximal ideal.
 ///
-
-*} 
-
+ 
 doc ///
      Key
      	 nu
