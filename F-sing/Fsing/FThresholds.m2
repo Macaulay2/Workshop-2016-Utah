@@ -3,12 +3,12 @@
 -- internal functions acted on:     nu*, FTApproxList, FPTApproxList, FTHatApproxList, 
 --     	       	       	       	    isFPTPoly, isFJumpingNumberPoly
 
--- internal functions to do: guessFPT, estFPT
+-- internal functions To DO: guessFPT, estFPT
 
 -- external functions acted on: divideFraction, findNumberBetween, fastExp,
---    	      	      	      	  frobeniusPower, genFrobeniusPower  
+--    	      	      	      	  frobeniusPower, genFrobeniusPower, ethRoot  
 
--- external functions to do: ethRoot*, tau*, sigma*
+-- external functions TO DO: tau*, sigma*
 
 -- TO DO:
 
@@ -215,7 +215,7 @@ nu( ZZ, RingElement ) := ( e, f ) -> nu( e, f, maxIdeal( ring f ) )
 -- isJToAInIToPe checks whether or not J^a is in I^(p^e).
 -- It seems to be much faster than raising J to a power.
 -- Allows tests with ridiculously large exponents
-isJToAInIToPe = ( J, a, I, e ) -> isSubset( ethRoot( J, a, e ), I )
+isJToAInIToPe = ( J, a, I, e ) -> isSubset( ethRoot( e, a, J ), I )
 
 -- binarySearch(I, J, e, int) searches for (nu_I)^J(p^e) in the interval int = {a,b}.
 -- It is assumed that a<=nu<b.
@@ -404,7 +404,7 @@ FPTApproxList ( ZZ, RingElement ) := ( e, f ) -> FPTApproxList( e, ideal(f) )
 --More specifically, this gives a list of nu_I^J(p^d)/p^d for d=1,...,e
 
 FTApproxList = method();
-
+Nontrivial
 FTApproxList ( ZZ, Ideal, Ideal ) := ( e, I, J ) ->
 (
     if not isSubset( I, radical(J) ) then error "F-threshold undefined.";
@@ -603,9 +603,9 @@ isFPTPoly ( QQ, RingElement ) := o -> ( t, f ) ->
 
 	returnValue := false;
 	
-	if ( isSubset(ideal(sub(1, ring f)), ethRootSafe(f, mySigma, myA2, b) )) then (
+	if ( isSubset(ideal(sub(1, ring f)), ethRoot(b, myA2, f , mySigma ) )) then (
 		if (o.Verbose==true) then print "we know t <= FPT";
-		if (not isSubset(ideal(sub(1, ring f)), ethRootSafe(f, myTau, myA, b) ))  then returnValue = true 
+		if (not isSubset(ideal(sub(1, ring f)), ethRoot( b, myA, f, myTau ) ))  then returnValue = true 
 	);
 		
 	returnValue
@@ -624,14 +624,14 @@ isFJumpingNumberPoly ( QQ, RingElement ) := o -> ( t, f ) ->
 	--this writes t = a/(p^b(p^c-1))
 	(a,b,c) := toSequence divideFraction( p, t );
 	mySigma := ideal(f);
-	myTau := ethRoot(tauPoly(f, t*p^b), b);
+	myTau := ethRoot(b, tauPoly(f, t*p^b) );
 	if (o.Verbose==true) then print "higher tau Computed";
 
 	--first we check whether this is even a jumping number.
 	if (c == 0) then
-		mySigma = ethRoot((ideal(f^(a-1)))*((sigmaAOverPEMinus1Poly(f, (p-1), 1))), b)
+		mySigma = ethRoot(b,(ideal(f^(a-1)))*((sigmaAOverPEMinus1Poly(f, (p-1), 1))))
 	else 
-		mySigma = ethRoot((sigmaAOverPEMinus1Poly(f, a, c)),b);
+		mySigma = ethRoot(b,(sigmaAOverPEMinus1Poly(f, a, c)));
 	if (o.Verbose==true) then print "sigma Computed";
 
 	not (isSubset(mySigma, myTau))
