@@ -41,23 +41,23 @@ DebuggingMode => true,
 Reload => true 
 )
 export{
-    "aPower",
+    "aPower", --gone
     "ascendIdeal", -- EthRoots.m2
     "ascendIdealSafe", -- EthRoots.m2
     "ascendIdealSafeList", -- EthRoots.m2
     "AscentCount", -- EthRoots.m2
-    "basePExp",
-    "basePExpMaxE",
+    "basePExp", -- BasicFunctions
+    "basePExpMaxE", --gone
     "BinomialCheck", -- FThresholds.m2
     "binomialFPT", -- FThresholds.m2
     "canonicalIdeal",
-    "canVector", -- FThresholds.m2
-    "carryTest",
-    "digit", 	 
-    "denom",
+    "canVector", -- Basic Functions (now getCanVector)
+    "carryTest",  -- BasicFunctions
+    "digit", 	  -- BasicFunctions
+    "denom",  -- BasicFunctions
     "DiagonalCheck", -- FThresholds.m2
     "diagonalFPT", -- FThresholds.m2
-    "divideFraction",
+    "divideFraction", -- Basic Functions
     "estFPT", -- FThresholds.m2
     "ethRoot", -- EthRoots.m2
     "ethRootSafe", -- EthRoots.m2
@@ -73,18 +73,18 @@ export{
     "findAllCompatibleIdeals", 	--- MK
     "findQGorGen", -- testIdeals
     "finduOfIdeal",
-    "firstCarry", 
+    "firstCarry", -- Basic Functions
     "FPTApproxList", -- FThresholds.m2    
     "FPT2VarHomog", -- FThresholds.m2    
     "FPT2VarHomogInternal", -- FThresholds.m2
-    "fracPart",
+    "fracPart", -- Basic Functions
     "frobenius", --Other
     "frobeniusPower",  --frobeniousPowers.m2 
     "fSig", -- Other
     "FTApproxList",  -- FThresholds.m2
     "FTHatApproxList",  -- FThresholds.m2
     "FullMap",--specifies whether the full data should be returned
-    "getNumAndDenom",
+    "getNumAndDenom", --Basic Functions
     "genFrobeniusPower",   --frobeniousPowers.m2 
     "guessFPT",  -- FThresholds.m2
     "HSL", --Other
@@ -107,7 +107,7 @@ export{
     "maxIdeal", -- BasicFunctions
     "minimalCompatible", -- EthRoots.m2 
 ---    "Mstar",			--- MK
-    "multOrder",
+    "multOrder", -- Basic Functions
     "MultiThread", --FThresholds
     "nonFInjectiveLocus",   --MK
     "Nontrivial", --SpecialFThresholds
@@ -119,7 +119,7 @@ export{
     "nuList", -- FThresholds.m2
     "nuListAlt", -- FThresholds.m2
     "nuListAlt1", -- FThresholds.m2
-    "num",
+    "num", --Basic functions
     "Origin", --FThresholds
     "OutputRange", -- FThresholds
     "paraTestModule",
@@ -137,8 +137,8 @@ export{
     "tauGorAmb",--needs optimization --testIdeals
     "tauQGor",--needs optimization -- testIdeals
     "tauQGorAmb",--needs optimization -- testIdeals
-    "taxicabNorm",  -- FThresholds.m2
-    "truncation",
+    "taxicabNorm",  -- Basic Functions
+    "truncation", -- Basic Functions (now truncatedBasePExp)
     "truncationBaseP"
 }
 --This file has "finished" functions from the Macaulay2 workshop at Wake 

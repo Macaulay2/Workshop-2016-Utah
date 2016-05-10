@@ -47,12 +47,22 @@ Reload => true
 
 export{
 --IntegerComputations (IntegerComps.m2)
-    "floorlog",
-    "multOrder",
-    "taxicabNorm",
+    "carryTest",  
+    "basePExp",    
+    "digit", 	   
+    "denom",   
     "divideFraction",
+    "firstCarry", 
+    "floorlog",
+    "fracPart", 
     "getCanVector",
-
+    "getNumAndDenom", 
+    "maxIdeal", 
+    "multOrder",
+    "num",
+    "taxicabNorm",
+    "truncatedBasePExp",
+    
 --ethRootFunctions (EthRoots.m2)
     "ascendIdeal", 
     "ascendIdealSafe",
