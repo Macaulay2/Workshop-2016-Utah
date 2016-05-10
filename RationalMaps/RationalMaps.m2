@@ -590,12 +590,12 @@ doc ///
                 Text
                         Gives the dimension of the image of a rational map. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these
                 Example
-                        S = QQ[x,y,z]
-                        a = ideal(x^2+y^2+z^2)
-                        T = QQ[u,v]
-                        b = ideal(u^2+v^2)
-                        f = matrix{{x*y,y*z}}
-                        dimImage(a,b,f)
+                        S = QQ[x,y,z,w];
+			b = ideal(x*y-z*w);
+			R = QQ[u,v];
+			a = ideal(sub(0,R));
+			f = matrix {{u,0,v,0}};
+			dimImage(a,b,f)
 ///
 
 
@@ -834,33 +834,30 @@ TEST /// --test #4
 	------ Tests for dimImage -----------
 	-------------------------------------
 
-	S = QQ[x,y,z];
-        a = ideal(x^2+y^2+z^2);
-        T = QQ[u,v];
-        f = map(S, T, {x*y,y*z});
-        d = dimImage(f);
-        assert(d == 1)
+	S = QQ[x,y,z,w];
+	b = ideal(x*y-z*w);
+	R = QQ[u,v];
+	a = ideal(sub(0,R));
+	f = matrix {{u,0,v,0}};
+	d = dimImage(a,b,f);
+	assert (d == 1)
 ///
 
 TEST /// --test #5
-        S = QQ[x0,x1]
-        a = ideal(0*x0)
-        T = QQ[y0,y1,y2]
-        b = ideal(0*y1)
-        f = matrix{{x0^4,x0^2*x1^2,x1^4}}
-        d = dimImage(a,b,f)
+        S = QQ[x0,x1];
+        T = QQ[y0,y1,y2];
+        f = map(S,T,{x0^4,x0^2*x1^2,x1^4});
+        d = dimImage(f);
         assert(d == 1)	
 ///
 
 TEST /// --test #6
     -- Since in Projective Space, check to make sure different representations give the same result
-    S = QQ[x,y]
-    a = ideal(0*x)
-    T = QQ[u,v]
-    b = ideal(0*v)
-    f1 = matrix{{x,y}}
-    f2 = matrix{{x^3*y^2,x^2*y^3}}
-    assert(dimImage(a,b,f1)==dimImage(a,b,f2))
+    S = QQ[x,y];
+    T = QQ[u,v];
+    f1 = map(S,T,{x,y});
+    f2 = map(S,T,{x^3*y^2,x^2*y^3});
+    assert(dimImage(f1)==dimImage(f2))
 ///
 
 
@@ -883,10 +880,13 @@ TEST ///	--test #8
 
 TEST /// --test #9
 	-- reducible source
+
 	R = QQ[x,y,z]/(x*y)
 	M = matrix{{x^2, x*y, y^2}}
 	I = ideal(x,y)
 	assert(I == baseLocusOfMap(M))
+
+    -- we should have a test for when that kernel is not a cyclic module
 ///
 
 
@@ -918,12 +918,41 @@ TEST /// --test #13
         assert(isRegularMap(h) == false)      
 ///
 
+TEST /// --test #14
+        R=QQ[x,y,z];
+        S=QQ[a,b,c];
+        h = map(R,S,{y*z,x*z,x*y});
+        assert(isRegularMap(h) == false
+///
+
+TEST /// -- test #15
+    -- projection from the blow up of P2 to P2
+
+    P5 = QQ[a..f]
+    M = matrix{{a,b,c},{d,e,f}}
+    segreProduct = P5/minors(2, M)
+    blowUpSubvar = segreProduct/ideal(b - d)
+    f = {a, b, c}
+    assert(isRegularMap(matrix{{a,b,c}}) == true)
+///
+
 	-------------------------------------
 	----- inverseOfMap  -----------------
 	-------------------------------------
 
+    -- Let's find the inverse of the projection map from
+    -- the blow up of P^2 to P^2
 
+    -- the blow up of P^2 is a projective variety in P^5: 
 
+--    P5 = QQ[a..f]
+--    M = matrix{{a,b,c},{d,e,f}}
+--    segreProduct = P5/minors(2, M)
+--    blowUpSubvar = segreProduct/ideal(b - d)
+--    f = {a, b, c}
+--    assert(isBirationalMap(blowUpSubvar, QQ[x,y,z], f) == true)
+--    assert(inverseOfMap(blowUpSubvar, QQ[x,y,z], f) == map(blowUpSubVar, QQ[x,y,z], {a, b, c}) -- I think?
+--    assert(baseLocusOfMap(inverseOfMap(blowUpSubvar, QQ[x,y,z], f)) == ideal(x,y)) -- I think?
     
  
 ----FUTURE PLANS------
