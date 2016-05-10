@@ -326,6 +326,7 @@ flatten nzlist);
   
   
   
+  
 inverseOfMap = method();
 
 --this checks whether a map X -> Y is birational.
