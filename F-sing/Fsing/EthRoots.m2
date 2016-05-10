@@ -15,7 +15,7 @@
 
 -- fancyEthRoot (I,m,e) -> (e, m, I)
 
--- EXTERNAL: basePExpMaxE
+-- EXTERNAL: basePExp
 
 --*************************************************
 --*************************************************
@@ -154,7 +154,7 @@ ethRootSafe( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> (
 	aRem := a%(p^e);
 	aQuot := floor(a/p^e);
 	
-	expOfA := basePExp(p,e,aRem); --this gives "a base p", with the left-most term the smallest "endian".
+	expOfA := basePExp(p,aRem); --this gives digits of aRem base p as a list, left-endian first 
 	
 	IN1 := I;
 	
@@ -184,7 +184,7 @@ ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
         aListRem := aList % p^e;
         aListQuot := aList // p^e;
         
-        expOfaList := apply(aListRem, z -> basePExp( p, e, z ) );
+        expOfaList := apply(aListRem, z -> basePExp( p, z ) );
         
         aPowerList := apply(elmtList, expOfaList, (f, z) -> f^(z#0));
         
