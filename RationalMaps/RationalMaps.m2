@@ -564,7 +564,7 @@ doc ///
                         true if the map is birational, false if otherwise
         Description
                 Text   
-                        This checks whether $f : X \to Y$ is birational onto its image.  For instance
+                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image.
                 Example
                         R=QQ[x,y,z];
                         S=QQ[a,b,c];
