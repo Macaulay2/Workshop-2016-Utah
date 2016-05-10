@@ -5,7 +5,7 @@ Authors => {
      {Name => "Erin Bela",
      Email=> "ebela@nd.edu"
      },
-     {Name => "DJ Bruce",
+     {Name => "David J. Bruce",
      Email => "djbruce@math.wisc.edu",
      HomePage => "http://www.math.wisc.edu/~djbruce/"
      },
@@ -47,7 +47,7 @@ AuxiliaryFiles=>true
 --- *** Reorganized by subpackages, so we know where to find stuff *** PT
 
 export{
---IntegerComputations (IntegerComps.m2)
+--BasicFunctions (BasicFunctions.m2)
     "carryTest",  
     "basePExp",    
     "digit", 	   

@@ -60,6 +60,7 @@ export {
   "gamma",
   "factorWitnessSet",
   "interactive",
+  "intermediateSolutions",
   "isCoordinateZero",
   "isWitnessSetMember",
   "loadSettingsPath",
@@ -169,16 +170,20 @@ parseSolutions (String,Ring) := o -> (s,R) -> (
   --      carrying also other diagnostic information about each.
   oldprec := defaultPrecision;
   defaultPrecision = o.Bits;
-  L := get s;
-  L = replace("([[:alnum:]]+) *=", ///"\1"=>///,  L);
+  L := get s; 
+  L = replace("=", "=>", L);
   L = replace("I", "ii", L);
   L = replace("E\\+","e",L);
   L = replace("E", "e", L);
-  L = replace(///"multiplicity"///, ///"mult"///, L); 
-  L = replace(///"res"///, ///"residual"///, L);
+  L = replace("time", "\"time\"", L);
+  L = replace("rco", "\"rco\"", L);
+  L = replace("multiplicity", "\"mult\"", L); 
+  L = replace("\\bres\\b", "\"residual\"", L);
+  L = replace("\\bresolution\\b", "\"residual\"", L);
+  -- because M2 automatically thinks "res"=resolution   	  
   sols := toList apply(value L, sol->new HashTable from toList sol);
   defaultPrecision = oldprec;
-  apply(sols, sol->point( {apply(gens R, v->sol#(toString v))} | outputToPoint sol ))
+  apply(sols, sol->point( {apply(gens R, v->sol#v)} | outputToPoint sol ))
 )
 
 -------------------------------------
@@ -581,7 +586,8 @@ witnessSuperSetsFilter (MutableList,List) := (witsets,pts) -> (
 -- CASCADE  --
 --------------
 
-cascade = method(TypicalValue => NumericalVariety, Options => {StartDimension => -1,Verbose => false})
+cascade = method(TypicalValue => NumericalVariety, 
+  Options => {StartDimension => -1,Verbose => false})
 cascade (List) := o -> (system) -> (
   -- IN: system, a polynomial system;
   --     dimension, top dimension of the solution set.
@@ -596,15 +602,18 @@ cascade (List) := o -> (system) -> (
   
   if # system > numgens R then error "the system is overdetermined";
     
-  if o.StartDimension==-1 then startdim:=(numgens R)-1
-    else startdim=o.StartDimension;  
+  if o.StartDimension==-1
+   then startdim := (numgens R)-1
+   else startdim = o.StartDimension;  
     
   PHCinputFile := temporaryFileName() | "PHCinput";
   PHCoutputFile := temporaryFileName() | "PHCoutput";
   PHCbatchFile := temporaryFileName() | "PHCbatch";
   PHCsolsFile := temporaryFileName() | "PHCsols";
   PHCsessionFile := temporaryFileName() | "PHCsession";
-  for f in {PHCinputFile, PHCoutputFile, PHCbatchFile, PHCsolsFile, PHCsessionFile} do if fileExists f then removeFile f;
+  for f in
+    {PHCinputFile, PHCoutputFile, PHCbatchFile, PHCsolsFile, PHCsessionFile} do
+      if fileExists f then removeFile f;
   toList (0..startdim) / (i->if fileExists (PHCoutputFile | "_sw" | i) 
        then removeFile (PHCoutputFile | "_sw" | i) );
   if o.Verbose then
@@ -1259,7 +1268,7 @@ topWitnessSet (List,ZZ) := o->(system,dimension) -> (
 -- TRACK PATHS --
 -----------------
 
-trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false, interactive => false, saveSettingsPath => "", loadSettingsPath => ""})
+trackPaths = method(TypicalValue => List, Options=>{gamma=>0, tDegree=>2, Verbose => false, numThreads=>0, seeProgress=>false, interactive => false, saveSettingsPath => "", loadSettingsPath => "", intermediateSolutions => false})
 trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   -- IN: T, target system to be solved;
   --     S, start system with solutions in Ssols;
@@ -1315,9 +1324,14 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
     );
     optionFileLines := lines get o.loadSettingsPath;
     for i from 0 to #optionFileLines - 1 do (
-      bat << optionFileLines#i << endl;
+        if  o.intermediateSolutions == true and i == #optionFileLines-1 then (
+            bat << "2" << endl;
+        ) else (
+            bat << optionFileLines#i << endl;
+      )
     );
     close bat;
+    << batchfile << endl;
     run(PHCexe|" -p "|(if o.numThreads > 1 then 
        ("-t"|o.numThreads) else "")|"<"|batchfile|" >phc_session.log");
     run(PHCexe|" -z "|outfile|" "|Tsolsfile);
@@ -1347,7 +1361,11 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
     -- second menu 
     bat << "0" << endl; -- exit for now
     -- third menu
-    bat << "0" << endl; -- exit for now
+    if o.intermediateSolutions then (
+        bat << "2" << endl;
+    ) else (
+        bat << "0" << endl; -- exit for now
+    );
     -- fourth menu
     bat << "0" << endl; -- exit for now
     close bat;
@@ -1376,6 +1394,9 @@ trackPaths (List,List,List) := List => o -> (T,S,Ssols) -> (
   
   );
   -- parse and output the solutions
+  if o.intermediateSolutions then (
+      return parseIntermediateSolutions(outfile,R);
+  );
   result := parseSolutions(Tsolsfile, R);
   if n > numgens R then (
     result = apply(result, s->(

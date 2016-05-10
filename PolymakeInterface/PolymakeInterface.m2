@@ -1,7 +1,7 @@
 newPackage(
 	"PolymakeInterface",
-    	Version => "0.4", 
-    	Date => "May 7, 2016",
+    	Version => "0.40", 
+    	Date => "May 10, 2016",
     	Authors => {{Name => "Josephine Yu", 
 		     Email => "josephine.yu@math.gatech.edu", 
 		     HomePage => "http://people.math.gatech.edu/~jyu67"},
@@ -171,6 +171,11 @@ propertyTypes = {
 	  "PolymakePropertyName" => "INTERIOR_LATTICE_POINTS",
 	  "ValueType" => "Matrix"
 	  },
+     {    
+	  "M2PropertyName" => "LatticePoints",
+	  "PolymakePropertyName" => "LATTICE_POINTS",
+	  "ValueType" => "Matrix"
+	  },      
      {    
 	  "M2PropertyName" => "LatticePointsGenerators",
 	  "PolymakePropertyName" => "LATTICE_POINTS_GENERATORS",
@@ -463,6 +468,9 @@ writePolymakeFile(Cone) := (C) -> (
 ---------------------------------------------------------------------------
 ----- Run Polymake with PolyhedralObject
 
+
+
+
 runPolymake(PolyhedralObject,String) := o -> (P,propertyName) -> (
      if (not(M2PropertyNameToPolymakePropertyName#?propertyName)) then (
 	  error ("Property does not exist:"|propertyName)
@@ -479,7 +487,7 @@ runPolymake(PolyhedralObject,String) := o -> (P,propertyName) -> (
 	       else if (not(isSubset(getParsedPropertyNames(P),getCachedPropertyNames(P)))) then (
 		    parseAllAvailableProperties(P);
 		    P#cache#"PolymakeFile" = writePolymakeFile(P);
-		    );
+		    );		
                script := "use application \"polytope\";
                     my $object = load(\""|(P#cache#"PolymakeFile")|"\");
 	            $object->"|polymakePropertyName|";
@@ -491,7 +499,11 @@ runPolymake(PolyhedralObject,String) := o -> (P,propertyName) -> (
                propertiesString := runPolymake(script);
                propertiesList := lines propertiesString;
                P#cache#"AvailableProperties" = new Set from propertiesList;
+	       if member(propertyName,{"AmbientDim","LinearSpan","LatticePoints"}) then ( 
+		   if o#"ParseAllProperties" then parseAllAvailableProperties(P);
+		   return runPolymakeExceptions(P,polymakePropertyName)
 	       );
+	  );
 	  if (o#"ParseAllProperties") then (
 	       parseAllAvailableProperties(P);
 	       );
@@ -499,7 +511,21 @@ runPolymake(PolyhedralObject,String) := o -> (P,propertyName) -> (
 	  )
      )
  
- 
+-- For some properties, it seems that polymake does not save them in the file 
+-- If we get here: then the propertyName is in {"AmbientDim","LinearSpan","LatticePoints"}
+-- P has a cache and a PolymakeFile already
+-- Write a script to print the property.  Then parse the polymake output
+runPolymakeExceptions = (P,polymakePropertyName) -> (
+    if polymakePropertyName == "AMBIENT_DIM" then (
+	return parseScalarProperty(P,"AMBIENT_DIM")
+    );
+    if polymakePropertyName == "LINEAR_SPAN" then (
+	return parseMatrixProperty(P,"LINEAR_SPAN")
+    );
+    if polymakePropertyName == "LATTICE_POINTS" then (
+	return parseMatrixProperty(P,"LATTICE_POINTS")
+    );	           
+); 
 ------------------------------------------------------------------------------
 -- Run any binary operation in polymake on two PolyhedralObjects
 ------------------------------------------------------------------------------
@@ -509,9 +535,7 @@ runPolymake(PolyhedralObject,PolyhedralObject,String):= o ->(P,Q,binaryOperation
     writePolymakeFile(Q);   
     fn:=temporaryFileName()|currentTime()|".poly";
     script:="";
-    if o#"BinaryOperationOutputType"===Boolean then (
-        writePolymakeFile(P);
-        writePolymakeFile(Q);        
+    if o#"BinaryOperationOutputType"===Boolean then (      
         script="use application \"polytope\";
                  my $P = load(\""|P.cache#"PolymakeFile"|"\");
                  my $Q = load(\""|Q.cache#"PolymakeFile"|"\");
@@ -539,6 +563,7 @@ runPolymake(PolyhedralObject,PolyhedralObject,String):= o ->(P,Q,binaryOperation
     R
 ); 
 
+
 ---------------------------------------------------------------------------
 -----------------------DOCUMENTATION----------------------
 ---------------------------------------------------------------------------
@@ -555,13 +580,13 @@ doc ///
      {\tt polymake} is a software for convex polyhedra, simplicial complexes, and other discrete geometric objects, written by Ewgenij Gawrilow and Michael Joswig.  It is available at @HREF "http://www.math.tu-berlin.de/polymake/"@. The user should have {\tt polymake} installed on their machine.
 
    Text 
-     Warning: this package is still under development. So it may not function properly on some machines. Use it in your one-time scripts only.
+     Warning: this package is still under development. It may not function properly on some machines. Use it at your own risk.
 
    Text
      The current polymake interface assumes that you can run the command {\tt polymake [script_file]} in the terminal to run a polymake script. To check if this works, just type {\tt polymake} in a terminal window. However, this does not work on some Mac machines. If you have this problem, see @HREF "https://github.com/Macaulay2/Workshop-2016-Utah/wiki/Running-polymake-on-a-Mac"@.
 
    Text
-     We can use the interface to get properties of @TO "PolyhedralObjects"@.  Here is a list of @TO "Available properties"@.
+     We can use the interface to get properties of a @TO "PolyhedralObjects::PolyhedralObject"@.  Here is a list of @TO "Available properties"@.
 
    Example
      --needsPackage "PolyhedralObjects";
@@ -609,6 +634,8 @@ doc ///
     Available properties
   Description
    Text 
+     The following PolyhedralObject output properties are available and have been tested: 
+   
      "AffineHull"
      
      "AmbientDim"
@@ -623,8 +650,6 @@ doc ///
      
      "EhrhartPolynomialCoeff"
      
-     "Equations"
-     
      "Facets"
      
      "Feasible"
@@ -633,14 +658,10 @@ doc ///
      
      "HilbertBasis"
      
-     "Inequalities"
-     
-     "InputLineality"
-     
-     "InputRays"
-     
      "InteriorLatticePoints"
-     
+
+     "LatticePoints"
+          
      "LatticePointsGenerators"
      
      "LatticeVolume"
@@ -648,30 +669,26 @@ doc ///
      "LinealitySpace"
      
      "LinearSpan"
-     
-     "Points"
-     
+    
      "Rays"
      
      "Vertices"
      
-     Here are some of the binary operations available in polymake:
-     
+     The following binary operations in polymake have been tested:
+
+     "conv" (compute the convex hull of two polyhedra)
+          
      "equal_polyhedra"
      
      "included_polyhedra"
      
-     "join_polytopes"
+     "intersection"
      
      "minkowski_sum"
      
      "product"
      
-     "intersection"
-     
-     "conv" (compute the convex hull of two polyhedra)
-     
-     For more binary operations, see the polymake documentation at @HREF "https://polymake.org/release_docs/3.0/polytope.html"@
+     For more binary operations, see the polymake documentation at @HREF "https://polymake.org/release_docs/3.0/polytope.html"@  However these are untested; use at your own risk.  
 ///
 
 doc ///
@@ -713,7 +730,7 @@ doc ///
             Q = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,0,1}}}
 	    R = runPolymake(P,Q,"minkowski_sum")
 	Text
-	    When Polymake computes a property of a polyhedral object, it may compute other properties in the process. If the "ParseAllProperties" option is set {\tt true}, then all properties that is computed in the process are parsed into M2 format. Otherwise, only the needed property is parsed, and the other properties are stored in a temporary file in Polymake format.
+	    When Polymake computes a property of a polyhedral object, it may compute other properties in the process. If the "ParseAllProperties" option is set {\tt true}, then all properties that are computed in the process are parsed into M2 format. Otherwise, only the needed property is parsed, and the other properties are stored in a temporary file in Polymake format.
 	Example
 	    --needsPackage "PolyhedralObjects";
             P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,1},{1,1,0},{1,1,1}}};
@@ -826,7 +843,7 @@ doc ///
         optional parameter for runPolymake
     Description
         Text
-	    When Polymake computes a property of a polyhedral object, it may compute other properties in the process. If the "ParseAllProperties" option is set {\tt true}, then all properties that is computed in the process are parsed into M2 format. Otherwise, only the needed property is parsed, and the other properties are stored in a temporary file in Polymake format.
+	    When Polymake computes a property of a polyhedral object, it may compute other properties in the process. If the "ParseAllProperties" option is set {\tt true}, then all properties that are computed in the process are parsed into M2 format. Otherwise, only the needed property is parsed, and the other properties are stored in a temporary file in Polymake format.
 	Example
 	    --needsPackage "PolyhedralObjects";
             P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,1},{1,1,0},{1,1,1}}};
@@ -851,7 +868,10 @@ TEST ///
     assert(t=={4,4});
 ///
 
+-----------------------------------
 -- Test runPolymake(P,propertyName)
+-----------------------------------
+
 -- The tests are in alphabetic order by propertyName
 
 -- Test "AffineHull"
@@ -863,17 +883,13 @@ TEST ///
 ///
 
 -- Test "AmbientDim"
--- Currently not working (May 9, 2016)
--- Issue: polymake doesn't save it to the file
--- Proposed fix: use the script to print it instead
--- Fix later
-{*TEST ///
+TEST ///
     P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,1},{1,1,0},{1,1,1}}};
     result = runPolymake(P,"AmbientDim");
-    assert(result== );
     assert(class(result)===ZZ);
+    assert(result== 2);
 ///
-*}
+
 
 -- Test "BoundaryLatticePoints"
 TEST ///
@@ -962,15 +978,10 @@ TEST ///
 ///
 
 -- Test "HilbertBasis"
--- Either not working, or I don't know how to use it, or both
--- Investigate later
-{*TEST ///
-    C = new Cone from {"Inequalities" => matrix{{0,1,0},{0,0,1},{0,4,-1}}};
-    result = runPolymake(C,"HilbertBasis");
-    assert(result=={4,4});
-    assert(class(result)===List);
-///
-*}
+--TEST ///
+--
+--///
+
 
 -- Test "Inequalities"
 -- Note: INEQUALITIES is an input property only
@@ -984,57 +995,169 @@ TEST ///
 ///
 
 -- Test "InputLineality"
--- I don't know what this is (Dave Swinarski)
--- Investigate later
 --TEST ///
 --
 --///
 
 -- Test "InputRays"
--- I don't know how to use this (Dave Swinarski)
--- Investigate later 
+--TEST ///
+--
+--///
+
+-- Test "InteriorLatticePoints"
+TEST ///
+    P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,3},{1,3,0},{1,3,3}}};
+    result = runPolymake(P,"InteriorLatticePoints");
+    assert(class(result)===Matrix);
+    L1 = set entries substitute(result,ZZ);
+    L2 = set {{1, 1, 1}, {1, 1, 2}, {1, 2, 1}, {1, 2, 2}};
+    assert(L1 === L2);
+///
+
+-- Test "LatticePoints"
+TEST ///
+    P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,2},{1,2,0},{1,2,2}}};
+    result = runPolymake(P,"LatticePoints");
+    assert(class(result)===Matrix);
+    L1 = set entries substitute(result,ZZ);
+    L2 = set {{1, 0, 0}, {1, 0, 1}, {1, 0, 2}, {1, 1, 0}, {1, 1, 1}, {1, 1, 2}, {1, 2, 0}, {1, 2, 1}, {1, 2, 2}};
+    assert(L1 === L2);
+///
+
+-- Test "LatticePointsGenerators"
+TEST ///
+    P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,2},{1,2,0},{1,2,2}}};
+    result=runPolymake(P,"LatticePointsGenerators");
+    assert( class(result) === List);
+    assert( #result === 3);
+    assert( result_0 ==
+matrix {{1/1, 0, 0}, {1, 0, 1}, {1, 0, 2}, {1, 1, 0}, {1, 1, 1}, {1, 1, 2}, {1, 2, 0}, {1, 2, 1}, {1, 2, 2}})
+    assert( (result_1)(P) == map(QQ^0,QQ^3,0))    
+    assert( (result_2)(P) == map(QQ^0,QQ^3,0))    
+///
+
+-- Test "LatticeVolume"
+TEST ///
+    P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,3},{1,3,0},{1,3,3}}};
+    result=runPolymake(P,"LatticeVolume");
+    assert( class(result) === ZZ);
+    assert( result === 18);
+///
+
+-- Test "LinealitySpace"
 --TEST ///
 --
 --///
 
 
+-- Test "LinearSpan"
 TEST ///
-    --needsPackage "PolyhedralObjects";
-    P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,2},{1,2,0},{1,2,2}}};
-    LPG=runPolymake(P,"LatticePointsGenerators");
-    assert( LPG_0 ==
-matrix {{1/1, 0, 0}, {1, 0, 1}, {1, 0, 2}, {1, 1, 0}, {1, 1, 1}, {1, 1, 2}, {1, 2, 0}, {1, 2, 1}, {1, 2, 2}})
-    assert( LPG_1(P) == map(QQ^0,QQ^3,0))    
-    assert( LPG_2(P) == map(QQ^0,QQ^3,0))    
+    P = new Polyhedron from {"Points" => matrix{{1,0,0,0},{1,1,0,0},{1,0,1,0},{1,1,1,0}}};
+    result=runPolymake(P,"LinearSpan");
+    assert(class(result)===Matrix);
+    assert(result === map((QQ)^1,(QQ)^4,{{0, 0, 0, 1}}));
 ///
 
 
--- Alphabetized up to here
+-- Test "Points" and Vertices
+-- Note: Points is an input property only
+TEST ///
+    P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,2},{1,2,0},{1,2,2},{1,1,1}}};
+    result=runPolymake(P,"Vertices");
+    assert( class(result) === Matrix);
+    L1=set entries substitute(result,ZZ);
+    L2=set {{1,0,0},{1,0,2},{1,2,0},{1,2,2}};
+    assert( L1===L2);
+///
 
+-- Test "Rays"
+--TEST ///
+--
+--///
 
+-- Test "Vertices"
+-- See test of Points above
 
+-------------------------
 -- Test binary operations
+-------------------------
+
+-- Test "conv"
 TEST ///
     P = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,1,0}}};
     Q = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,0,1}}};
-    R = runPolymake(P,Q,"minkowski_sum","ParseAllProperties"=>true);
-    L1 = set(entries R#"Points");
-    L2 = {{1,0,0},{1,0,1},{1,1,0},{1,1,1}};    
-    L2 = set(apply(L2, i -> (1/1)*i))
-    assert(L1===L2)
+    result = runPolymake(P,Q,"conv","ParseAllProperties"=>true);
+    assert(class(result)===Polyhedron);
+    L1 = set entries substitute(result#"Points",ZZ);
+    L2 = set {{1,0,0},{1,0,1},{1,1,0}};    
+    assert(L1===L2);
 ///
 
 
+-- Test "equal_polyhedra"
+TEST ///
+    P = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,1,0},{1,2,0}}};
+    Q = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,2,0}}};
+    result = runPolymake(P,Q,"equal_polyhedra","BinaryOperationOutputType"=>Boolean);
+    assert(class(result)===Boolean);
+    assert(result===true);
+    R = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,1,0}}};
+    result = runPolymake(P,R,"equal_polyhedra","BinaryOperationOutputType"=>Boolean);
+    assert(class(result)===Boolean);
+    assert(result===false);
+///
 
 
+-- Test "included_polyhedra"
+TEST ///
+    P = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,1,0}}};
+    Q = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,2,0}}};
+    result = runPolymake(P,Q,"included_polyhedra","BinaryOperationOutputType"=>Boolean);
+    assert(class(result)===Boolean);
+    assert(result===true);
+    R = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,-1,0}}};
+    result = runPolymake(P,R,"equal_polyhedra","BinaryOperationOutputType"=>Boolean);
+    assert(class(result)===Boolean);
+    assert(result===false);
+///
+
+-- Test "intersection"
+TEST ///
+    P = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,1,0},{1,0,1},{1,1,1}}};
+    Q = new Polyhedron from {"Points"=> matrix {{1,1,0},{1,1,1},{1,2,0},{1,2,1}}};
+    result = runPolymake(P,Q,"intersection","ParseAllProperties"=>true);
+    assert(class(result)===Polyhedron);
+    result = runPolymake(result,"Vertices");
+    L1 = set entries substitute(result,ZZ);
+    L2 = set {{1,1,0},{1,1,1}};    
+    assert(L1===L2);
+///
+
+-- Test "minkowski_sum"
+TEST ///
+    P = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,1,0}}};
+    Q = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,0,1}}};
+    result = runPolymake(P,Q,"minkowski_sum","ParseAllProperties"=>true);
+    L1 = set entries substitute(result#"Points",ZZ);
+    L2 = set {{1,0,0},{1,0,1},{1,1,0},{1,1,1}};    
+    assert(L1===L2);
+///
+
+-- Test "product"
+TEST ///
+    P = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,1,0}}};
+    Q = new Polyhedron from {"Points"=> matrix {{1,0,0},{1,1,0}}};
+    result = runPolymake(P,Q,"product","ParseAllProperties"=>true);
+    L1 = set entries substitute(result#"Vertices",ZZ);
+    L2 = set {{1, 0, 0, 0, 0}, {1, 0, 0, 1, 0}, {1, 1, 0, 0, 0}, {1, 1, 0, 1, 0}};    
+    assert(L1===L2);
+///
 
 
+----------------------------
+-- More interesting tests
+----------------------------
 
-
-
-
-
--- Test multiple properties
 TEST ///
     --needsPackage "PolyhedralObjects";
     P = new Polyhedron from {"Points" => matrix{{1,0,0},{1,0,1},{1,1,0},{1,1,1}}};
@@ -1260,7 +1383,7 @@ viewHelp PolymakeInterface
 ------------------------- TO DO ---------------------------
 ---------------------------------------------------------------------------
 
-{* Version 0.3
+{* Version 0.3 To do list
 -- There is 1 known bug
 -- Need to handle error from Polymake
 -- Add new properties to the table
@@ -1269,10 +1392,19 @@ viewHelp PolymakeInterface
 -- Documentation
 *}
 
-{* Version 0.4:
-Fix AmbientDim
-Fix HilbertBasis
-Make a test for InputLineality
-Make a test for InputRays
+{* Version 0.4 To do list:
+Add function to get faces of a specified dimension
+Add function to get a triangulation of a polytope 
+
+Many properties above are only tested on a bounded polytope.  
+Where appropriate, add an example of an unbounded polytope to the test.  
+
+The following properties for unbounded polyhedra are not tested at all yet:
+  HilbertBasis
+  InputLineality
+  InputRays
+  LinealitySpace
+
+Add functions and tests for other kinds of PolyhedralObjects (Cone, Fan, etc.)
 
 *}
