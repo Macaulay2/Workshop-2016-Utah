@@ -108,9 +108,7 @@ bettiTableIlambda(ZZ,ZZ,ZZ,List) := (n,m,p,lam) -> (
     J := ideal lis;
     I := ideal mingens J;
     if (numgens I != e*d) then error"wrong number of generators"
-    else betti res I --needs to be replaced by next two lines
-    --else F:= res(I, FastNonminimal => true);
-   -- betti(F, Minimize => true)
+    else (F:= res(module I, FastNonminimal => true);betti(F, Minimize => true))
     )
 
 bettiTableIlambda(ZZ,ZZ,List) := (n,m,lam) -> (
@@ -191,8 +189,8 @@ doc ///
       Text
         This package implements basic functionality for the representation theory of
 	the general linear Lie superalgebra {\tt gl(m|n)}. We compute characters of irreducible 
-	{\tt gl(m|n)}-modules, as well as those of Kac modules. As an application, we pursue the
-	problem of describing the syzygies of thickenings of determinantal ideals.
+	{\tt gl(m|n)}-modules, as well as those of Kac modules. As an application, we investigate
+	the syzygies of some thickenings of determinantal ideals.
 --    Caveat
 --       It's far from completed
 ///
@@ -248,7 +246,7 @@ doc ///
 	(makeLinearComplexLGenericlambda,ZZ,ZZ,List)
 	(makeLinearComplexLGenericlambda,ZZ,ZZ,List,PolynomialRing)
     Headline
-    	The linear complex associated via the BGG correspondence to a simple gl(m|n)-module
+    	The linear complex associated via the BGG correspondence to a (generic) simple gl(m|n)-module
     Usage
     	C = makeLinearComplexLGenericlambda(m,n,lambda,S)
     Inputs
@@ -421,3 +419,8 @@ dimLlamd(3,3,{3,1},5)
 --F = resolution I
 F = res(I, FastNonminimal => true)
 betti(F, Minimize => true)
+
+--TODO
+--list the composition factors of K_lambda
+--construct conjectural Betti table for I_lambda
+--construct the linear complex corresponding to L_lambda for arbitrary lambda
