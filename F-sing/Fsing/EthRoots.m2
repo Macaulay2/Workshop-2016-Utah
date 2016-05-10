@@ -2,7 +2,8 @@
 
 -- INTERNAL: 
 
--- ethRoot: (I,e) -> (e,I), (f, I, a, e) -> (e,a,f,I), (Matrix, ZZ) -> (ZZ, Matrix)
+-- ethRoot: (I,e) -> (e,I), (f, I, a, e) -> (e,a,f,I), (f, I, a, e) -> (e,a,f,I), (Matrix, ZZ) -> (ZZ, Matrix), 
+--    	    (Ideal, ZZ, ZZ),  (I,m,e) -> ( e, m, I ) 
 
 -- eR: gone
 
@@ -11,6 +12,8 @@
 -- ethRootSafeList: (fList,I,aList,e) -> (e,aList,fList,I), (fList,aList,e) -> (e,aList,fList)
 
 -- mEthRoot, mEthRootOneElement: (A,e) -> (e,A)
+
+-- fancyEthRoot (I,m,e) -> (e, m, I)
 
 -- EXTERNAL: basePExpMaxE
 
@@ -64,11 +67,15 @@ ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootSafe 
 
 -----------------------------------------------------------------------------
 
-ethRoot (Ideal, ZZ, ZZ) := opts -> (I,m,e) -> fancyEthRoot (I,m,e)  --- MK
+ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootSafe ( e, a, f ) ---MK
 
 -----------------------------------------------------------------------------
 
-ethRoot( RingElement, ZZ, ZZ ) := opts -> ( f, a, e ) -> ethRoot( ideal( f ), a, e )
+ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> fancyEthRoot( e, m, I )  --- MK
+
+-----------------------------------------------------------------------------
+
+ethRoot ( RingElement, ZZ, ZZ ) := opts -> ( f, a, e ) -> ethRoot( ideal( f ), a, e )
 
 -----------------------------------------------------------------------------
 
@@ -198,7 +205,7 @@ ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
 ethRootSafeList( ZZ, List, List ) := ( e, a, F ) ->
     ethRootSafeList( e, a, F, ideal( 1_( ring( F#0 )  ) ) )
 	
-fancyEthRoot = (I,m,e) ->
+fancyEthRoot = (e,m,I) ->
 (
 	G:=first entries mingens I;
 	k:=#G;
