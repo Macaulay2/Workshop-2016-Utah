@@ -69,9 +69,9 @@ export{
     "Substitution",
     
 --Frobenius Powers (frobeniusPowers.m2)
-    "fastExp"
-    "frobeniusPower"
-    "genFrobeniusPower"     
+    "fastExp",
+    "frobeniusPower",
+    "genFrobeniusPower" ,    
     
 --F-thresholds computations (FThresholds.m2)
     "BinomialCheck",
