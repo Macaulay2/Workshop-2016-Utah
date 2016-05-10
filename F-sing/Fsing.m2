@@ -182,6 +182,7 @@ load "./Fsing/EthRoots.m2"
 
 load "./Fsing/generatingMorphism.m2"
 
+load ".Fsing/frobeniusPowers.m2"
 
 load "./Fsing/compatiblySplit.m2"
 
