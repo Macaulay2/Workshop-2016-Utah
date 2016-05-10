@@ -403,9 +403,13 @@ mapOntoImage(Ideal, Ideal, BasicList) := (a,b,l)->(
 isEmbedding = method(); --checks whether a map is a closed embedding.
 
 isEmbedding(Ideal, Ideal, BasicList) := (a1, b1, f1)->(
+        newMap = map((ring a1)/a1, (ring b1)/b1, f1);
+        isEmbedding(newMap)
 );
 
 isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
+        newMap=map(R1,S1,f1);
+        isEmbedding(newMap)
 );
 
 isEmbedding(RingMap) := (f1)->(
