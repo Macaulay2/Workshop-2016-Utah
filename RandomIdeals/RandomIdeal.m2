@@ -1299,8 +1299,8 @@ assert(not isShelling({{3},{1,2}}))
 
 TEST///
 setRandomSeed(0);
-assert(#randomAddition(6,3,{{1,2,3}})==2)
-assert(#randomAddition(6,3,{{1,2,3,4}})==2)
+assert(#randomAddition(6,2,{{1,2,3}})==2)
+assert(#randomAddition(6,2,{{1,2,3,4}})==2)
 ///
 
 TEST///
