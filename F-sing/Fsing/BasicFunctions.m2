@@ -360,6 +360,7 @@ carryTest = ( p, w ) ->
 --Given a vector w={x,y} of rational integers in [0,1], returns the first spot 
 --e where the x and y carry in base p; i.e., 
 --(the e-th digit of x)+(the e-th digit of y) >= p
+-- counting is weird...
 firstCarry = ( p, w ) ->
 (   if w#0 < 0 or w#0 > 1 or w#1 < 0 or w#1 > 1 then(
 	 error "basePExp: Expected w in [0,1]^2"

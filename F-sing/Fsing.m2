@@ -58,6 +58,7 @@ export{
     "ascendIdealSafe",
     "ascendIdealSafeList",
     "AscentCount",
+    "boundLargestCompatible", ---MK
     "ethRoot",
     "ethRootSafe", 	       
     "ethRootSafeList",    
@@ -68,9 +69,9 @@ export{
     "Substitution",
     
 --Frobenius Powers (frobeniusPowers.m2)
-    "fastExp"
-    "frobeniusPower"
-    "genFrobeniusPower"     
+    "fastExp",
+    "frobeniusPower",
+    "genFrobeniusPower" ,    
     
 --F-thresholds computations (FThresholds.m2)
     "BinomialCheck",
@@ -212,5 +213,5 @@ load "./Fsing/generatingMorphismDoc.m2"
 
 load "./Fsing/parameterTestIdealDoc.m2"
 
-load "./Fsing/Fpure.m2"
+load "./Fsing/FpureDoc.m2"
 
