@@ -751,6 +751,8 @@ TEST ///
 	I = ideal(x,y)
 	assert(I == baseLocusOfMap(M))
 
+    -- we should have a test for when that kernel is not a cyclic module
+
 	-------------------------------------
 	----- isRegularMap -----------------
 	-------------------------------------
@@ -767,10 +769,36 @@ TEST ///
     M = matrix{{y-z, x}}
     assert(isRegularMap(M) == false)
 
+    -- projection from the blow up of P2 to P2
+
+    P5 = QQ[a..f]
+    M = matrix{{a,b,c},{d,e,f}}
+    segreProduct = P5/minors(2, M)
+    blowUpSubvar = segreProduct/ideal(b - d)
+    f = {a, b, c}
+    assert(isRegularMap(matrix{{a,b,c}}) == true)
+
 
 	-------------------------------------
 	----- inverseOfMap  -----------------
 	-------------------------------------
+
+    -- Let's find the inverse of the projection map from
+    -- the blow up of P^2 to P^2
+
+    -- the blow up of P^2 is a projective variety in P^5: 
+
+--    P5 = QQ[a..f]
+--    M = matrix{{a,b,c},{d,e,f}}
+--    segreProduct = P5/minors(2, M)
+--    blowUpSubvar = segreProduct/ideal(b - d)
+--    f = {a, b, c}
+--    assert(isBirationalMap(blowUpSubvar, QQ[x,y,z], f) == true)
+--    assert(inverseOfMap(blowUpSubvar, QQ[x,y,z], f) == map(blowUpSubVar, QQ[x,y,z], {a, b, c}) -- I think?
+--    assert(baseLocusOfMap(inverseOfMap(blowUpSubvar, QQ[x,y,z], f)) == ideal(x,y)) -- I think?
+    
+
+    
 
 
 
