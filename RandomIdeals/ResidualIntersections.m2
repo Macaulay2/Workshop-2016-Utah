@@ -632,7 +632,11 @@ doc ///
          true if {\tt I} is Strongly Cohen Macaulay
    Description
       Text
-         Checks whether {\tt I} is Strongly Cohen Macaulay. We compute the depths of the Koszul homology by using {\tt koszulDepth} and compares it to {\tt codim I}.
+         Checks whether {\tt I} is Strongly Cohen Macaulay.
+         
+         Given an ideal $I=(f_1,\ldots,f_n)$, $I$ is Strongly Cohen Macaulay if every non-zero
+         Koszul homology module $H_i((f_1,\ldots,f_n))$ is itself Cohen Macaulay. This can be checked
+         by computing the depth of the Koszul homology and comparing it to $codim I$
       Example
          R = QQ[x_1..x_5];
 	 I = ideal{x_1*x_3,x_2*x_4,x_3*x_4,x_1*x_5,x_3*x_5};
