@@ -834,33 +834,30 @@ TEST /// --test #4
 	------ Tests for dimImage -----------
 	-------------------------------------
 
-	S = QQ[x,y,z];
-        a = ideal(x^2+y^2+z^2);
-        T = QQ[u,v];
-        f = map(S, T, {x*y,y*z});
-        d = dimImage(f);
-        assert(d == 1)
+	S = QQ[x,y,z,w];
+	b = ideal(x*y-z*w);
+	R = QQ[u,v];
+	a = ideal(sub(0,R));
+	f = matrix {{u,0,v,0}};
+	d = dimImage(a,b,f);
+	assert (d == 1)
 ///
 
 TEST /// --test #5
-        S = QQ[x0,x1]
-        a = ideal(0*x0)
-        T = QQ[y0,y1,y2]
-        b = ideal(0*y1)
-        f = matrix{{x0^4,x0^2*x1^2,x1^4}}
-        d = dimImage(a,b,f)
+        S = QQ[x0,x1];
+        T = QQ[y0,y1,y2];
+        f = map(S,T,{x0^4,x0^2*x1^2,x1^4});
+        d = dimImage(f);
         assert(d == 1)	
 ///
 
 TEST /// --test #6
     -- Since in Projective Space, check to make sure different representations give the same result
-    S = QQ[x,y]
-    a = ideal(0*x)
-    T = QQ[u,v]
-    b = ideal(0*v)
-    f1 = matrix{{x,y}}
-    f2 = matrix{{x^3*y^2,x^2*y^3}}
-    assert(dimImage(a,b,f1)==dimImage(a,b,f2))
+    S = QQ[x,y];
+    T = QQ[u,v];
+    f1 = map(S,T,{x,y});
+    f2 = map(S,T,{x^3*y^2,x^2*y^3});
+    assert(dimImage(f1)==dimImage(f2))
 ///
 
 
