@@ -108,8 +108,23 @@ export{
     "setFTData",
     "splittingField",
 
--- Other
+-- testIdeals.m2
+    "findQGorGen",
+    "findTestElementAmbient",
+    "tauAOverPEMinus1Poly",
+    "tauGor", --needs optimization
+    "tauGorAmb",--needs optimization
+    "tauNonPrincipalAOverPEPoly",    
+    "tauPoly",
+    "tauQGor",    
+    "tauQGorAmb",--needs optimization
 
+
+-- Other.m2
+
+
+
+-- Other
        "findAllCompatibleIdeals", ---MK	
     
 	"findTestElementAmbient", ---Karl
@@ -159,6 +174,9 @@ load "./Fsing/FThresholds.m2"
 load "./Fsing/SpecialFThresholds.m2"
 
 
+load "./Fsing/testIdeals.m2"
+
+load "./Fsing/Other.m2"
 
 load "./Fsing/FsingDocs.m2"
 
