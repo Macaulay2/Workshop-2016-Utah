@@ -337,12 +337,6 @@ randomShellableIdealChain(Ring,ZZ,ZZ) := (R,dimProj,deg)->(
 randomShellableIdealChain(Ring,ZZ) := (R,dimProj)->(
     idealChainFromShelling(R,randomShelling(numgens R,dimProj))
     )
-///
-S = ZZ/101[x_0..x_5]
-I = randomShellableIdeal(S,2,5)
-dim I == 3
-degree I == 5
-///
 
 randomShelling(Ring,ZZ,ZZ) := (R,m,k) -> listsToMonomials(randomShelling(numgens R,m,k),R)
 randomShelling(Ring,ZZ)    := (R,m)   -> listsToMonomials(randomShelling(numgens R,m),R)
@@ -661,6 +655,12 @@ R=QQ[x1,x2,x3,x4,x5];
 assert(isShellable simplicialComplex randomShelling(R,2,6))
 ///
 
+TEST///
+S = ZZ/101[x_0..x_5];
+I = randomShellableIdeal(S,2,5);
+assert(dim I == 3)
+assert(degree I == 5)
+///
 
 
 
