@@ -1,6 +1,3 @@
-needsPackage("NumericalHilbert")
-needsPackage("NumericalAlgebraicGeometry")
-needsPackage("Bertini")
 newPackage("Implicitization",
     Headline => "Implicitization",
     Version => "0.1",
@@ -9,6 +6,8 @@ newPackage("Implicitization",
         {Name => "Justin Chen"},
         {Name => "Joe Kileel"}
         },
+    PackageImports => {"Bertini"},
+    PackageExports => {"NumericalAlgebraicGeometry"},
     DebuggingMode => true,
     HomePage => "https://math.berkeley.edu/~jchen/"
     )
@@ -27,9 +26,8 @@ newPackage("Implicitization",
         "getRandomImagePoint",
 	"monodromyLoop"
     }
-needsPackage("NumericalHilbert")
-needsPackage("NumericalAlgebraicGeometry")
-needsPackage("Bertini")
+
+debug NumericalAlgebraicGeometry
 
 rationalForm = method() -- Writes a map as a list of 2-element sequences, given by (numerator, denominator)
 rationalForm List := List => F -> (
@@ -131,10 +129,6 @@ numericalImageMembership (List, Ideal, Thing, RR) := (F,I,p,tol) -> (
 )
 numericalImageMembership (List, Ideal, Thing) := (F, I, p) -> numericalImageDim(F, I, p, 0.0000000001)
 
-norm2 = method(TypicalValue=>RR) -- 2-norm of a vector with CC entries
-norm2 List := v -> sqrt(sum(v, x->x*conjugate x))
-norm2 Matrix := v -> norm2 flatten entries v
-
 numericalImageHilbert = method()
 numericalImageHilbert (List, Ideal, ZZ) := ZZ => (F,I,d) -> (
     local targetvariable;
@@ -173,7 +167,7 @@ numericalImageDegree (List, Ideal, String) := ZZ => (F, I, software) -> (
     imageDim := numericalImageDim(F, I, {{startPoint}});
     extra := (toList(0..<dim I - imageDim)/(n -> random(1, ring I)))/(l -> l - (evaluate(polySystem{l}, startPoint#0))_(0,0));
     traceTestAttempts := 0;
-    monodromyOutput := monodromyLoop(F, I, {imageDim, startPoint, traceTestAttempts, createSystem(imageDim, F, {extra, I, startPoint#1}), extra}, software);
+    monodromyOutput := monodromyLoop(F, I, {imageDim, startPoint, traceTestAttempts, createSystem(imageDim, F, {extra, I, startPoint#1}), extra, startPoint#1}, software);
     if not traceTest(monodromyOutput, F, software) then (
 	print "Failed trace test!";
 	traceTestAttempts = 1;
@@ -219,6 +213,21 @@ monodromyLoop (List, Ideal, List, String) := List => (F, I, P, software) -> (
     C := coefficientRing ring I;
     startSols := {startPoint#0};
     intersectionPoints := {startPoint#1};
+    if software == "parametricM2" then (
+    	a := symbol a;
+    	R := C(monoid [gens ring I, a_(1,1)..a_(#F,imageDim)]);
+    	toR := map(R, ring I, take(gens R,numgens ring I));
+    	slice := genericMatrix(R,R_(numgens ring I),imageDim,#F);
+    	pullbackSystem := flatten entries(slice * toR transpose matrix{F});
+    	pt1 := random(C^imageDim,C^#F);
+    	pullbackSystem = pullbackSystem - flatten entries(pt1*transpose matrix startPoint#1);
+    	pullbackSystem = join(pullbackSystem, extra/(f->toR f));
+    	if I != 0 then pullbackSystem = join(pullbackSystem, (toR I)_*);
+    	PS := polySystem pullbackSystem;
+    	makeGateMatrix(PS,Parameters=>drop(gens R,numgens ring I));
+    	PH := parametricSegmentHomotopy PS; 
+	pt1 = transpose flatten pt1; 
+	);
     noNewPoints := 0;
     local downstairs, local currentPointsNum, local startSystem, local mid1, local mid2, local gamma;
     local homotopyStep1, local homotopyStep2, local homotopyStep3;
@@ -245,11 +254,18 @@ monodromyLoop (List, Ideal, List, String) := List => (F, I, P, software) -> (
             homotopyStep1 = bertiniTrackHomotopy(T, T*gamma#0*startSystem + (1-T)*mid1, startSols, Verbose => false);
             homotopyStep2 = bertiniTrackHomotopy(T, T*gamma#1*mid1 + (1-T)*mid2, homotopyStep1, Verbose => false);
             homotopyStep3 = bertiniTrackHomotopy(T, T*gamma#2*mid2 + (1-T)*startSystem, homotopyStep2, Verbose => false);
-        ) else (
+        ) else if software == "parametricM2" then (
+	    pt2 := random(C^(numcols PH.Parameters//2),C^1);
+	    pt3 := random(C^(numcols PH.Parameters//2),C^1);
+	    homotopyStep1 = trackHomotopy(specialize (PH, pt1||pt2), startSols);
+            homotopyStep2 = trackHomotopy(specialize (PH, pt2||pt3), homotopyStep1);
+            homotopyStep3 = trackHomotopy(specialize (PH, pt3||pt1), homotopyStep2);
+	    homotopyStep3 = select(homotopyStep3, p -> p#SolutionStatus == Regular);
+	) else (
             homotopyStep1 = track(gamma#0*startSystem, mid1, startSols);
             homotopyStep2 = track(gamma#1*mid1, mid2, homotopyStep1);
             homotopyStep3 = track(gamma#2*mid2, startSystem, homotopyStep2);
-	    homotopyStep3 = select(delete(startPoint#0, homotopyStep3), p -> p#SolutionStatus == Regular);
+	    homotopyStep3 = select(homotopyStep3, p -> p#SolutionStatus == Regular);
         );
 	for p in homotopyStep3 do (
             downstairs = numericalEvaluate(F, p);
@@ -359,6 +375,7 @@ numericalImageHilbert(F,I,3)
 
 -- Rational normal curve
 
+restart
 R = CC[s,t]
 F = flatten entries basis(66, R)
 I = ideal(0_R)

@@ -21,15 +21,12 @@ export{
 	"dimImage",
 	"isRegularMap",
 	"isEmbedding",
-	"blowUpIdeals",
 	"relationType",
-	"dgi",
-	"isSameDegree",
 	"isBirationalOntoImage",
-	"nonZeroMinor",
 	"inverseOfMap",
+	"isSameDegree",
 	"mapOntoImage",
-    "sameMapToPn" -- Dan: maybe we shouldn't export this
+        "sameMapToPn" -- Dan: maybe we shouldn't export this
 }
 
 ----------------------------------------------------------------
@@ -152,7 +149,7 @@ isRegularMap(RingMap) := (ff) ->(
         I == ideal 1_(ring I)
 );
 
- blowUpIdeals=method();
+ blowUpIdeals:=method();
   
   --this is to compute the ideal definition of the blowup of a subvariety Z 
   --in the projective variety X
@@ -219,7 +216,7 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
      
      
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- dgi=method();
+ dgi:=method();
  --this function computes the degeneration index of an ideal a which is the 
  --number of t linear generators among the generators of a.
  --dgi measures the number of hyperPlanes which cut the variety
@@ -347,7 +344,7 @@ isBirationalOntoImage(RingMap) :=(f)->(
     
     --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-nonZeroMinor=method();
+nonZeroMinor:=method();
 nonZeroMinor(Matrix,ZZ):=(M,ra)->(
     cc:=numColumns(M);
     ro:=numRows(M);
@@ -575,7 +572,7 @@ doc ///
                         true if the map is birational, false if otherwise
         Description
                 Text   
-                        This checks whether $f : X \to Y$ is birational onto its image.  For instance
+                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image.
                 Example
                         R=QQ[x,y,z];
                         S=QQ[a,b,c];
