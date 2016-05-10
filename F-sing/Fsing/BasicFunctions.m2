@@ -116,54 +116,8 @@ findNearPthPowerBelow = ( p, e, t ) ->
 
 --===================================================================================
 
---Returns the digits in nn which are nonzero in binary 
---for example, 5 in binary is 101, so this would return {0,2}
---the second term tells me where to start the count, so passing
---5,0 gives {0,2} but 5,1 is sent to {1,3}.  i should be
---used only for recursive purposes
-getNonzeroBinaryDigits = ( i, n ) -> 
-(
-    halfsies := n//2;
-    val1 := n%2;
-    val2 := false; 
-    if (halfsies > 0) then val2 = (getNonzeroBinaryDigits(i+1,n//2));
-    if ( (val1 != 0) and (not (val2 === false))) then (
-	 flatten {i, val2}
-    )
-    else if (val1 != 0) then (
-	 {i}
-    )
-    else if ( not (val2 === false)) then (
-	 flatten {val2}
-    )
-    else(
-	 false
-    )
-)
-
---===================================================================================
-
-
-getSublistOfList = method();
-
---Returns the entries of myList specified by their position.
-getSublistOfList( List, List ) := ( entryList, myList ) -> 
-(
-     if entryList == {} then(
-	  error "getSublistOfList expected non-empty list" 
-	  )
-     else(
-	 apply(#entryList, i->myList#(entryList#i))
-    )
-)
-
---===================================================================================
-
 --Returns the power set of a  list removing the emptyset.  
-nontrivialPowerSet = ( myList ) ->
-(
-     apply(2^(#myList)-1, i-> getSublistOfList(getNonzeroBinaryDigits(0,i+1),myList))
-)
+nontrivialPowerSet = L -> delete({},subsets L)
 
 --===================================================================================
 
@@ -457,7 +411,7 @@ xInt = ( x1, y1, x2, y2 ) ->
 --- The following code was written in order to more quickly compute eth roots of (f^n*I)
 --- It is used in fancyEthRoot
 ----------------------------------------------------------------------------------------
---- Find all ORDERED partitions of n with k parts
+--- Find all ORDERED partitions of n with k parts.
 allPartitions = ( n, k )->
 (
 	PP0:=matrix{ toList(1..k) };
@@ -465,6 +419,7 @@ allPartitions = ( n, k )->
 	allPartitionsInnards (n,k,PP,{})
 )
 
+--- Used for allPartitions.
 allPartitionsInnards = ( n, k, PP, answer)->
 (
 	local i;
