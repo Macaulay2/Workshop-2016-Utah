@@ -28,7 +28,8 @@ export{
 	"isBirationalOntoImage",
 	"nonZeroMinor",
 	"inverseOfMap",
-	"mapOntoImage"
+	"mapOntoImage",
+    "sameMapToPn" -- Dan: maybe we shouldn't export this
 }
 
 ----------------------------------------------------------------
@@ -448,6 +449,12 @@ isEmbedding(RingMap) := (f1)->(
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
  
+ sameMapToPn = method(); --checks whether to rational maps to Pn are the same. Assumes domain is irreducible
+
+ sameMapToPn(List, List) := (L1, L2) -> (
+    theRing := ring first L1;
+    rank matrix(frac(theRing), {L1, L2}) == 1
+ );
 
 --****************************************************--
 --*****************Documentation**********************--
@@ -946,17 +953,17 @@ TEST /// --test #14
         R=QQ[x,y,z];
         S=QQ[a,b,c];
         h = map(R,S,{y*z,x*z,x*y});
-        assert(isRegularMap(h) == false
+        assert(isRegularMap(h) == false)
 ///
 
 TEST /// -- test #15
     -- projection from the blow up of P2 to P2
 
-    P5 = QQ[a..f]
-    M = matrix{{a,b,c},{d,e,f}}
-    segreProduct = P5/minors(2, M)
-    blowUpSubvar = segreProduct/ideal(b - d)
-    f = {a, b, c}
+    P5 = QQ[a..f];
+    M = matrix{{a,b,c},{d,e,f}};
+    segreProduct = P5/minors(2, M);
+    blowUpSubvar = segreProduct/ideal(b - d);
+    f = {a, b, c};
     assert(isRegularMap(matrix{{a,b,c}}) == true)
 ///
 
@@ -964,11 +971,11 @@ TEST /// -- test #15
 	----- inverseOfMap  -----------------
 	-------------------------------------
 
+--TEST ///
     -- Let's find the inverse of the projection map from
     -- the blow up of P^2 to P^2
 
     -- the blow up of P^2 is a projective variety in P^5: 
-
 --    P5 = QQ[a..f]
 --    M = matrix{{a,b,c},{d,e,f}}
 --    segreProduct = P5/minors(2, M)
@@ -977,7 +984,15 @@ TEST /// -- test #15
 --    assert(isBirationalMap(blowUpSubvar, QQ[x,y,z], f) == true)
 --    assert(inverseOfMap(blowUpSubvar, QQ[x,y,z], f) == map(blowUpSubVar, QQ[x,y,z], {a, b, c}) -- I think?
 --    assert(baseLocusOfMap(inverseOfMap(blowUpSubvar, QQ[x,y,z], f)) == ideal(x,y)) -- I think?
-    
- 
+--///
+
+TEST ///
+    R =  QQ[a..d];
+    I = ideal(a*d - b*c);
+    S = QQ[x,y,z];
+    J = ideal 0_S;
+    f = inverseOfMap(I, J, {a,b,c});
+    assert(sameMapToPn(first entries matrix f, {x^2, x*y, x*z, y*z}))
+/// 
 ----FUTURE PLANS------
 
