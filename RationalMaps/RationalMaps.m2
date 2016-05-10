@@ -314,7 +314,7 @@ isBirationalOntoImage(RingMap) :=(f)->(
     
     --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-    nonZeroMinor=method();
+nonZeroMinor=method();
 nonZeroMinor(Matrix,ZZ):=(M,ra)->(
     cc:=numColumns(M);
     ro:=numRows(M);
@@ -335,6 +335,7 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
 flatten nzlist);  
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
   
   
   
