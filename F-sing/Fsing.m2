@@ -38,7 +38,8 @@ Authors => {
 },
 Headline => "A package for calculations of singularities in positive characteristic", 
 DebuggingMode => true, 
-Reload => true 
+Reload => true,
+AuxiliaryFiles=>true 
 )
 
 
@@ -154,11 +155,9 @@ export{
 -- Other
        "findAllCompatibleIdeals", ---MK	
     
-	"findTestElementAmbient", ---Karl
 	"FFiniteSupport", ---MK
 	"findGeneratingMorphisms", ---MK
 	"FPureIdeals",
-	"frobeniusPower",
  	"FullMap", ---Karl
 	"generatingMorphism", ---MK
 	"generatingRoot", ---MK
