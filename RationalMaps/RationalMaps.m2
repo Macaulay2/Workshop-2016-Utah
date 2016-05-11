@@ -25,7 +25,7 @@ export{
 	"isBirationalOntoImage",
 	"inverseOfMap",
 	"mapOntoImage",
-    --"sameMapToPn", -- Dan: maybe we shouldn't export this.  Karl: I commented it out and made it internal.
+    "isSameMapToPn", -- Dan: maybe we shouldn't export this.  Karl: I commented it out and made it internal.
     --**********************************
     --*************OPTIONS**************
     --**********************************
@@ -159,7 +159,7 @@ baseLocusOfMap(List) := o->(L) ->(
 
 baseLocusOfMap(RingMap) := o->(ff) ->(
     mm := sub(matrix ff, target ff);  
-    baseLocusOfMap(mm, , SaturateOutput=>o.SaturateOutput)
+    baseLocusOfMap(mm, SaturateOutput=>o.SaturateOutput)
 );
 
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -240,11 +240,11 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
      max L2);
  
  relationType(Ideal,Ideal):=(a,b)->(
-     relationType(Ideal,first entries gens b)
+     relationType(ideal,first entries gens b)
      );
  
  relationType(Ring,Ideal):=(R1,b)->(
-     relationType(Ideal R1,first entries gens b)
+     relationType(ideal R1,first entries gens b)
      );
      
      
@@ -401,8 +401,7 @@ flatten nzlist);
 inverseOfMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
     if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
     R:=ring di;
-    K:=coefficientRing R;
-    im1 := saturate idealOfImageOfMap(di, im, bm);
+    K:=coefficientRing R;    
     S:=ring im;
     --In the following lines we remove the linear parts of the ideal di and 
 --modify our map bm
@@ -426,13 +425,13 @@ inverseOfMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
    g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
    barJD:=g(JD);
    jdd:=(numgens ambient Rlin1)-1;
-   if not(isSubset(minors(jdd,barJD),im1))==false then error "The map is not Birational onto its image";
+   if not(isSubset(minors(jdd,barJD),im))==false then error "The map is not birational onto its image";
    Col:=(nonZeroMinor(barJD,jdd))#0;
    SbarJD:=submatrix(barJD,,Col);
    Inv:={};
    for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
-   psi:=map(S,Rlin1,matrix{Inv});
-   first entries matrix (psi*phi) );    
+   psi:=map(S/im,Rlin1,matrix{Inv});
+   psi*phi );    
 
 inverseOfMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
     inverseOfMap(ideal R1, ideal S1, bm)
@@ -447,6 +446,8 @@ inverseOfMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
 --    );
 
 inverseOfMap(RingMap) :=(f)->(
+   -- invList := inverseOfMap(target f, source f, first entries matrix f);
+--    map(source f, target f, invList)
     inverseOfMap(target f, source f, first entries matrix f)
     );
     
@@ -505,12 +506,15 @@ isEmbedding(RingMap) := (f1)->(
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
  
- sameMapToPn := method(); --checks whether to rational maps to Pn are the same. Assumes domain is irreducible
+ isSameMapToPn = method(); --checks whether to rational maps to Pn are the same. Assumes domain is irreducible
 
- sameMapToPn(List, List) := (L1, L2) -> (
+ isSameMapToPn(List, List) := (L1, L2) -> (
     theRing := ring first L1;
     rank matrix(frac(theRing), {L1, L2}) == 1
  );
+ isSameMapToPn(RingMap, RingMap) := (f1, f2) -> (
+    isSameMapToPn( first entries matrix f1, first entries matrix f2) 
+ )
 
 --****************************************************--
 --*****************Documentation**********************--
@@ -532,7 +536,7 @@ doc ///
     Key
         AssumeDominant
     Headline
-        If true, certain functions assume that $f : X \to Y$ is dominant.
+        If true, certain functions assume that from X to Y are dominant.
     Usage
         AssumeDominant=>b    
     Description
@@ -560,7 +564,7 @@ doc ///
 		(isBirationalMap, RingMap)
 		[isBirationalMap, AssumeDominant]
 	Headline
-		Checks if a map $X \to Y$ between projective varieties is birational.
+		Checks if a map between projective varieties is birational.
 	Usage
 		val = isBirationalMap(a,b,f)
 		val = isBirationalMap(R,S,f)
@@ -583,7 +587,7 @@ doc ///
 			true if the map is birational, false if otherwise
 	Description
 		Text   
-			This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  Let's check that the plane quadratic cremona transformation is birational.
+			This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The target and source must be varieties, in particular their defining ideals must be prime.  Let's check that the plane quadratic cremona transformation is birational.
 		Example
 			R=QQ[x,y,z];
 			S=QQ[a,b,c];
@@ -606,7 +610,7 @@ doc ///
 		(isBirationalOntoImage, RingMap)
 		[isBirationalOntoImage, AssumeDominant]
         Headline
-                Checks if a map $X \to Y$ between projective varieties is birational onto f(X).
+                Checks if a map between projective varieties is birational onto its image.
         Usage
                 val = isBirationalMap(a,b,f)
                 val = isBirationalMap(R,S,f)
@@ -629,7 +633,7 @@ doc ///
                         true if the map is birational, false if otherwise
         Description
                 Text   
-                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling isBirationalOntoImage.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).
+                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling isBirationalOntoImage.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its  defining ideals must be prime.
                 Example
                         R=QQ[x,y,z];
                         S=QQ[a,b,c];
@@ -739,7 +743,7 @@ doc ///
                 (mapOntoImage, Ideal, Ideal, BasicList)
                 (mapOntoImage, Ring, Ring, BasicList)
         Headline
-                Given a map of rings, correspoing to $f : X \to Y$, this returns the map of rings corresponding to $f : X \to f(X)$.
+                Given a map of rings, correspoing to X mapping to Y, this returns the map of rings corresponding to X mapping to f(X).
         Usage
                 h = mapOntoImage(f)
                 h = mapOntoImage(a,b,l)
@@ -779,7 +783,7 @@ doc ///
                 (isEmbedding, Ideal, Ideal, BasicList)
                 (isEmbedding, Ring, Ring, BasicList)
         Headline
-                Given a map of rings, correspoing to $f : X \to Y$, this determines if this map embeds $X$ as a closed subscheme into $Y$.
+                Checks whether a map of projective varieties is a closed embedding.
         Usage
                 val = isEmbedding(f)
                 val = isEmbedding(a,b,l)
@@ -803,10 +807,10 @@ doc ///
 			true if the map is an embedding, otherwise false.
 	Description
 	        Text
-	                Consider the Veronese embedding.
+	                Given a map of rings, correspoing to $f : X \to Y$, this determines if this map embeds $X$ as a closed subscheme into $Y$.  The target and source must be varieties, in particular their defining ideals must be prime.  Consider the Veronese embedding.
 	        Example 
-	                R = QQ[x,y];
-	                S = QQ[a,b,c];
+	                R = ZZ/7[x,y];
+	                S = ZZ/7[a,b,c];
 	                f = map(R, S, {x^2, x*y, y^2});
 	                isEmbedding(f)
 	        Text
@@ -834,6 +838,7 @@ doc ///
         (baseLocusOfMap, Matrix)
         (baseLocusOfMap, List)
         (baseLocusOfMap, RingMap)
+        [baseLocusOfMap, SaturateOutput]
     Headline
         Computes base locus of a map from a projective variety to projective space
     Usage
@@ -852,7 +857,7 @@ doc ///
             The saturated defining ideal of the baselocus of the corresponding maps.
     Description
         Text
-            This defines the locus where a given map of projective varieties is not defined.  For instance, consider the following rational map from $P^2$ to $P^1$
+            This defines the locus where a given map of projective varieties is not defined.  If the option SaturateOutput is set to false, the output will not be saturated.  The default value is true.  Consider the following rational map from $P^2$ to $P^1$
         Example
             R = QQ[x,y,z];
             S = QQ[a,b];
@@ -875,6 +880,81 @@ doc ///
             minimalPrimes J
         Text
             The base locus is exactly the three points one expects.
+///
+
+doc ///
+    Key
+        relationType
+        (relationType, Ideal,BasicList)
+        (relationType, Ideal,Ideal)
+        (relationType, Ring,Ideal)
+    Headline
+        Given an ideal in a ring this computes the maximum degree, of the new variables, of the minimal generators of the defining ideal of the associated Rees algebra.
+    Usage
+        n = relationType(I, L)
+        n = relationType(I, J)
+        n = relationType(R,J)
+    Inputs
+        I: Ideal
+            The ideal defining the base ring $R$.
+        L: List
+            The list of generators of the ideal $J$ we are forming the Rees algebra of.
+        R: Ring
+            The base ring.
+        J: Ideal
+            The ideal we are forming the Rees algebra of.
+    Outputs
+        n: ZZ
+            The maximum degree of the generators of the defining ideal of the Rees algebra.
+    Description
+        Text
+            Suppose $( g_1, \ldots, g_m ) = J \subseteq R$ is an ideal in a ring $R$.  We form the Rees algebra $R[Jt] = R[Y_1, \ldots, Y_m]/K$ where the $Y_i$ map to the $g_i$.  This function returns the maximum $Y$-degree of the generators of $K$.  For more information, see page 22 of Vasconcelos, Rees algebras, multiplicities, algorithms. Springer Monographs in Mathematics. Springer-Verlag, Berlin, 2005.
+        Example
+            R = QQ[x_0..x_8];
+            M = genericMatrix(R,x_0,3,3)
+            J = minors (2,M)
+            relationType(R,J)
+///
+
+doc ///
+    Key
+        isSameMapToPn
+        (isSameMapToPn, List,List)
+        (isSameMapToPn, RingMap,RingMap)
+    Headline
+        Checks whether two maps to projective space are really the same
+    Usage
+        b = isSameMapToPn(L1,L2)
+        b = isSameMapToPn(f1, f2)
+    Inputs
+        L1: List
+            The homogeneous forms that define the first map.
+        L2: List
+            The homogeneous forms that define the second map.
+        f1: RingMap
+            The first map.
+        f2: RingMap
+            The second map.
+    Outputs
+        b: Boolean
+            True if the maps are the same, false otherwise.
+    Description
+        Text
+            Checks whether two maps, from the same variety, to projective space are really the same. 
+        Example
+            R=QQ[x,y,z];
+            S=QQ[a,b,c];
+            L1={y*z,x*z,x*y};
+            L2={x*y*z,x^2*z,x^2*y};
+            isSameMapToPn(L1,L2)
+--        Example
+--            R = QQ[x_0..x_8];
+--            M = genericMatrix(R,x_0,3,3);
+--            A = submatrix'(M,{2},)   
+--            B = submatrix'(M,{0},)
+--            L1 = first entries gens minors(2,A)
+--            L2 = first entries gens minors(2,B)                   
+--            isSameMapToPn(L1,L2)
 ///
 
 doc ///
@@ -937,7 +1017,35 @@ doc ///
             Inverse function of your birational map
     Description
         Text
-            Finds the inverse function of your birational map
+            Finds the inverse function of your birational map.  The target and source must be varieties, in particular their defining ideals must be prime.
+        Example
+            R = ZZ/7[x,y,z];
+            S = ZZ/7[a,b,c];
+            h = map(R, S, {y*z, x*z, x*y});
+            inverseOfMap h
+        Text
+            Notice that the leading minus signs do not change the projective map.  Next let us compute the inverse of the blowup of $P^2$ at a point.
+        Example
+            P5 = QQ[a..f];
+            M = matrix{{a,b,c},{d,e,f}};
+            blowUpSubvar = P5/(minors(2, M)+ideal(b - d));
+            h = map(blowUpSubvar, QQ[x,y,z],{a, b, c});
+            g = inverseOfMap(h)
+            baseLocusOfMap(g)
+            baseLocusOfMap(h)
+        Text
+            Finally, we do a more complicated example.
+        Example
+            R=QQ[x,y,z,t]/(z-2*t);
+            F = {y*z*(x-z)*(x-2*y), x*z*(y-z)*(x-2*y),y*x*(y-z)*(x-z)};
+            S = QQ[u,v,w];
+            h = map(R, S, F);
+            g = inverseOfMap h
+            (g*h)(u)*v==(g*h)(v)*u
+            (g*h)(u)*w==(g*h)(w)*u
+            (g*h)(v)*w==(g*h)(w)*v
+        Text
+            Notice the last two checks are just verifying that the composition g*h agrees with the identity.
     Caveat
         Only works for irreducible varieties right now
         
@@ -1168,28 +1276,39 @@ TEST /// --test #25 (3rd veronese embedding of P^1)
 	----- inverseOfMap  -----------------
 	-------------------------------------
 
---TEST ///
+TEST /// --test #26
     -- Let's find the inverse of the projection map from
     -- the blow up of P^2 to P^2
 
     -- the blow up of P^2 is a projective variety in P^5: 
---    P5 = QQ[a..f]
---    M = matrix{{a,b,c},{d,e,f}}
---    segreProduct = P5/minors(2, M)
---    blowUpSubvar = segreProduct/ideal(b - d)
---    f = {a, b, c}
---    assert(isBirationalMap(blowUpSubvar, QQ[x,y,z], f) == true)
---    assert(inverseOfMap(blowUpSubvar, QQ[x,y,z], f) == map(blowUpSubVar, QQ[x,y,z], {a, b, c}) -- I think?
---    assert(baseLocusOfMap(inverseOfMap(blowUpSubvar, QQ[x,y,z], f)) == ideal(x,y)) -- I think?
---///
+    P5 = QQ[a..f]
+    M = matrix{{a,b,c},{d,e,f}}
+    blowUpSubvar = P5/(minors(2, M)+ideal(b - d))
+    h = map(blowUpSubvar, QQ[x,y,z],{a, b, c})
+    assert(baseLocusOfMap(inverseOfMap(h)) == ideal(x,y)) 
+///
 
-TEST ///
-    R =  QQ[a..d];
-    I = ideal(a*d - b*c);
+TEST /// --test #27
+    R =  QQ[a..d]/(a*d - b*c);
     S = QQ[x,y,z];
-    J = ideal 0_S;
-    f = inverseOfMap(I, J, {a,b,c});
-    assert(sameMapToPn(first entries matrix f, {x^2, x*y, x*z, y*z}))
+    f = inverseOfMap(R, S, {a,b,c});
+    assert(isSameMapToPn(first entries matrix f, {x^2, x*y, x*z, y*z}))
 /// 
+
+-----------------------------------
+------- isEmbedding ---------------
+-----------------------------------
+
+TEST /// --test #28
+    -- Let's find the inverse of the projection map from
+    -- the blow up of P^2 to P^2
+
+    -- the blow up of P^2 is a projective variety in P^5: 
+    P5 = QQ[a..f]
+    M = matrix{{a,b,c},{d,e,f}}
+    blowUpSubvar = P5/(minors(2, M)+ideal(b - d))
+    h = map(blowUpSubvar, QQ[x,y,z],{a, b, c})
+    assert(isEmbedding(h)==false)
+///
 ----FUTURE PLANS------
 
