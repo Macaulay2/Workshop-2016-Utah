@@ -13,36 +13,26 @@
  
 -- This function computes the element in the ambient ring S of R=S/I such that
 -- I^{[p^e]}:I = (f) + I^{[p^e]}
--- If there is no such unique element, the function returns zero
+-- If there is no such unique element, the function returns an error
 
-findQGorGen=method();
-findQGorGen (Ring,ZZ) := (Rk,ek) -> (
-     Sk := ambient Rk; -- the ambient ring
-     Ik := ideal Rk; -- the defining ideal
-     pp := char Sk; --the characteristic
-     Ikpp := frobeniusPower(ek,Ik);
-     
-     J1 := trim (Ikpp : Ik); --compute the colon
-     Tk := Sk/Ikpp; --determine the ideal in 
-     
-     J2 := trim sub(J1, Tk);
-     
-     Lk := first entries gens J2;
-     
-     nk := #Lk;
-     val := 0_Sk;
-     
-     if (nk != 1) then (
-	  error "findGorGen: this ring does not appear to be (Q-)Gorenstein, or
-	   you might need to work on a smaller chart.  Or the index may not divide p^e-1
+findQGorGen=method()
+
+findQGorGen ( Ring, ZZ ) := ( R, e ) -> 
+(
+     S := ambient R; -- the ambient ring
+     I := ideal R; -- the defining ideal
+     Ie := frobeniusPower( e, I );     
+     J := trim ( Ie : I ); --compute the colon
+     J = trim sub( J, S/Ie ); -- colon modulo Ie
+     L := J_*;
+     if ( #L != 1 ) then 
+	  error "findQGorGen: this ring does not appear to be (Q-)Gorenstein, or
+	   you might need to work on a smaller chart. Or the index may not divide p^e-1
 	   for the e you have selected.";
-     )
-     else (
-	  val = lift(Lk#0, Sk);
-     );    
-     val 
+     lift( L#0, S )
 )
-findQGorGen(Ring) := (R2) -> ( findQGorGen(R2, 1) )
+
+findQGorGen ( Ring ) := R -> findQGorGen( R, 1 )
 
 --Finds a test element of a ring R = k[x, y, ...]/I (or at least an ideal 
 --containing a nonzero test element).  It views it as an element of the ambient ring
@@ -50,68 +40,38 @@ findQGorGen(Ring) := (R2) -> ( findQGorGen(R2, 1) )
 --One could make this faster by not computing the entire Jacobian / singular locus
 --instead, if we just find one element of the Jacobian not in I, then that would also work
 --and perhaps be substantially faster
-findTestElementAmbient = Rk -> (
-     --Sk := ambient Rk;
-     -- Ik := ideal Sk;
-     
-     Jk := ideal singularLocus(Rk);
-     if (isSubset(Jk, ideal Rk) == true) then 
-          error "findTestElementAmbient: No test elements found, is the ring non-reduced?";
-	  
-     
-     Jk          
+findTestElementAmbient = R -> 
+(
+     J := ideal singularLocus( R );
+     if isSubset( J, ideal R ) then 
+          error "findTestElementAmbient: No test elements found; is the ring non-reduced?";	  
+     J          
 )
 
 
 --Outputs the test ideal of a (Q-)Gorenstein ring (with no pair or exponent)
---ek is the number such that the index divides (p^ek - 1)
+--e is the number such that the index divides (p^e - 1)
 --It actually spits out the appropriate stable/fixed ideal inside the ambient ring
-tauQGorAmb = (Rk, ek) -> (
-     Jk := findTestElementAmbient(Rk);
-     hk := findQGorGen(Rk, ek);
-
-     sub(ascendIdeal(Jk,hk,ek),Rk)
+tauQGorAmb = ( R, e ) -> 
+(
+     J := findTestElementAmbient( R );
+     h := findQGorGen( R, e);
+     sub( ascendIdeal( J, h, e ), R )
 )
 
 --Computes the test ideal of an ambient Gorenstein ring
-tauGorAmb = (Rk) -> (tauQGorAmb(Rk, 1))
+tauGorAmb = R -> tauQGorAmb( R, 1 )
 
 --Computes the test ideal of (R, f^(a/(p^e - 1)))
 --when R is a polynomial ring.  This is based upon ideas of Moty Katzman.
-tauAOverPEMinus1Poly = (fm, a1, e1) -> (
-     Rm := ring fm;
-     pp := char Rm;
-     a2 := a1 % (pp^e1 - 1);
-     k2 := a1 // (pp^e1 - 1); --it seems faster to use the fact that tau(f^(1+k)) = f*tau(f^k) 
-     --this should be placed inside a try, and then if it fails we should be smarter...
-     --fpow := fastExp(fm,a2);
-     --IN := eR(ideal(fpow*fm),e1);  --the idea contained inside the test ideal.
-     IN := ethRootSafe(e1, a2, fm, ideal(fm) );
-     
-     IN = ascendIdealSafe(IN, fm, a2, e1);
-     -- this is going to be the new value.  The *fm is a test element
-     --5/0;
-     --return the final ideal
-     IN*ideal(fm^k2)
-)
-
---Computes the test ideal of (R, f^t) when R 
---is a polynomial ring over a perfect field.
-tauPolyOld = (fm, t1) -> (
-     Rm := ring fm; 
-     pp := char Rm;
-     L1 := divideFraction(pp,t1); --this breaks up t1 into the pieces we need
-     local I1;
-     --first we compute tau(fm^{a/(p^c-1)})
-     if (L1#2 != 0) then 
-          I1 = tauAOverPEMinus1Poly(fm,L1#0,L1#2) else I1 = ideal(fm^(L1#0));     
-	  
-       
-     
-     --now we compute the test ideal using the fact that 
-     --tau(fm^t)^{[1/p^a]} = tau(fm^(t/p^a))
-     if (L1#1 != 0) then 
-          ethRoot(L1#1, I1) else I1
+tauAOverPEMinus1Poly = ( f, a, e ) -> (
+     R := ring f;
+     p := char R;
+     b := a % (p^e - 1);
+     k := a // (p^e - 1); --it seems faster to use the fact that tau(f^(1+k)) = f*tau(f^k) 
+     I := ethRoot( e, a, f, ideal(f) );     
+     I = ascendIdealSafe( I, f, b, e );
+     I*ideal(f^k)
 )
 
 --a slightly faster tauPoly

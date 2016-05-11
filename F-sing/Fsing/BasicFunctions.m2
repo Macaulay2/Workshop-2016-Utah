@@ -123,7 +123,7 @@ numberToPrimeFactorList = n ->
 
 --Returns a list of all proper -- not one -- factors of number.
 --Has funny order...
-getFactorList = ( n ) ->
+getFactorList = n ->
 (
      if (n < 1) then error "getFactorList: expected an integer greater than 1.";
      powSet := nontrivialPowerSet(numberToPrimeFactorList(n)); 
@@ -193,7 +193,7 @@ findNumberBetween( ZZ, List ) := ( maxDenom, myInterv )->
 digit = method()
 
 --Gives the e-th digit of the non-terminating base p expansion of x in [0,1].
-digit ( ZZ, ZZ, QQ ) := ( p, e, x) -> 
+digit ( ZZ, ZZ, QQ ) := ( p, e, x ) -> 
 (
     if x < 0 or x > 1 then error "digit: Expected x in [0,1]";     	
     local y;
@@ -233,7 +233,7 @@ truncatedBasePExp = method()
 truncatedBasePExp ( ZZ, ZZ, QQ ) := ( p, e, x ) -> 
 (
     if x<0 then error "truncatedBasePExp: Expected x>0";
-    (ceiling(p^e*x)-1)/p^e    	
+    ( ceiling( p^e*x ) - 1 )/p^e    	
 )
 
 --truncation threads over lists.
@@ -242,7 +242,7 @@ truncatedBasePExp ( ZZ, ZZ, List ) := ( p, e, u ) -> apply( u, x -> truncatedBas
 --===================================================================================
 
 --- write n=a*p^e+a_{e-1} p^{e-1} + \dots + a_0 where 0\leq e_j <p 
-baseP1 = ( n, p, e )->
+baseP1 = ( n, p, e ) ->
 (
     a:=n//(p^e);
     answer:=1:a;
