@@ -11,9 +11,9 @@
 --****************************************************
 --****************************************************
  
--- This function computes the element in the ambient ring S of R=S/I such that
--- I^{[p^e]}:I = (f) + I^{[p^e]}
--- If there is no such unique element, the function returns an error
+-- This function computes the element f in the ambient ring S of R=S/I such that
+-- I^{[p^e]}:I = (f) + I^{[p^e]}.
+-- If there is no such unique element, the function returns an error.
 
 findQGorGen=method()
 
@@ -23,12 +23,11 @@ findQGorGen ( Ring, ZZ ) := ( R, e ) ->
      I := ideal R; -- the defining ideal
      Ie := frobeniusPower( e, I );     
      J := trim ( Ie : I ); --compute the colon
-     J = trim sub( J, S/Ie ); -- colon modulo Ie
-     L := J_*;
+     J = trim sub( J, S/Ie ); -- extend colon ideal to S/Ie
+     L := J_*; -- grab generators
      if ( #L != 1 ) then 
-	  error "findQGorGen: this ring does not appear to be (Q-)Gorenstein, or
-	   you might need to work on a smaller chart. Or the index may not divide p^e-1
-	   for the e you have selected.";
+	  error "findQGorGen: this ring does not appear to be (Q-)Gorenstein, or you might need to work on 
+	  a smaller chart. Or the index may not divide p^e-1 for the e you have selected.";
      lift( L#0, S )
 )
 
@@ -64,7 +63,8 @@ tauGorAmb = R -> tauQGorAmb( R, 1 )
 
 --Computes the test ideal of (R, f^(a/(p^e - 1)))
 --when R is a polynomial ring.  This is based upon ideas of Moty Katzman.
-tauAOverPEMinus1Poly = ( f, a, e ) -> (
+tauAOverPEMinus1Poly = ( f, a, e ) -> 
+(
      R := ring f;
      p := char R;
      b := a % (p^e - 1);
@@ -75,24 +75,24 @@ tauAOverPEMinus1Poly = ( f, a, e ) -> (
 )
 
 --a slightly faster tauPoly
-tauPoly = (fm, t1) -> (
-     Rm := ring fm; 
-     pp := char Rm;
-     L1 := divideFraction(pp,t1); --this breaks up t1 into the pieces we need
-     local I1;
-     --first we compute tau(fm^{a/(p^c-1)})
-     if (L1#2 != 0) then (
-     	I1 = tauAOverPEMinus1Poly(fm,L1#0,L1#2);
-     	if (L1#1 != 0) then
-     		I1 = ethRoot(L1#1,I1)
-     	)
-     else (
-     	if (L1#1 != 0) then
-     		I1 = ethRootSafe(L1#1, L1#0, fm, ideal( sub(1, Rm)) )
-     	else
- 	    		I1 = ideal(fm^(L1#0))
- 	    	);
-     I1
+tauPoly = ( f, t ) -> 
+(
+     R := ring f; 
+     p := char R;
+     (a,b,c) := toSequence( divideFraction( p, t) ); --this breaks up t into the pieces we need
+     local I;
+     --first we compute tau(f^{a/(p^c-1)})
+     if (c != 0) then 
+     (
+     	I = tauAOverPEMinus1Poly( f, a, c);
+     	if (b != 0) then I = ethRoot( b, I)
+     )
+     else 
+     (
+     	if (b != 0) then I = ethRoot( b, a, f )
+     	else I = ideal( f^a )
+     );
+     I
 )
 
 --This is an internal function
