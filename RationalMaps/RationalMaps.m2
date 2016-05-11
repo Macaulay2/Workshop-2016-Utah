@@ -24,9 +24,9 @@ export{
 	"relationType",
 	"isBirationalOntoImage",
 	"inverseOfMap",
-	"isSameDegree",
 	"mapOntoImage",
-        "sameMapToPn" -- Dan: maybe we shouldn't export this
+    --"sameMapToPn", -- Dan: maybe we shouldn't export this.  Karl: I commented it out and made it internal.
+    "AssumeDominant" --option to, assume's that the map is dominant (ie, don't compute the kernel)
 }
 
 ----------------------------------------------------------------
@@ -96,6 +96,27 @@ dimImage(RingMap) := (p) -> (
 	I := idealOfImageOfMap(p);
 	(dim I) - 1
 );
+
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+isSameDegree:=method();
+isSameDegree(BasicList):=(L)->(
+    n:=#L;
+    flag := true;
+    if n!=0 then (
+        d:=max(apply(L,zz->degree zz));
+        i := 0;
+        while ((i < n) and (flag == true)) do(
+	    if (isHomogeneous(L#i) == false) then flag = false;
+        if ((L#i) != sub(0, ring(L#i))) then (
+	        if (degree(L#i) != d) then flag = false;
+	    );
+       	i = i+1;     	  
+        );
+    );  
+    flag
+);
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 baseLocusOfMap = method();
 
@@ -233,26 +254,9 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
          );
      );
  d);
--- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-isSameDegree=method();
-isSameDegree(BasicList):=(L)->(
-    n:=#L;
-    flag := true;
-    if n!=0 then (
-        d:=max(apply(L,zz->degree zz));
-        i := 0;
-        while ((i < n) and (flag == true)) do(
-	    if (isHomogeneous(L#i) == false) then flag = false;
-        if ((L#i) != sub(0, ring(L#i))) then (
-	        if (degree(L#i) != d) then flag = false;
-	    );
-       	i = i+1;     	  
-        );
-    );  
-    flag
-);
+
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-isBirationalMap = method();
+isBirationalMap = method(Options => {AssumeDominant=>false});
 
 --this checks whether a map X -> Y is birational.
 
@@ -263,45 +267,50 @@ isBirationalMap = method();
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
 --list of elements = bm
-isBirationalMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
+isBirationalMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     R:=ring di;
     S:=ring im;
-    im1 := idealOfImageOfMap(di, im, bm); 
-    if (dim ((im1*S^1)/(im*S^1)) <= 0) then(
-        isBirationalOntoImage(di,im1,bm)
+    im1 := im;
+    if (o.AssumeDominant==false) then (
+        im1 = idealOfImageOfMap(di, im, bm); 
+        if (dim ((im1*S^1)/(im*S^1)) <= 0) then( --first check if the image is the closure of the image is even the right thing
+            isBirationalOntoImage(di,im1,bm,AssumeDominant=>true)
+        )
+        else(
+            false
+        )
     )
     else(
-        false
+        isBirationalOntoImage(di,im1,bm,AssumeDominant=>true)
     )
-
 );    
 
-isBirationalMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
-    isBirationalMap(ideal R1, ideal S1, bm)
+isBirationalMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+    isBirationalMap(ideal R1, ideal S1, bm,AssumeDominant=>o.AssumeDominant)
     );
 
---isBirationalMap(Ideal,Ring,BasicList) := (di, S1, bm)->(
---    isBirationalMap(di, ideal S1, bm)
---    );
 
---isBirationalMap(Ring,Ideal,BasicList) := (R1, im, bm)->(
---    isBirationalMap(ideal R1, im, bm)
---    );
-
-isBirationalMap(RingMap) :=(f)->(
-    isBirationalMap(target f, source f, first entries matrix f)
+isBirationalMap(RingMap) :=o->(f)->(
+    isBirationalMap(target f, source f, first entries matrix f,AssumeDominant=>o.AssumeDominant)
     );
  
   --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
+isBirationalOntoImage = method(Options => {AssumeDominant=>false});
+--if AssumeDominant is true, it doesn't form the kernel.  
+--TODO:  (Karl) Do we need to saturate di?  Or I guess we are already assuming it is prime...
 
-isBirationalOntoImage = method();
---TODO: KARL -- have a flag so that im1 is assumed to be im (ie, don't saturate or do any checks).
-
-isBirationalOntoImage(Ideal,Ideal, BasicList) :=(di,im,bm)->(
+isBirationalOntoImage(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
     if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
     R:=ring di;
     S:=ring im;
-    im1 := saturate idealOfImageOfMap(di, im, bm);
+    im1 := im;
+    if (o.AssumeDominant == true) then (
+        im1 =  im;
+    )
+    else (
+        im1 = idealOfImageOfMap(di, im, bm);
+    );
 
     K:=coefficientRing R;
 --In the following lines we remove the linear parts of the ideal di and 
@@ -333,12 +342,12 @@ isBirationalOntoImage(Ideal,Ideal, BasicList) :=(di,im,bm)->(
     not(isSubset(minors(jdd,barJD),im1))
 );
   
-isBirationalOntoImage(Ring,Ring,BasicList) := (R1, S1, bm)->(
-    isBirationalOntoImage(ideal R1, ideal S1, bm)
+isBirationalOntoImage(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+    isBirationalOntoImage(ideal R1, ideal S1, bm, AssumeDominant=>o.AssumeDominant)
 ); 
 
-isBirationalOntoImage(RingMap) :=(f)->(
-    isBirationalOntoImage(target f, source f, first entries matrix f)
+isBirationalOntoImage(RingMap) :=o->(f)->(
+    isBirationalOntoImage(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
 );
     
     
@@ -474,7 +483,7 @@ isEmbedding(RingMap) := (f1)->(
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
  
- sameMapToPn = method(); --checks whether to rational maps to Pn are the same. Assumes domain is irreducible
+ sameMapToPn := method(); --checks whether to rational maps to Pn are the same. Assumes domain is irreducible
 
  sameMapToPn(List, List) := (L1, L2) -> (
     theRing := ring first L1;
@@ -498,14 +507,27 @@ doc ///
 ///
 
 doc /// 
-	 Key
+    Key
+        AssumeDominant
+    Headline
+        If true, certain functions assume that $f : X \to Y$ is dominant.
+    Usage
+        AssumeDominant=>b    
+    Description
+    	Text
+            If true, certain functions assume that $f : X \to Y$ is dominant.  In other words that the closure of $f(X)$ is equal to $Y$.
+///
+
+doc /// 
+	Key
 		isBirationalMap
 		(isBirationalMap, Ideal, Ideal, BasicList)
 		(isBirationalMap, Ring, Ring, BasicList)
 		(isBirationalMap, RingMap)
-    Headline
-        Checks if a map X -> Y between projective varieties is birational.
-    Usage
+		[isBirationalMap, AssumeDominant]
+	Headline
+		Checks if a map $X \to Y$ between projective varieties is birational.
+	Usage
 		val = isBirationalMap(a,b,f)
 		val = isBirationalMap(R,S,f)
 		val = isBirationalMap(Pi)
@@ -515,31 +537,31 @@ doc ///
 		b:Ideal
 			defining equations for Y
 		f:BasicList
-            A list of where to send the variables in the ring of b, to in the ring of a.
-        R:Ring
-            the homogeneous coordinate ring of X
-        S:Ring
-            the homogeneous coordinate ring of Y
-        Pi:RingMap
-            A ring map S to R corresponding to X mapping to Y
-    Outputs
-        val:Boolean
-            true if the map is birational, false if otherwise
-    Description
-        Text   
-            This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to have a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  Let's check that the plane quadratic cremona transformation is birational.
-        Example
-            R=QQ[x,y,z];
-            S=QQ[a,b,c];
-            Pi = map(R, S, {x*y, x*z, y*z});
-            isBirationalMap(Pi)
-        Text   
-            We can also verify that a cover of $P^1$ by an elliptic curve is not birational.
-        Example
-            R=QQ[x,y,z]/(x^3+y^3-z^3);
-            S=QQ[s,t];
-            Pi = map(R, S, {x, y-z});
-            isBirationalMap(Pi)
+			A list of where to send the variables in the ring of b, to in the ring of a.
+		R:Ring
+			the homogeneous coordinate ring of X
+		S:Ring
+			the homogeneous coordinate ring of Y
+		Pi:RingMap
+			A ring map S to R corresponding to X mapping to Y
+	Outputs
+		val:Boolean
+			true if the map is birational, false if otherwise
+	Description
+		Text   
+			This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  Let's check that the plane quadratic cremona transformation is birational.
+		Example
+			R=QQ[x,y,z];
+			S=QQ[a,b,c];
+			Pi = map(R, S, {x*y, x*z, y*z});
+			isBirationalMap(Pi)
+		Text   
+			We can also verify that a cover of $P^1$ by an elliptic curve is not birational.
+		Example
+			R=QQ[x,y,z]/(x^3+y^3-z^3);
+			S=QQ[s,t];
+			Pi = map(R, S, {x, y-z});
+			isBirationalMap(Pi)
 ///                     
 
 doc /// 
@@ -548,13 +570,14 @@ doc ///
 		(isBirationalOntoImage, Ideal, Ideal, BasicList)
 		(isBirationalOntoImage, Ring, Ring, BasicList)
 		(isBirationalOntoImage, RingMap)
+		[isBirationalOntoImage, AssumeDominant]
         Headline
-                Checks if a map X -> Y between projective varieties is birational onto f(X).
+                Checks if a map $X \to Y$ between projective varieties is birational onto f(X).
         Usage
                 val = isBirationalMap(a,b,f)
                 val = isBirationalMap(R,S,f)
-		val = isBirationalMap(Pi)
-	Inputs
+                val = isBirationalMap(Pi)
+        Inputs
                 a:Ideal
                         defining equations for X		
                 b:Ideal
@@ -572,7 +595,7 @@ doc ///
                         true if the map is birational, false if otherwise
         Description
                 Text   
-                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image.
+                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling isBirationalOntoImage.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).
                 Example
                         R=QQ[x,y,z];
                         S=QQ[a,b,c];
@@ -618,7 +641,7 @@ doc ///
 			defining equations for the image of f
 	Description
 		Text
-			Given $f : X->Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these.  In particular, this function returns an ideal defining a subset of the  the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
+			Given $f : X \to Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these.  In particular, this function returns an ideal defining a subset of the  the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
 		Example
 			S = QQ[x,y,z,w];
 			b = ideal(x*y-z*w);
@@ -682,7 +705,7 @@ doc ///
                 (mapOntoImage, Ideal, Ideal, BasicList)
                 (mapOntoImage, Ring, Ring, BasicList)
         Headline
-                Given a map of rings, correspoing to $f : X -> Y$, this returns the map of rings corresponding to $f : X -> f(X)$.
+                Given a map of rings, correspoing to $f : X \to Y$, this returns the map of rings corresponding to $f : X \to f(X)$.
         Usage
                 h = mapOntoImage(f)
                 h = mapOntoImage(a,b,l)
@@ -695,7 +718,7 @@ doc ///
 		l:BasicList
                         projective rational map given by polynomial represenatives of the same degree
                 f:RingMap
-                        the ring map corresponding to $f : X -> Y$
+                        the ring map corresponding to $f : X \to Y$
                 R:Ring
                         coordinate ring for X
                 S:Ring
@@ -703,10 +726,10 @@ doc ///
                 
         Outputs
                 h:RingMap
-			the map of rings corresponding to $f : X -> f(X)$.  
+			the map of rings corresponding to $f : X \to f(X)$.  
 	Description
 	        Text
-	                This function is really simple, given $S -> R$, this just returns $S/kernel -> R$.  
+	                This function is really simple, given $S \to R$, this just returns $S/kernel \to R$.  
 	        Example 
 	                R = QQ[x,y];
 	                S = QQ[a,b,c];
@@ -722,7 +745,7 @@ doc ///
                 (isEmbedding, Ideal, Ideal, BasicList)
                 (isEmbedding, Ring, Ring, BasicList)
         Headline
-                Given a map of rings, correspoing to $f : X -> Y$, this determines if this map embeds $X$ as a closed subscheme into $Y$.
+                Given a map of rings, correspoing to $f : X \to Y$, this determines if this map embeds $X$ as a closed subscheme into $Y$.
         Usage
                 val = isEmbedding(f)
                 val = isEmbedding(a,b,l)
@@ -735,7 +758,7 @@ doc ///
 		l:BasicList
                         projective rational map given by polynomial represenatives of the same degree
                 f:RingMap
-                        the ring map corresponding to $f : X -> Y$
+                        the ring map corresponding to $f : X \to Y$
                 R:Ring
                         coordinate ring for X
                 S:Ring
