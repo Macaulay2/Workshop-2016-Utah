@@ -14,6 +14,9 @@ gotzmannBound (RingElement, ZZ) := List => (P, s) -> (
 )
 gotzmannBound RingElement := List => P -> gotzmannBound(P, 0)
 gotzmannBound Ideal := List => I -> gotzmannBound hilbertPolynomial(I, Projective => false)
+gotzmannBound Module := List => M -> gotzmannBound(hilbertPolynomial(M,Projective=>false)-rank(M)*hilbertPolynomial(ideal(0_(ring M)),Projective=>false))
+
+
 
 lexSegment = method()
 lexSegment Ideal := Ideal => I -> (
@@ -36,6 +39,36 @@ lexSegment Ideal := Ideal => I -> (
 		--L = trim(L + ideal(submatrix'(lift(A, R), {(numcols A - hF#i)..numcols A})));
 	);
 	L
+)
+
+lexSegment Module := Module => M -> (
+	-- seems to work for submodules of ambient module gen in degree zero or less
+	-- currently does not order the generators of ambient module by degree - problem?
+	-- doc and tests not added yet
+	F := ambient M;
+	R := ring M;
+	s := max(append(flatten degrees M, gotzmannBound(F/M))); 
+	print("Gotzmann bound: " | s);
+	if not isSubset(M,F) then error "Input is not a submodule.";
+	if first max degrees F > 0 then error "Ambient module must be generated in degrees at most zero.";
+	L := gens module(ideal(0_R))**F; -- uses zero matrix as a seed
+	hF := (flatten entries last coefficients hilbertSeries(F/M, Order => s+1))/(c -> lift(c, ZZ));
+    	lowDeg := first degree first terms hilbertSeries(F/M, Order=>s+1); -- allow for lowest degree negative
+	print "Computing lex submodule ...";
+	for i from lowDeg to s do (
+		hFdeg := i - lowDeg; -- correlate index i with i-th term of hF
+		A := basis(i, F/(image L));
+		--not sure how to do next line yet for modules:
+		--if not hF#?hFdeg then ( L = trim(L + (module gens F)^hFdeg); break; );
+		n := numcols A;
+		A = lift(A, R);
+		K := gens module(ideal(0_R))**F;
+		for j from 0 to floor(n/80000) do ( -- to prevent long sequence error
+			K = K | A_{j*80000..min(n - 1 - hF#hFdeg, (j+1)*80000 - 1)};
+		);
+		L = L | K; -- append columns to generating matrix
+	);
+	trim image L
 )
 
 -------------------------------------------------------
