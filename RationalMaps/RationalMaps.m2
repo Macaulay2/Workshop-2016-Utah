@@ -375,16 +375,12 @@ flatten nzlist);
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  
-  
-  
-inverseOfMap = method();
-
+ inverseOfMap = method();
 --this checks whether a map X -> Y is birational.
 
 --X = Proj R
 --Y = Proj S
---This map is given by a list of elements in R, all homogeneous
+--This madfp is given by a list of elements in R, all homogeneous
 --of the same degree.  
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
@@ -392,26 +388,38 @@ inverseOfMap = method();
 inverseOfMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
     if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
     R:=ring di;
-    r:=numgens ambient R;
     K:=coefficientRing R;
-    Jr:= blowUpIdeals(di,bm);
+    im1 := saturate idealOfImageOfMap(di, im, bm);
+    S:=ring im;
+    --In the following lines we remove the linear parts of the ideal di and 
+--modify our map bm
+    Rlin:=(ambient ring di)/di;
+    Rlin2 := minimalPresentation(Rlin);
+    phi:=Rlin.minimalPresentationMap;    
+    Rlin1:=target phi;
+    di1:=ideal Rlin1;
+    bm0:=phi(matrix{bm});
+    bm1:=flatten first entries bm0;
+    --From here the situation is under the assumption that the variety is not contained in any hyperplane.
+    r:=numgens ambient Rlin1;
+    Jr:= blowUpIdeals(di1,bm1);
     n:=numgens Jr;
     L:={};
-    for i from 0 to (n-1) do if  (degree Jr_i)_0==1 then
-      L=append(L, Jr_i);
+    for i from 0 to (n-1) do(
+	 if  (degree Jr_i)_0==1 then  L=append(L, Jr_i);
+    );
    JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
-   S:=ring im;
    vS:=gens ambient S;
    g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
    barJD:=g(JD);
-   jdd:=(numgens ambient R)-1+dgi(di);
-   if not(isSubset(minors(jdd,barJD),im))==false then error "The map is not Birational";
+   jdd:=(numgens ambient Rlin1)-1;
+   if not(isSubset(minors(jdd,barJD),im1))==false then error "The map is not Birational onto its image";
    Col:=(nonZeroMinor(barJD,jdd))#0;
    SbarJD:=submatrix(barJD,,Col);
    Inv:={};
    for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
-   map(S/im, R/di, Inv)
-);    
+   psi:=map(S,Rlin1,matrix{Inv});
+   first entries matrix (psi*phi) );    
 
 inverseOfMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
     inverseOfMap(ideal R1, ideal S1, bm)
@@ -429,6 +437,7 @@ inverseOfMap(RingMap) :=(f)->(
     inverseOfMap(target f, source f, first entries matrix f)
     );
     
+   
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 mapOntoImage = method(); --given a map f : X -> Y, this creates the map f : X -> f(X).
