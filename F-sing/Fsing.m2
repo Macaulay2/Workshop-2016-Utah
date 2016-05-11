@@ -5,6 +5,9 @@ Authors => {
      {Name => "Erin Bela",
      Email=> "ebela@nd.edu"
      },
+     {Name => "Alberto F. Boix",
+     Email=> "alberto.fernandezb@upf.edu"
+     },
      {Name => "David J. Bruce",
      Email => "djbruce@math.wisc.edu",
      HomePage => "http://www.math.wisc.edu/~djbruce/"
