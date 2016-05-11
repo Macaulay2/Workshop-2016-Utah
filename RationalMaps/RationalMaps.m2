@@ -26,7 +26,11 @@ export{
 	"inverseOfMap",
 	"mapOntoImage",
     --"sameMapToPn", -- Dan: maybe we shouldn't export this.  Karl: I commented it out and made it internal.
-    "AssumeDominant" --option to, assume's that the map is dominant (ie, don't compute the kernel)
+    --**********************************
+    --*************OPTIONS**************
+    --**********************************
+    "SaturateOutput",  --option to turn off saturation of the output
+    "AssumeDominant" --option to assume's that the map is dominant (ie, don't compute the kernel)
 }
 
 ----------------------------------------------------------------
@@ -118,9 +122,9 @@ isSameDegree(BasicList):=(L)->(
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-baseLocusOfMap = method();
+baseLocusOfMap = method(Options=>{SaturateOutput=>true});
 
-baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
+baseLocusOfMap(Matrix) := o->(L1) -> ( --L1 is a row matrix
     if numRows L1 > 1 then error "Expected a row matrix";
     if isSameDegree( first entries L1  )==false then error "Expected a matrix of homogenous elements of the same degree";
 
@@ -136,7 +140,12 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     
     
     L:= apply(entries M, ll->ideal(ll));
-    saturate fold(L, plus)
+    if (o.SaturateOutput == true) then (
+        saturate fold(L, plus)
+    )
+    else (
+        fold(L, plus)
+    )
     -- these two commands create an ideal for the base 
     -- locus from the information
     -- given in the submodule above. We take the saturation to get
@@ -144,30 +153,34 @@ baseLocusOfMap(Matrix) := (L1) -> ( --L1 is a row matrix
     
 );
 
-baseLocusOfMap(List) := (L) ->(
-    baseLocusOfMap(matrix{L})
+baseLocusOfMap(List) := o->(L) ->(
+    baseLocusOfMap(matrix{L}, SaturateOutput=>o.SaturateOutput)
 );
 
-baseLocusOfMap(RingMap) := (ff) ->(
+baseLocusOfMap(RingMap) := o->(ff) ->(
     mm := sub(matrix ff, target ff);  
-    baseLocusOfMap(mm)
+    baseLocusOfMap(mm, , SaturateOutput=>o.SaturateOutput)
 );
+
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-- isRegularMap returns true if a map is regular (ie, has no base locus)
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 isRegularMap = method();
 
 isRegularMap(Matrix) := (L1) -> ( --L1 is a row matrix
-    I:= baseLocusOfMap(L1);
-    I == ideal 1_(ring I)
+    I:= baseLocusOfMap(L1, SaturateOutput=>false);
+    (dim I <= 0)
 );
 
 isRegularMap(List) := (L1) -> ( 
-    I:= baseLocusOfMap(L1);
-    I == ideal 1_(ring I)
+    I:= baseLocusOfMap(L1, SaturateOutput=>false);
+    (dim I <= 0)
 );
 
 isRegularMap(RingMap) := (ff) ->(
-        I:=baseLocusOfMap(ff);
-        I == ideal 1_(ring I)
+    I:=baseLocusOfMap(ff, SaturateOutput=>false);
+    (dim I <= 0)
 );
 
  blowUpIdeals:=method();
@@ -524,7 +537,19 @@ doc ///
         AssumeDominant=>b    
     Description
     	Text
-            If true, certain functions assume that $f : X \to Y$ is dominant.  In other words that the closure of $f(X)$ is equal to $Y$.
+            If true, certain functions assume that $f : X \to Y$ is dominant.  In other words that the closure of $f(X)$ is equal to $Y$.  In practice, this means that a kernel of a ring map will not be computed.
+///
+
+doc /// 
+    Key
+        SaturateOutput
+    Headline
+        If false, certain functions will not saturate their output.
+    Usage
+        SaturateOutput=>b    
+    Description
+    	Text
+            If SaturateOutput is true (the default), then functions will saturate their output.  Otherwise they will not.  It may be beneficial not to saturate in certain circumstances.
 ///
 
 doc /// 
