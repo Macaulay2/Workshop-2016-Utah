@@ -2,7 +2,7 @@
 
 -- INTERNAL: NONE
 
--- EXTERNAL: ethRoot*, frobeniusPower, divideFraction
+-- EXTERNAL: ethRoot*, frobeniusPower, divideFraction, ascendIdeal*
 
 
 --****************************************************
@@ -56,7 +56,7 @@ tauQGorAmb = ( R, e ) ->
 (
      J := findTestElementAmbient( R );
      h := findQGorGen( R, e);
-     sub( ascendIdeal( J, h, e ), R )
+     sub( ascendIdeal( e, h, J ), R )
 )
 
 --Computes the test ideal of an ambient Gorenstein ring
@@ -70,7 +70,7 @@ tauAOverPEMinus1Poly = ( f, a, e ) -> (
      b := a % (p^e - 1);
      k := a // (p^e - 1); --it seems faster to use the fact that tau(f^(1+k)) = f*tau(f^k) 
      I := ethRoot( e, a, f, ideal(f) );     
-     I = ascendIdealSafe( I, f, b, e );
+     I = ascendIdealSafe( b, e, f, I );
      I*ideal(f^k)
 )
 
@@ -115,7 +115,7 @@ tauAOverPEMinus1QGorAmbOld = (Sk, Jk, hk, ek, fm, a1, e1) -> (
                               --that tau(f^(1+k)) = f*tau(f^k) 
      fpow := fm^a2; 
      
-     Iasc := ascendIdeal(Jk*ideal(fm), fpow*hk1, et);
+     Iasc := ascendIdeal(et, fpow*hk1, Jk*ideal(fm) );
     
      Iasc*ideal(fm^k2)
 )
@@ -131,11 +131,10 @@ tauAOverPEMinus1QGorAmb = (Sk, Jk, hk, ek, fm, a1, e1) -> (
 	a2 := a3 % (pp^et - 1);
      k2 := a3 // (pp^et - 1); --it seems faster to use the fact that we can do simple Skoda for tau
      
-     Jl := ascendIdealSafe(Jk, hk, 1, ek);
-                      
+     Jl := ascendIdealSafe(1, ek, hk, Jk );
+                   
         --          assert false;                             
-     Iasc := ascendIdealSafeList(Jk*ideal(fm)^(ceiling(a3/(pp^et - 1))), (fm, hk), (a2, numerator ((pp^et - 1)/(pp^ek - 1))), et);
-     
+     Iasc := ascendIdealSafeList( (a2, numerator ((pp^et - 1)/(pp^ek - 1))), et, (fm, hk), Jk*ideal(fm)^(ceiling(a3/(pp^et - 1))) );
 --     assert false;
      
      Iasc*ideal(fm^k2)
@@ -184,7 +183,7 @@ tauQGor = (Rk, ek, fk, t1) -> (
 		else I2 = I1
      )
      else (
-	  	I1 = ascendIdeal(Jk, hk, ek);
+	  	I1 = ascendIdeal(ek, hk, Jk);
 	  	if (pPow != 0) then (
 	  		I2 = ethRootSafeList( pPow, (numerator((pp^pPow - 1)/(pp^ek - 1)), a2), (hk, fm), I1 )
 	  	)

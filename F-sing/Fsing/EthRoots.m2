@@ -155,6 +155,8 @@ ethRootSafe( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> (
 	aQuot := floor(a/p^e);
 	
 	expOfA := basePExp(p,aRem); --this gives digits of aRem base p as a list, left-endian first 
+	zeros := apply(e-#expOfA,i->0);
+	expOfA = expOfA|zeros;
 	
 	IN1 := I;
 	
