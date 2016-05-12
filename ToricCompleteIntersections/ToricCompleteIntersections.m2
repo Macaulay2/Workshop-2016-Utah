@@ -20,7 +20,21 @@ newPackage(
 	    --"PolymakeInterface"
         })
 
-export {"vertexIndices","dualFaces","matrixFromString","findInteriors","findPolarDual","faceIndices","polarDualFace","latticePointFaces","hodgeOfCYToricDivisor","h11OfCY","h21OfCY"}
+export {"vertexIndices",
+    "dualFaces",
+    "matrixFromString",
+    "findInteriors",
+    "findPolarDual",
+    "faceIndices",
+    "polarDualFace",
+    "latticePointFaces",
+    "hodgeOfCYToricDivisor",
+    "hodgeOfCYToricDivisors",
+    "h11OfCY",
+    "h21OfCY",
+    "interiorLattice",
+    "isFavorable"
+    }
 
 -- Code here
 matrixFromString = method()
@@ -163,6 +177,20 @@ hodgeOfCYToricDivisor(Polyhedron,List) := (P,l) -> (
       else if lp#0#l1#1 == 1 then {1,n,0}
       else if lp#0#l1#1 == 2 then {1+n,0,0}
     )
+hodgeOfCYToricDivisors = method()
+hodgeOfCYToricDivisors(Polyhedron, HashTable) := (P, intP) -> (
+    flatten for i from 0 to 3 list (
+        flatten for f in keys intP#i list (
+            pts := intP#i#f;
+            for g in pts#0 list g => (
+                n := #pts#1;
+                if i == 0 then {1,0,n} 
+                else if i == 1 then {1,n,0}
+                else if i == 2 then {1+n,0,0}
+                )
+            )
+        )
+    )
 
 h11OfCY = method()
 h11OfCY(Polyhedron) := (P) -> (
@@ -171,6 +199,16 @@ h11OfCY(Polyhedron) := (P) -> (
     t := sum l;
     l1 := for f in faces(2, polar P) list (#(interiorLatticePoints f))*(#(interiorLatticePoints(P,polarDualFace(polar P,faceIndices(polar P,f)))));
     t1 := sum l1;
+    np - 5 - t + t1
+    );
+
+h11OfCY(Polyhedron, HashTable) := (P, interiors) -> (
+    -- interiors is the result of 'interiorLattice P'
+    np1 := 1 + (values interiors)/values//flatten/last/length//sum;
+    np := #(latticePoints polar P);
+    if np != np1 then error "oops";
+    t := (values interiors#0)/last/length//sum;
+    t1 := (values interiors#1)/(v -> #v#0 * #v#1)//sum;
     np - 5 - t + t1
     );
 
@@ -183,6 +221,43 @@ h21OfCY(Polyhedron) := (P) -> (
     t1 := sum l1;
     np - 5 - t + t1
     );
+h21OfCY(Polyhedron, HashTable) := (P, interiors) -> (
+    -- interiors is the result of 'interiorLattice P'    
+    np1 := 1 + (values interiors)/values//flatten/first/length//sum;
+    np := #(latticePoints P);
+    if np != np1 then error "oops";
+    t := (values interiors#3)/first/length//sum;
+    t1 := (values interiors#2)/(v -> #v#0 * #v#1)//sum;
+    np - 5 - t + t1
+    );
+isFavorable(Polyhedron, HashTable) := (P, interiors) -> (
+    t1 := (values interiors#1)/(v -> #v#0 * #v#1)//sum;
+    t1 == 0
+    )
+
+interiorLattice = method()
+interiorLattice Polyhedron := (P1) -> (
+    time P2 := polar P1;
+    time LP1 := select(latticePoints P1, v -> v != 0);
+    time LP2 := select(latticePoints P2, v -> v != 0);
+    facedims := time hashTable flatten for i from 0 to dim P1-1 list for f in faces(dim P1-i,P1) list faceIndices(P1,f) => i;
+    time lp1 := for p in LP1 list (
+        pf := positions(flatten entries ((transpose vertices P2) * p), x -> x == -1);
+        f := polarDualFace(P2,pf);
+        (f,p)
+        );
+    interiors1 := applyPairs(partition(f->f#0, lp1), (k,v) -> (k,v/last));
+    time lp2 := for p in LP2 list (
+        pf := positions(flatten entries ((transpose vertices P1) * p), x -> x == -1);
+        --f := polarDualFace(P1,pf);
+        (pf,p)
+        );
+    interiors2 := applyPairs(partition(f->f#0, lp2), (k,v) -> (k,v/last));
+    actualfaces := sort toList (set keys interiors1 + set keys interiors2);
+    result := for k in actualfaces list k => (if interiors1#?k then interiors1#k else {}, if interiors2#?k then interiors2#k else {});
+    result = partition(f->facedims#(first f), result);
+    applyPairs(result, (k,v) -> (k,hashTable v))
+    )
     
 beginDocumentation()
 
