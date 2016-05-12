@@ -388,7 +388,7 @@ flatten nzlist);
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
- inverseOfMap = method();
+ inverseOfMap = method(Options => {AssumeDominant=>false});
 --this checks whether a map X -> Y is birational.
 
 --X = Proj R
@@ -398,11 +398,18 @@ flatten nzlist);
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
 --list of elements = bm
-inverseOfMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
+inverseOfMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
     R:=ring di;
     K:=coefficientRing R;    
     S:=ring im;
+    im1 := im;
+    if (o.AssumeDominant == true) then (
+        im1 =  im;
+    )
+    else (
+        im1 = idealOfImageOfMap(di, im, bm);
+    );
     --In the following lines we remove the linear parts of the ideal di and 
 --modify our map bm
     Rlin:=(ambient ring di)/di;
@@ -425,30 +432,22 @@ inverseOfMap(Ideal,Ideal,BasicList) :=(di,im,bm)->(
    g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
    barJD:=g(JD);
    jdd:=(numgens ambient Rlin1)-1;
-   if not(isSubset(minors(jdd,barJD),im))==false then error "The map is not birational onto its image";
+   if not(isSubset(minors(jdd,barJD),im1))==false then error "The map is not birational onto its image";
    Col:=(nonZeroMinor(barJD,jdd))#0;
    SbarJD:=submatrix(barJD,,Col);
    Inv:={};
    for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
-   psi:=map(S/im,Rlin1,matrix{Inv});
+   psi:=map(S/im1,Rlin1,matrix{Inv});
    psi*phi );    
 
-inverseOfMap(Ring,Ring,BasicList) := (R1, S1, bm)->(
-    inverseOfMap(ideal R1, ideal S1, bm)
+inverseOfMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+    inverseOfMap(ideal R1, ideal S1, bm, AssumeDominant=>o.AssumeDominant)
     );
 
---isBirationalMap(Ideal,Ring,BasicList) := (di, S1, bm)->(
---    isBirationalMap(di, ideal S1, bm)
---    );
-
---isBirationalMap(Ring,Ideal,BasicList) := (R1, im, bm)->(
---    isBirationalMap(ideal R1, im, bm)
---    );
-
-inverseOfMap(RingMap) :=(f)->(
+inverseOfMap(RingMap) := o->(f)->(
    -- invList := inverseOfMap(target f, source f, first entries matrix f);
 --    map(source f, target f, invList)
-    inverseOfMap(target f, source f, first entries matrix f)
+    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
     );
     
    
@@ -490,7 +489,7 @@ isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
 isEmbedding(RingMap) := (f1)->(
         f2 := mapOntoImage(f1);
         flag := true;
-        try ( h := inverseOfMap(f2) ) then (
+        try ( h := inverseOfMap(f2, AssumeDominant=>true) ) then (
                 flag = isRegularMap(f2);
                 if (flag == true) then(
                         flag = isRegularMap(h);
@@ -640,6 +639,12 @@ doc ///
                         Pi = map(R, S, {x*y, x*z, y*z});
                         isBirationalMap(Pi)
                 Text
+                        Note the Frobenius map is not birational.
+                Example
+                        R = ZZ/5[x,y,z]/(x^3+y^3-z^3);
+                        S = ZZ/5[a,b,c]/(a^3+b^3-b^3);
+                        h = map(R, S, {x^5, y^5, z^5});
+                        isBirationalMap(h)
 ///                     
 
 
@@ -997,8 +1002,9 @@ doc ///
 		(inverseOfMap, Ideal, Ideal, BasicList)
 		(inverseOfMap, Ring, Ring, BasicList)
 		(inverseOfMap, RingMap)
+		[inverseOfMap, AssumeDominant]
     Headline
-        Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational
+        Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational onto its image.
     Usage
         f = inverseOfMap(I, J, L)
         f = inverseOfMap(R, S, L)
@@ -1011,13 +1017,13 @@ doc ///
         L: List
             List of polynomials that define the coordinates of your birational map
         g: RingMap
-            Your birational map
+            Your birational map $f : X \to Y$.
     Outputs
         f: RingMap
-            Inverse function of your birational map
+            Inverse function of your birational map, $f(X) \to X$.
     Description
         Text
-            Finds the inverse function of your birational map.  The target and source must be varieties, in particular their defining ideals must be prime.
+            Given a map $f : X \to Y$, this finds the inverse of your birational map $f(X) \to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.  If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant.
         Example
             R = ZZ/7[x,y,z];
             S = ZZ/7[a,b,c];
@@ -1272,11 +1278,18 @@ TEST /// --test #25 (3rd veronese embedding of P^1)
     f = map(R, S, {x^3,x^2*y,x*y^2,x^3});
     assert(isBirationalOntoImage(f) == true)
 ///
+
+TEST /// --test #26 (Frobenius on an elliptic curve)
+    R = ZZ/5[x,y,z]/(x^3+y^3-z^3);
+    S = ZZ/5[a,b,c]/(a^3+b^3-b^3);
+    h = map(R, S, {x^5, y^5, z^5});
+    assert(isBirationalMap(h) == false)
+///                        
 	-------------------------------------
 	----- inverseOfMap  -----------------
 	-------------------------------------
 
-TEST /// --test #26
+TEST /// --test #27
     -- Let's find the inverse of the projection map from
     -- the blow up of P^2 to P^2
 
@@ -1288,7 +1301,7 @@ TEST /// --test #26
     assert(baseLocusOfMap(inverseOfMap(h)) == ideal(x,y)) 
 ///
 
-TEST /// --test #27
+TEST /// --test #28
     R =  QQ[a..d]/(a*d - b*c);
     S = QQ[x,y,z];
     f = inverseOfMap(R, S, {a,b,c});
@@ -1299,8 +1312,8 @@ TEST /// --test #27
 ------- isEmbedding ---------------
 -----------------------------------
 
-TEST /// --test #28
-    -- Let's find the inverse of the projection map from
+TEST /// --test #29
+    -- Consider the projection map from
     -- the blow up of P^2 to P^2
 
     -- the blow up of P^2 is a projective variety in P^5: 
@@ -1309,6 +1322,22 @@ TEST /// --test #28
     blowUpSubvar = P5/(minors(2, M)+ideal(b - d))
     h = map(blowUpSubvar, QQ[x,y,z],{a, b, c})
     assert(isEmbedding(h)==false)
+///
+
+TEST /// --test #30
+    --Let's do the twisted cubic curve
+    P3 = ZZ/101[x,y,z,w];
+    C = ZZ/101[a,b];
+    h = map(C, P3, {a^3, a^2*b, a*b^2, b^3});
+    assert(isEmbedding(h) == true)
+///
+
+TEST /// --test 31
+     --let's parameterize the nodal plane cubic
+     P2 = QQ[x,y,z]
+     C = QQ[a,b]
+     h = map(C, P2, {b*a*(a-b), a^2*(a-b), b^3})
+     assert((isBirationalMap h == false) and (isBirationalOntoImage h == true) and (isEmbedding(h) == false) and (isRegularMap inverseOfMap h == false))
 ///
 ----FUTURE PLANS------
 
