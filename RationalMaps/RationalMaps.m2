@@ -1353,7 +1353,7 @@ TEST /// --test #33, map from genus 3 curve to projective space
     C = QQ[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
     Q = ideal(y,x+z); --a point on our curve
     f2 = mapToProjectiveSpace(7*divisor(Q)); --a divisor of degree 7 (this is degree 7, so should induce an embedding)
-    assert( (isEmbedding(f2) == true)) --note for this example, 6*divisor(Q) is not an embedding...
+    assert( (isEmbedding(f2) == true)) --note for this example, 6*divisor(Q) is not an embedding, indeed it appears the image is singular for 6*D.
 ///
 ----FUTURE PLANS------
 
