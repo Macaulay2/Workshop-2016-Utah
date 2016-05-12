@@ -1308,11 +1308,19 @@ TEST /// --test #28
     assert(isSameMapToPn(first entries matrix f, {x^2, x*y, x*z, y*z}))
 /// 
 
+TEST /// --test #29 (quadratic cremona)
+    R = ZZ/11[x,y,z];
+    S = ZZ/11[a,b,c];
+    h = map(R, S, {y*z, x*z, x*y});
+    g = inverseOfMap(h);
+    assert(isSameMapToPn(first entries matrix g, {b*c, a*c, a*b}))
+///
+
 -----------------------------------
 ------- isEmbedding ---------------
 -----------------------------------
 
-TEST /// --test #29
+TEST /// --test #30
     -- Consider the projection map from
     -- the blow up of P^2 to P^2
 
@@ -1324,7 +1332,7 @@ TEST /// --test #29
     assert(isEmbedding(h)==false)
 ///
 
-TEST /// --test #30
+TEST /// --test #31
     --Let's do the twisted cubic curve
     P3 = ZZ/101[x,y,z,w];
     C = ZZ/101[a,b];
@@ -1332,12 +1340,20 @@ TEST /// --test #30
     assert(isEmbedding(h) == true)
 ///
 
-TEST /// --test 31
+TEST /// --test 32
      --let's parameterize the nodal plane cubic
      P2 = QQ[x,y,z]
      C = QQ[a,b]
      h = map(C, P2, {b*a*(a-b), a^2*(a-b), b^3})
      assert((isBirationalMap h == false) and (isBirationalOntoImage h == true) and (isEmbedding(h) == false) and (isRegularMap inverseOfMap h == false))
+///
+
+TEST /// --test #33, map from genus 3 curve to projective space
+    needsPackage "Divisor";    
+    C = QQ[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
+    Q = ideal(y,x+z); --a point on our curve
+    f2 = mapToProjectiveSpace(7*divisor(Q)); --a divisor of degree 7 (this is degree 7, so should induce an embedding)
+    assert( (isEmbedding(f2) == true)) --note for this example, 6*divisor(Q) is not an embedding...
 ///
 ----FUTURE PLANS------
 
