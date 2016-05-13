@@ -11,7 +11,9 @@ newPackage(
     	DebuggingMode => false
     	)
     
-export{"characterLlambda", "characterKlambda", "bettiTableIlambda", "hilbertFunctionLlambda",
+export{"characterLlambda", "characterKlambda", 
+    "bettiTableIlambda", "conjecturalBettiTableIlambda", 
+    "hilbertFunctionLlambda",
     "makeLinearComplexLGenericlambda"}
 
 --the character of the exterior algebra
@@ -129,8 +131,16 @@ dimLlamd(ZZ,ZZ,List,ZZ) := (n,m,lam,d) -> (
 --the list of dimensions of graded components of the simple glmn module Llambda
 hilbertFunctionLlambda = method()
 hilbertFunctionLlambda(ZZ,ZZ,List) := (n,m,lam) -> (
-    G := apply(characterLlambda(n,m,lam),x->sum(x#0));
-    for i from sum lam to max G list dimLlamd(n,m,lam,i)
+    t := local t;
+    s := local s;
+    T1 := schurRing(t,n);
+    T2 := schurRing(s,m);
+    charL := characterLlambda(n,m,lam);
+    G := apply(charL,x->sum(x#0));
+    for i from sum lam to max G list (
+	F := select(charL, x -> sum(x#0) == i);
+	sum apply(F, x-> dim(T1_(x#0)) * dim(T2_(x#1)) * x#2)
+	)
     )
 
 --replaces x_i*y_j via e_(i,j) -- internal, not to be exported!
@@ -176,6 +186,64 @@ makeLinearComplexLGenericlambda(ZZ,ZZ,List,PolynomialRing) := (m,n,lam,S) -> (
     matE := matrix apply(entries mat,row -> apply(row,pol -> makeLinearMap(pol,m,n,e,x,y)));
     dual bggComplex(coker matE,S)
     )
+
+
+-----Conjectural Betti table for I_lambda
+-----
+
+borderStrip = (n,lam) -> (
+    b0 := (lam#0,0,lam#0);
+    conjlam := conjugate new Partition from lam;
+    listBoxes := {b0};
+    for i from 1 to min(conjlam#0,n-1) do
+    (
+	li := for j from lam#i to lam#(i-1) list (j,i,i+j);
+	listBoxes = listBoxes | (reverse li);
+	);
+    listBoxes
+    )
+
+admissiblePatterns := admissiblePatterns;
+
+generateDyck = method()
+generateDyck(ZZ,List,List,List) := (n,lamD,dyckPat,limits) ->
+(
+    starts := limits#0;
+    ends := limits#1;
+    admissiblePatterns = admissiblePatterns | {(lamD,set dyckPat)};
+    bS := borderStrip(n,lamD); 
+    for i from 0 to #bS-2 do if member((bS#i)_1,starts) then
+    	for j from i+1 to #bS-1 do if (bS#j)_2 < (bS#i)_2 then break else
+	    if member((bS#j)_1,ends) and (bS#i)_2 == (bS#j)_2 then
+	    (
+		newD := bS_(toList(i..j));
+		ri := (bS#i)_1;
+		rj := (bS#j)_1;
+		newlamD := (for k from 0 to ri list if lamD#k>lamD#ri then lamD#k else lamD#k+1) |
+		    	   (for k from ri+1 to rj list lamD#(k-1)+1) |
+			   (for k from rj+1 to #lamD-1 list lamD#k);
+		newstarts := starts - set(toList(ri+1..rj));
+		newends := ends - set(toList(ri..rj-1));
+		generateDyck(n,newlamD,dyckPat | {newD},{newstarts,newends});
+		)
+    )
+
+
+conjecturalBettiTableIlambda = method()
+conjecturalBettiTableIlambda(ZZ,ZZ,List) := (m,n,lam) ->
+(
+    l := set(toList(0..n-1));
+    admissiblePatterns = {};
+    if #lam < n then lam = lam | splice{n-#lam:0};
+    generateDyck(n,lam,{},{l,l});
+    bet := apply(toList(set admissiblePatterns),x-> (x#0,sum apply(toList(x#1),y->#y)));
+    sum apply(bet,t -> new BettiTally from 
+	(
+	    hF := hilbertFunctionLlambda(m,n,t_0);
+	    for i from 0 to #hF-1 list (t_1+i,{sum(t#0)+i},sum(t#0)+i) => hF#i)
+	    )
+    )
+
 
 beginDocumentation()
 
@@ -328,41 +396,82 @@ doc ///
 doc ///
     Key
        bettiTableIlambda
-       (bettiTableIlambda,ZZ,ZZ,ZZ,List)
        (bettiTableIlambda,ZZ,ZZ,List)	 
+       (bettiTableIlambda,ZZ,ZZ,ZZ,List)
     Headline
-        a function to compute the betti table of the GLm X GLn invariant ideal I_lambda
+        compute the Betti table of the GL_m X GL_n invariant ideal I_lambda
     Usage
-        f = bettiTableIlambda(m,n,p,lam)
         f = bettiTableIlambda(m,n,lam)
+        f = bettiTableIlambda(m,n,p,lam)
     Inputs
         m:ZZ
         n:ZZ
-        p:ZZ 
+        p:ZZ
+	  a prime characteristic 
         lam:List 
     Outputs
         f:BettiTally
     Description
       Text
-         This function only works in positive characteristic. It takes as input integers
-         m,n,p, and a partition lam. It computes the betti table of the GLm X GLn invariant
-         ideal I_{lam} in characteristic p. 
+         The function takes as input three integers
+         m,n,p (if the prime p is not provided, we take p=32003) and a partition {\tt lam}. 
+	 It computes the Betti table of the {\tt GL_m\times GL_n}-invariant 
+	 ideal {\tt I_{lam}} in characteristic p (assuming that p is generic enough). 
     
       Example
-       m=2;
-       n=2;
+       m=3;
+       n=3;
        p=101;
        lam={2,1};
        bettiTableIlambda(m,n,p,lam)
-      
-      Text
-       If a prime is not provided, the largest possible prime is automatically selected:
-       
+             
       Example
-       m=2;
-       n=3;
+       m=3;
+       n=2;
        lam={3};
        bettiTableIlambda(m,n,lam)
+   
+   Caveat
+     This function only works in positive characteristic: it uses speed-ups for computing the
+     Betti table which are currently not available in characteristic zero.
+   SeeAlso
+     conjecturalBettiTableIlambda
+///
+
+doc ///
+    Key
+       conjecturalBettiTableIlambda
+       (conjecturalBettiTableIlambda,ZZ,ZZ,List)	 
+    Headline
+       compute the Betti table of the GL_m X GL_n invariant ideal I_lambda, based on a conjectural relationship with gl(m|n)-representations
+    Usage
+        b = conjecturalBettiTableIlambda(m,n,lam)
+    Inputs
+        m:ZZ
+        n:ZZ
+        lam:List 
+    Outputs
+        b:BettiTally
+    Description
+      Text
+         The function takes as input the integers
+         m,n and a partition {\tt lam}. 
+	 It computes the betti table of the {\tt GL_m\times GL_n} invariant ideal {\tt I_{lam}}
+    
+      Example
+       m = 3;
+       n = 3;
+       lam = {2,1};
+       b = conjecturalBettiTableIlambda(m,n,lam)
+
+      Example
+       m=3;
+       n=2;
+       lam={3};
+       conjecturalBettiTableIlambda(m,n,lam)
+
+    SeeAlso
+      bettiTableIlambda       
 ///
 
 doc ///
@@ -414,13 +523,13 @@ characterKlambda(3,2,{1})
 charE(4,3)
 hilbertFunctionLlambda(3,3,{3,1})
 dimLlamd(3,3,{3,1},5)
-
---F = resolution(I,DegreeLimit => 5)
---F = resolution I
-F = res(I, FastNonminimal => true)
-betti(F, Minimize => true)
+time conjecturalBettiTableIlambda(4,3,{2,1,0})
+time bettiTableIlambda(4,3,{2,1,0})
 
 --TODO
 --list the composition factors of K_lambda
---construct conjectural Betti table for I_lambda
 --construct the linear complex corresponding to L_lambda for arbitrary lambda
+
+
+
+
