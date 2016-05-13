@@ -22,17 +22,18 @@ newPackage(
 
 export {"vertexIndices",
     "dualFaces",
-    "matrixFromString",
     "findInteriors",
     "findPolarDual",
     "faceIndices",
     "polarDualFace",
     "latticePointFaces",
+    -- The following are the ones we care about
+    "matrixFromString",
     "hodgeOfCYToricDivisor",
     "hodgeOfCYToricDivisors",
     "h11OfCY",
     "h21OfCY",
-    "interiorLattice",
+    "interiorLattice", -- this should be internal?  Right now, we need to see it.
     "isFavorable"
     }
 
@@ -170,20 +171,24 @@ polarDualFace(Polyhedron,List) := (P,f) -> (
 
 hodgeOfCYToricDivisor = method();
 hodgeOfCYToricDivisor(Polyhedron,List) := (P,l) -> (
+    P2 := polar P;
     l1 := transpose matrix{l};
-    lp := latticePointFaces(P);
-    n := #interiorLatticePoints(polar P,polarDualFace(P,lp#0#l1#0));
+    lp := latticePointFaces(P2);
+    n := #interiorLatticePoints(P,polarDualFace(P2,lp#0#l1#0));
     if lp#0#l1#1 == 0 then {1,0,n} 
       else if lp#0#l1#1 == 1 then {1,n,0}
       else if lp#0#l1#1 == 2 then {1+n,0,0}
     )
+
 hodgeOfCYToricDivisors = method()
-hodgeOfCYToricDivisors(Polyhedron, HashTable) := (P, intP) -> (
+hodgeOfCYToricDivisors Polyhedron := (P) -> (
+    if dim P != 4 then error "expected a 4d reflexive polytope";
+    intP := interiorLattice P;
     flatten for i from 0 to 3 list (
-        flatten for f in keys intP#i list (
-            pts := intP#i#f;
-            for g in pts#0 list g => (
-                n := #pts#1;
+        flatten for f in keys intP#(3-i) list (
+            pts := intP#(3-i)#f;
+            for g in pts#1 list g => (
+                n := #pts#0;
                 if i == 0 then {1,0,n} 
                 else if i == 1 then {1,n,0}
                 else if i == 2 then {1+n,0,0}
@@ -193,7 +198,10 @@ hodgeOfCYToricDivisors(Polyhedron, HashTable) := (P, intP) -> (
     )
 
 h11OfCY = method()
-h11OfCY(Polyhedron) := (P) -> (
+h21OfCY = method()
+
+-- original code, changed by Mike to avoid use of faces(...,P)
+h11OfCY(Polyhedron,Thing) := (P,notused) -> (
     np := #(latticePoints polar P);
     l := for f in faces(1,polar P) list #(interiorLatticePoints f);
     t := sum l;
@@ -202,8 +210,18 @@ h11OfCY(Polyhedron) := (P) -> (
     np - 5 - t + t1
     );
 
-h11OfCY(Polyhedron, HashTable) := (P, interiors) -> (
-    -- interiors is the result of 'interiorLattice P'
+-- original code, changed by Mike to avoid use of faces(...,P)
+h21OfCY(Polyhedron,Thing) := (P,notused) -> (
+    np := #(latticePoints P);
+    l := for f in faces(1,P) list #(interiorLatticePoints f);
+    t := sum l;
+    l1 := for f in faces(2,P) list (#(interiorLatticePoints f))*(#(interiorLatticePoints(polar P,polarDualFace(P,faceIndices(P,f)))));
+    t1 := sum l1;
+    np - 5 - t + t1
+    );
+
+h11OfCY Polyhedron := (P) -> (
+    interiors := interiorLattice P;
     np1 := 1 + (values interiors)/values//flatten/last/length//sum;
     np := #(latticePoints polar P);
     if np != np1 then error "oops";
@@ -212,17 +230,8 @@ h11OfCY(Polyhedron, HashTable) := (P, interiors) -> (
     np - 5 - t + t1
     );
 
-h21OfCY = method()
-h21OfCY(Polyhedron) := (P) -> (
-    np := #(latticePoints P);
-    l := for f in faces(1,P) list #(interiorLatticePoints f);
-    t := sum l;
-    l1 := for f in faces(2,P) list (#(interiorLatticePoints f))*(#(interiorLatticePoints(polar P,polarDualFace(P,faceIndices(P,f)))));
-    t1 := sum l1;
-    np - 5 - t + t1
-    );
-h21OfCY(Polyhedron, HashTable) := (P, interiors) -> (
-    -- interiors is the result of 'interiorLattice P'    
+h21OfCY Polyhedron := (P) -> (
+    interiors := interiorLattice P;
     np1 := 1 + (values interiors)/values//flatten/first/length//sum;
     np := #(latticePoints P);
     if np != np1 then error "oops";
@@ -230,33 +239,53 @@ h21OfCY(Polyhedron, HashTable) := (P, interiors) -> (
     t1 := (values interiors#2)/(v -> #v#0 * #v#1)//sum;
     np - 5 - t + t1
     );
-isFavorable(Polyhedron, HashTable) := (P, interiors) -> (
+
+isFavorable Polyhedron := (P) -> (
+    -- This is from the Batyrev formula for h^11, 
+    -- The term ell^*(theta) * ell^*(theta^*) gives new divisors.
+    --  here theta is an edge of P, theta^* is a (dim P)-2 face of (polar P)
+    --  and ell^* is the number of interior lattice points.
+    interiors := interiorLattice P;
     t1 := (values interiors#1)/(v -> #v#0 * #v#1)//sum;
     t1 == 0
     )
 
+-- TODO: this function has an awful name
+-- This function takes a polytope, and returns a hash table with keys the dimension i of faces
+-- whose key is also a hashtable with keys being the faces of P of dimension i (given by 
+--  an ascending list of integer indices of the vertices of the face), 
+-- and the value at that index is a pair:
+--   (list of interior points to that face of P, list of interior points to the dual face in polar P)
+-- If both of these are empty lists, then that face is not placed in as a key.
+-- It is stashed inside the Polyhedron object.
+-- This function uses the following potentially low functions:
+--  latticePoints
+--  faces.  We could potentially avoid this by recomputing the dimension of
 interiorLattice = method()
 interiorLattice Polyhedron := (P1) -> (
-    time P2 := polar P1;
-    time LP1 := select(latticePoints P1, v -> v != 0);
-    time LP2 := select(latticePoints P2, v -> v != 0);
-    facedims := time hashTable flatten for i from 0 to dim P1-1 list for f in faces(dim P1-i,P1) list faceIndices(P1,f) => i;
-    time lp1 := for p in LP1 list (
-        pf := positions(flatten entries ((transpose vertices P2) * p), x -> x == -1);
-        f := polarDualFace(P2,pf);
-        (f,p)
+    if not P1.cache.?interiorLattice then P1.cache.interiorLattice = (
+        P2 := polar P1;
+        LP1 := select(latticePoints P1, v -> v != 0);
+        LP2 := select(latticePoints P2, v -> v != 0);
+        facedims := hashTable flatten for i from 0 to dim P1-1 list for f in faces(dim P1-i,P1) list faceIndices(P1,f) => i;
+        lp1 := for p in LP1 list (
+            pf := positions(flatten entries ((transpose vertices P2) * p), x -> x == -1);
+            f := polarDualFace(P2,pf);
+            (f,p)
+            );
+        interiors1 := applyPairs(partition(f->f#0, lp1), (k,v) -> (k,v/last));
+        lp2 := for p in LP2 list (
+            pf := positions(flatten entries ((transpose vertices P1) * p), x -> x == -1);
+            --f := polarDualFace(P1,pf);
+            (pf,p)
+            );
+        interiors2 := applyPairs(partition(f->f#0, lp2), (k,v) -> (k,v/last));
+        actualfaces := sort toList (set keys interiors1 + set keys interiors2);
+        result := for k in actualfaces list k => (if interiors1#?k then interiors1#k else {}, if interiors2#?k then interiors2#k else {});
+        result = partition(f->facedims#(first f), result);
+        applyPairs(result, (k,v) -> (k,hashTable v))
         );
-    interiors1 := applyPairs(partition(f->f#0, lp1), (k,v) -> (k,v/last));
-    time lp2 := for p in LP2 list (
-        pf := positions(flatten entries ((transpose vertices P1) * p), x -> x == -1);
-        --f := polarDualFace(P1,pf);
-        (pf,p)
-        );
-    interiors2 := applyPairs(partition(f->f#0, lp2), (k,v) -> (k,v/last));
-    actualfaces := sort toList (set keys interiors1 + set keys interiors2);
-    result := for k in actualfaces list k => (if interiors1#?k then interiors1#k else {}, if interiors2#?k then interiors2#k else {});
-    result = partition(f->facedims#(first f), result);
-    applyPairs(result, (k,v) -> (k,hashTable v))
+    P1.cache.interiorLattice
     )
     
 beginDocumentation()
@@ -272,7 +301,50 @@ Description
 Caveat
 SeeAlso
 ///
+
+TEST ///
+  -- We work on one example in 4 dimensions, where we know the answers (or have computed them elsewhere).
+  -- Second polytope (index 1) on h11=3 Kreuzer-Skarke list of 4d reflexive polytopes for h11=3.
+  -- 4 5  M:48 5 N:8 5 H:3,45 [-84]
+  str = "  1   0   2   4  -8
+         0   1   5   3  -9
+         0   0   6   0  -6
+         0   0   0   6  -6
+  "
+  M = matrixFromString str
+  assert(M == matrix {{1, 0, 2, 4, -8}, {0, 1, 5, 3, -9}, {0, 0, 6, 0, -6}, {0, 0, 0, 6, -6}})
+
+  P = convexHull M  
+  assert(# latticePoints P == 48)
+  assert(# latticePoints polar P == 8)
+  assert(h11OfCY P == 3)
+  assert(h21OfCY P == 45)
+  assert(h11OfCY polar P == 45)
+  assert(h21OfCY polar P == 3)
+  
+  -- Now compute all of the cohomologies of the (irreducible) toric divisors 
+  LP = select(latticePoints polar P, p -> p != 0)
+  LP = for lp in LP list flatten entries lift(lp,ZZ)
+  assert(#LP == 7)
+  cohoms = for v in LP list hodgeOfCYToricDivisor(P, v)
+  cohomH = hashTable hodgeOfCYToricDivisors P
+  cohoms1 = for v in LP list cohomH#(transpose matrix {v})
+  assert(cohoms == cohoms1)
+  assert isFavorable P
+
+  -- Now compute all of the cohomologies of the (irreducible) toric divisors for the polar dual
+  LP = select(latticePoints P, p -> p != 0)
+  LP = for lp in LP list flatten entries lift(lp,ZZ)
+  assert(#LP == 47)
+  cohoms = for v in LP list hodgeOfCYToricDivisor(polar P, v)
+  cohomH = hashTable hodgeOfCYToricDivisors polar P
+  cohoms1 = for v in LP list cohomH#(transpose matrix {v})
+  assert(cohoms == cohoms1)
+  assert not isFavorable polar P
+///
+
 end--
+
 doc ///
 Key
 Headline
