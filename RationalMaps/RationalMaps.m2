@@ -311,7 +311,6 @@ isBirationalMap(RingMap) :=o->(f)->(
   
 isBirationalOntoImage = method(Options => {AssumeDominant=>false});
 --if AssumeDominant is true, it doesn't form the kernel.  
---TODO:  (Karl) Do we need to saturate di?  Or I guess we are already assuming it is prime...
 
 isBirationalOntoImage(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
     if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
@@ -488,18 +487,18 @@ isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
 
 isEmbedding(RingMap) := (f1)->(
         f2 := mapOntoImage(f1);
-        flag := true;
-        try ( h := inverseOfMap(f2, AssumeDominant=>true) ) then (
-                flag = isRegularMap(f2);
-                if (flag == true) then(
-                        flag = isRegularMap(h);
-                );                
-        )
-        else (
-                flag = false
+        flag := isRegularMap(f2);
+        if (flag == true) then (
+            try ( h := inverseOfMap(f2, AssumeDominant=>true) ) then (  
+                    if (flag == true) then(
+                            flag = isRegularMap(h);
+                    );                
+            )
+            else (
+                    flag = false
+            );
         );
-        flag
-        
+        flag        
 );
     
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1354,6 +1353,25 @@ TEST /// --test #33, map from genus 3 curve to projective space
     Q = ideal(y,x+z); --a point on our curve
     f2 = mapToProjectiveSpace(7*divisor(Q)); --a divisor of degree 7 (this is degree 7, so should induce an embedding)
     assert( (isEmbedding(f2) == true)) --note for this example, 6*divisor(Q) is not an embedding, indeed it appears the image is singular for 6*D.
+///
+
+
+--finally we test a map between non-rational varieties
+TEST /// --test #34, maps between cones over elliptic curves and their blowups
+    --the cone over an elliptic curve lies in P3, the blowup lives in P11
+    P3 = QQ[x,y,z,w]
+    P11 = QQ[a_{0,0}..a_{2,3}]
+    M = matrix{{a_{0,0}..a_{0,3}},{a_{1,0}..a_{1,3}},{a_{2,0}..a_{2,3}}}
+    blowUpP3 = P11/(minors(2,M) + ideal(a_{1,0}-a_{0,1}, a_{2,0}-a_{0,2}, a_{2,1}-a_{1,2}))
+    h = map(blowUpP3, P3, {a_{0,0}..a_{0,3}}) -- map from blowup of P3 back down to P3
+    J = ideal(h(x^3+y^3+z^3)) --x^3+y^3+z^3 defines the projective cone over an elliptic curve
+    I = saturate(J, ideal(h(x), h(y), h(z))) -- strict transform of the projective cone over an elliptic curve
+    S = P11/(ideal(blowUpP3) + sub(I, P11))
+    T = P3/ideal(x^3+y^3+z^3)
+    g = map(S, T, toList(a_{0,0}..a_{0,3}))
+    b = isRegularMap g
+    gg = inverseOfMap g
+    assert( b and ( isRegularMap gg == false))
 ///
 ----FUTURE PLANS------
 
