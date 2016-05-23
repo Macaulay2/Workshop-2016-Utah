@@ -340,19 +340,8 @@ isBirationalOntoImage(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
     bm1:=flatten first entries bm0;
  --From here the situation is under the assumption that the variety is not contained in any hyperplane.
     r:=numgens ambient Rlin1;
-    Jr:= blowUpIdeals(di1,bm1);
-    n:=numgens Jr;
-    L:={};
-    for i from 0 to (n-1) do (
-        if  (degree Jr_i)_0==1 then L=append(L, Jr_i);
-    );
-    JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
-    vS:=gens ambient S;
-   --print "we got here.";
-    g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
-     --  print "we got there.";
-    barJD:=g(JD);
-     --  print barJD;
+    barJD:=jacobianDualMatrix(di1,im1,bm1);--JacobianDual Matrix is another function in thi package
+   --  print barJD;
     jdd:=(numgens ambient Rlin1)-1;
    --print jdd;
     not(isSubset(minors(jdd,barJD),im1))
@@ -424,17 +413,8 @@ inverseOfMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     bm1:=flatten first entries bm0;
     --From here the situation is under the assumption that the variety is not contained in any hyperplane.
     r:=numgens ambient Rlin1;
-    Jr:= blowUpIdeals(di1,bm1);
-    n:=numgens Jr;
-    L:={};
-    for i from 0 to (n-1) do(
-	 if  (degree Jr_i)_0==1 then  L=append(L, Jr_i);
-    );
-   JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
-   vS:=gens ambient S;
-   g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
-   barJD:=g(JD);
-   jdd:=(numgens ambient Rlin1)-1;
+   barJD:=jacobianDualMatrix(di1,im1,bm1);--JacobianDual Matrix is another function in thi package
+  jdd:=(numgens ambient Rlin1)-1;
    if not(isSubset(minors(jdd,barJD),im1))==false then error "The map is not birational onto its image";
    Col:=(nonZeroMinor(barJD,jdd))#0;
    SbarJD:=submatrix(barJD,,Col);
@@ -516,7 +496,67 @@ isEmbedding(RingMap) := (f1)->(
  );
  isSameMapToPn(RingMap, RingMap) := (f1, f2) -> (
     isSameMapToPn( first entries matrix f1, first entries matrix f2) 
- )
+ );
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ jacobianDualMatrix = method(Options => {AssumeDominant=>false});
+--this the jacobian dual matrix of  a  rational map X -> Y.
+
+--X = Proj R
+--Y = Proj S
+--This map is given by a list of elements in R, all homogeneous
+--of the same degree.  
+--Below we have defining ideal of X = di
+--defining ideal of Y = im
+--list of elements = bm
+
+jacobianDualMatrix(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
+    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    R:=ring di;
+    K:=coefficientRing R;    
+    S:=ring im;
+    im1 := im;
+    if (o.AssumeDominant == true) then (
+        im1 =  im;
+    )
+    else (
+        im1 = idealOfImageOfMap(di, im, bm);
+    );
+    --In the following lines we remove the linear parts of the ideal di and 
+--modify our map bm
+    Rlin:=(ambient ring di)/di;
+    Rlin2 := minimalPresentation(Rlin);
+    phi:=Rlin.minimalPresentationMap;    
+    Rlin1:=target phi;
+    di1:=ideal Rlin1;
+    bm0:=phi(matrix{bm});
+    bm1:=flatten first entries bm0;
+    --From here the situation is under the assumption that the variety is not contained in any hyperplane.
+    r:=numgens ambient Rlin1;
+    Jr:= blowUpIdeals(di1,bm1);
+    n:=numgens Jr;
+    L:={};
+    for i from 0 to (n-1) do(
+	 if  (degree Jr_i)_0==1 then  L=append(L, Jr_i);
+    );
+   JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
+   vS:=gens ambient S;
+   g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
+   barJD:=g(JD);
+   barJD
+   );
+
+jacobianDualMatrix(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+   jacobianDualMatrix(ideal R1, ideal S1, bm, AssumeDominant=>o.AssumeDominant)
+    );
+
+jacobianDualMatrix(RingMap) := o->(f)->(
+   -- invList := inverseOfMap(target f, source f, first entries matrix f);
+--    map(source f, target f, invList)
+    jacobianDualMatrix(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
+    );
+
+
 
 --****************************************************--
 --*****************Documentation**********************--
