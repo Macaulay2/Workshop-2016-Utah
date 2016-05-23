@@ -1,0 +1,176 @@
+\documentclass[12pt]{amsart}
+%   \overfullrule=5pt
+\usepackage[active]{srcltx}
+\usepackage{calc,amssymb,amsthm,amsmath,amscd, eucal,ulem}
+\usepackage{alltt}
+\usepackage[left=1.35in,top=1.25in,right=1.35in,bottom=1.25in]{geometry}
+\synctex=1
+%\usepackage{mathtools}
+\RequirePackage[dvipsnames,usenames]{color}
+\let\mffont=\sf
+\normalem
+\input{kmacros3.sty}
+\input{mabliautoref.sty}
+\input{xy}
+\xyoption{all}
+\usepackage{tikz}
+%\usepackage{pdfsync}
+%
+%
+
+\numberwithin{equation}{theorem}
+
+%\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\D}{\displaystyle}
+\newcommand{\til}{\widetilde}
+\newcommand{\ol}{\overline}
+\newcommand{\F}{\mathbb{F}}
+\DeclareMathOperator{\E}{E}
+\renewcommand{\:}{\colon}
+\newcommand{\eg}{{\itshape e.g.} }
+\renewcommand{\m}{\mathfrak{m}}
+\renewcommand{\n}{\mathfrak{n}}
+\newcommand{\Tt}{{\mathfrak{T}}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\RamiT}{\mathcal{R_{T}}}
+\DeclareMathOperator{\edim}{edim}
+\DeclareMathOperator{\length}{length}
+\DeclareMathOperator{\monomials}{monomials}
+\DeclareMathOperator{\Fitt}{Fitt}
+\DeclareMathOperator{\depth}{depth}
+\newcommand{\Frob}[2]{{#1}^{1/p^{#2}}}
+\newcommand{\Frobp}[2]{{(#1)}^{1/p^{#2}}}
+\newcommand{\FrobP}[2]{{\left(#1\right)}^{1/p^{#2}}}
+\newcommand{\extends}{extends over $\Tt${}}
+\newcommand{\extension}{extension over $\Tt${}}
+\DeclareMathOperator{\DIV}{Div}
+%\DeclareMathOperator{\Tor}{Tor}
+%\DeclareMa
+%\DeclareMathOperator{\Ann}{Ann}
+%\DeclareMathOperator{\height}{ht}
+%\DeclareMathOperator{\rank}{rank}
+%\DeclareMathOperator{\ord}{ord}
+%\DeclareMathOperator{\ker}{ker}
+%\DeclareMathOperator{\im}{im}
+\DeclareMathOperator{\sspan}{span}
+%\DeclareMathOperator{\Spec}{Spec}
+%\DeclareMathOperator{\Hom}{Hom}
+%\DeclareMathOperator{\Ext}{Ext}
+\DeclareMathOperator{\socle}{socle}
+%\DeclareMathOperator{\id}{id}
+%\DeclareMathOperator{\coker}{coker}
+\DeclareMathOperator{\Ass}{Ass}
+\DeclareMathOperator{\Exc}{exc}
+\DeclareMathOperator{\Newt}{Newt}
+\DeclareMathOperator{\sheafhom}{\scr{H}{\kern -2pt om}}
+\DeclareMathOperator{\soc}{socle}
+\DeclareMathOperator{\pd}{pd}
+%\DeclareMathOperator{\sn}{sn}
+%\usepackage{showkeys}
+
+%\usepackage[left=1.25in,top=1.25in,right=1.25in,bottom=1.25in]{geometry}
+\usepackage{fullpage}
+
+\usepackage{setspace}
+% \singlespacing, \doublespacing, \onehalfspacing,
+%\spacing{1.3}
+\usepackage{hyperref}
+% \url{http://www.umich.edu/~kevtuck}, \href{mailto:kevtuck@umich.edu}{kevtuck@umich.edu}
+
+\usepackage{enumerate}
+%\begin{enumerate}[(1.)]
+
+\usepackage{graphicx}
+% \includegraphics[width=2in]{Pics/picture.pdf}
+
+\usepackage[all,cmtip]{xy}
+%\ar[r] to
+%\ar@{|->}[r] mapsto
+%\ar@{-}[r]} line
+%\ar@{^{(}->}[r] injective arrow
+%\ar@{->>}[r] surjective arrow
+%\ar@{.>}[r] just the head of an arrow
+%\ar@{-->}[r] dashed arrow
+%\ar@{=>}[r] double lined arrow
+%\ar@{~>}[r] squigly arrow
+%\ar@{=}[r] equals
+%
+% superscripts and subscripts add labels to the arrows
+%
+%Commutative Diagram
+%
+%\[  \xymatrix{
+%%
+%A    \ar[d]    \ar[r]    &     B   \ar[d]   \\
+%C    \ar[r]                 &     D
+%%
+%} \]
+%
+%
+%Short Exact Sequence
+%
+%\[  \xymatrix{
+%%
+%0 \ar[r] &   A   \ar[r] &   B   \ar[r] &   C   \ar[r] & 0
+%%
+%} \]
+%
+
+\usepackage{verbatim}
+
+\theoremstyle{theorem}
+\newtheorem*{mainthm}{Main Theorem}
+\newtheorem*{mainthma}{Main Theorem A}
+\newtheorem*{mainthmb}{Main Theorem B}
+\newtheorem*{mainthmc}{Main Theorem C}
+\newtheorem*{atheorem}{Theorem}
+
+%The todo box!
+\def\todo#1{\textcolor{Mahogany}%
+{\footnotesize\newline{\color{Mahogany}\fbox{\parbox{\textwidth-15pt}{\textbf{todo:
+} #1}}}\newline}}
+
+%What is going on?  Why isn't \O a script O?!?
+\renewcommand{\O}{\mathcal O}
+
+\begin{document}
+\title{RationalMaps, a package for Macaulay2}
+\author{C.J. Bott}
+\author{S. Hamid Hassanzadeh}
+\author{Karl Schwede}
+\author{Daniel Smolkin}
+\address{Department of Mathematics\\ University of Utah\\ Salt Lake City\\ UT 84112}
+\email{schwede@math.utah.edu}
+\address{Department of Mathematics\\ University of Utah\\ Salt Lake City\\ UT 84112}
+\email{smolkin@math.utah.edu}
+
+
+\thanks{The third named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
+\thanks{The fourth named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
+
+
+%  \subjclass[2010]{14F18, 13A35, 14B05}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+
+
+\section{Introduction}
+
+\cite{DoriaHassanzadehSimisBirationality}
+
+\section{Base Loci}
+
+\section{Birationality and Inverse Maps}
+
+\section{Embeddings}
+
+\bibliographystyle{skalpha}
+\bibliography{MainBib}
+\end{document}
+
+
