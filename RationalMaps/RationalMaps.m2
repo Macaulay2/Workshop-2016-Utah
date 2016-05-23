@@ -3,13 +3,15 @@ Version => "0.1", Date => "May 7th, 2016", Authors => {
      {Name => "Karl Schwede",
      Email=> "kschwede@gmail.com",
      HomePage=> "http://www.math.utah.edu/~schwede"
-     },
+     }, --Karl Schwede was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102
      {Name => "Daniel Smolkin",
      Email=> "smolkin@math.utah.edu",
      HomePage=> "http://www.math.utah.edu/~smolkin"
-     },
+     },--Dan Smolkin was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102
      {Name => "S. Hamid Hassanzadeh",
-     Email => "hassanzadeh.ufrj@gmail.com"},
+     Email => "hassanzadeh.ufrj@gmail.com",
+     HomePage=>"https://www.researchgate.net/profile/Seyed_Hassanzadeh"
+     }, --S. Hamid Hassanzadeh was supported by CNPq-bolsa de Produtividade
      {Name => "C.J. Bott",
      Email => "cjamesbott@gmail.com"}
 }, --this file is in the public domain
@@ -22,6 +24,7 @@ export{
 	"isRegularMap",
 	"isEmbedding",
 	"relationType",
+	"jacobianDualMatrix",
 	"isBirationalOntoImage",
 	"inverseOfMap",
 	"mapOntoImage",
@@ -732,6 +735,40 @@ doc ///
 			f = matrix {{u,0,v,0}};
 			idealOfImageOfMap(a,b,f)
 ///
+
+doc ///
+	Key 
+		jacobianDualMatrix
+		(jacobianDualMatrix,Ideal,Ideal,BasicList)
+		(jacobianDualMatrix,Ring,Ring,BasicList)
+		(jacobianDualMatrix,RingMap)
+		[jacobianDualMatrix,AssumeDominant]
+	Headline
+		Computes the Jacobian Dual Matrix, a matrix describing the syzygies of the inverse map.
+	Usage
+		M = jacobianDualMatrix(a,b,g)
+		M = jacobianDualMatrix(R,S,g)
+		M = jacobianDualMatrix(p)
+	Inputs
+		a:Ideal
+			defining equations for X
+		b:Ideal
+			defining equations for Y
+		g:BasicList
+			projective rational map given by polynomial representatives
+		R:Ring
+			coordinate ring of X
+		S:Ring
+			coordinate ring of Y
+		p:RingMap
+			projective rational map given by polynomial representatives
+	Outputs
+		M:Matrix
+			Returns a matrix describing the syzygies of the inverse map, if it exists.
+	Description
+		Text
+			This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the AssumeDominant option is set to true, it assumes that the kernel of the associated ring map is zero (default value is false).  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390–413.
+///
 			
 doc ///
         Key
@@ -1413,5 +1450,13 @@ TEST /// --test #34, maps between cones over elliptic curves and their blowups
     gg = inverseOfMap g
     assert( b and ( isRegularMap gg == false))
 ///
-----FUTURE PLANS------
 
+
+----FUTURE PLANS------
+--1.  Handle multi-graded rings (multi-graded maps etc.)
+--2.  Find generic degree of a map (generic rank).
+--3.  Degree of inverse map as well.
+--4.  Make faster.
+------a) maybe add multi-core support?  
+------b) find the relevant low degree part of the blowup ideal
+--5.  Check for smoothness/flatness of map (find loci)?
