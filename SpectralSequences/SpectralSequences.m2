@@ -68,7 +68,7 @@ export {
    "pageMap", 
    "page" ,
   "prunningMaps", "edgeComplex",
-  "filteredHomologyObject", "associatedGradedHomologyObject", "netPage"  
+  "filteredHomologyObject", "associatedGradedHomologyObject", "netPage" 
   }
 
 
@@ -994,6 +994,22 @@ associatedGradedHomologyObject(ZZ,ZZ,FilteredComplex) := (p,n,K) -> (
 -----------------------------------------------------------
 -----------------------------------------------------------
 
+
+-- New method for tensor that returns the pushforward of a complex
+tensor(RingMap,ChainComplex) := ChainComplex => 
+ opts -> (f,C) -> (
+         k := min C; 
+    D := chainComplex(
+	if even(k) then apply(
+	    drop(select(keys C, 
+	    	i -> instance(i,ZZ)),1), 
+	    j -> f ** C.dd_j)
+	else apply(
+	    drop(select(keys C, 
+	    	i -> instance(i,ZZ)),1), 
+	    j -> (-1) * (f ** C.dd_j)));
+    D[-k]
+    )
 
 
 beginDocumentation()
@@ -3049,6 +3065,8 @@ doc ///
 	      Returns the infinity page a spectral sequence.
      ///
 
+
+
   doc ///
      Key
      	  (symbol ^, SpectralSequencePage, List)
@@ -3137,6 +3155,35 @@ doc ///
      SeeAlso
           "Filtrations and tensor product complexes"	       
     ///
+    
+doc ///
+     Key
+     	  (tensor, RingMap, ChainComplex)
+     Headline
+     	  pushforward of chain complexes
+     Usage
+     	  D = tensor(f,C)
+     Inputs
+	  f:RingMap
+	  C:ChainComplex
+     Outputs
+     	  D:ChainComplex
+     Description
+     	  Text 
+	       Given a ring map R -> S and a chain complex over R, 
+	       returns the pushforward of the given chain complex.
+	  Example
+	      R = QQ[x];
+	      M = R^1/(x^2);
+	      S = R/(x^4);
+     	      C = res M
+	      f = map(S,R,{1});
+	      tensor(f,C)            
+     SeeAlso
+          "Filtrations and tensor product complexes"	       
+    ///
+        
+    
     
  doc ///
      Key

@@ -1,6 +1,6 @@
-unineedsPackage "SpectralSequences"
-
-tensor(RingMap,ChainComplex) := ChainComplex => 
+needsPackage "SpectralSequences"
+tensoring = method();
+tensoring (RingMap,ChainComplex) := ChainComplex => 
 opts -> (f,C) -> (
     k := min C; 
     D := chainComplex(
@@ -125,5 +125,13 @@ C.dd
 prune pushForward(phi,S^1)
 prune presentation pushForward(phi,S^1)
 
-
-
+R = QQ[x]
+S = R/(x)
+phi = map(S,R,{1})
+phi(1)
+M = R^1/R_0
+C = res M
+tensoring(phi,C)
+C.dd_1
+C
+phi
