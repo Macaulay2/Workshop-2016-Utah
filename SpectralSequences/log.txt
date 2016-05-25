@@ -1,0 +1,5 @@
+* Created netPage and documentation for it
+
+* Comment out the “experimental” change of rings code — this should be deleted
+
+* Added code for a new method for tensor that does pushforwards of complexes and corresponding documentation
