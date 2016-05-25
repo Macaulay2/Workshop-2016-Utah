@@ -28,6 +28,28 @@
 --*************************************************
 --*************************************************
 
+-------------------------------------------------------
+---------- List of functions in this file -------------
+-----------------(as of 2016-05-25)--------------------
+-------------------------------------------------------
+-- ethRoot
+-- getFieldGenRoot 
+-- ethRootMonStrat 
+-- ethRootSubStrat 
+-- ethRootSafe
+-- ethRootSafeList 
+-- ascendIdeal 
+-- ascendIdealSafe 
+-- ascendIdealSafeList 
+-- getExponents
+-- mEthRootOfOneElement
+-- mEthRoot 
+-- Mstar 
+-------------------------------------------------------
+-------------------------------------------------------
+-------------------------------------------------------
+
+
 ethRoot = method(Options => {EthRootStrategy => Substitution});
 --ethRoot takes two strategy options: Substitution and MonomialBasis
 --The second strategy seems to generally be faster for computing I^[1/p^e] when e = 1, especially for polynomials of
