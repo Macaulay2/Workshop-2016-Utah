@@ -1031,7 +1031,7 @@ undocumented {page, --prunningMaps,-- PageMap, --spots,
     (spots, PageMap),
  --   (spots, SpectralSequencePageMap),
     (support, SpectralSequencePage),
-   spots,  ReducedHomology, sourcePruningMap, targetPruningMap,
+   ReducedHomology, sourcePruningMap, targetPruningMap,
    pageMap,
    (describe, SpectralSequence),
    (describe, SpectralSequencePage),
@@ -2195,14 +2195,13 @@ doc ///
 
 doc ///
           Key
-       	   spots
+       	   (spots, ChainComplex)
           Headline
 	       which spots does the given chain complex has a module.
      	  Usage
 	       s = spots L
 	  Inputs
-	       L:ChainComplex  
-	          	  
+	       L:ChainComplex   	  
 	  Outputs
 	       s:List 
 	  Description
