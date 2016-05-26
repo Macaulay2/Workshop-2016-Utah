@@ -1,0 +1,22 @@
+\def\cfudot#1{\ifmmode\setbox7\hbox{$\accent"5E#1$}\else
+  \setbox7\hbox{\accent"5E#1}\penalty 10000\relax\fi\raise 1\ht7
+  \hbox{\raise.1ex\hbox to 1\wd7{\hss.\hss}}\penalty 10000 \hskip-1\wd7\penalty
+  10000\box7}
+\providecommand{\bysame}{\leavevmode\hbox to3em{\hrulefill}\thinspace}
+\providecommand{\MR}{\relax\ifhmode\unskip\space\fi MR}
+% \MRhref is called by the amsart/book/proc definition of \MR.
+\providecommand{\MRhref}[2]{%
+  \href{http://www.ams.org/mathscinet-getitem?mr=#1}{#2}
+}
+\providecommand{\href}[2]{#2}
+\begin{thebibliography}{DHS12}
+
+\bibitem[DHS12]{DoriaHassanzadehSimisBirationality}
+{\sc A.~V. Doria, S.~H. Hassanzadeh, and A.~Simis}: \emph{A characteristic-free
+  criterion of birationality}, Adv. Math. \textbf{230} (2012), no.~1, 390--413.
+  {\sf\scriptsize 2900548}
+
+\bibitem[Sim04]{SimisCremonaTransforms}
+  {\sc Simis, Aron}: \emph{Cremona transformations and some related algebras}, J. Algebra. \textbf{280} (2004), no.~1, 162--179. {\sf\scriptsize 2081926}
+
+\end{thebibliography}

@@ -1,0 +1,267 @@
+\documentclass[12pt]{amsart}
+%   \overfullrule=5pt
+\usepackage[active]{srcltx}
+\usepackage{calc,amssymb,amsthm,amsmath,amscd, eucal,ulem}
+\usepackage{alltt}
+\usepackage[left=1.35in,top=1.25in,right=1.35in,bottom=1.25in]{geometry}
+\synctex=1
+%\usepackage{mathtools}
+\RequirePackage[dvipsnames,usenames]{color}
+\let\mffont=\sf
+\normalem
+\input{kmacros3.sty}
+\input{mabliautoref.sty}
+\input{xy}
+\xyoption{all}
+\usepackage{tikz}
+%\usepackage{pdfsync}
+%
+%
+
+\numberwithin{equation}{theorem}
+
+%\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\D}{\displaystyle}
+\newcommand{\til}{\widetilde}
+\newcommand{\ol}{\overline}
+\newcommand{\F}{\mathbb{F}}
+\DeclareMathOperator{\E}{E}
+\renewcommand{\:}{\colon}
+\newcommand{\eg}{{\itshape e.g.} }
+\renewcommand{\m}{\mathfrak{m}}
+\renewcommand{\n}{\mathfrak{n}}
+\newcommand{\Tt}{{\mathfrak{T}}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\RamiT}{\mathcal{R_{T}}}
+\DeclareMathOperator{\edim}{edim}
+\DeclareMathOperator{\length}{length}
+\DeclareMathOperator{\monomials}{monomials}
+\DeclareMathOperator{\Fitt}{Fitt}
+\DeclareMathOperator{\depth}{depth}
+\newcommand{\Frob}[2]{{#1}^{1/p^{#2}}}
+\newcommand{\Frobp}[2]{{(#1)}^{1/p^{#2}}}
+\newcommand{\FrobP}[2]{{\left(#1\right)}^{1/p^{#2}}}
+\newcommand{\extends}{extends over $\Tt${}}
+\newcommand{\extension}{extension over $\Tt${}}
+\DeclareMathOperator{\DIV}{Div}
+%\DeclareMathOperator{\Tor}{Tor}
+%\DeclareMa
+%\DeclareMathOperator{\Ann}{Ann}
+%\DeclareMathOperator{\height}{ht}
+%\DeclareMathOperator{\rank}{rank}
+%\DeclareMathOperator{\ord}{ord}
+%\DeclareMathOperator{\ker}{ker}
+%\DeclareMathOperator{\im}{im}
+\DeclareMathOperator{\sspan}{span}
+%\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\homgp}{Hom}
+%\DeclareMathOperator{\Ext}{Ext}
+\DeclareMathOperator{\socle}{socle}
+%\DeclareMathOperator{\id}{id}
+%\DeclareMathOperator{\coker}{coker}
+\DeclareMathOperator{\Ass}{Ass}
+\DeclareMathOperator{\Exc}{exc}
+\DeclareMathOperator{\Newt}{Newt}
+\DeclareMathOperator{\sheafhom}{\scr{H}{\kern -2pt om}}
+\DeclareMathOperator{\soc}{socle}
+\DeclareMathOperator{\pd}{pd}
+\DeclareMathOperator{\ffield}{frac} %fraction field
+\DeclareMathOperator{\Projfnc}{Proj} %proj functor
+%\DeclareMathOperator{\sn}{sn}
+%\usepackage{showkeys}
+
+%\usepackage[left=1.25in,top=1.25in,right=1.25in,bottom=1.25in]{geometry}
+\usepackage{fullpage}
+
+\usepackage{setspace}
+% \singlespacing, \doublespacing, \onehalfspacing,
+%\spacing{1.3}
+\usepackage{hyperref}
+% \url{http://www.umich.edu/~kevtuck}, \href{mailto:kevtuck@umich.edu}{kevtuck@umich.edu}
+
+\usepackage{enumerate}
+%\begin{enumerate}[(1.)]
+
+\usepackage{graphicx}
+% \includegraphics[width=2in]{Pics/picture.pdf}
+
+\usepackage[all,cmtip]{xy}
+%\ar[r] to
+%\ar@{|->}[r] mapsto
+%\ar@{-}[r]} line
+%\ar@{^{(}->}[r] injective arrow
+%\ar@{->>}[r] surjective arrow
+%\ar@{.>}[r] just the head of an arrow
+%\ar@{-->}[r] dashed arrow
+%\ar@{=>}[r] double lined arrow
+%\ar@{~>}[r] squigly arrow
+%\ar@{=}[r] equals
+%
+% superscripts and subscripts add labels to the arrows
+%
+%Commutative Diagram
+%
+%\[  \xymatrix{
+%%
+%A    \ar[d]    \ar[r]    &     B   \ar[d]   \\
+%C    \ar[r]                 &     D
+%%
+%} \]
+%
+%
+%Short Exact Sequence
+%
+%\[  \xymatrix{
+%%
+%0 \ar[r] &   A   \ar[r] &   B   \ar[r] &   C   \ar[r] & 0
+%%
+%} \]
+%
+
+\usepackage{verbatim}
+
+\theoremstyle{theorem}
+\newtheorem*{mainthm}{Main Theorem}
+\newtheorem*{mainthma}{Main Theorem A}
+\newtheorem*{mainthmb}{Main Theorem B}
+\newtheorem*{mainthmc}{Main Theorem C}
+\newtheorem*{atheorem}{Theorem}
+
+%The todo box!
+\def\todo#1{\textcolor{Mahogany}%
+{\footnotesize\newline{\color{Mahogany}\fbox{\parbox{\textwidth-15pt}{\textbf{todo:
+} #1}}}\newline}}
+
+%What is going on?  Why isn't \O a script O?!?
+\renewcommand{\O}{\mathcal O}
+
+\begin{document}
+\title{RationalMaps, a package for Macaulay2}
+\author{C.J. Bott}
+\author{S. Hamid Hassanzadeh}
+\author{Karl Schwede}
+\author{Daniel Smolkin}
+\address{Department of Mathematics\\ University of Utah\\ Salt Lake City\\ UT 84112}
+\email{schwede@math.utah.edu}
+\address{Department of Mathematics\\ University of Utah\\ Salt Lake City\\ UT 84112}
+\email{smolkin@math.utah.edu}
+
+
+\thanks{The third named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
+\thanks{The fourth named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
+
+
+%  \subjclass[2010]{14F18, 13A35, 14B05}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+
+
+\section{Introduction}
+
+\cite{DoriaHassanzadehSimisBirationality}
+
+\section{Base Loci}
+We begin with the problem of computing the base locus of a map to projective space. Let $X$ be a projective variety over $k$ and let $F: X \to \P_k^m$ be a rational map of $X$ to projective space. Then we can choose some representative $(f_0, \cdots, f_m)$ of $F$, where each $f_i$ is the $i^{\textrm{th}}$ coordinate of $F$. A priori, each $f_i$ is in $K = \ffield R$, where $R$ is the coordinate ring of $X$. However, we can get another representative of $F$ by clearing denominators. (Note this does not enlarge the base locus of $F$ since $F$ is undefined wherever the denominator of the of the $f_i$s vanishes.) Thus we can assume that $f_i\in R$ for all $i$, and that all the $f_i$ are homogenous of the same degree.   
+
+In this setting, one might naively think that the map $F$ is undefined exactly when all of the $f_i$ vanish, and thus the base locus is the vanishing set of the ideal $(f_0, \cdots, f_m)$. However, this can yield a base locus that's too big. For example, suppose $X = \Projfnc k[x, y, z]$ and $F$ is the rational map represented by $(x^2y, x^2z, xyz)$. Then the vanishing locus of the ideal $(x^2y, x^2z, xyz)$ is the union of the line $\left\{ x = 0 \right\}$ with the point $(1:0:0)$. However, the same rational map is given by $(xy, xz, yz)$ since these two representations agree where $\left\{ x\neq 0 \right\}$ (see \cite[I.4]{Hartshorne}), and the vanishing locus of $(xy, xz, yz)$ is just the three points $\left\{ (1:0:0), (0:1:0), (0:0:1) \right\}$. 
+
+Thus, to find the base locus of a rational map, we must consider all possible representations of the map and find where none of them are defined. To do this, we use a lemma of Aron Simis \cite[Proposition 1.1]{SimisCremonaTransforms}. We restate the lemma here for convenience's sake: 
+
+% take a presentation of I
+% ker $\vp^t$ is Hom(I,R)
+% vectors of this correpond to reps of $I$
+% so take the ideal generated by these vectors
+% 
+
+\begin{lemma}
+  Let $F: X \dashrightarrow \P^m$ be a rational map and let $\textbf{f} = \left\{ f_0, \dots, f_m \right\}$ be a representative of $F$ with $f_i\in R$ homogenous of degree $d$ for all $i$. Set $I  = (f_0, \cdots, f_m)$. Then the set of such representatives of $F$ corresponds bijectively to the homogenous vectors in the rank 1 graded $R$-module $\homgp_R(I, R)$.
+  \label{lemma:repsOfRatMap}
+\end{lemma}
+%I can probably omit this...
+\begin{proof}
+  Suppose that $(f'_0, \cdots, f'_m)$ is another such representative of $F$. Then there is some $h\in K$ such that $hf_i = f'_i$ for all $i$. In particular, we have that each $hf_i \in R$ for each $i$, and so $h\in \left( R :_K I \right)$. Further, it's clear that each homogenous element of $\left( R :_K I \right)$ gives another representative of $F$. Thus the set of representatives of $F$ is $\left\{ (h f_0, \cdots, hf_m)\mid h\in \left( R :_K I \right) \right\}$. It's a standard fact that $\homgp_R(I, R) = \left\{ x\mapsto hx \mid h\in (R :_K I) \right\}$, giving us the desired result. 
+\end{proof}
+
+%and I can probably just refer to simis for this...
+Now, in the setting of \ref{lemma:repsOfRatMap}, let
+  \[
+    \bigoplus_s R(d_s) \xrightarrow{\varphi} R(-d)^m \xrightarrow{[f_0, \cdots, f_m]} I \to 0 
+  \]
+be a free resolution of $I$. Then we get
+\[
+  0 \to \homgp_R(I, R) \to \left( R(-d)^{m+1} \right)^\vee \xrightarrow{\varphi^t} \left( \bigoplus_s R(d_s) \right)^\vee 
+\]
+where $\varphi^t$ is the transpose of $\varphi$ and $R^\vee$ is the dual module of $R$. Thus, we get that $\homgp_R(I,R) \cong \ker \varphi^t$, and so each representative of $F$ corresponds to a vector in $\ker \varphi^t$. The correspondence takes a representative $(hf_0, \cdots, hf_m)$ to the map that multiplies vectors in $R^{m+1}$ by $[hf_0, \cdots, hf_m]$ on the left.
+
+The base locus of $F$ is the intersection of the sets $V(f^i_0, \cdots, f^i_m)$ as $\mathbf{f}^i = (f^i_0, \cdots, f^i_m)$ ranges over all the representatives of $F$. The above implies that this is the same as the intersection of the sets $V(w^i_0,\cdots, w^i_m)$ as $\mathbf{w}^i = (w^i_0, \cdots, w^i_m)$ ranges over the vectors in $\ker \varphi^t$. Now, given any $a, f, g\in R$, we have $V(af) \supseteq V(f)$ and $V(f + g) \supseteq V(f)\cap V(g)$. Thus, it's enough to take a generating set $\mathbf w^1, \cdots, \mathbf w^n$ of $\ker \varphi^t$  and take the intersection over this generating set. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In summary, if we're given a representation $(f_0, \cdots, f_m)$ of a rational map to projective space, we compute its base locus by:
+\begin{enumerate}
+  \item finding $M = \ker \varphi^t$, where $\varphi$ is a presentation matrix for $I$,
+  \item fixing a generating set $\mathbf w^1, \cdots, \mathbf w^n$ for $M$ as an $R$-module, and
+  \item taking the ideal generated by all the entries of all of the $\mathbf w^i$.
+\end{enumerate}
+The base locus of $F$ is then the variety cut out by this ideal, though our function \verb=baseLocusOfMap= just returns this ideal:
+
+\begin{verbatim}
+i1 : loadPackage "RationalMaps"
+
+o1 = RationalMaps
+
+o1 : Package
+
+i2 : R = QQ[x,y,z]
+
+o2 = R
+
+o2 : PolynomialRing
+
+i3 : f = {x^2*y, x^2*z, x*y*z}
+
+       2    2
+o3 = {x y, x z, x*y*z}
+
+o3 : List
+
+i4 : baseLocusOfMap(f)
+
+o4 = ideal (y*z, x*z, x*y)
+
+o4 : Ideal of R
+
+
+\end{verbatim}
+
+ If the \verb=SaturateOutput= option is left on, our function will return the saturation of this ideal:
+
+\begin{verbatim}
+i5 : baseLocusOfMap({x,y,z})
+
+o5 = ideal 1
+
+o5 : Ideal of R
+
+i6 : baseLocusOfMap({x,y,z}, SaturateOutput=>false)
+
+o6 = ideal (x, y, z)
+
+o6 : Ideal of R    
+\end{verbatim}
+
+This is desirable because, for any ideal $I$, the saturation of $I$ is the largest ideal cutting out the same projective variety as $I$ \cite[II.5 exercise whatever]{Hartshorne}. Thus, by saturating the output, we get a canonical ideal that cuts out the base locus. 
+
+\section{Birationality and Inverse Maps}
+
+\section{Embeddings}
+
+\bibliographystyle{skalpha}
+\bibliography{MainBib.bib}
+\end{document}
+
+

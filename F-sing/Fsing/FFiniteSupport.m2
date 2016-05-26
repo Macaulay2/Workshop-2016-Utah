@@ -33,13 +33,13 @@ FFiniteSupport= (A,U) ->(
 	R:=ring(A);
 	alpha:=rank source U;
 	LL:=id_(R^alpha);
-	L:=ethRoot(U*LL,1);
+	L:=ethRoot(1, U*LL);
 	while (((gens image LL) %( (gens image L)|A))!=0) do
 	{
 		LL=L;
 ---		L=mingens image U*L;
 		L=U*L;
-		L=ethRoot(L,1);
+		L=ethRoot(1,L);
 ---?		L=mingens image L;
 ---		print("=================================================================");
 ---		print(L);

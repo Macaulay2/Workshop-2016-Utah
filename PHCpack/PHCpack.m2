@@ -586,7 +586,8 @@ witnessSuperSetsFilter (MutableList,List) := (witsets,pts) -> (
 -- CASCADE  --
 --------------
 
-cascade = method(TypicalValue => NumericalVariety, Options => {StartDimension => -1,Verbose => false})
+cascade = method(TypicalValue => NumericalVariety, 
+  Options => {StartDimension => -1,Verbose => false})
 cascade (List) := o -> (system) -> (
   -- IN: system, a polynomial system;
   --     dimension, top dimension of the solution set.
@@ -601,15 +602,18 @@ cascade (List) := o -> (system) -> (
   
   if # system > numgens R then error "the system is overdetermined";
     
-  if o.StartDimension==-1 then startdim:=(numgens R)-1
-    else startdim=o.StartDimension;  
+  if o.StartDimension==-1
+   then startdim := (numgens R)-1
+   else startdim = o.StartDimension;  
     
   PHCinputFile := temporaryFileName() | "PHCinput";
   PHCoutputFile := temporaryFileName() | "PHCoutput";
   PHCbatchFile := temporaryFileName() | "PHCbatch";
   PHCsolsFile := temporaryFileName() | "PHCsols";
   PHCsessionFile := temporaryFileName() | "PHCsession";
-  for f in {PHCinputFile, PHCoutputFile, PHCbatchFile, PHCsolsFile, PHCsessionFile} do if fileExists f then removeFile f;
+  for f in
+    {PHCinputFile, PHCoutputFile, PHCbatchFile, PHCsolsFile, PHCsessionFile} do
+      if fileExists f then removeFile f;
   toList (0..startdim) / (i->if fileExists (PHCoutputFile | "_sw" | i) 
        then removeFile (PHCoutputFile | "_sw" | i) );
   if o.Verbose then
@@ -700,7 +704,7 @@ constructEmbedding (List, ZZ) := o->  (system, dimension) -> (
   for f in {PHCinputFile, PHCoutputFile, PHCbatchFile, PHCsessionFile} do if fileExists f then removeFile f;
   
   systemToFile(system,PHCinputFile);
-  s := concatenate("1\ny\n",PHCinputFile);
+  s := concatenate("1\n0\ny\n",PHCinputFile);
   s = concatenate(s,"\n",PHCoutputFile);
   s = concatenate(s,"\n");
   s = concatenate(s,toString(dimension));

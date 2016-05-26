@@ -28,6 +28,28 @@
 --*************************************************
 --*************************************************
 
+-------------------------------------------------------
+---------- List of functions in this file -------------
+-----------------(as of 2016-05-25)--------------------
+-------------------------------------------------------
+-- ethRoot
+-- getFieldGenRoot 
+-- ethRootMonStrat 
+-- ethRootSubStrat 
+-- ethRootSafe
+-- ethRootSafeList 
+-- ascendIdeal 
+-- ascendIdealSafe 
+-- ascendIdealSafeList 
+-- getExponents
+-- mEthRootOfOneElement
+-- mEthRoot 
+-- Mstar 
+-------------------------------------------------------
+-------------------------------------------------------
+-------------------------------------------------------
+
+
 ethRoot = method(Options => {EthRootStrategy => Substitution});
 --ethRoot takes two strategy options: Substitution and MonomialBasis
 --The second strategy seems to generally be faster for computing I^[1/p^e] when e = 1, especially for polynomials of
@@ -155,6 +177,8 @@ ethRootSafe( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> (
 	aQuot := floor(a/p^e);
 	
 	expOfA := basePExp(p,aRem); --this gives digits of aRem base p as a list, left-endian first 
+	zeros := apply(e-#expOfA,i->0);
+	expOfA = expOfA|zeros;
 	
 	IN1 := I;
 	
@@ -245,7 +269,7 @@ fancyEthRoot = (e,m,I) ->
 --Jk is the given ideal, ek is the power of Frobenius to use, hk is the function to multiply 
 --trace by to give phi:  phi(_) = Tr^(ek)(hk._)
 --This is based on ideas of Moty Katzman, and his star closure
-ascendIdeal = (Jk, hk, ek) -> (
+ascendIdeal = (ek, hk, Jk) -> (
      Sk := ring Jk;
      pp := char Sk;
      IN := Jk;
@@ -263,7 +287,7 @@ ascendIdeal = (Jk, hk, ek) -> (
 )
 
 --Works like ascendIdeal but tries to minimize the exponents elements are taken to
-ascendIdealSafe = (Jk, hk, ak, ek) -> (
+ascendIdealSafe = ( ak, ek, hk, Jk) -> (
 	Sk := ring Jk;
      pp := char Sk;
      IN := Jk;
@@ -284,7 +308,7 @@ ascendIdealSafe = (Jk, hk, ak, ek) -> (
 
 
 --works just like ascendIdealSafe but also handles lists of hk to powers...
-ascendIdealSafeList ={AscentCount=>false} >> o ->  (Jk, hkList, akList, ek) -> (
+ascendIdealSafeList ={AscentCount=>false} >> o ->  (akList, ek, hkList, Jk) -> (
 	Sk := ring Jk;
 	pp := char Sk;
 	IN := Jk;
@@ -309,10 +333,14 @@ ascendIdealSafeList ={AscentCount=>false} >> o ->  (Jk, hkList, akList, ek) -> (
 ---    containg a given ideal for a given ring element u,
 -- (2) the finding of the smallest submodule V of a free module which satisfies UV\subset V^{[p^e]} 
 --     containg a given submodule for a given matrix U.
+--minimalCompatible = method();
+--minimalCompatible(Ideal,RingElement,ZZ) :=  (Jk, hk, ek) -> ascendIdeal (Jk, hk, ek)
+--minimalCompatible(Ideal,RingElement,ZZ,ZZ) :=  (Jk, hk, ak, ek) -> ascendIdealSafe (Jk, hk, ak, ek)
+--minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
 minimalCompatible = method();
-minimalCompatible(Ideal,RingElement,ZZ) :=  (Jk, hk, ek) -> ascendIdeal (Jk, hk, ek)
-minimalCompatible(Ideal,RingElement,ZZ,ZZ) :=  (Jk, hk, ak, ek) -> ascendIdealSafe (Jk, hk, ak, ek)
-minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
+minimalCompatible(ZZ,RingElement,Ideal) :=  (ek, hk, Jk) -> ascendIdeal (ek, hk, Jk)
+minimalCompatible(ZZ,ZZ,RingElement,Ideal) :=  ( ak, ek,hk,Jk) -> ascendIdealSafe (ak, ek,hk,Jk)
+minimalCompatible(ZZ,Matrix,Matrix) := (e,A,U) -> Mstar (e,A,U)
 
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
 
@@ -331,7 +359,7 @@ minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
 
 getExponents=(f)->(
 answer:={};
-t:=terms(f);
+t:=terms(first first entries f);
 apply(t, i->
 {
 	exps:=first exponents(i);
@@ -358,9 +386,11 @@ mEthRootOfOneElement= (e,v) ->(
 	B:={};
 	for i from 1 to alpha do
 	{
-		vi:=v_(i-1);
+		vi:=v^{i-1};
+---print("i=",i);
+---print("vi=",vi);
 		C:=getExponents(vi);
----print(vi,C);
+---print(C);
 		apply(C, c->
 		{
 			lambda:=c#0;
@@ -428,7 +458,7 @@ mEthRoot = (e,A) ->(
 ---    a prime p which is the characteristic of R
 --- Output:
 ---    the smallest ideal J of R containing I with the property that u^(1+p+...+p^(e-1)) J is in J^{[p^e]}
-Mstar = (A,U,e) ->(
+Mstar = (e,A,U) ->(
 	local answer;
 	R:=ring(A); p:=char R;
 	if (A==0) then

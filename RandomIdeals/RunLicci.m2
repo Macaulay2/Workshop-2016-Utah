@@ -13,6 +13,14 @@ getLicciStats := (L,LI,Licci) -> (
 
 end--
 
-R=QQ[x_1..x_5]
-(L,LI,Licci) = runLicci(R,1,5)
-getLicciStats(L,LI,Licci)
+R=QQ[x_1..x_6]
+{*
+scan((1..10),i-> ((L,LI,Licci) = runLicci(R,1,i);
+        print getLicciStats(L,LI,Licci)))
+*}
+
+needsPackage "Visualize"
+R=QQ[x_1..x_6];
+(L,LI,Licci) = runLicci(R,1,6);
+print getLicciStats(L,LI,Licci)
+scan(100,i -> if Licci_i then visualize graph L_i)

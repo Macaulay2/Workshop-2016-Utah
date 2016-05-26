@@ -1,0 +1,132 @@
+%%%
+%%%  This is mabliautoref.sty
+%%%
+%%%  This style file is for personal use of Manuel Blickle
+%%%  Used with permission by Karl Schwede
+%%%  What it does:
+%%%  --->Sets up AMS-like Theorems which can be accessed with \autoref to include the "Theorem" in the link
+%%%  --->Also makes \autoref to equations and items to be set in brackets
+%%%  --->Control of other \autoref names, to sections subsections and so forth...
+%%%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{mabliautoref}
+   [2009/11/06 v0.1 finetuning autoref and theorem setup]
+
+\RequirePackage{hyperref}
+%%%
+%%%
+%%% Setting up \autoref names for sections.
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\subsectionautorefname}{\sectionautorefname}
+\renewcommand{\subsubsectionautorefname}{\sectionautorefname}
+\renewcommand{\chapterautorefname}{Chapter}
+\renewcommand{\figureautorefname}{Figure}
+
+%%%
+%%%
+%%% this will automatically put \autoref's to equations into brackets e.g (2.1)
+\makeatletter
+\@ifdefinable\equationname{\let\equationname\equationautorefname}
+\def\equationautorefname~#1\@empty\@empty\null{(#1\@empty\@empty\null)}%
+\@ifdefinable\AMSname{\let\AMSname\AMSautorefname}
+\def\AMSautorefname~#1\@empty\@empty\null{(#1\@empty\@empty\null)}%
+%%%
+%%%
+%%% similarly, items in enumerate environments are also enclosed in round brackets
+\@ifdefinable\itemname{\let\itemname\itemautorefname}
+\def\itemautorefname~#1\@empty\@empty\null{(#1\@empty\@empty\null)%
+}%
+\makeatother
+
+%%%
+%%%
+%%%
+%%% labels in the enumerate and itemize environments
+%%%
+\makeatletter
+\renewcommand{\theenumi}{\alph{enumi}}
+\renewcommand{\labelenumi}{(\theenumi)}
+\renewcommand{\theenumii}{\roman{enumii}}
+\renewcommand{\labelenumii}{\theenumii.}
+\renewcommand{\p@enumii}{\theenumi$\m@th\vert$}
+\renewcommand{\theenumiii}{\arabic{enumiii}}
+\renewcommand{\labelenumiii}{\theenumiii.}
+\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+
+
+\renewcommand{\labelitemi}{$\m@th\circ$}
+\renewcommand{\labelitemii}{$\m@th\diamond$}
+\renewcommand{\labelitemiii}{$\m@th\star$}
+\renewcommand{\labelitemiv}{$\m@th\cdot$}
+\makeatother
+
+%%% Theorem Environment setup for \autoref
+%%% setup is complicated due to:
+%%% uses the aliascnt package to allow usage of the \autoref command (this automatically inserts Theorem, Lemma,  and so forth into reference calls.
+% \basetheorem{theorem}{Theorem}[section] sets up a new theorem environment (just like new \newtheorem in AMS), and at the same time an unnumbered version.
+% \maketheorem{test}{Test}{count} sets up new theorem, numbered subordinate to some counter count, such that \autoref works correctly. count should mostly be the name of the some basetheorem. an unnumbered version is also set up automatically
+%
+\RequirePackage{amsthm}
+\RequirePackage{aliascnt}
+\newcommand{\basetheorem}[3]{%
+    \newtheorem{#1}{#2}[#3]
+    \newtheorem*{#1*}{#2}
+    \expandafter\def\csname #1autorefname\endcsname{#2}
+}%
+\newcommand{\maketheorem}[3]{%
+    \newaliascnt{#1}{#3}
+    \newtheorem{#1}[#1]{#2}
+    \aliascntresetthe{#1}
+    \expandafter\def\csname #1autorefname\endcsname{#2}
+    \newtheorem{#1*}{#2}
+}%
+%%%
+%%%Setting up some standard theorems just now...
+%%%
+\theoremstyle{plain}   %-------------------standard Style-------------------------
+
+%\newcounter{theorem}
+\basetheorem{theorem}{Theorem}{section}
+\basetheorem{ex}{Exercise}{section}
+
+
+\maketheorem{proposition}{Proposition}{theorem}
+\maketheorem{corollary}{Corollary}{theorem}
+\maketheorem{lemma}{Lemma}{theorem}
+\maketheorem{conjecture}{Conjecture}{theorem}
+\newtheorem{definition-proposition}[theorem]{Definition-Proposition}
+%\maketheorem{mainthm}{Main Theorem}{theorem}
+\newtheorem*{mainthm*}{Main Theorem}
+\newtheorem*{theoremA*}{Theorem A}
+\newtheorem*{theoremB*}{Theorem B}
+\newtheorem*{theoremC*}{Theorem C}
+\newtheorem*{theoremD*}{Theorem D}
+\newtheorem*{theoremE*}{Theorem E}
+\newtheorem*{keylemma*}{Key Lemma}
+\maketheorem{claim}{Claim}{theorem}
+
+\theoremstyle{definition}    %------------text not italic style------------------
+
+\maketheorem{definition}{Definition}{theorem}
+\maketheorem{notation}{Notation}{theorem}
+\maketheorem{setting}{Setting}{theorem}
+\maketheorem{defprop}{Definition-Proposition}{theorem}
+\maketheorem{exercise}{Exercise}{ex}
+\maketheorem{starexercise}{Exercise*}{ex}
+\maketheorem{starstarexercise}{Exercise**}{ex}
+\maketheorem{example}{Example}{theorem}
+\maketheorem{examples}{Examples}{theorem}
+
+
+\theoremstyle{remark}    %----------------also text not italic, not bold either ------------------
+
+\maketheorem{remark}{Remark}{theorem}
+\maketheorem{remarks}{Remarks}{theorem}
+\maketheorem{question}{Question}{theorem}
+\maketheorem{convention}{Convention}{theorem}
+\maketheorem{setup}{Setup}{theorem}
+
+%%%
+%%%  End file mabliautoref
+%%%
