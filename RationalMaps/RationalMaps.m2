@@ -28,10 +28,13 @@ export{
 	"isBirationalOntoImage",
 	"inverseOfMap",
 	"mapOntoImage",
+	"blowUpIdeals",
     "isSameMapToPn", -- Dan: maybe we shouldn't export this.  Karl: I commented it out and made it internal.
     --**********************************
     --*************OPTIONS**************
     --**********************************
+    "SaturationStrategy", --an option for controlling how blowUpIdeals is run
+    "ReesStrategy", --an option for controlling how blowUpIdeals is run
     "SaturateOutput",  --option to turn off saturation of the output
     "AssumeDominant" --option to assume's that the map is dominant (ie, don't compute the kernel)
 }
@@ -190,14 +193,52 @@ isRegularMap(RingMap) := (ff) ->(
     (dim I <= 0)
 );
 
- blowUpIdeals:=method();
-  
+
+
+ blowUpIdeals=method(Options => {Strategy=>ReesStrategy});
+ blowUpIdealsSaturation := method();
+ blowUpIdealsRees := method();
+      
   --this is to compute the ideal definition of the blowup of a subvariety Z 
   --in the projective variety X
   --the defining ideal of the variety X=a
   --the subvariety Z = L list of element in the ring of X
   
-  blowUpIdeals(Ideal, BasicList):=(a,L)->(
+  blowUpIdeals(Ideal, BasicList):=o->(a,L)->(
+    if (o.Strategy == ReesStrategy) then (
+        blowUpIdealsRees(a,L)
+    )
+    else if (o.Strategy == SaturationStrategy) then (
+        blowUpIdealsSaturation(a,L)
+    )
+  );
+    
+    
+  --the rees algebra computation below is too slow, we need to modify it  
+  blowUpIdealsSaturation(Ideal, BasicList):=(a,L)->(
+    r:=length  L;
+    SS:=ring a;
+    RRR:= SS/a;
+    LL:=apply(L,uu->sub(uu, SS));
+    n:=numgens ambient  SS;
+    K:=coefficientRing SS;
+    yyy:=local yyy;
+    elt := 0;
+    i := 0;
+    while ( (i < r) and (sub(L#i,RRR) == sub(0, RRR))) do (i = i+1;);
+    if (i == r) then error "Map is zero map";
+    elt = sub(L#i, RRR);
+    myRees := reesAlgebra(sub(ideal(L), RRR), elt, Variable=>yyy);
+    myReesIdeal := ideal myRees;
+    mymon := monoid[gens ambient SS | gens ambient myRees, Degrees=>{n:{1,0},r:{0,1}}];
+    flatAmbRees := K(mymon);
+    JJ := sub(a, flatAmbRees) + sub(myReesIdeal, flatAmbRees);
+    JJ
+  );
+  
+
+  
+  blowUpIdealsRees(Ideal, BasicList):=(a,L)->(
     r:=length  L;
     SS:=ring a;
     LL:=apply(L,uu->sub(uu, SS));
@@ -347,7 +388,8 @@ isBirationalOntoImage(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
    --  print barJD;
     jdd:=(numgens ambient Rlin1)-1;
    --print jdd;
-    not(isSubset(minors(jdd,barJD),im1))
+    --not(isSubset(minors(jdd,barJD),im1))
+    ((rank barJD) == jdd)
 );
   
 isBirationalOntoImage(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
@@ -360,26 +402,42 @@ isBirationalOntoImage(RingMap) :=o->(f)->(
     
     
     --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
+    --this method is no longer used, it will be deleted in a later version
+    --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 nonZeroMinor:=method();
 nonZeroMinor(Matrix,ZZ):=(M,ra)->(
     cc:=numColumns(M);
     ro:=numRows(M);
     col:=apply(0..cc-1,i->i);
     row:=apply(0..ro-1,i->i);
-    Collist:=subsets(col,ra);
-    Rowlist:=subsets(row,ra);
-    nzlist:={};
-    for i from 0 to (#Collist)-1 do  (
-       if nzlist!={} then break; 
-       for j from 0 to (#Rowlist)-1 do (
-	   if det(submatrix(M,Rowlist#j,Collist#i))!=0 then (
-	       nzlist=append(nzlist,{Collist#i,Rowlist#j});
-	       break;
-	   );
+--    Collist:=subsets(col,ra); these are slow, so we are turning them off
+--    Rowlist:=subsets(row,ra);
+--    nzlist:={};
+--    for i from 0 to (#Collist)-1 do  (
+--       if nzlist!={} then break; 
+--       for j from 0 to (#Rowlist)-1 do (
+--	   if det(submatrix(M,Rowlist#j,Collist#i))!=0 then (
+--       if (rank(submatrix(M,Rowlist#j,Collist#i))==ra) then (
+--	       nzlist=append(nzlist,{Collist#i,Rowlist#j});
+--	       break;
+--	   );
+--       );
+    flag := false;
+    subM := null;
+    colList := null;
+    rowList := null;
+    while (flag == false) do (
+       colList = take(random toList col, {0,ra-1});
+       rowList = take(random toList row, {0,ra-1});
+       subM = submatrix(M, rowList, colList);
+       if (rank(subM == ra)) then (
+            flag = true;
        );
+       );
+       {colList, rowList}
    );
-flatten nzlist);  
+
+
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
@@ -417,13 +475,19 @@ inverseOfMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     --From here the situation is under the assumption that the variety is not contained in any hyperplane.
     r:=numgens ambient Rlin1;
    barJD:=jacobianDualMatrix(di1,im1,bm1);--JacobianDual Matrix is another function in thi package
+    --print "JD computed";
   jdd:=(numgens ambient Rlin1)-1;
-   if not(isSubset(minors(jdd,barJD),im1))==false then error "The map is not birational onto its image";
-   Col:=(nonZeroMinor(barJD,jdd))#0;
-   SbarJD:=submatrix(barJD,,Col);
-   Inv:={};
-   for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
-   psi:=map(S/im1,Rlin1,matrix{Inv});
+   if not ((rank barJD) == jdd) then error "The map is not birational onto its image";
+   --print "birationalityVerified";
+--   Col:=(nonZeroMinor(barJD,jdd))#0;
+--   print "found nonzerominor";
+--   SbarJD:=submatrix(barJD,,Col);
+--   Inv:={};
+--   for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
+   --psi:=map(ring(Inv#0),Rlin1,matrix{Inv});
+   Inv := first entries transpose submatrix((gens kernel transpose barJD), {0});
+   --print "made Inv";
+   psi := map(S/im1,Rlin1,sub(matrix{Inv}, S/im1));
    psi*phi );    
 
 inverseOfMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
@@ -544,7 +608,7 @@ jacobianDualMatrix(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     );
    JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens ideal L);
    vS:=gens ambient S;
-   g:=map(S,ring Jr, toList(apply(0..r-1,z->0))|vS);
+   g:=map(S/im1,ring Jr, toList(apply(0..r-1,z->0))|vS);
    barJD:=g(JD);
    barJD
    );
