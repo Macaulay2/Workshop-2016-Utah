@@ -20,7 +20,7 @@ export{
 	"isBirationalMap",
 	"idealOfImageOfMap",
 	"baseLocusOfMap",
-	"dimImage",
+	"dimImage", --probably this shouldn't be exported
 	"isRegularMap",
 	"isEmbedding",
 	"relationType",
@@ -29,7 +29,7 @@ export{
 	"inverseOfMap",
 	"mapOntoImage",
 	"blowUpIdeals",
-    "isSameMapToPn", -- Dan: maybe we shouldn't export this.  Karl: I commented it out and made it internal.
+    "isSameMap", -- Dan: maybe we shouldn't export this.  --Karl.  Or maybe we should have a more general version for comparing two maps.
     --**********************************
     --*************OPTIONS**************
     --**********************************
@@ -563,15 +563,32 @@ isEmbedding(RingMap) := (f1)->(
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    
  
- isSameMapToPn = method(); --checks whether to rational maps to Pn are the same. Assumes domain is irreducible
+ isSameMap = method(); --checks whether two rational maps are the same. Assumes domain is irreducible
 
- isSameMapToPn(List, List) := (L1, L2) -> (
+ isSameMap(List, List) := (L1, L2) -> (
     theRing := ring first L1;
-    rank matrix(frac(theRing), {L1, L2}) == 1
+--    rank matrix(frac(theRing), {L1, L2}) == 1
+    isSameMap(L1, L1, theRing)
  );
- isSameMapToPn(RingMap, RingMap) := (f1, f2) -> (
-    isSameMapToPn( first entries matrix f1, first entries matrix f2) 
+ 
+ isSameMap(List, List, Ring) := (L1, L2, R1) -> (
+    rank matrix(frac(R1), {L1, L2}) == 1
  );
+ 
+ isSameMap(RingMap, RingMap) := (f1, f2) -> (
+    if (not (target f1 === target f2)) then (
+        error "The ring maps should have the same target.";
+    );
+    if (not (source f1 === source f2)) then (
+        error "The ring maps should have the same source.";
+    );
+    theRing := target f1;
+--    rank matrix(frac(theRing), entries ((matrix f1) || (matrix f2))) == 1
+    isSameMap(first entries matrix f1, first entries matrix f2, theRing)
+--    isSameMapToPn( first entries matrix f1, first entries matrix f2) 
+ );
+ 
+ 
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  jacobianDualMatrix = method(Options => {AssumeDominant=>false});
@@ -1088,19 +1105,23 @@ doc ///
 
 doc ///
     Key
-        isSameMapToPn
-        (isSameMapToPn, List,List)
-        (isSameMapToPn, RingMap,RingMap)
+        isSameMap
+        (isSameMap, List,List)
+        (isSameMap, List,List,Ring)
+        (isSameMap, RingMap,RingMap)
     Headline
         Checks whether two maps to projective space are really the same
     Usage
-        b = isSameMapToPn(L1,L2)
-        b = isSameMapToPn(f1, f2)
+        b = isSameMap(L1,L2)
+        b = isSameMap(L1,L2, R1)
+        b = isSameMap(f1, f2)
     Inputs
         L1: List
             The homogeneous forms that define the first map.
         L2: List
             The homogeneous forms that define the second map.
+        R1: Ring
+            The ring in which the homogeneous forms should live.
         f1: RingMap
             The first map.
         f2: RingMap
@@ -1110,13 +1131,13 @@ doc ///
             True if the maps are the same, false otherwise.
     Description
         Text
-            Checks whether two maps, from the same variety, to projective space are really the same. 
+            Checks whether two maps, from the same variety, to projective space are really the same. If you pass it two ring maps, it will check whether the source and targets are really the same.
         Example
             R=QQ[x,y,z];
             S=QQ[a,b,c];
             L1={y*z,x*z,x*y};
             L2={x*y*z,x^2*z,x^2*y};
-            isSameMapToPn(L1,L2)
+            isSameMap(L1,L2)
 --        Example
 --            R = QQ[x_0..x_8];
 --            M = genericMatrix(R,x_0,3,3);
@@ -1471,7 +1492,7 @@ TEST /// --test #27
     R =  QQ[a..d]/(a*d - b*c);
     S = QQ[x,y,z];
     f = inverseOfMap(R, S, {a,b,c});
-    assert(isSameMapToPn(first entries matrix f, {x^2, x*y, x*z, y*z}))
+    assert(isSameMap(first entries matrix f, {x^2, x*y, x*z, y*z}))
 /// 
 
 TEST /// --test #28 (quadratic cremona)
@@ -1479,7 +1500,7 @@ TEST /// --test #28 (quadratic cremona)
     S = ZZ/11[a,b,c];
     h = map(R, S, {y*z, x*z, x*y});
     g = inverseOfMap(h);
-    assert(isSameMapToPn(first entries matrix g, {b*c, a*c, a*b}))
+    assert(isSameMap(first entries matrix g, {b*c, a*c, a*b}))
 ///
 
 -----------------------------------
