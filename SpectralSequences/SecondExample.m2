@@ -18,7 +18,7 @@ opts -> (f,C) -> (
 end
 
 restart
-load "FirstExample.m2"
+load "SecondExample.m2"
 -- Example 1
 -- Resolves k over a polynomial ring and a quotient of it
 k = QQ;
@@ -36,6 +36,7 @@ E_2 .dd_{1,0}
 
 -- Example 2
 restart
+load "SecondExample.m2"
 load "FirstExample.m2"
 k = QQ;
 R = k[a,b,c]/ideal"b2-ac";
@@ -51,7 +52,7 @@ E = prune spectralSequence E0
 E^infinity
 -- Example 3: more interesting version of Example 1
 restart
-load "FirstExample.m2"
+load "SecondExample.m2"
 k = QQ;
 S = k[x];
 M = S^1/ideal"x3";
@@ -65,7 +66,7 @@ E = prune spectralSequence E0
 E_infinity
 -- Example 4: two variable version of Example 1
 restart
-load "FirstExample.m2"
+load "SecondExample.m2"
 k = QQ;
 S = k[x,y];
 M = S^1/ideal"x,y";
@@ -79,7 +80,7 @@ E = prune spectralSequence E0
 E_infinity
 -- Example 5: three variable version of Example 1
 restart
-load "FirstExample.m2"
+load "SecondExample.m2"
 k = QQ;
 S = k[x,y,z];
 M = S^1/ideal"x,y,z";
