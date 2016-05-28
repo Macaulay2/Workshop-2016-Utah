@@ -215,11 +215,12 @@ isRegularMap(RingMap) := (ff) ->(
   );
     
     
-  --the rees algebra computation below is too slow, we need to modify it  
-  blowUpIdealsSaturation(Ideal, BasicList):=(a,L)->(
+  --the rees algebra computation below is too slow, we need to modify it 
+  --Hamid: we may add all of the strategies and options which are applied in saturate 
+ blowUpIdealsSaturation(Ideal, BasicList):=(a,L)->(
     r:=length  L;
     SS:=ring a;
-    RRR:= SS/a;
+    RRR:= ring L#0;
     LL:=apply(L,uu->sub(uu, SS));
     n:=numgens ambient  SS;
     K:=coefficientRing SS;
@@ -228,17 +229,24 @@ isRegularMap(RingMap) := (ff) ->(
     i := 0;
     while ( (i < r) and (sub(L#i,RRR) == sub(0, RRR))) do (i = i+1;);
     if (i == r) then error "Map is zero map";
-    elt = sub(L#i, RRR);
-    myRees := reesAlgebra(sub(ideal(L), RRR), elt, Variable=>yyy);
-    myReesIdeal := ideal myRees;
-    mymon := monoid[gens ambient SS | gens ambient myRees, Degrees=>{n:{1,0},r:{0,1}}];
-    flatAmbRees := K(mymon);
-    JJ := sub(a, flatAmbRees) + sub(myReesIdeal, flatAmbRees);
-    JJ
+    nzd1 := sub(L#i, RRR);
+    Rs:=RRR[ toList(yyy_0..yyy_(r-1))];
+    M1:=syz(matrix{L},Algorithm =>Homogeneous);
+    M2:=sub(M1,Rs);
+    N:=matrix{{yyy_0..yyy_(r-1)}};
+    symIdeal:=ideal(N*M2);
+    print"symideal ok";
+     mymon := monoid[gens ambient SS | toList(yyy_0..yyy_(r-1)), Degrees=>{n:{1,0},r:{0,1}}];
+    flatAmbRees:= K(mymon);
+    symIdeal2:=sub(a, flatAmbRees)+sub(symIdeal, flatAmbRees);
+    nzele:=sub(nzd1,flatAmbRees);
+    myReesIdeal:=saturate(symIdeal2,nzele, MinimalGenerators=>false);
+   myReesIdeal
   );
   
 
   
+   
   blowUpIdealsRees(Ideal, BasicList):=(a,L)->(
     r:=length  L;
     SS:=ring a;
