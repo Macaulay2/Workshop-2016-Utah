@@ -33,8 +33,9 @@ export{
     --**********************************
     --*************OPTIONS**************
     --**********************************
-    "SaturationStrategy", --an option for controlling how blowUpIdeals is run
-    "ReesStrategy", --an option for controlling how blowUpIdeals is run
+    "SaturationStrategy", --an option for controlling how blowUpIdeals is run, not clear if we can get this to work
+    "ReesStrategy", --an option for controlling how blowUpIdeals is run, not clear if we can get this to work
+    "CheckBirational", --an option for inverseOfMap, whether or not to check if something is birational
     "SaturateOutput",  --option to turn off saturation of the output
     "AssumeDominant" --option to assume's that the map is dominant (ie, don't compute the kernel)
 }
@@ -441,7 +442,7 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
- inverseOfMap = method(Options => {AssumeDominant=>false});
+ inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true});
 --this checks whether a map X -> Y is birational.
 
 --X = Proj R
@@ -452,17 +453,30 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
 --defining ideal of Y = im
 --list of elements = bm
 inverseOfMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
+    inverseOfMap( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant)
+);    
+
+inverseOfMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+    inverseOfMap(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant)
+    );
+
+inverseOfMap(RingMap) := o->(f)->(
+   -- invList := inverseOfMap(target f, source f, first entries matrix f);
+--    map(source f, target f, invList)
+--    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
+---*******************
+    if (o.AssumeDominant == false) then (
+        f = mapOntoImage(f);
+    );
+    di := ideal target f;
+    im := ideal source f;
+    bm := first entries matrix f;        
     if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
     R:=ring di;
     K:=coefficientRing R;    
     S:=ring im;
     im1 := im;
-    if (o.AssumeDominant == true) then (
-        im1 =  im;
-    )
-    else (
-        im1 = idealOfImageOfMap(di, im, bm);
-    );
+    
     --In the following lines we remove the linear parts of the ideal di and 
 --modify our map bm
     Rlin:=(ambient ring di)/di;
@@ -477,7 +491,9 @@ inverseOfMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
    barJD:=jacobianDualMatrix(di1,im1,bm1,AssumeDominant=>true);--JacobianDual Matrix is another function in thi package
     --print "JD computed";
   jdd:=(numgens ambient Rlin1)-1;
-   if not ((rank barJD) == jdd) then error "The map is not birational onto its image";
+   if (o.CheckBirational== true) then (
+    if not ((rank barJD) == jdd) then error "The map is not birational onto its image";
+   );
    --print "birationalityVerified";
 --   Col:=(nonZeroMinor(barJD,jdd))#0;
 --   print "found nonzerominor";
@@ -487,18 +503,10 @@ inverseOfMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
    --psi:=map(ring(Inv#0),Rlin1,matrix{Inv});
    Inv := first entries transpose submatrix((gens kernel transpose barJD), {0});
    --print "made Inv";
-   psi := map(S/im1,Rlin1,sub(matrix{Inv}, S/im1));
-   psi*phi );    
-
-inverseOfMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
-    inverseOfMap(ideal R1, ideal S1, bm, AssumeDominant=>o.AssumeDominant)
-    );
-
-inverseOfMap(RingMap) := o->(f)->(
-   -- invList := inverseOfMap(target f, source f, first entries matrix f);
---    map(source f, target f, invList)
-    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
-    );
+    psi := null;
+    psi = map(source f, Rlin1, sub(matrix{Inv}, source f));    
+    psi*phi
+);
     
    
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -639,6 +647,19 @@ doc ///
     Description
     	Text
             A package for computations with rational maps.
+///
+
+doc ///
+    Key
+        CheckBirational
+    Headline
+        If true, inverseOfMap will check birationality.
+    Usage
+        CheckBirational=>b    
+    Description
+    	Text
+            If true, inverseOfMap will check whether the passed map is birational.  If it is not birational, it will throw an error.
+
 ///
 
 doc /// 
@@ -1147,6 +1168,7 @@ doc ///
 		(inverseOfMap, Ring, Ring, BasicList)
 		(inverseOfMap, RingMap)
 		[inverseOfMap, AssumeDominant]
+        [inverseOfMap, CheckBirational]
     Headline
         Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational onto its image.
     Usage
@@ -1167,7 +1189,7 @@ doc ///
             Inverse function of your birational map, $f(X) \to X$.
     Description
         Text
-            Given a map $f : X \to Y$, this finds the inverse of your birational map $f(X) \to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.  If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant.
+            Given a map $f : X \to Y$, this finds the inverse of your birational map $f(X) \to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.  If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant.  If CheckBirational is set to false (default is true), then no check for birationality will be done.  If it is set to true and the map is not birational, an error will be thrown.
         Example
             R = ZZ/7[x,y,z];
             S = ZZ/7[a,b,c];
