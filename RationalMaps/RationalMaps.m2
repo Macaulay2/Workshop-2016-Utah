@@ -384,7 +384,7 @@ isBirationalOntoImage(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
     bm1:=flatten first entries bm0;
  --From here the situation is under the assumption that the variety is not contained in any hyperplane.
     r:=numgens ambient Rlin1;
-    barJD:=jacobianDualMatrix(di1,im1,bm1);--JacobianDual Matrix is another function in thi package
+    barJD:=jacobianDualMatrix(di1,im1,bm1,AssumeDominant=>true);--JacobianDual Matrix is another function in thi package
    --  print barJD;
     jdd:=(numgens ambient Rlin1)-1;
    --print jdd;
@@ -474,7 +474,7 @@ inverseOfMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     bm1:=flatten first entries bm0;
     --From here the situation is under the assumption that the variety is not contained in any hyperplane.
     r:=numgens ambient Rlin1;
-   barJD:=jacobianDualMatrix(di1,im1,bm1);--JacobianDual Matrix is another function in thi package
+   barJD:=jacobianDualMatrix(di1,im1,bm1,AssumeDominant=>true);--JacobianDual Matrix is another function in thi package
     --print "JD computed";
   jdd:=(numgens ambient Rlin1)-1;
    if not ((rank barJD) == jdd) then error "The map is not birational onto its image";
