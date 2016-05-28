@@ -1,20 +1,4 @@
 needsPackage "SpectralSequences"
-tensoring = method();
-tensoring (RingMap,ChainComplex) := ChainComplex => 
-opts -> (f,C) -> (
-    k := min C; 
-    D := chainComplex(
-	if even(k) then apply(
-	    drop(select(keys C.dd, 
-	    	i -> instance(i,ZZ)),1), 
-	    j -> f ** C.dd_j)
-	else apply(
-	    drop(select(keys C.dd, 
-	    	i -> instance(i,ZZ)),1), 
-	    j -> (-1) * (f ** C.dd_j)));
-    D[-k]
-    )
-   
 end
 
 restart
@@ -37,18 +21,17 @@ E_2 .dd_{1,0}
 -- Example 2
 restart
 load "SecondExample.m2"
-load "FirstExample.m2"
 k = QQ;
 R = k[a,b,c]/ideal"b2-ac";
 S = k[s,t]
 phi = map(S,R,{s^2,s*t,t^2})
 M = R^1/ideal"a,b,c"
 N = S^1/ideal(s,t)
-C = res (M,LengthLimit => 10)
+C = res (M,LengthLimit => 10);
 C' = tensor(phi,C)
 D = res(N,LengthLimit => 10);
 E0 = C' ** (filteredComplex D);
-E = prune spectralSequence E0
+ahE = prune spectralSequence E0
 E^infinity
 -- Example 3: more interesting version of Example 1
 restart
