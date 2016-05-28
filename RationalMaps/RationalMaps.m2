@@ -653,18 +653,24 @@ jacobianDualMatrix(RingMap) := o->(f)->(
 --****************************************************--
 --*****************Documentation**********************--
 --****************************************************--
+needsPackage "Parametrization";
+needsPackage "Cremona";
 
 beginDocumentation();
 
-doc /// 
-    Key
-        RationalMaps
-    Headline
-        A package for computations with rational maps.
-    Description
-    	Text
-            A package for computations with rational maps.
-///
+document {
+    Key => RationalMaps,
+    Headline => "A package for computations with rational maps.",
+    EM "RationalMaps", " is a package for computing things related to maps between projective varieties in projective space.", 
+    BR{},BR{},
+    BOLD "Overlap with other packages:\n\n",BR{},BR{},
+    BOLD "Parametrization.m2",  
+      ":  While the ", TO "Parametrization", " focuses on mostly on curves, it also includes a function ", TO "invertBirationalMap", " which has the same functionality as ", TO "inverseOfMap", ".  On the other hand, these two functions were implemented differently and so sometimes one function can be substantially faster than the other.\n", BR{}, BR{},
+    BOLD "Cremona.m2",  
+    ":  The package ", TO "Cremona", " focuses on very fast probabilistic computation in some general cases and very fast deterministic computation for maps from projective space of certain forms.  In particular, ",BR{},
+    TO "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer that is frequently faster than what this package can provide.",BR{},
+    TO "invertBirMap", " gives a very fast computation of the inverse of a birational map if the source is projective space ", EM " and ", "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ", TO "invertBirationalMap", " from ", TO "Parametrization", "."
+}
 
 doc ///
     Key
