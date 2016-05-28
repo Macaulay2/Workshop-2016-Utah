@@ -501,10 +501,12 @@ inverseOfMap(RingMap) := o->(f)->(
 --   Inv:={};
 --   for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
    --psi:=map(ring(Inv#0),Rlin1,matrix{Inv});
-   Inv := first entries transpose submatrix((gens kernel transpose barJD), {0});
+--   Inv := first entries transpose submatrix((gens kernel transpose barJD), {0});
+    Inv :=syz(transpose barJD,SyzygyLimit =>1);
    --print "made Inv";
     psi := null;
-    psi = map(source f, Rlin1, sub(matrix{Inv}, source f));    
+    psi = map(source f, Rlin1, sub(transpose Inv, source f));    
+--    psi = map(source f, Rlin1, sub(matrix{Inv}, source f));    
     psi*phi
 );
     
