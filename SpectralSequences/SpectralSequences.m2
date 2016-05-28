@@ -18,8 +18,8 @@
 newPackage(
   "SpectralSequences",
 --  AuxiliaryFiles => true,
-  Version => "0.6",
-  Date => "10 January 2014",
+  Version => "0.7",
+  Date => "26 May 2016",
   Authors => {
        {
       Name => "David Berlekamp", 
@@ -31,8 +31,8 @@ newPackage(
       HomePage => "http://www.math.berkeley.edu/~aboocher"},
        {
       Name => "Nathan Grieve", 
-      Email => "ngrieve@math.mcgill.ca",
-      HomePage => "http://www.math.mcgill.ca/ngrieve"},             
+      Email => "n.grieve@unb.ca",
+      HomePage => "http://www.math.unb.ca/~ngrieve"},             
     {
       Name => "Gregory G. Smith", 
       Email => "ggsmith@mast.queensu.ca", 

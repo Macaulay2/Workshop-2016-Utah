@@ -1,1 +1,3 @@
 Todo List
+
+1) There are several examples that we had to comment out in order for the package to install. These should be tested and either fixed or deleted.
