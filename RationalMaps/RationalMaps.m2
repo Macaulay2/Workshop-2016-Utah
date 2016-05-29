@@ -1,5 +1,5 @@
 newPackage( "RationalMaps",
-Version => "0.1", Date => "May 7th, 2016", Authors => {
+Version => "0.2", Date => "May 28th, 2016", Authors => {
      {Name => "Karl Schwede",
      Email=> "kschwede@gmail.com",
      HomePage=> "http://www.math.utah.edu/~schwede"
@@ -29,12 +29,12 @@ export{
 	"inverseOfMap",
 	"mapOntoImage",
 	"blowUpIdeals",
-    "isSameMap", -- Dan: maybe we shouldn't export this.  --Karl.  Or maybe we should have a more general version for comparing two maps.
+    "isSameMap", 
     --**********************************
     --*************OPTIONS**************
     --**********************************
-    "SaturationStrategy", --an option for controlling how blowUpIdeals is run, not clear if we can get this to work
-    "ReesStrategy", --an option for controlling how blowUpIdeals is run, not clear if we can get this to work
+    "SaturationStrategy", --an option for controlling how our internal function blowUpIdeals is run, not clear if we can get this to work
+    "ReesStrategy", --an option for controlling how our internal function  blowUpIdeals is run, not clear if we can get this to work
     "CheckBirational", --an option for inverseOfMap, whether or not to check if something is birational
     "SaturateOutput",  --option to turn off saturation of the output
     "AssumeDominant" --option to assume's that the map is dominant (ie, don't compute the kernel)
@@ -235,7 +235,7 @@ isRegularMap(RingMap) := (ff) ->(
     M2:=sub(M1,Rs);
     N:=matrix{{yyy_0..yyy_(r-1)}};
     symIdeal:=ideal(N*M2);
-    print"symideal ok";
+    --print"symideal ok";
      mymon := monoid[gens ambient SS | toList(yyy_0..yyy_(r-1)), Degrees=>{n:{1,0},r:{0,1}}];
     flatAmbRees:= K(mymon);
     symIdeal2:=sub(a, flatAmbRees)+sub(symIdeal, flatAmbRees);
@@ -671,15 +671,24 @@ beginDocumentation();
 document {
     Key => RationalMaps,
     Headline => "A package for computations with rational maps.",
-    EM "RationalMaps", " is a package for computing things related to maps between projective varieties in projective space.", 
+    EM "RationalMaps", " is a package for computing things related to maps between projective varieties.", 
     BR{},BR{},
-    BOLD "Overlap with other packages:\n\n",BR{},BR{},
+    "It focuses on finding where a birational map is undefined, checking whether a map is a closed embedding, checking birationality and computing inverse maps",
+    BR{},BR{},
+    BOLD "Mathematical background:",BR{},
+    UL {
+	  {"A. V. Dória, S. H. Hassanzadeh, A. Simis,  ",EM "  A characteristic free criterion of birationality", ", Advances in Mathematics, Volume 230, Issue 1, 1 May 2012, Pages 390-413."},
+	  {"A. Simis, ",EM "  Cremona Transformations and some Related Algebras", ", Journal of Algebra, Volume 280, Issue 1, 1 October 2004, Pages 162–179"},
+	},
+    BOLD "Functionality overlap with other packages:\n\n",BR{},BR{},
     BOLD "Parametrization.m2",  
-      ":  While the ", TO "Parametrization", " focuses on mostly on curves, it also includes a function ", TO "invertBirationalMap", " which has the same functionality as ", TO "inverseOfMap", ".  On the other hand, these two functions were implemented differently and so sometimes one function can be substantially faster than the other.\n", BR{}, BR{},
+      ":  While the ", TO "Parametrization", " focuses on mostly on curves, it also includes a function ", TO "invertBirationalMap", " which has the same functionality as ", TO "inverseOfMap", ".  On the other hand, these two functions were implemented somewhat differently and so sometimes one function can be substantially faster than the other.\n", BR{}, BR{},
     BOLD "Cremona.m2",  
-    ":  The package ", TO "Cremona", " focuses on very fast probabilistic computation in some general cases and very fast deterministic computation for maps from projective space of certain forms.  In particular, ",BR{},
-    TO "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer that is frequently faster than what this package can provide.",BR{},
-    TO "invertBirMap", " gives a very fast computation of the inverse of a birational map if the source is projective space ", EM " and ", "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ", TO "invertBirationalMap", " from ", TO "Parametrization", "."
+    ":  The package ", TO "Cremona", " focuses on very fast probabilistic computation in general cases and very fast deterministic computation for special kinds of maps from projective space.  In particular, ",BR{},
+    UL {
+        {TO "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer that is frequently substantially faster than what this package can provide with ", TO "isBirationalMap", ".", },
+        {TO "invertBirMap", " gives a very fast computation of the inverse of a birational map if the source is projective space ", EM " and ", "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ", TO "invertBirationalMap", " from ", TO "Parametrization", "."},
+    },
 }
 
 doc ///
@@ -693,6 +702,31 @@ doc ///
     	Text
             If true, inverseOfMap will check whether the passed map is birational.  If it is not birational, it will throw an error.
 
+///
+
+doc ///
+    Key
+        ReesStrategy
+    Headline
+        Currently not exposed to the user.   
+    Description
+    	Text
+            It is a valid valude for the Strategy Option in blowUpIdeals (currently an internal function).  This is the currently activated strategy.
+    SeeAlso
+        ReesStrategy
+
+///
+
+doc ///
+    Key
+        SaturationStrategy
+    Headline
+        Currently not exposed to the user.   
+    Description
+    	Text
+            It is a valid value for the Strategy Option in blowUpIdeals (currently an internal function).  We are still trying to improve this performance before enabling this for the user.
+    SeeAlso
+        ReesStrategy
 ///
 
 doc /// 
@@ -720,49 +754,60 @@ doc ///
 ///
 
 doc /// 
-	Key
-		isBirationalMap
-		(isBirationalMap, Ideal, Ideal, BasicList)
-		(isBirationalMap, Ring, Ring, BasicList)
-		(isBirationalMap, RingMap)
-		[isBirationalMap, AssumeDominant]
-	Headline
-		Checks if a map between projective varieties is birational.
-	Usage
-		val = isBirationalMap(a,b,f)
-		val = isBirationalMap(R,S,f)
-		val = isBirationalMap(Pi)
-	Inputs
-		a:Ideal
-			defining equations for X			
-		b:Ideal
-			defining equations for Y
-		f:BasicList
-			A list of where to send the variables in the ring of b, to in the ring of a.
-		R:Ring
-			the homogeneous coordinate ring of X
-		S:Ring
-			the homogeneous coordinate ring of Y
-		Pi:RingMap
-			A ring map S to R corresponding to X mapping to Y
-	Outputs
-		val:Boolean
-			true if the map is birational, false if otherwise
-	Description
-		Text   
-			This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The target and source must be varieties, in particular their defining ideals must be prime.  Let's check that the plane quadratic cremona transformation is birational.
-		Example
-			R=QQ[x,y,z];
-			S=QQ[a,b,c];
-			Pi = map(R, S, {x*y, x*z, y*z});
-			isBirationalMap(Pi)
-		Text   
-			We can also verify that a cover of $P^1$ by an elliptic curve is not birational.
-		Example
-			R=QQ[x,y,z]/(x^3+y^3-z^3);
-			S=QQ[s,t];
-			Pi = map(R, S, {x, y-z});
-			isBirationalMap(Pi)
+    Key
+        isBirationalMap
+        (isBirationalMap, Ideal, Ideal, BasicList)
+        (isBirationalMap, Ring, Ring, BasicList)
+        (isBirationalMap, RingMap)
+        [isBirationalMap, AssumeDominant]
+    Headline
+        Checks if a map between projective varieties is birational.
+    Usage
+        val = isBirationalMap(a,b,f)
+        val = isBirationalMap(R,S,f)
+        val = isBirationalMap(Pi)
+    Inputs
+        a:Ideal
+            defining equations for X            
+        b:Ideal
+            defining equations for Y
+        f:BasicList
+            A list of where to send the variables in the ring of b, to in the ring of a.
+        R:Ring
+            the homogeneous coordinate ring of X
+        S:Ring
+            the homogeneous coordinate ring of Y
+        Pi:RingMap
+            A ring map S to R corresponding to X mapping to Y
+    Outputs
+        val:Boolean
+            true if the map is birational, false if otherwise
+    Description
+        Text   
+            This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The target and source must be varieties, in particular their defining ideals must be prime.  Let's check that the plane quadratic cremona transformation is birational.
+        Example
+            R=QQ[x,y,z];
+            S=QQ[a,b,c];
+            Pi = map(R, S, {x*y, x*z, y*z});
+            isBirationalMap(Pi)
+        Text   
+            We can also verify that a cover of $P^1$ by an elliptic curve is not birational.
+        Example
+            R=QQ[x,y,z]/(x^3+y^3-z^3);
+            S=QQ[s,t];
+            Pi = map(R, S, {x, y-z});            
+            isBirationalMap(Pi)
+        Text
+            Note the Frobenius map is not birational.
+        Example
+            R = ZZ/5[x,y,z]/(x^3+y^3-z^3);
+            S = ZZ/5[a,b,c]/(a^3+b^3-b^3);
+            h = map(R, S, {x^5, y^5, z^5});
+            isBirationalMap(h)
+    SeeAlso
+        isBirationalOntoImage
+    Caveat
+        Also see the very fast probabilisitc birationality checking of the Cremona package: isBirational
 ///                     
 
 doc /// 
@@ -796,19 +841,15 @@ doc ///
                         true if the map is birational, false if otherwise
         Description
                 Text   
-                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling isBirationalOntoImage.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its  defining ideals must be prime.
+                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling isBirationalOntoImage.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its defining ideals must be prime.  In the following example, the map is not birational, but it is birational onto its image.
                 Example
-                        R=QQ[x,y,z];
-                        S=QQ[a,b,c];
-                        Pi = map(R, S, {x*y, x*z, y*z});
-                        isBirationalMap(Pi)
-                Text
-                        Note the Frobenius map is not birational.
-                Example
-                        R = ZZ/5[x,y,z]/(x^3+y^3-z^3);
-                        S = ZZ/5[a,b,c]/(a^3+b^3-b^3);
-                        h = map(R, S, {x^5, y^5, z^5});
-                        isBirationalMap(h)
+                        R=QQ[x,y];
+                        S=QQ[a,b,c,d];
+                        Pi = map(R, S, {x^3, x^2*y, x*y^2, y^3});
+                        isBirationalOntoImage(Pi)
+                        isBirationalMap(Pi)                       
+        SeeAlso 
+            isBirationalMap
 ///                     
 
 
@@ -1256,8 +1297,7 @@ doc ///
         Text
             Notice the last two checks are just verifying that the composition g*h agrees with the identity.
     Caveat
-        Only works for irreducible varieties right now
-        
+        Only works for irreducible varieties right now.  Also see the function invertBirMap in the package Cremona, which for certain types of maps from projective space is much faster.  Additionally, also compare with the function invertBirationalMap of the package Parametrization.        
 ///
 
 --******************************************
@@ -1560,6 +1600,10 @@ TEST /// --test #32, map from genus 3 curve to projective space
 ///
 
 
+-----------------------------------
+------- Further Tests -------------
+-----------------------------------
+
 --finally we test a map between non-rational varieties
 TEST /// --test #33, maps between cones over elliptic curves and their blowups
     --the cone over an elliptic curve lies in P3, the blowup lives in P11
@@ -1577,7 +1621,9 @@ TEST /// --test #33, maps between cones over elliptic curves and their blowups
     gg = inverseOfMap g
     assert( b and ( isRegularMap gg == false))
 ///
-
+----Version information----
+--0.1  First version.
+--0.2  Substantial improvements in speed.
 
 ----FUTURE PLANS------
 --1.  Handle multi-graded rings (multi-graded maps etc.)
