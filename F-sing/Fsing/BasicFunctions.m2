@@ -52,16 +52,17 @@ floorLog = ( b, x ) ->
     flog - 1       
 )
 
--- the following function is faster than just floor(log_b x). This is less pronounced 
--- for large x though. Also it seems like the opposite is true when b is small compared to x 
+-- the following function is faster than just floor(log_b x) if x is not too large compared
+-- to b. 
 
+-- for instance, the following function takes 1.2e-4 seconds to find log_2(13131231), 
+-- whereas the old method takes 9.5e-5 seconds. 
 
-
-maybeFaster = ( b, x ) -> (
+fasterFloorLog = ( b, x ) -> (
     if ( x < b) then ( return 0 );
     flog := 1; 
     powerofb := b;
-    oldfpowerofb := 0;
+    oldpowerofb := 0;
     oldflog := 0;
     while powerofb <= x do (
         oldflog = flog;
