@@ -995,7 +995,7 @@ associatedGradedHomologyObject(ZZ,ZZ,FilteredComplex) := (p,n,K) -> (
 -----------------------------------------------------------
 
 
--- New method for tensor that returns the pushforward of a complex
+-- New method for tensor that returns the tensor product of a complex via a ring map
 tensor(RingMap,ChainComplex) := ChainComplex => 
  opts -> (f,C) -> (
          k := min C; 
@@ -3159,7 +3159,7 @@ doc ///
      Key
      	  (tensor, RingMap, ChainComplex)
      Headline
-     	  pushforward of chain complexes
+     	  tensor product of a chain complex by a ring map
      Usage
      	  D = tensor(f,C)
      Inputs
@@ -3170,7 +3170,7 @@ doc ///
      Description
      	  Text 
 	       Given a ring map R -> S and a chain complex over R, 
-	       returns the pushforward of the given chain complex.
+	       returns the tensor product of the given chain complex.
 	  Example
 	      R = QQ[x];
 	      M = R^1/(x^2);
@@ -3867,6 +3867,16 @@ end
 ---
 -- scratch code --
 ---
+
+--------------------------------------------------------------------------------
+restart
+uninstallPackage"SpectralSequences"
+installPackage"SpectralSequences"
+installPackage("SpectralSequences", RemakeAllDocumentation => true)
+check "SpectralSequences";
+viewHelp SpectralSequences
+------------------------------------------
+
 Status API Training Shop Blog About
 © 2016 GitHub, Inc. Terms Privacy Security Contact Help
 
