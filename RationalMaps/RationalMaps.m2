@@ -586,8 +586,10 @@ inverseOfMapRees(RingMap) := o->(f)->(
 --**********************************
 --inverse of map using simis algebra
 --**********************************
+--THIS NEEDS TO BE MODIFIED FOR HYBRID STRATEGY
+--***********************************
 
-inverseOfMapSimis(RingMap) :=o->(f)->(
+inverseOfMapSimis(RingMap) :=o->(f)->( 
    -- invList := inverseOfMap(target f, source f, first entries matrix f);
 --    map(source f, target f, invList)
 --    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
