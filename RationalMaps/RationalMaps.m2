@@ -37,6 +37,8 @@ export{
     "SaturationStrategy", --an option for controlling how inversion of maps is run.
     "ReesStrategy", --an option for controlling how inversion of maps is run.
     "SimisStrategy", --an option for controlling how inversion of maps is run.
+    "HybridStrategy", --an option for controlling how inversion of maps is run. (This is the default)
+    "HybridLimit", --an option for controlling inversion of maps (whether to do more simis or more rees strategies)
     "CheckBirational", --an option for inverseOfMap, whether or not to check if something is birational
     "SaturateOutput",  --option to turn off saturation of the output
     "AssumeDominant" --option to assume's that the map is dominant (ie, don't compute the kernel)
@@ -495,9 +497,9 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
- inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>SimisStrategy});
+ inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>HybridStrategy, HybridLimit=>15});
  inverseOfMapRees := method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy});
- inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true}); 
+ inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true,  HybridLimit=>15}); 
 --this checks whether a map X -> Y is birational.
 
 --X = Proj R
@@ -512,7 +514,10 @@ inverseOfMap(RingMap):=o->(f)->(
         inverseOfMapRees(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
     )
     else if (o.Strategy == SimisStrategy) then (
-        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational)
+        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>infinity)
+    )
+    else if (o.Strategy == HybridStrategy) then(
+        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>o.HybridLimit)
     )
   );
 
@@ -586,15 +591,14 @@ inverseOfMapRees(RingMap) := o->(f)->(
 --**********************************
 --inverse of map using simis algebra
 --**********************************
---THIS NEEDS TO BE MODIFIED FOR HYBRID STRATEGY
---***********************************
+
 
 inverseOfMapSimis(RingMap) :=o->(f)->( 
    -- invList := inverseOfMap(target f, source f, first entries matrix f);
 --    map(source f, target f, invList)
 --    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
 ---*******************
-    if (o.CheckBirational == true) then print "Warning:  when using the current default SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
+    if ((o.CheckBirational == true) and (o.HybridLimit == infinity)) then print "Warning:  when using the current default SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
    
     if (o.AssumeDominant == false) then (
         f = mapOntoImage(f);
@@ -638,13 +642,21 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     J:=sub(di1,tR)+ideal apply(1..rs,j->(gens tR)_(n+j)-myt*F_(0,(j-1)));
 
     flag := false;
+    giveUp := false;
     secdeg:=1;
     jj := 1;
+    M := null;
     while (flag == false) do (
 --  Jr:= simisAlgebra(di1,bm1,secdeg);
  --THe following is substituing simisAlgebra, we don't call that because we want to save the sotred groebner basis
-        M:=gb(J,DegreeLimit=>{1,secdeg}); --instead of computing the whole Grob. 
+        if (secdeg < o.HybridLimit) then (
+            M=gb(J,DegreeLimit=>{1,secdeg}); --instead of computing the whole Grob. 
                                                --Baisis of J we only compute the parts of degree (1,m) or less, 
+        )
+        else( --we are running the hybrid strategy, so we compute the whole gb
+            M=gb(J); -- probably this should be DegreeLimit=>{1,infinity}, not sure if that works or not
+            giveUp = true;
+        );                                              
         gM:=selectInSubring(1,gens M);
         L2:=ideal mingens ideal gM;
         W:=local W;
@@ -656,8 +668,17 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
         vS:=gens ambient S;
         g:=map(source f,ring Jr, toList(apply(0..r-1,z->0))|vS);
         barJD:=g(JD);
-        if ((rank barJD) == jdd) then (
-            flag = true);       
+        if (giveUp == false) then( 
+            if ((rank barJD) == jdd) then (
+                flag = true;
+            );
+        )
+        else (
+            flag = true;
+            if (o.CheckBirational == true) then (
+                if (not ((rank barJD) == jdd)) then error "The map is not birational onto its image";
+            );
+        );     
         secdeg=secdeg + jj;
         jj = jj + 1; --we are basically growing secdeg in a quadratic way now, but we could grow it faster or slower...
                     --maybe the user should control it with an option
@@ -718,7 +739,7 @@ isEmbedding(RingMap) := (f1)->(
         f2 := mapOntoImage(f1);
         flag := isRegularMap(f2);
         if (flag == true) then (
-            try ( h := inverseOfMap(f2, AssumeDominant=>true, Strategy=>ReesStrategy) ) then (  
+            try ( h := inverseOfMap(f2, AssumeDominant=>true, Strategy=>HybridStrategy) ) then (  
                     if (flag == true) then(
                             flag = isRegularMap(h);
                     );                
@@ -847,7 +868,7 @@ document {
     ":  The package ", TO "Cremona", " focuses on very fast probabilistic computation in general cases and very fast deterministic computation for special kinds of maps from projective space.  In particular, ",BR{},
     UL {
         {TO "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer that is frequently substantially faster than what this package can provide with ", TO "isBirationalMap", ".", },
-        {TO "invertBirMap", " gives a very fast computation of the inverse of a birational map if the source is projective space ", EM " and ", "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ", TO "invertBirationalMap", " from ", TO "Parametrization", ".  In some cases, our function ", TO "inverseOfMap", " appears to be competitive if SimisStrategy is used."},
+        {TO "invertBirMap", " gives a very fast computation of the inverse of a birational map if the source is projective space ", EM " and ", "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ", TO "invertBirationalMap", " from ", TO "Parametrization", ".  In some cases, our function ", TO "inverseOfMap", " appears to be competitive however."},
     },
 }
 
@@ -873,7 +894,9 @@ doc ///
     	Text
             It is a valid value for the Strategy Option for inverseOfMap (and other functions).
     SeeAlso
-        ReesStrategy
+        SaturationStrategy
+        SimisStrategy
+        HybridStrategy
 
 ///
 
@@ -887,6 +910,8 @@ doc ///
             It is a valid value for the Strategy Option for inverseOfMap (and other functions).  This appears to be slower in some examples.  
     SeeAlso
         ReesStrategy
+        SimisStrategy
+        HybridStrategy
 ///
 
 doc ///
@@ -896,9 +921,38 @@ doc ///
         A strategy for inverseOfMap
     Description
     	Text
-            It is a valid value for the Strategy Option for inverseOfMap (and other functions).  This is currently the default strategy.
+            It is a valid value for the Strategy Option for inverseOfMap (and other functions).  
     SeeAlso
         ReesStrategy
+        SaturationStrategy
+        HybridStrategy
+///
+
+doc ///
+    Key
+        HybridStrategy
+    Headline
+        A strategy for inverseOfMap
+    Description
+    	Text
+            It is a valid value for the Strategy Option for inverseOfMap.  This is currently the default strategy.  It is a combination of ReesStrategy and SimisStrategy.  By increasing the HybridLimit value (default 15), you can weight it more towards SimisStrategy.
+    SeeAlso
+        ReesStrategy
+        SaturationStrategy
+        SimisStrategy
+        HybridLimit
+///
+
+doc ///
+    Key
+        HybridLimit
+    Headline
+        An option to control HybridStrategy
+    Description
+    	Text
+            By increasing the HybridLimit value (default 15), you can weight HybridStrategy it more towards SimisStrategy.  Infinity will behave just like SimisStrategy.
+    SeeAlso
+        HybridStrategy
 ///
 
 doc /// 
@@ -1421,6 +1475,7 @@ doc ///
 		[inverseOfMap, AssumeDominant]
 		[inverseOfMap, Strategy]
         [inverseOfMap, CheckBirational]
+        [inverseOfMap, HybridLimit]
     Headline
         Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational onto its image.
     Usage
@@ -1441,7 +1496,11 @@ doc ///
             Inverse function of your birational map, $f(X) \to X$.
     Description
         Text
-            Given a map $f : X \to Y$, this finds the inverse of your birational map $f(X) \to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.  If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of f.  The Strategy option can be set to SimisStrategy (default), ReesStrategy, or SaturationStrategy.  Note SimisStrategy will never terminate for non-birational maps. If CheckBirational is set to false (default is true), then no check for birationality will be done.  If it is set to true and the map is not birational, an error will be thrown if you are not using SimisStrategy.  
+            Given a map $f : X \to Y$, this finds the inverse of your birational map $f(X) \to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.  
+        Text
+            If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of f.  
+        Text
+            The Strategy option can be set to HybridStrategy (default), SimisStrategy, ReesStrategy, or SaturationStrategy.  Note SimisStrategy will never terminate for non-birational maps. If CheckBirational is set to false (default is true), then no check for birationality will be done.  If it is set to true and the map is not birational, an error will be thrown if you are not using SimisStrategy. The option HybridLimit can weight the HybridStrategy between ReesStrategy and SimisStrategy, the default value is 15 and increasing it will weight towards SimisStrategy.
         Example
             R = ZZ/7[x,y,z];
             S = ZZ/7[a,b,c];
@@ -1807,5 +1866,4 @@ TEST /// --test #33, maps between cones over elliptic curves and their blowups
 ------a) maybe add multi-core support?  
 ------b) find the relevant low degree part of the blowup ideal
 --5.  Check for smoothness/flatness of map (find loci)?
---6.  Make a HybridStrategy, which has aspects of both  ReesStrategy and SimisStrategy, in particular it will run Simis to a certain level, and then run Rees.
---7.  isEmbedding is currently only working with ReesStrategy, probably it should use the HybridStrategy
+--6.  Maybe run isBirationalMap with a hybrid strategy too?
