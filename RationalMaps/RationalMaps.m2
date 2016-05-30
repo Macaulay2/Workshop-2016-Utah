@@ -28,9 +28,9 @@ export{
 	"isBirationalOntoImage",
 	"inverseOfMap",
 	"mapOntoImage",
-	"blowUpIdeals",
+	--"blowUpIdeals", --at some point we should document this and expose it to the user
     "isSameMap", 
-    "simisAlgebra",
+    --"simisAlgebra", --at some point we should document this and expose it to the user
     --**********************************
     --*************OPTIONS**************
     --**********************************
@@ -198,7 +198,7 @@ isRegularMap(RingMap) := (ff) ->(
 
 
 
- blowUpIdeals=method(Options => {Strategy=>ReesStrategy});
+ blowUpIdeals:=method(Options => {Strategy=>ReesStrategy});
  blowUpIdealsSaturation := method();
  blowUpIdealsRees := method();
       
@@ -284,7 +284,7 @@ blowUpIdeals(Ideal, Matrix):=(a,M)->(
 -- the following is basically a variant of the blowUpIdeals strategy, used for more speed
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-simisAlgebra = method();
+simisAlgebra := method();
 simisAlgebra(Ideal, BasicList, ZZ):=(a,L,m)->(
     r:=length  L;
     SS:=ring a;
@@ -495,7 +495,7 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
- inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy});
+ inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>SimisStrategy});
  inverseOfMapRees := method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy});
  inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true}); 
 --this checks whether a map X -> Y is birational.
@@ -592,7 +592,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
 --    map(source f, target f, invList)
 --    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
 ---*******************
-    if (o.CheckBirational == true) then error "When using SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
+    if (o.CheckBirational == true) then print "Warning:  when using the current default SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
    
     if (o.AssumeDominant == false) then (
         f = mapOntoImage(f);
@@ -657,7 +657,8 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
         if ((rank barJD) == jdd) then (
             flag = true);       
         secdeg=secdeg + jj;
-        jj = jj + 1;
+        jj = jj + 1; --we are basically growing secdeg in a quadratic way now, but we could grow it faster or slower...
+                    --maybe the user should control it with an option
     );
     Inv :=syz(transpose barJD,SyzygyLimit =>1);
    --print "made Inv";
@@ -715,7 +716,7 @@ isEmbedding(RingMap) := (f1)->(
         f2 := mapOntoImage(f1);
         flag := isRegularMap(f2);
         if (flag == true) then (
-            try ( h := inverseOfMap(f2, AssumeDominant=>true) ) then (  
+            try ( h := inverseOfMap(f2, AssumeDominant=>true, Strategy=>ReesStrategy) ) then (  
                     if (flag == true) then(
                             flag = isRegularMap(h);
                     );                
@@ -844,7 +845,7 @@ document {
     ":  The package ", TO "Cremona", " focuses on very fast probabilistic computation in general cases and very fast deterministic computation for special kinds of maps from projective space.  In particular, ",BR{},
     UL {
         {TO "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer that is frequently substantially faster than what this package can provide with ", TO "isBirationalMap", ".", },
-        {TO "invertBirMap", " gives a very fast computation of the inverse of a birational map if the source is projective space ", EM " and ", "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ", TO "invertBirationalMap", " from ", TO "Parametrization", "."},
+        {TO "invertBirMap", " gives a very fast computation of the inverse of a birational map if the source is projective space ", EM " and ", "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ", TO "invertBirationalMap", " from ", TO "Parametrization", ".  In some cases, our function ", TO "inverseOfMap", " appears to be competitive if SimisStrategy is used."},
     },
 }
 
@@ -865,10 +866,10 @@ doc ///
     Key
         ReesStrategy
     Headline
-        Currently not exposed to the user.   
+        A strategy for inverseOfMap
     Description
     	Text
-            It is a valid valude for the Strategy Option in blowUpIdeals (currently an internal function).  This is the currently activated strategy.
+            It is a valid value for the Strategy Option for inverseOfMap (and other functions).
     SeeAlso
         ReesStrategy
 
@@ -878,10 +879,22 @@ doc ///
     Key
         SaturationStrategy
     Headline
-        Currently not exposed to the user.   
+        A strategy for inverseOfMap
     Description
     	Text
-            It is a valid value for the Strategy Option in blowUpIdeals (currently an internal function).  We are still trying to improve this performance before enabling this for the user.
+            It is a valid value for the Strategy Option for inverseOfMap (and other functions).  This appears to be slower in some examples.  
+    SeeAlso
+        ReesStrategy
+///
+
+doc ///
+    Key
+        SimisStrategy
+    Headline
+        A strategy for inverseOfMap
+    Description
+    	Text
+            It is a valid value for the Strategy Option for inverseOfMap (and other functions).  This is currently the default strategy.
     SeeAlso
         ReesStrategy
 ///
@@ -1063,6 +1076,7 @@ doc ///
 		(jacobianDualMatrix,Ring,Ring,BasicList)
 		(jacobianDualMatrix,RingMap)
 		[jacobianDualMatrix,AssumeDominant]
+		[jacobianDualMatrix,Strategy]
 	Headline
 		Computes the Jacobian Dual Matrix, a matrix describing the syzygies of the inverse map.
 	Usage
@@ -1087,7 +1101,7 @@ doc ///
 			Returns a matrix describing the syzygies of the inverse map, if it exists.
 	Description
 		Text
-			This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the AssumeDominant option is set to true, it assumes that the kernel of the associated ring map is zero (default value is false).  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390–413.
+			This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the AssumeDominant option is set to true, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the Strategy option are ReesStrategy and SaturationStrategy.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390–413.
 ///
 			
 doc ///
@@ -1403,6 +1417,7 @@ doc ///
 		(inverseOfMap, Ring, Ring, BasicList)
 		(inverseOfMap, RingMap)
 		[inverseOfMap, AssumeDominant]
+		[inverseOfMap, Strategy]
         [inverseOfMap, CheckBirational]
     Headline
         Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational onto its image.
@@ -1424,7 +1439,7 @@ doc ///
             Inverse function of your birational map, $f(X) \to X$.
     Description
         Text
-            Given a map $f : X \to Y$, this finds the inverse of your birational map $f(X) \to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.  If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant.  If CheckBirational is set to false (default is true), then no check for birationality will be done.  If it is set to true and the map is not birational, an error will be thrown.
+            Given a map $f : X \to Y$, this finds the inverse of your birational map $f(X) \to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.  If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of f.  The Strategy option can be set to SimisStrategy (default), ReesStrategy, or SaturationStrategy.  Note SimisStrategy will never terminate for non-birational maps. If CheckBirational is set to false (default is true), then no check for birationality will be done.  If it is set to true and the map is not birational, an error will be thrown if you are not using SimisStrategy.  
         Example
             R = ZZ/7[x,y,z];
             S = ZZ/7[a,b,c];
@@ -1790,3 +1805,5 @@ TEST /// --test #33, maps between cones over elliptic curves and their blowups
 ------a) maybe add multi-core support?  
 ------b) find the relevant low degree part of the blowup ideal
 --5.  Check for smoothness/flatness of map (find loci)?
+--6.  Make a HybridStrategy, which has aspects of both  ReesStrategy and SimisStrategy, in particular it will run Simis to a certain level, and then run Rees.
+--7.  isEmbedding is currently only working with ReesStrategy, probably it should use the HybridStrategy
