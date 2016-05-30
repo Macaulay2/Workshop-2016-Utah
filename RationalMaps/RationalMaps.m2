@@ -30,11 +30,13 @@ export{
 	"mapOntoImage",
 	"blowUpIdeals",
     "isSameMap", 
+    "simisAlgebra",
     --**********************************
     --*************OPTIONS**************
     --**********************************
-    "SaturationStrategy", --an option for controlling how our internal function blowUpIdeals is run, not clear if we can get this to work
-    "ReesStrategy", --an option for controlling how our internal function  blowUpIdeals is run, not clear if we can get this to work
+    "SaturationStrategy", --an option for controlling how inversion of maps is run.
+    "ReesStrategy", --an option for controlling how inversion of maps is run.
+    "SimisStrategy", --an option for controlling how inversion of maps is run.
     "CheckBirational", --an option for inverseOfMap, whether or not to check if something is birational
     "SaturateOutput",  --option to turn off saturation of the output
     "AssumeDominant" --option to assume's that the map is dominant (ie, don't compute the kernel)
@@ -277,6 +279,49 @@ blowUpIdeals(Ideal, Ideal):=(a,b)->(
 blowUpIdeals(Ideal, Matrix):=(a,M)->(
     blowUpIdeals(a, first entries gens M)
     );
+    
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-- the following is basically a variant of the blowUpIdeals strategy, used for more speed
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+simisAlgebra = method();
+simisAlgebra(Ideal, BasicList, ZZ):=(a,L,m)->(
+    r:=length  L;
+    SS:=ring a;
+    LL:=apply(L,uu->sub(uu, SS));
+    n:=numgens ambient  SS;
+    K:=coefficientRing SS;
+    yyy:=local yyy;
+    ttt:=local ttt;
+    if r!=0 then (d:=max(apply(L,zz->degree zz)));--the degree of the elements of linear sys
+     mymon:=monoid[({ttt}|gens ambient SS|toList(yyy_0..yyy_(r-1))), MonomialOrder=>Eliminate 1,
+	Degrees=>{{(-d_0),1},n:{1,0},r:{0,1}}];
+    tR:=K(mymon);  --ambient ring of Rees algebra with weights
+    f:=map(tR,SS,submatrix(vars tR,{1..n}));
+    F:=f(matrix{LL});
+    myt:=(gens tR)#0;
+    J:=sub(a,tR)+ideal apply(1..r,j->(gens tR)_(n+j)-myt*F_(0,(j-1)));
+    M:=gb(J,DegreeLimit=>{1,m}); --instead of computing the whole Grob. Baisis of J we only compute the parts of degree (1,m) or less, 
+    gM:=selectInSubring(1,gens M);
+    L2:=ideal mingens ideal gM;
+    W:=local W;
+    nextmon:=monoid[(gens ambient  SS|toList(W_0..W_(r-1))), Degrees=>{n:{1,0},r:{0,1}}];
+    RR:=K(nextmon);
+    g:=map(RR,tR,0|vars RR);
+    trim g(L2)); 
+
+
+
+
+simisAlgebra(Ideal, Ideal,ZZ):=(a,b,m)->(
+    simisAlgebra(a, first entries gens b,m)
+    );
+
+--Matrix M consists of elements in the ring of a 
+simisAlgebra(Ideal, Matrix,ZZ):=(a,M,m)->(
+    simisAlgebra(a, first entries gens M)
+    );
+
 
 
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -450,7 +495,9 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
- inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true});
+ inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy});
+ inverseOfMapRees := method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy});
+ inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true}); 
 --this checks whether a map X -> Y is birational.
 
 --X = Proj R
@@ -460,15 +507,33 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
 --list of elements = bm
+inverseOfMap(RingMap):=o->(f)->(
+    if ((o.Strategy == ReesStrategy) or (o.Strategy == SaturationStrategy)) then (        
+        inverseOfMapRees(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
+    )
+    else if (o.Strategy == SimisStrategy) then (
+        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational)
+    )
+  );
+
 inverseOfMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
-    inverseOfMap( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant)
+    inverseOfMap( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
 );    
 
 inverseOfMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
-    inverseOfMap(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant)
+    inverseOfMap(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
     );
 
-inverseOfMap(RingMap) := o->(f)->(
+
+inverseOfMapRees(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
+    inverseOfMap( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
+);    
+
+inverseOfMapRees(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+    inverseOfMap(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
+    );
+
+inverseOfMapRees(RingMap) := o->(f)->(
    -- invList := inverseOfMap(target f, source f, first entries matrix f);
 --    map(source f, target f, invList)
 --    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
@@ -496,7 +561,7 @@ inverseOfMap(RingMap) := o->(f)->(
     bm1:=flatten first entries bm0;
     --From here the situation is under the assumption that the variety is not contained in any hyperplane.
     r:=numgens ambient Rlin1;
-   barJD:=jacobianDualMatrix(di1,im1,bm1,AssumeDominant=>true);--JacobianDual Matrix is another function in thi package
+   barJD:=jacobianDualMatrix(di1,im1,bm1,AssumeDominant=>true, Strategy=>o.Strategy);--JacobianDual Matrix is another function in thi package
     --print "JD computed";
   jdd:=(numgens ambient Rlin1)-1;
    if (o.CheckBirational== true) then (
@@ -517,6 +582,98 @@ inverseOfMap(RingMap) := o->(f)->(
 --    psi = map(source f, Rlin1, sub(matrix{Inv}, source f));    
     psi*phi
 );
+
+--**********************************
+--inverse of map using simis algebra
+--**********************************
+
+inverseOfMapSimis(RingMap) :=o->(f)->(
+   -- invList := inverseOfMap(target f, source f, first entries matrix f);
+--    map(source f, target f, invList)
+--    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
+---*******************
+    if (o.CheckBirational == true) then error "When using SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
+   
+    if (o.AssumeDominant == false) then (
+        f = mapOntoImage(f);
+    );
+    di := ideal target f; -- the defining ideal of the source variety
+    im := ideal source f; -- the defining ideal of the target variety
+    bm := first entries matrix f;     --the list defining the map from the source to target variety   
+    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    R:=ring di;
+    K:=coefficientRing R;    
+    S:=ring im;
+    im1 := im;
+    
+    --In the following lines we remove the linear parts of the ideal di and 
+--modify our map bm
+    Rlin:=target f;
+    Rlin2 := minimalPresentation(Rlin);
+    phi:=Rlin.minimalPresentationMap;    
+    Rlin1:=target phi;
+    di1:=ideal Rlin1;
+    bm0:=phi(matrix{bm});
+    bm1:=flatten first entries bm0;
+    --From here the situation is under the assumption that the variety is not contained in any hyperplane.
+    r:=numgens ambient Rlin1;
+    jdd:=(numgens ambient Rlin1)-1;
+    --THe following is a part of simisAlgebra
+    rs:=length  bm1;
+    SS:=ring di1;
+    LL:=apply(bm1,uu->sub(uu, SS));
+    n:=numgens ambient  SS;
+    Kf:=coefficientRing SS;
+    yyy:=local yyy;
+    ttt:=local ttt;
+    if rs!=0 then (d:=max(apply(bm1,zz->degree zz)));--the degree of the elements of linear sys
+    degList := {{(-d_0),1}} | toList(n:{1,0}) | toList(rs:{0,1});
+    mymon:=monoid[({ttt}|gens ambient SS|toList(yyy_0..yyy_(rs-1))), MonomialOrder=>Eliminate 1, Degrees=>degList];
+    tR:=Kf(mymon);  --ambient ring of Rees algebra with weights
+    f1:=map(tR,SS,submatrix(vars tR,{1..n}));
+    F:=f1(matrix{LL});
+    myt:=(gens tR)#0;
+    J:=sub(di1,tR)+ideal apply(1..rs,j->(gens tR)_(n+j)-myt*F_(0,(j-1)));
+
+    flag := false;
+    secdeg:=1;
+    jj := 1;
+    while (flag == false) do (
+--  Jr:= simisAlgebra(di1,bm1,secdeg);
+ --THe following is substituing simisAlgebra, we don't call that because we want to save the sotred groebner basis
+        M:=gb(J,DegreeLimit=>{1,secdeg}); --instead of computing the whole Grob. 
+                                               --Baisis of J we only compute the parts of degree (1,m) or less, 
+        gM:=selectInSubring(1,gens M);
+        L2:=ideal mingens ideal gM;
+        W:=local W;
+        nextmon:=monoid[(gens ambient  SS|toList(W_0..W_(rs-1))), Degrees=>{n:{1,0},rs:{0,1}}];
+        RR:=Kf(nextmon);
+        g1:=map(RR,tR,0|vars RR);
+        Jr:= g1(L2);
+        JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens Jr);
+        vS:=gens ambient S;
+        g:=map(source f,ring Jr, toList(apply(0..r-1,z->0))|vS);
+        barJD:=g(JD);
+        if ((rank barJD) == jdd) then (
+            flag = true);       
+        secdeg=secdeg + jj;
+        jj = jj + 1;
+    );
+    Inv :=syz(transpose barJD,SyzygyLimit =>1);
+   --print "made Inv";
+    psi := null;
+    psi = map(source f, Rlin1, sub(transpose Inv, source f));    
+    psi*phi
+);
+
+
+inverseOfMapSimis(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
+    inverseOfMapSimis( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational)
+);    
+
+inverseOfMapSimis(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+    inverseOfMapSimis(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational)
+    );
     
    
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -601,7 +758,7 @@ isEmbedding(RingMap) := (f1)->(
  
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- jacobianDualMatrix = method(Options => {AssumeDominant=>false});
+ jacobianDualMatrix = method(Options => {AssumeDominant=>false, Strategy=>ReesStrategy});
 --this the jacobian dual matrix of  a  rational map X -> Y.
 
 --X = Proj R
@@ -635,7 +792,7 @@ jacobianDualMatrix(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     bm1:=flatten first entries bm0;
     --From here the situation is under the assumption that the variety is not contained in any hyperplane.
     r:=numgens ambient Rlin1;
-    Jr:= blowUpIdeals(di1,bm1);
+    Jr:= blowUpIdeals(di1,bm1, Strategy=>o.Strategy);
     n:=numgens Jr;
     L:={};
     for i from 0 to (n-1) do(
