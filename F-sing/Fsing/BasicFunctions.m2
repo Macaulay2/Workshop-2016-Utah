@@ -51,6 +51,33 @@ floorLog = ( b, x ) ->
     flog - 1       
 )
 
+maybeFaster = ( b, x ) -> (
+    if ( x < b) then ( return 0 );
+    flog := 1; 
+    powerofb := b;
+    oldfpowerofb := 0;
+    while powerofb <= x do (
+        flog = flog * 2;
+        oldpowerofb = powerofb; -- just so we don't waste time taking square roots
+                               -- during the binary search part
+        powerofb = powerofb^2;
+    );
+
+    -- binary search
+    lowerbound = 0;
+    upperbound = flog/2; -- this should always be an integer.
+    while (lowerbound + 1 < upperbound ) do ( --maybe the answer is between these two
+        mid := ceiling ((lowerbound + upperbound)/2);
+        if (oldpowerofb * b^mid > x)
+        then ( upperbound = mid; )
+        else ( lowerbound = mid; ); --if equality, now lowerbound is the answer
+    );
+
+    -- it's possible that x is == to b^upperbound, so we check. 
+    if (oldpowerofb * b^upperbound == x) then (return flog + upperbound;);
+    return flog + lowerbound;
+)
+
 --===================================================================================
 
 multOrder = method()
