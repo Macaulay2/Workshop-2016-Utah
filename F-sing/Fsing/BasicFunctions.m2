@@ -46,10 +46,16 @@ fracPart = x -> x - floor(x)
 --Computes floor(log_b x), correcting problems due to rounding.
 floorLog = ( b, x ) -> 
 (
+    if ( x < b ) then ( return 0 );
     flog := floor( log_b x );
     while b^flog <= x do flog = flog + 1;
     flog - 1       
 )
+
+-- the following function is faster than just floor(log_b x). This is less pronounced 
+-- for large x though. Also it seems like the opposite is true when b is small compared to x 
+
+
 
 maybeFaster = ( b, x ) -> (
     if ( x < b) then ( return 0 );
@@ -59,15 +65,20 @@ maybeFaster = ( b, x ) -> (
     oldflog := 0;
     while powerofb <= x do (
         oldflog = flog;
-        flog = flog * 2;
+        flog = flog * 2; -- just so we don't waste time dividing flog by 2 later
+                         -- getting rid of this seems to make this function take
+                         -- 7% more time. 
+
         oldpowerofb = powerofb; -- just so we don't waste time taking square roots
                                -- during the binary search part
+                               -- taking the squareroot seems to slow down
+                               -- this function by about 70%
         powerofb = powerofb^2;
     );
 
     -- binary search
     lowerbound = 0;
-    upperbound = oldflog; -- this should always be an integer.
+    upperbound = oldflog; 
     while (lowerbound + 1 < upperbound ) do ( --maybe the answer is between these two
         mid := ceiling ((lowerbound + upperbound)/2);
         if (oldpowerofb * b^mid > x)
