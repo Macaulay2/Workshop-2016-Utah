@@ -1530,7 +1530,7 @@ doc ///
         Text
             Notice the last two checks are just verifying that the composition g*h agrees with the identity.
     Caveat
-        Only works for irreducible varieties right now.  Also see the function invertBirMap in the package Cremona, which for certain types of maps from projective space is much faster.  Additionally, also compare with the function invertBirationalMap of the package Parametrization.        
+        Only works for irreducible varieties right now.  Also see the function invertBirMap in the package Cremona, which for certain types of maps from projective space is sometimes faster.  Additionally, also compare with the function invertBirationalMap of the package Parametrization.        
 ///
 
 --******************************************
