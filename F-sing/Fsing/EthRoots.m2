@@ -49,11 +49,16 @@
 -------------------------------------------------------
 -------------------------------------------------------
 
+needs "BasicFunctions.m2" -- maybe this should be removed
+                          -- when we publish this package
 
 ethRoot = method(Options => {EthRootStrategy => Substitution});
 --ethRoot takes two strategy options: Substitution and MonomialBasis
 --The second strategy seems to generally be faster for computing I^[1/p^e] when e = 1, especially for polynomials of
 --high degree, but slower for larger e. 
+-- Dan: I wonder if this is because getFieldGen is not optimized? It's called many times per
+-- generator of the ideal in the monomial strategy. Though I see it's also called for the 
+-- substitution strategy...
 
 ethRoot ( ZZ, Ideal ) := Ideal => opts -> (e,I) -> (
     if (not e >= 0) then (error "ethRoot: Expected second argument to be a nonnegative integer.");
@@ -62,6 +67,7 @@ ethRoot ( ZZ, Ideal ) := Ideal => opts -> (e,I) -> (
     p := char R;
     k := coefficientRing(R);
     if ((k =!= ZZ/p) and (class(k) =!= GaloisField)) then (error "ethRoot: Expected the coefficient field to be ZZ/p or a GaloisField.");
+
     q := k#order;
     --Gets the cardinality of the base field.
     G := I_*;
@@ -121,6 +127,12 @@ getFieldGenRoot = (e,p,q,k) -> (
 -----------------------------------------------------------------------------
 
 ethRootMonStrat = (e,p,q,k,f,R) -> (
+    -- e = exponent, p = prime, q = size of coeff field, k = coeff field, 
+	-- f = a generator of the ideal in question, R = the ring
+	-- to use this strategy to find the p^eth root of an ideal, you need to apply this
+	-- function to each generator of the ideal and sum the results. 
+	-- maybe this should just return the ideal though? I guess it's an internal
+	-- function, so it doesn't matter.
     expDecomp := apply(exponents(f),exponent->{coefficient(R_exponent,f)*R_(exponent //p^e),exponent%p^e});
     --Gets the exponent vectors of each monomial X^u of the polynomial f, and associates to u the two-element list whose
     --first entry is cX^v and second entry is w, where c is the coefficient of X^u in f and u = p^e*v + w. 
@@ -229,6 +241,8 @@ ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
 ethRootSafeList( ZZ, List, List ) := ( e, a, F ) ->
     ethRootSafeList( e, a, F, ideal( 1_( ring( F#0 )  ) ) )
 	
+
+-- DS: what does fancyEthRoot do?
 fancyEthRoot = (e,m,I) ->
 (
 	G:=first entries mingens I;
