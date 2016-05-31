@@ -38,6 +38,7 @@ export{
     "ReesStrategy", --an option for controlling how inversion of maps is run.
     "SimisStrategy", --an option for controlling how inversion of maps is run.
     "HybridStrategy", --an option for controlling how inversion of maps is run. (This is the default)
+    "MinorsCount", --an option for how many times we should randomly look for a minor before calling syz in inverseOfMap
     "HybridLimit", --an option for controlling inversion of maps (whether to do more simis or more rees strategies)
     "CheckBirational", --an option for inverseOfMap, whether or not to check if something is birational
     "SaturateOutput",  --option to turn off saturation of the output
@@ -457,11 +458,9 @@ isBirationalOntoImage(RingMap) :=o->(f)->(
 );
     
     
-    --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    --this method is no longer used, it will be deleted in a later version
-    --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--find a full rank minor of a matrix (of a specified size), tries minorCount times
 nonZeroMinor:=method();
-nonZeroMinor(Matrix,ZZ):=(M,ra)->(
+nonZeroMinor(Matrix,ZZ,ZZ):=(M,ra,minorCount)->(
     cc:=numColumns(M);
     ro:=numRows(M);
     col:=apply(0..cc-1,i->i);
@@ -486,7 +485,7 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
        colList = take(random toList col, {0,ra-1});
        rowList = take(random toList row, {0,ra-1});
        subM = submatrix(M, rowList, colList);
-       if (rank(subM == ra)) then (
+       if (rank(subM) == ra) then (
             flag = true;
        );
        );
@@ -497,9 +496,9 @@ nonZeroMinor(Matrix,ZZ):=(M,ra)->(
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
- inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>HybridStrategy, HybridLimit=>15});
- inverseOfMapRees := method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy});
- inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true,  HybridLimit=>15}); 
+ inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>HybridStrategy, HybridLimit=>15}, Verbose=>true, MinorsCount=>100);
+ inverseOfMapRees := method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy}, Verbose=>true,MinorsCount=>100);
+ inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true,  HybridLimit=>15}, Verbose=>true,MinorsCount=>100); 
 --this checks whether a map X -> Y is birational.
 
 --X = Proj R
@@ -634,7 +633,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     ttt:=local ttt;
     if rs!=0 then (d:=max(apply(bm1,zz->degree zz)));--the degree of the elements of linear sys
     degList := {{(-d_0),1}} | toList(n:{1,0}) | toList(rs:{0,1});
-    mymon:=monoid[({ttt}|gens ambient SS|toList(yyy_0..yyy_(rs-1))), MonomialOrder=>Eliminate 1, Degrees=>degList];
+    mymon:=monoid[({ttt}|gens ambient SS|toList(yyy_0..yyy_(rs-1))),  Degrees=>degList, MonomialOrder=>Eliminate 1];
     tR:=Kf(mymon);  --ambient ring of Rees algebra with weights
     f1:=map(tR,SS,submatrix(vars tR,{1..n}));
     F:=f1(matrix{LL});
@@ -646,6 +645,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     secdeg:=1;
     jj := 1;
     M := null;
+    1/0;
     while (flag == false) do (
 --  Jr:= simisAlgebra(di1,bm1,secdeg);
  --THe following is substituing simisAlgebra, we don't call that because we want to save the sotred groebner basis
@@ -683,6 +683,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
         jj = jj + 1; --we are basically growing secdeg in a quadratic way now, but we could grow it faster or slower...
                     --maybe the user should control it with an option
     );
+    if (o.Verbose == true) print "Now computing syz of the jacobianDualMatrix.  If this is slow";
     Inv :=syz(transpose barJD,SyzygyLimit =>1);
    --print "made Inv";
     psi := null;
