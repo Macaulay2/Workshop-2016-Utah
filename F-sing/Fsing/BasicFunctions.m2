@@ -46,9 +46,50 @@ fracPart = x -> x - floor(x)
 --Computes floor(log_b x), correcting problems due to rounding.
 floorLog = ( b, x ) -> 
 (
+    if ( x < b ) then ( return 0 );
     flog := floor( log_b x );
     while b^flog <= x do flog = flog + 1;
     flog - 1       
+)
+
+-- the following function is faster than just floor(log_b x) if x is not too large compared
+-- to b. 
+
+-- for instance, the following function takes 1.2e-4 seconds to find log_2(13131231), 
+-- whereas the old method takes 9.5e-5 seconds. 
+
+fasterFloorLog = ( b, x ) -> (
+    if ( x < b) then ( return 0 );
+    flog := 1; 
+    powerofb := b;
+    oldpowerofb := 0;
+    oldflog := 0;
+    while powerofb <= x do (
+        oldflog = flog;
+        flog = flog * 2; -- just so we don't waste time dividing flog by 2 later
+                         -- getting rid of this seems to make this function take
+                         -- 7% more time. 
+
+        oldpowerofb = powerofb; -- just so we don't waste time taking square roots
+                               -- during the binary search part
+                               -- taking the squareroot seems to slow down
+                               -- this function by about 70%
+        powerofb = powerofb^2;
+    );
+
+    -- binary search
+    lowerbound = 0;
+    upperbound = oldflog; 
+    while (lowerbound + 1 < upperbound ) do ( --maybe the answer is between these two
+        mid := ceiling ((lowerbound + upperbound)/2);
+        if (oldpowerofb * b^mid > x)
+        then ( upperbound = mid; )
+        else ( lowerbound = mid; ); --if equality, now lowerbound is the answer
+    );
+
+    -- it's possible that x is == to b^upperbound, so we check. 
+    if (oldpowerofb * b^upperbound == x) then (return oldflog + upperbound;);
+    return oldflog + lowerbound;
 )
 
 --===================================================================================
