@@ -253,10 +253,23 @@ fancyEthRoot = (e,m,I) ->
 		};
 		answer=answer+a;
 	});
-	ideal(mingens(answer))
+--	ideal((answer))
+    answer
 )
 
 
+--this is a working name for a function which should generalize both ethRootSafe and fancyEthRoot
+--it will take 
+smartEthRoot = method();
+
+smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
+--the idealList, can take a list of ideals, a list of elements, or a mix of lists of ideals or elements
+    idealList = apply(idealList, jj -> (if (class jj === Ideal) then (jj) else (ideal(jj))));
+);
+
+--this function is the same as the above, it just explicitly adds J to the end of the ideal list and 1 to the end of the exponent list
+smartEthRoot(ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
+);
 ----------------------------------------------------------------
 --************************************************************--
 --Functions for computing test ideals, and related objects.   --
