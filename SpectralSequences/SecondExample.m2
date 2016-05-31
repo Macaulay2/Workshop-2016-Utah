@@ -75,3 +75,33 @@ D = res(N,LengthLimit => 7);
 E0 = C' ** (filteredComplex D);
 E = prune spectralSequence E0;
 E_infinity
+
+--Other scratch Example
+restart
+needsPackage"SpectralSequences"
+viewHelp"PushForward"
+k=QQ
+R=k[a,b,c]
+S=k[s,t]
+f = map(S,R,{s^2,s*t,t^2})
+N = (pushFwd f)_0
+cN = chainComplex(R)
+cN_0 = N
+M = coker vars R
+C = res M
+
+F = (filteredComplex C)** cN
+E = prune spectralSequence F
+E^0
+E^1
+E^2
+
+FF = C ** (filteredComplex cN)
+EE = prune spectralSequence FF
+EE^0
+EE^1
+EE^2
+
+
+E^infinity
+EE^infinity
