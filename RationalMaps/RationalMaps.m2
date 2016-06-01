@@ -29,7 +29,7 @@ export{
 	"inverseOfMap",
 	"mapOntoImage",
 	--"blowUpIdeals", --at some point we should document this and expose it to the user
-	--"nonZeroMinor",-- it is internal because the answer is probobalistic and it is controlled by MinorsCount option
+	"nonZeroMinor",-- it is internal because the answer is probobalistic and it is controlled by MinorsCount option
     "isSameMap", 
     --"simisAlgebra", --at some point we should document this and expose it to the user
     --**********************************
@@ -601,7 +601,7 @@ if isSameDegree(bm)==false then error "Expected a list of homogenous elements of
 --find a full rank minor of a matrix (of a specified size), tries minorCount times
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-nonZeroMinor:=method(Options => {Verbose=>true});
+nonZeroMinor =method(Options => {Verbose=>true});
 nonZeroMinor(Matrix,ZZ,ZZ):=o->(M,ra,minorCount)->(
     cc:=numColumns(M);
     ro:=numRows(M);
@@ -620,6 +620,7 @@ nonZeroMinor(Matrix,ZZ,ZZ):=o->(M,ra,minorCount)->(
        subM = submatrix(M, rowList, colList);
        curRank = rank(subM);
        if ((curRank) == ra) then (
+            if (o.Verbose==true) then print "Found a nonzero minor";
             flag = true;
        );
       ct=ct+1;
@@ -734,19 +735,33 @@ inverseOfMapRees(RingMap) := o->(f)->(
      nc:=numColumns(transpose barJD);
      nr:=numRows(transpose barJD);
     if (o#Verbose ) then(
-             	print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.  Now computing syzygies of the Jacobian dual matrix.  If this is slow and the size of the jacobian dual matrix is relatively small, set Verbose=>false" 
-			    ));
-    if (o#Verbose) then ( --the logic here isn't right.  Verbose should just control if things are printed, not what functions are run
-    Inv =syz(transpose barJD,SyzygyLimit =>1);
-    psi = map(source f, Rlin1, sub(transpose Inv, source f));    
+        print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.")
+    );
+    print "Looking for a nonzero minor";   
+    nonZMinor := nonZeroMinor(barJD,jdd,o.MinorsCount, Verbose=>o.Verbose);    
+    if (nonZMinor === null) then (
+        if (o.Verbose==true) then print "Failed to find a nonzero minor.  We now compute syzygies instead.  If this doesn't terminate quickly, you may want to try increasing the option MinorsCount";
+        Inv =syz(transpose barJD,SyzygyLimit =>1);
+        psi = map(source f, Rlin1, sub(transpose Inv, source f));    
     )
     else (
-	 Col=(nonZeroMinor(barJD,jdd,o.MinorsCount))#0;
-         SbarJD=submatrix(barJD,,Col);
-	 
-         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
-         psi=map(ring(Inv#0),Rlin1,matrix{Inv});
-      	);
+        if (o.Verbose==true) then print "We found a nonzero minor.";  
+        Col = (nonZeroMinor(barJD,jdd,o.MinorsCount))#0;      
+        SbarJD=submatrix(barJD,,Col);
+        for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
+        psi=map(ring(Inv#0),Rlin1,matrix{Inv});
+    );
+    --if (o#Verbose) then ( --the logic here isn't right.  Verbose should just control if things are printed, not what functions are run
+--        Inv =syz(transpose barJD,SyzygyLimit =>1);
+--        psi = map(source f, Rlin1, sub(transpose Inv, source f));    
+--    )
+--    else (
+--	 Col=(nonZeroMinor(barJD,jdd,o.MinorsCount))#0;
+--         SbarJD=submatrix(barJD,,Col);
+--	 
+--         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
+--         psi=map(ring(Inv#0),Rlin1,matrix{Inv});
+--      	);
        psi*phi
 );
 
@@ -851,20 +866,23 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
      SbarJD:=null;
      nc:=numColumns(transpose barJD);
      nr:=numRows(transpose barJD);
-    if (o#Verbose ) then(
-             	print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.  Now computing syzygies of the Jacobian dual matrix.  If this is slow and the size of the jacobian dual matrix is relatively small, set Verbose=>false" 
-			    ));
-    if (o#Verbose) then (
-    Inv =syz(transpose barJD,SyzygyLimit =>1);
-    psi = map(source f, Rlin1, sub(transpose Inv, source f));    
+     if (o#Verbose ) then(
+        print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.")
+    );
+    print "Looking for a nonzero minor";   
+    nonZMinor := nonZeroMinor(barJD,jdd,o.MinorsCount, Verbose=>o.Verbose);    
+    if (nonZMinor === null) then (
+        if (o.Verbose==true) then print "Failed to find a nonzero minor.  We now compute syzygies instead.  If this doesn't terminate quickly, you may want to try increasing the option MinorsCount";
+        Inv =syz(transpose barJD,SyzygyLimit =>1);
+        psi = map(source f, Rlin1, sub(transpose Inv, source f));    
     )
     else (
-	 Col=(nonZeroMinor(barJD,jdd,o.MinorsCount))#0;
-         SbarJD=submatrix(barJD,,Col);
-	 
-         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
-         psi=map(ring(Inv#0),Rlin1,matrix{Inv});
-      	);
+        if (o.Verbose==true) then print "We found a nonzero minor.";  
+        Col = (nonZeroMinor(barJD,jdd,o.MinorsCount))#0;      
+        SbarJD=submatrix(barJD,,Col);
+        for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
+        psi=map(ring(Inv#0),Rlin1,matrix{Inv});
+    );
     psi*phi
 );
 
