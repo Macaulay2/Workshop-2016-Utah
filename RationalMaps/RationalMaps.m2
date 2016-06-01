@@ -718,7 +718,7 @@ inverseOfMapRees(RingMap) := o->(f)->(
 --    map(source f, target f, invList)
 --    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
 ---*******************
-    if (o.Verbose == true) then print "Starting inverseOfMapRees(ReesStrategy/SaturationStrategy)";
+    if (o.Verbose == true) then print "Starting inverseOfMapRees(ReesStrategy or SaturationStrategy)";
     if (o.AssumeDominant == false) then (
         if (o.Verbose === true) then print "inverseOfMapRees: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant option if this is slow.";
         f = mapOntoImage(f);
@@ -805,7 +805,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
 --    map(source f, target f, invList)
 --    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
 ---*******************
-    if (o.Verbose == true) then print "Starting inverseOfMapSimis(SimisStrategyHybridStrategy)";
+    if (o.Verbose == true) then print "Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)";
     if ((o.CheckBirational == true) and (o.HybridLimit == infinity)) then print "Warning:  when using the current default SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
    
     if (o.AssumeDominant == false) then (
