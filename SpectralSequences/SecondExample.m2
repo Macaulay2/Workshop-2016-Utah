@@ -105,3 +105,62 @@ EE^2
 
 E^infinity
 EE^infinity
+
+--
+-- some other experimental things
+--
+
+restart
+needsPackage"SpectralSequences"
+
+-- possible rewrite  of pushFwd Chain Complex code 
+-- What's written below might update the existing code
+-- it relies on the pushFwd method from the package "PushForward.m2"
+
+pushFwd(RingMap,ChainComplex):=o->(f,C) ->
+(    pushFwdC := chainComplex(source f);
+     maps := apply(spots C, i-> (i,pushFwd(f,C.dd_i)));
+     for i from min C to max C do (
+	 pushFwdC.dd_(maps#i_0) = maps#i_1 
+	 );
+    pushFwdC
+    )
+
+
+--possible rewrite of Change of Rings Tor code
+-- What's written below might update the existing code
+
+changeOfRingsTor = method()
+changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
+    -- f : R --> S a finite ring map, N an S module, M an R module
+    F := complete res N;
+    pushFwdF := pushFwd(f,F);
+    G := complete res M;
+    E := spectralSequence(filteredComplex(G)** pushFwdF);
+    EE := spectralSequence((G) ** (filteredComplex pushFwdF));
+    (E,EE) 
+)
+
+
+-- Try an example
+k=QQ
+R=k[a,b,c]
+S=k[s,t]
+f = map(S,R,{s^2,s*t,t^2})
+kappa = coker vars S
+kkappa = coker vars R
+(E,EE) = changeOfRingsTor(kkappa,kappa,f)
+e = prune E
+ee = prune EE
+
+e^0
+e^1
+e^2
+e^infinity
+
+ee^0
+ee^1
+ee^2
+(ee^2).dd
+ee^3
+ee^infinity 
