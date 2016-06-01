@@ -603,6 +603,7 @@ if isSameDegree(bm)==false then error "Expected a list of homogenous elements of
 
 nonZeroMinor =method(Options => {Verbose=>true});
 nonZeroMinor(Matrix,ZZ,ZZ):=o->(M,ra,minorCount)->(
+    if (o.Verbose == true) then print("Starting nonZeroMinor, looking for rank: " | ra | ", we will run it " | minorCount | " times.  If this is slow, rerun with MinorsCount=>0.");
     cc:=numColumns(M);
     ro:=numRows(M);
     col:=apply(0..cc-1,i->i);
@@ -614,20 +615,22 @@ nonZeroMinor(Matrix,ZZ,ZZ):=o->(M,ra,minorCount)->(
     rowList := null;
     ct:=0;
     curRank := 0;
-    while (flag == false and ct<minorCount) do (
-       colList = take(random toList col, {0,ra-1});
-       rowList = take(random toList row, {0,ra-1});
+    while ( (flag == false) and (ct<minorCount) ) do (
+       colList = sort take(random toList col, {0,ra-1});
+       rowList = sort take(random toList row, {0,ra-1});
        subM = submatrix(M, rowList, colList);
+       
        curRank = rank(subM);
        if ((curRank) == ra) then (
-            if (o.Verbose==true) then print "Found a nonzero minor";
+            if (o.Verbose==true) then print "nonZeroMinor: Found a nonzero minor";
             flag = true;
        );
       ct=ct+1;
+      --print ct;
     );
     if ((curRank) != ra) then (
             if (o.Verbose==true) then (
-                print"MinorsCount is not sufficient, consider a number M >100 and set the option MinorsCount=>M ";
+                print "nonZeroMinor: MinorsCount is not sufficient, consider a number M >100 and set the option MinorsCount=>M ";
             )
 	)
     else ( 
@@ -650,9 +653,9 @@ nonZeroMinor(Matrix,ZZ,ZZ):=o->(M,ra,minorCount)->(
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
- inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>HybridStrategy, HybridLimit=>15, Verbose=>true, MinorsCount=>100});
- inverseOfMapRees := method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy, Verbose=>true,MinorsCount=>100});
- inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true,  HybridLimit=>15, Verbose=>true,MinorsCount=>100}); 
+ inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>HybridStrategy, HybridLimit=>15, Verbose=>true, MinorsCount=>null});
+ inverseOfMapRees := method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy, Verbose=>true,MinorsCount=>null});
+ inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true,  HybridLimit=>15, Verbose=>true,MinorsCount=>null}); 
 --this checks whether a map X -> Y is birational.
 
 --X = Proj R
@@ -664,14 +667,30 @@ nonZeroMinor(Matrix,ZZ,ZZ):=o->(M,ra,minorCount)->(
 --list of elements = bm
 ------*****************************Strategies
 inverseOfMap(RingMap):=o->(f)->(
+    minorsCt := o.MinorsCount;
+    if (o.MinorsCount === null) then ( --if the user didn't specify MinorsCount, we make some educated guesses
+        nn := #(gens ambient target f);
+        if (nn < 6) then(
+            minorsCt = 1000;
+        )
+        else if (nn < 9) then (
+            minorsCt = 100;
+        )
+        else if (nn < 12) then (
+            minorsCt = 10;
+        )
+        else (
+            minorsCt = 0;
+        );
+    );
     if ((o.Strategy == ReesStrategy) or (o.Strategy == SaturationStrategy)) then (        
-        inverseOfMapRees(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
+        inverseOfMapRees(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,Verbose=>o.Verbose, MinorsCount=>minorsCt)
     )
     else if (o.Strategy == SimisStrategy) then (
-        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>infinity,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
+        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>infinity,Verbose=>o.Verbose, MinorsCount=>minorsCt)
     )
     else if (o.Strategy == HybridStrategy) then(
-        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>o.HybridLimit,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
+        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>o.HybridLimit,Verbose=>o.Verbose, MinorsCount=>minorsCt)
     )
   );
 
@@ -699,8 +718,11 @@ inverseOfMapRees(RingMap) := o->(f)->(
 --    map(source f, target f, invList)
 --    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
 ---*******************
+    if (o.Verbose == true) then print "Starting inverseOfMapRees(ReesStrategy/SaturationStrategy)";
     if (o.AssumeDominant == false) then (
+        if (o.Verbose === true) then print "inverseOfMapRees: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant option if this is slow.";
         f = mapOntoImage(f);
+        if (o.Verbose === true) then print "inverseOfMapRees: Found the image of the map.";
     );
     di := ideal target f;
     im := ideal source f;
@@ -722,9 +744,11 @@ inverseOfMapRees(RingMap) := o->(f)->(
     bm1:=flatten first entries bm0;
     --From here the situation is under the assumption that the variety is not contained in any hyperplane.
     r:=numgens ambient Rlin1;
+     if (o.Verbose === true) then print "inverseOfMapRees: About to compute the Jacobian Dual Matrix";
    barJD:=jacobianDualMatrix(di1,im1,bm1,AssumeDominant=>true, Strategy=>o.Strategy);--JacobianDual Matrix is another function in thi package
+     if (o.Verbose === true) then print "inverseOfMapRees: We computed Jacobian Dual Matrix";
     --print "JD computed";
-  jdd:=(numgens ambient Rlin1)-1;
+    jdd:=(numgens ambient Rlin1)-1;
    if (o.CheckBirational== true) then (
     if not ((rank barJD) == jdd) then error "The map is not birational onto its image";
    );
@@ -735,18 +759,24 @@ inverseOfMapRees(RingMap) := o->(f)->(
      nc:=numColumns(transpose barJD);
      nr:=numRows(transpose barJD);
     if (o#Verbose ) then(
-        print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.")
+        print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.");        
     );
-    print "Looking for a nonzero minor";   
-    nonZMinor := nonZeroMinor(barJD,jdd,o.MinorsCount, Verbose=>o.Verbose);    
+    nonZMinor := null;
+    if (o.MinorsCount > 0) then (
+        if (o.Verbose == true) then print "inverseOfMapRees: Looking for a nonzero minor";   
+        nonZMinor = nonZeroMinor(barJD,jdd,o.MinorsCount, Verbose=>o.Verbose);    
+    );
     if (nonZMinor === null) then (
-        if (o.Verbose==true) then print "Failed to find a nonzero minor.  We now compute syzygies instead.  If this doesn't terminate quickly, you may want to try increasing the option MinorsCount";
+        if (o.Verbose==true) then (
+            print "inverseOfMapSimis: Failed to find a nonzero minor.  We now compute syzygies instead.";  
+            print "                   If this doesn't terminate quickly, you may want to try increasing the option MinorsCount.";
+        );
         Inv =syz(transpose barJD,SyzygyLimit =>1);
         psi = map(source f, Rlin1, sub(transpose Inv, source f));    
     )
     else (
-        if (o.Verbose==true) then print "We found a nonzero minor.";  
-        Col = (nonZeroMinor(barJD,jdd,o.MinorsCount))#0;      
+        if (o.Verbose==true) then print "inverseOfMapRees: We found a nonzero minor.  If this doesn't terminate quickly, rerun with MinorsCount=>0.";  
+        Col = (nonZMinor)#0;      
         SbarJD=submatrix(barJD,,Col);
         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
         psi=map(ring(Inv#0),Rlin1,matrix{Inv});
@@ -775,10 +805,13 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
 --    map(source f, target f, invList)
 --    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
 ---*******************
+    if (o.Verbose == true) then print "Starting inverseOfMapSimis(SimisStrategyHybridStrategy)";
     if ((o.CheckBirational == true) and (o.HybridLimit == infinity)) then print "Warning:  when using the current default SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
    
     if (o.AssumeDominant == false) then (
+        if (o.Verbose === true) then print "inverseOfMapSimis: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant option if this is slow.";
         f = mapOntoImage(f);
+        if (o.Verbose === true) then print "inverseOfMapSimis: Found the image of the map.";
     );
     di := ideal target f; -- the defining ideal of the source variety
     im := ideal source f; -- the defining ideal of the target variety
@@ -826,11 +859,13 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     while (flag == false) do (
 --  Jr:= simisAlgebra(di1,bm1,secdeg);
  --THe following is substituing simisAlgebra, we don't call that because we want to save the sotred groebner basis
+        if (o.Verbose === true) then print("inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree " | toString({1, secdeg}) | "." );
         if (secdeg < o.HybridLimit) then (
             M=gb(J,DegreeLimit=>{1,secdeg}); --instead of computing the whole Grob. 
                                                --Baisis of J we only compute the parts of degree (1,m) or less, 
         )
         else( --we are running the hybrid strategy, so we compute the whole gb
+            if (o.Verbose === true) then print("inverseOfMapSimis:  We give up, we'll just compute the whole Groebner basis of the rees ideal.  Increase HybridLimit and rerun to avoid this." );
             M=gb(J); -- probably this should be DegreeLimit=>{1,infinity}, not sure if that works or not
             giveUp = true;
         );                                              
@@ -847,6 +882,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
         barJD:=g(JD);
         if (giveUp == false) then( 
             if ((rank barJD) == jdd) then (
+                if (o.Verbose === true) then print("inverseOfMapSimis: We computed enough of the Groebner basis." );
                 flag = true;
             );
         )
@@ -867,18 +903,27 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
      nc:=numColumns(transpose barJD);
      nr:=numRows(transpose barJD);
      if (o#Verbose ) then(
-        print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.")
+        print ( "inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  " |nc|" columns  and about  "|nr|" rows.");
+        
     );
-    print "Looking for a nonzero minor";   
-    nonZMinor := nonZeroMinor(barJD,jdd,o.MinorsCount, Verbose=>o.Verbose);    
+    
+    nonZMinor := null;
+    if (o.MinorsCount > 0) then (
+        if (o.Verbose==true) then print "inverseOfMapSimis: Looking for a nonzero minor";   
+        nonZMinor = nonZeroMinor(barJD,jdd,o.MinorsCount, Verbose=>o.Verbose);    
+    );
+
     if (nonZMinor === null) then (
-        if (o.Verbose==true) then print "Failed to find a nonzero minor.  We now compute syzygies instead.  If this doesn't terminate quickly, you may want to try increasing the option MinorsCount";
+        if (o.Verbose==true) then (
+            print "inverseOfMapSimis: Failed to find a nonzero minor.  We now compute syzygies instead.";  
+            print "                   If this doesn't terminate quickly, you may want to try increasing the option MinorsCount.";
+        );
         Inv =syz(transpose barJD,SyzygyLimit =>1);
         psi = map(source f, Rlin1, sub(transpose Inv, source f));    
     )
     else (
-        if (o.Verbose==true) then print "We found a nonzero minor.";  
-        Col = (nonZeroMinor(barJD,jdd,o.MinorsCount))#0;      
+        if (o.Verbose==true) then print "inverseOfMapSimis: We found a nonzero minor.";  
+        Col = (nonZMinor)#0;      
         SbarJD=submatrix(barJD,,Col);
         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
         psi=map(ring(Inv#0),Rlin1,matrix{Inv});
@@ -2036,18 +2081,18 @@ TEST /// --test #32, map from genus 3 curve to projective space
 --finally we test a map between non-rational varieties
 TEST /// --test #33, maps between cones over elliptic curves and their blowups
     --the cone over an elliptic curve lies in P3, the blowup lives in P11
-    P3 = QQ[x,y,z,w]
-    P11 = QQ[a_{0,0}..a_{2,3}]
-    M = matrix{{a_{0,0}..a_{0,3}},{a_{1,0}..a_{1,3}},{a_{2,0}..a_{2,3}}}
-    blowUpP3 = P11/(minors(2,M) + ideal(a_{1,0}-a_{0,1}, a_{2,0}-a_{0,2}, a_{2,1}-a_{1,2}))
-    h = map(blowUpP3, P3, {a_{0,0}..a_{0,3}}) -- map from blowup of P3 back down to P3
+    P3 = QQ[x,y,z,w];
+    P11 = QQ[a_{0,0}..a_{2,3}];
+    M = matrix{{a_{0,0}..a_{0,3}},{a_{1,0}..a_{1,3}},{a_{2,0}..a_{2,3}}};
+    blowUpP3 = P11/(minors(2,M) + ideal(a_{1,0}-a_{0,1}, a_{2,0}-a_{0,2}, a_{2,1}-a_{1,2}));
+    h = map(blowUpP3, P3, {a_{0,0}..a_{0,3}}); -- map from blowup of P3 back down to P3
     J = ideal(h(x^3+y^3+z^3)) --x^3+y^3+z^3 defines the projective cone over an elliptic curve
-    I = saturate(J, ideal(h(x), h(y), h(z))) -- strict transform of the projective cone over an elliptic curve
-    S = P11/(ideal(blowUpP3) + sub(I, P11))
-    T = P3/ideal(x^3+y^3+z^3)
-    g = map(S, T, toList(a_{0,0}..a_{0,3}))
-    b = isRegularMap g
-    gg = inverseOfMap g
+    I = saturate(J, ideal(h(x), h(y), h(z))); -- strict transform of the projective cone over an elliptic curve
+    S = P11/(ideal(blowUpP3) + sub(I, P11));
+    T = P3/ideal(x^3+y^3+z^3);
+    g = map(S, T, toList(a_{0,0}..a_{0,3}));
+    b = isRegularMap g;
+    gg = inverseOfMap g;
     assert( b and ( isRegularMap gg == false))
 ///
 ----Version information----
