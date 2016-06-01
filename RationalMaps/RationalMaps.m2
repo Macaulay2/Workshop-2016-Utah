@@ -601,8 +601,8 @@ if isSameDegree(bm)==false then error "Expected a list of homogenous elements of
 --find a full rank minor of a matrix (of a specified size), tries minorCount times
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-nonZeroMinor:=method();
-nonZeroMinor(Matrix,ZZ,ZZ):=(M,ra,minorCount)->(
+nonZeroMinor:=method(Options => {Verbose=>true});
+nonZeroMinor(Matrix,ZZ,ZZ):=o->(M,ra,minorCount)->(
     cc:=numColumns(M);
     ro:=numRows(M);
     col:=apply(0..cc-1,i->i);
@@ -613,22 +613,26 @@ nonZeroMinor(Matrix,ZZ,ZZ):=(M,ra,minorCount)->(
     colList := null;
     rowList := null;
     ct:=0;
+    curRank := 0;
     while (flag == false and ct<minorCount) do (
        colList = take(random toList col, {0,ra-1});
        rowList = take(random toList row, {0,ra-1});
        subM = submatrix(M, rowList, colList);
-       if ((rank(subM)) == ra) then (
+       curRank = rank(subM);
+       if ((curRank) == ra) then (
             flag = true;
        );
       ct=ct+1;
-       );
-       if ((rank(subM)) != ra) then (
-            print"MinorsCount is not sufficient, consider a number M >100 and set the option MinorsCount=>M "
-	    )
-       else 
-       ( {colList, rowList}
-       )
-   );
+    );
+    if ((curRank) != ra) then (
+            if (o.Verbose==true) then (
+                print"MinorsCount is not sufficient, consider a number M >100 and set the option MinorsCount=>M ";
+            )
+	)
+    else ( 
+        {colList, rowList}
+    )
+);
 
 --    Collist:=subsets(col,ra); these are slow, so we are turning them off
 --    Rowlist:=subsets(row,ra);
@@ -732,7 +736,7 @@ inverseOfMapRees(RingMap) := o->(f)->(
     if (o#Verbose ) then(
              	print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.  Now computing syzygies of the Jacobian dual matrix.  If this is slow and the size of the jacobian dual matrix is relatively small, set Verbose=>false" 
 			    ));
-    if (o#Verbose) then (
+    if (o#Verbose) then ( --the logic here isn't right.  Verbose should just control if things are printed, not what functions are run
     Inv =syz(transpose barJD,SyzygyLimit =>1);
     psi = map(source f, Rlin1, sub(transpose Inv, source f));    
     )
