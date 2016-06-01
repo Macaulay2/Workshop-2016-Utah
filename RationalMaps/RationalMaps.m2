@@ -29,6 +29,7 @@ export{
 	"inverseOfMap",
 	"mapOntoImage",
 	--"blowUpIdeals", --at some point we should document this and expose it to the user
+	--"nonZeroMinor",-- it is internal because the answer is probobalistic and it is controlled by MinorsCount option
     "isSameMap", 
     --"simisAlgebra", --at some point we should document this and expose it to the user
     --**********************************
@@ -199,7 +200,7 @@ isRegularMap(RingMap) := (ff) ->(
     (dim I <= 0)
 );
 
-
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
  blowUpIdeals:=method(Options => {Strategy=>ReesStrategy});
  blowUpIdealsSaturation := method();
@@ -374,7 +375,7 @@ simisAlgebra(Ideal, Matrix,ZZ):=(a,M,m)->(
  d);
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-isBirationalMap = method(Options => {AssumeDominant=>false});
+isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>ReesStrategy, HybridLimit=>15});
 
 --this checks whether a map X -> Y is birational.
 
@@ -392,8 +393,15 @@ isBirationalMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     if (o.AssumeDominant==false) then (
         im1 = idealOfImageOfMap(di, im, bm); 
         if (dim ((im1*S^1)/(im*S^1)) <= 0) then( --first check if the image is the closure of the image is even the right thing
-            isBirationalOntoImage(di,im1,bm,AssumeDominant=>true)
-        )
+           
+	     if (o.Strategy==ReesStrategy) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>ReesStrategy))
+	                             
+             else if (o.Strategy==HybridStrategy) then ( isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>HybridStrategy, HybridLimit=>o.HybridLimit))
+                                      
+            else if (o.Strategy==SimisStrategy) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>SimisStrategy))
+			     
+            )  
+    
         else(
             false
         )
@@ -404,20 +412,66 @@ isBirationalMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
 );    
 
 isBirationalMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
-    isBirationalMap(ideal R1, ideal S1, bm,AssumeDominant=>o.AssumeDominant)
+    isBirationalMap(ideal R1, ideal S1, bm,AssumeDominant=>o.AssumeDominant, Strategy=>o.Strategy, HybridLimit=>o.HybridLimit)
     );
 
 
 isBirationalMap(RingMap) :=o->(f)->(
-    isBirationalMap(target f, source f, first entries matrix f,AssumeDominant=>o.AssumeDominant)
+    isBirationalMap(target f, source f, first entries matrix f,AssumeDominant=>o.AssumeDominant,Strategy=>o.Strategy, HybridLimit=>o.HybridLimit)
     );
  
   --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-isBirationalOntoImage = method(Options => {AssumeDominant=>false});
---if AssumeDominant is true, it doesn't form the kernel.  
+isBirationalOntoImage = method(Options => {AssumeDominant=>false, Strategy=>ReesStrategy, HybridLimit=>15});
+--if AssumeDominant is true, it doesn't form the kernel. 
+isBirationalOntoImageRees := method(Options => {AssumeDominant=>false,  Strategy=>ReesStrategy});
+ isBirationalOntoImageSimis := method(Options => {AssumeDominant=>false,  HybridLimit=>15}); 
 
+
+--*****************************Strategies
 isBirationalOntoImage(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
+    if ((o.Strategy == ReesStrategy) or (o.Strategy == SaturationStrategy)) then (        
+        isBirationalOntoImageRees(di,im,bm, AssumeDominant=>o.AssumeDominant,  Strategy=>o.Strategy)
+    )
+    else if (o.Strategy == SimisStrategy) then (
+        isBirationalOntoImageSimis(di,im,bm, AssumeDominant=>o.AssumeDominant,  HybridLimit=>infinity)
+    )
+    else if (o.Strategy == HybridStrategy) then(
+        isBirationalOntoImageSimis(di,im,bm, AssumeDominant=>o.AssumeDominant, HybridLimit=>o.HybridLimit)
+    )
+  );
+--*********************************************
+--*************other modes
+isBirationalOntoImage(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+    isBirationalOntoImage(ideal R1, ideal S1, bm, AssumeDominant=>o.AssumeDominant,Strategy=>o.Strategy,HybridLimit=>o.HybridLimit)
+); 
+
+isBirationalOntoImage(RingMap) :=o->(f)->(
+    isBirationalOntoImage(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant,Strategy=>o.Strategy,HybridLimit=>o.HybridLimit)
+);
+
+isBirationalOntoImageRees(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+   isBirationalOntoImageRees(ideal R1, ideal S1, bm, AssumeDominant=>o.AssumeDominant,Strategy=>o.Strategy)
+); 
+
+isBirationalOntoImageRees(RingMap) :=o->(f)->(
+    isBirationalOntoImageRees(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant,Strategy=>o.Strategy)
+);
+isBirationalOntoImageSimis(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
+    isBirationalOntoImageSimis(ideal R1, ideal S1, bm, AssumeDominant=>o.AssumeDominant,Strategy=>o.Strategy,HybridLimit=>o.HybridLimit)
+); 
+
+isBirationalOntoImageSimis(RingMap) :=o->(f)->(
+    isBirationalOntoImageSimis(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant,Strategy=>o.Strategy,HybridLimit=>o.HybridLimit)
+);
+
+
+--*************main part of function
+
+
+
+
+isBirationalOntoImageRees(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
     if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
     R:=ring di;
     S:=ring im;
@@ -449,22 +503,133 @@ isBirationalOntoImage(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
     ((rank barJD) == jdd)
 );
   
-isBirationalOntoImage(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
-    isBirationalOntoImage(ideal R1, ideal S1, bm, AssumeDominant=>o.AssumeDominant)
-); 
+    
+    
+--isBirationalOntoImageSimis
+---***************************************************
 
-isBirationalOntoImage(RingMap) :=o->(f)->(
-    isBirationalOntoImage(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
-);
+isBirationalOntoImageSimis(Ideal,Ideal, BasicList) :=o->(di,im,bm)->( 
+   -- invList := inverseOfMap(target f, source f, first entries matrix f);
+--    map(source f, target f, invList)
+--    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
+---*******************
+    im1 := im;
+    if (o.AssumeDominant == true) then (
+        im1 =  im;
+    )
+    else (
+        im1 = idealOfImageOfMap(di, im, bm);
+    );
+if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    R:=ring di;
+    K:=coefficientRing R;    
+    S:=ring im;
+    --im1 := im;
     
-    
+    --In the following lines we remove the linear parts of the ideal di and 
+--modify our map bm
+    Rlin:=(ambient ring di)/di;
+    Rlin2 := minimalPresentation(Rlin);
+    phi:=Rlin.minimalPresentationMap;    
+    Rlin1:=target phi;
+    di1:=ideal Rlin1;
+    bm0:=phi(matrix{bm});
+    bm1:=flatten first entries bm0;
+    --From here the situation is under the assumption that the variety is not contained in any hyperplane.
+    r:=numgens ambient Rlin1;
+    jdd:=(numgens ambient Rlin1)-1;
+    --THe following is a part of simisAlgebra
+    rs:=length  bm1;
+    SS:=ring di1;
+    LL:=apply(bm1,uu->sub(uu, SS));
+    n:=numgens ambient  SS;
+    Kf:=coefficientRing SS;
+    yyy:=local yyy;
+    ttt:=local ttt;
+    if rs!=0 then (d:=max(apply(bm1,zz->degree zz)));--the degree of the elements of linear sys
+    degList := {{(-d_0),1}} | toList(n:{1,0}) | toList(rs:{0,1});
+    mymon:=monoid[({ttt}|gens ambient SS|toList(yyy_0..yyy_(rs-1))),  Degrees=>degList, MonomialOrder=>Eliminate 1];
+    tR:=Kf(mymon);  --ambient ring of Rees algebra with weights
+    f1:=map(tR,SS,submatrix(vars tR,{1..n}));
+    F:=f1(matrix{LL});
+    myt:=(gens tR)#0;
+    J:=sub(di1,tR)+ideal apply(1..rs,j->(gens tR)_(n+j)-myt*F_(0,(j-1)));
+
+    flag := false;   --this boolian checks if it is birational
+    giveUp := false;  --this checks if we giveup checkin birationality or not yet
+    secdeg:=1;        --the second degree of rees equations
+    jj := 1;
+    M := null;
+    while (giveUp == false) do (
+        if (secdeg < o.HybridLimit) then (
+            M=gb(J,DegreeLimit=>{1,secdeg}); --instead of computing the whole Grob. 
+                                               --Baisis of J we only compute the parts of degree (1,m) or less, 
+        )
+        else( M=gb(J);
+            giveUp = true;
+        );                                              
+        gM:=selectInSubring(1,gens M);
+        L2:=ideal mingens ideal gM;
+        W:=local W;
+        nextmon:=monoid[(gens ambient  SS|toList(W_0..W_(rs-1))), Degrees=>{n:{1,0},rs:{0,1}}];
+        RR:=Kf(nextmon);
+        g1:=map(RR,tR,0|vars RR);
+        Jr:= g1(L2);
+        JD:=diff(transpose ((vars ambient ring Jr)_{0..(r-1)}) ,gens Jr);
+        vS:=gens ambient S;
+        g:=map(S/im1,ring Jr, toList(apply(0..r-1,z->0))|vS);
+        barJD:=g(JD);
+        if (giveUp == false) then( 
+            if ((rank barJD) == jdd) then (
+		flag=true;
+		giveUp=true;
+            );
+	)
+        else (
+            if ((rank barJD) == jdd) then (
+                flag = true;
+		giveUp=true;
+            );
+	   );     
+        secdeg=secdeg + jj;
+        jj = jj + 1; --we are basically growing secdeg in a quadratic way now, but we could grow it faster or slower...
+         );
+	flag            
+    );    
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 --find a full rank minor of a matrix (of a specified size), tries minorCount times
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 nonZeroMinor:=method();
 nonZeroMinor(Matrix,ZZ,ZZ):=(M,ra,minorCount)->(
     cc:=numColumns(M);
     ro:=numRows(M);
     col:=apply(0..cc-1,i->i);
     row:=apply(0..ro-1,i->i);
+
+    flag := false;
+    subM := null;
+    colList := null;
+    rowList := null;
+    ct:=0;
+    while (flag == false and ct<minorCount) do (
+       colList = take(random toList col, {0,ra-1});
+       rowList = take(random toList row, {0,ra-1});
+       subM = submatrix(M, rowList, colList);
+       if ((rank(subM)) == ra) then (
+            flag = true;
+       );
+      ct=ct+1;
+       );
+       if ((rank(subM)) != ra) then (
+            print"MinorsCount is not sufficient, consider a number M >100 and set the option MinorsCount=>M "
+	    )
+       else 
+       ( {colList, rowList}
+       )
+   );
+
 --    Collist:=subsets(col,ra); these are slow, so we are turning them off
 --    Rowlist:=subsets(row,ra);
 --    nzlist:={};
@@ -477,66 +642,53 @@ nonZeroMinor(Matrix,ZZ,ZZ):=(M,ra,minorCount)->(
 --	       break;
 --	   );
 --       );
-    flag := false;
-    subM := null;
-    colList := null;
-    rowList := null;
-    while (flag == false) do (
-       colList = take(random toList col, {0,ra-1});
-       rowList = take(random toList row, {0,ra-1});
-       subM = submatrix(M, rowList, colList);
-       if (rank(subM) == ra) then (
-            flag = true;
-       );
-       );
-       {colList, rowList}
-   );
-
-
    
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
- inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>HybridStrategy, HybridLimit=>15}, Verbose=>true, MinorsCount=>100);
- inverseOfMapRees := method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy}, Verbose=>true,MinorsCount=>100);
- inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true,  HybridLimit=>15}, Verbose=>true,MinorsCount=>100); 
+ inverseOfMap = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>HybridStrategy, HybridLimit=>15, Verbose=>true, MinorsCount=>100});
+ inverseOfMapRees := method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>ReesStrategy, Verbose=>true,MinorsCount=>100});
+ inverseOfMapSimis := method(Options => {AssumeDominant=>false, CheckBirational=>true,  HybridLimit=>15, Verbose=>true,MinorsCount=>100}); 
 --this checks whether a map X -> Y is birational.
 
 --X = Proj R
 --Y = Proj S
---This madfp is given by a list of elements in R, all homogeneous
+----This madfp is given by a list of elements in R, all homogeneous
 --of the same degree.  
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
 --list of elements = bm
+------*****************************Strategies
 inverseOfMap(RingMap):=o->(f)->(
     if ((o.Strategy == ReesStrategy) or (o.Strategy == SaturationStrategy)) then (        
-        inverseOfMapRees(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
+        inverseOfMapRees(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
     )
     else if (o.Strategy == SimisStrategy) then (
-        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>infinity)
+        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>infinity,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
     )
     else if (o.Strategy == HybridStrategy) then(
-        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>o.HybridLimit)
+        inverseOfMapSimis(f, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, HybridLimit=>o.HybridLimit,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
     )
   );
 
+--**************other modes
 inverseOfMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
-    inverseOfMap( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
+    inverseOfMap( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
 );    
 
 inverseOfMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
-    inverseOfMap(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
+    inverseOfMap(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
     );
 
 
 inverseOfMapRees(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
-    inverseOfMap( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
+    inverseOfMapRees( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
 );    
 
 inverseOfMapRees(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
-    inverseOfMap(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy)
+    inverseOfMapRees(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
     );
 
+--********************************main part Rees
 inverseOfMapRees(RingMap) := o->(f)->(
    -- invList := inverseOfMap(target f, source f, first entries matrix f);
 --    map(source f, target f, invList)
@@ -571,20 +723,27 @@ inverseOfMapRees(RingMap) := o->(f)->(
    if (o.CheckBirational== true) then (
     if not ((rank barJD) == jdd) then error "The map is not birational onto its image";
    );
-   --print "birationalityVerified";
---   Col:=(nonZeroMinor(barJD,jdd))#0;
---   print "found nonzerominor";
---   SbarJD:=submatrix(barJD,,Col);
---   Inv:={};
---   for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
-   --psi:=map(ring(Inv#0),Rlin1,matrix{Inv});
---   Inv := first entries transpose submatrix((gens kernel transpose barJD), {0});
-    Inv :=syz(transpose barJD,SyzygyLimit =>1);
-   --print "made Inv";
-    psi := null;
+  Inv:={};
+     psi:=null;
+     Col:={};
+     SbarJD:=null;
+     nc:=numColumns(transpose barJD);
+     nr:=numRows(transpose barJD);
+    if (o#Verbose ) then(
+             	print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.  Now computing syzygies of the Jacobian dual matrix.  If this is slow and the size of the jacobian dual matrix is relatively small, set Verbose=>false" 
+			    ));
+    if (o#Verbose) then (
+    Inv =syz(transpose barJD,SyzygyLimit =>1);
     psi = map(source f, Rlin1, sub(transpose Inv, source f));    
---    psi = map(source f, Rlin1, sub(matrix{Inv}, source f));    
-    psi*phi
+    )
+    else (
+	 Col=(nonZeroMinor(barJD,jdd,o.MinorsCount))#0;
+         SbarJD=submatrix(barJD,,Col);
+	 
+         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
+         psi=map(ring(Inv#0),Rlin1,matrix{Inv});
+      	);
+       psi*phi
 );
 
 --**********************************
@@ -645,7 +804,6 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     secdeg:=1;
     jj := 1;
     M := null;
-    1/0;
     while (flag == false) do (
 --  Jr:= simisAlgebra(di1,bm1,secdeg);
  --THe following is substituing simisAlgebra, we don't call that because we want to save the sotred groebner basis
@@ -683,21 +841,36 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
         jj = jj + 1; --we are basically growing secdeg in a quadratic way now, but we could grow it faster or slower...
                     --maybe the user should control it with an option
     );
-    if (o.Verbose == true) print "Now computing syz of the jacobianDualMatrix.  If this is slow";
-    Inv :=syz(transpose barJD,SyzygyLimit =>1);
-   --print "made Inv";
-    psi := null;
+     Inv:={};
+     psi:=null;
+     Col:={};
+     SbarJD:=null;
+     nc:=numColumns(transpose barJD);
+     nr:=numRows(transpose barJD);
+    if (o#Verbose ) then(
+             	print ( "Jacobain dual matrix has  " |nc|" columns  and about  "|nr|" rows.  Now computing syzygies of the Jacobian dual matrix.  If this is slow and the size of the jacobian dual matrix is relatively small, set Verbose=>false" 
+			    ));
+    if (o#Verbose) then (
+    Inv =syz(transpose barJD,SyzygyLimit =>1);
     psi = map(source f, Rlin1, sub(transpose Inv, source f));    
+    )
+    else (
+	 Col=(nonZeroMinor(barJD,jdd,o.MinorsCount))#0;
+         SbarJD=submatrix(barJD,,Col);
+	 
+         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
+         psi=map(ring(Inv#0),Rlin1,matrix{Inv});
+      	);
     psi*phi
 );
 
 
 inverseOfMapSimis(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
-    inverseOfMapSimis( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational)
+    inverseOfMapSimis( (ring di)/di, (ring im)/im, bm, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
 );    
 
 inverseOfMapSimis(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
-    inverseOfMapSimis(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational)
+    inverseOfMapSimis(map(R1, S1, bm), AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
     );
     
    
