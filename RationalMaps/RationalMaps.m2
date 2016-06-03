@@ -697,7 +697,7 @@ nonZeroMinor(Matrix,ZZ,ZZ):=o->(M,ra,minorCount)->(
 
 --X = Proj R
 --Y = Proj S
-----This madfp is given by a list of elements in R, all homogeneous
+----This map is given by a list of elements in R, all homogeneous
 --of the same degree.  
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
@@ -847,7 +847,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     if ((o.CheckBirational == true) and (o.HybridLimit == infinity)) then print "Warning:  when using the current default SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
    
     if (o.AssumeDominant == false) then (
-        if (o.Verbose === true) then print "inverseOfMapSimis: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant option if this is slow.";
+        if (o.Verbose === true) then print "inverseOfMapSimis: About to find the image of the map.  If you know the image, you may want to use it and set AssumeDominant=>true if this is slow.";
         f = mapOntoImage(f);
         if (o.Verbose === true) then print "inverseOfMapSimis: Found the image of the map.";
     );
@@ -1002,32 +1002,49 @@ mapOntoImage(Ideal, Ideal, BasicList) := (a,b,l)->(
     
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
-isEmbedding = method(); --checks whether a map is a closed embedding.
+isEmbedding = method(Options => {AssumeDominant=>false, CheckBirational=>true, Strategy=>HybridStrategy,
+	 HybridLimit=>15, Verbose=>true, MinorsCount=>0});
+ --checks whether a map is a closed embedding.
 
-isEmbedding(Ideal, Ideal, BasicList) := (a1, b1, f1)->(
+isEmbedding(Ideal, Ideal, BasicList) := o-> (a1, b1, f1)->(
         newMap := map((ring a1)/a1, (ring b1)/b1, f1);
-        isEmbedding(newMap)
+        isEmbedding(newMap, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, 
+	    Strategy=>o.Strategy, HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
 );
 
-isEmbedding(Ring, Ring, BasicList) := (R1, S1, f1)->(
+isEmbedding(Ring, Ring, BasicList) := o-> (R1, S1, f1)->(
         newMap:=map(R1,S1,f1);
-        isEmbedding(newMap)
+        isEmbedding(newMap, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, 
+	    Strategy=>o.Strategy, HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount)
 );
 
-isEmbedding(RingMap) := (f1)->(
-        f2 := mapOntoImage(f1);
+isEmbedding(RingMap):= o-> (f1)->(
+    f2:=null;
+    h:=null;
+    if (o.AssumeDominant==false) then(
+	if (o.Verbose === true) then print "isEmbedding: About to find the image of the map.";
+	  if (o.Verbose === true) then print "If you know the image, you may want to set AssumeDominant=>true option if this is slow.";
+       
+	 f2 = mapOntoImage(f1);
+	); 
+    if (o.AssumeDominant==true) then( 
+	f2=f1;
+	);
+     	if (o.Verbose === true) then print "isEmbedding is checking if the map is a regular map";
         flag := isRegularMap(f2);
         if (flag == true) then (
-            try ( h := inverseOfMap(f2, AssumeDominant=>true, Strategy=>HybridStrategy) ) then (  
-                    if (flag == true) then(
-                            flag = isRegularMap(h);
-                    );                
-            )
-            else (
-                    flag = false
-            );
-        );
-        flag        
+	   if (o.Verbose === true) then print "isEmbedding is computing the inverse  map";
+        
+            h = inverseOfMap(f2, AssumeDominant=>true, Strategy=>o.Strategy,
+		     HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount); 
+	     
+	     	if (o.Verbose === true) then print "isEmbedding is checking if the inverse map is a regular map";
+        
+            flag = isRegularMap(h);
+          );                
+            
+       
+      flag        
 );
     
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
