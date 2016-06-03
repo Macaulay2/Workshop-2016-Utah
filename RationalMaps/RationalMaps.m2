@@ -375,7 +375,7 @@ simisAlgebra(Ideal, Matrix,ZZ):=(a,M,m)->(
  d);
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>ReesStrategy,Verbose=>true, HybridLimit=>15});
+isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStrategy,Verbose=>true, HybridLimit=>15});
 
 --this checks whether a map X -> Y is birational.
 
@@ -426,7 +426,7 @@ isBirationalMap(RingMap) :=o->(f)->(
  
   --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-isBirationalOntoImage = method(Options => {AssumeDominant=>false, Strategy=>ReesStrategy,Verbose=>true, HybridLimit=>15});
+isBirationalOntoImage = method(Options => {AssumeDominant=>false, Strategy=>HybridStrategy,Verbose=>true, HybridLimit=>15});
 --if AssumeDominant is true, it doesn't form the kernel. 
 isBirationalOntoImageRees := method(Options => {AssumeDominant=>false,  Strategy=>ReesStrategy,Verbose=>true});
  isBirationalOntoImageSimis := method(Options => {AssumeDominant=>false,  HybridLimit=>15,Verbose=>true}); 
