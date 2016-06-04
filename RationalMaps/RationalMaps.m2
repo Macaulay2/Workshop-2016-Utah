@@ -1023,31 +1023,27 @@ isEmbedding(Ring, Ring, BasicList) := o-> (R1, S1, f1)->(
 isEmbedding(RingMap):= o-> (f1)->(
     f2:=null;
     if (o.AssumeDominant==false) then(
-	                                 if (o.Verbose === true) then print "isEmbedding: About to find the image of the map.";
-	                                 if (o.Verbose === true) then print "If you know the image, you may want to set AssumeDominant=>true option if this is slow.";
+        if (o.Verbose === true) then print "isEmbedding: About to find the image of the map.";
+	    if (o.Verbose === true) then print "If you know the image, you may want to specify that and set AssumeDominant=>true option if this is slow.";
         f2 = mapOntoImage(f1);
-	); 
-    if (o.AssumeDominant==true) then( 
-	f2=f1;
+	)
+    else ( 
+	    f2=f1;
 	);
-     	if (o.Verbose === true) then print "isEmbedding is checking if the map is a regular map";
+     	if (o.Verbose === true) then print "isEmbedding: Checking to see if the map is a regular map";
         flag := isRegularMap(f2);
         if (flag == true) then (
-	                          if (o.Verbose === true) then (print "isEmbedding is computing the inverse  map");
+	        if (o.Verbose === true) then (print "isEmbedding: computing the inverse  map");
         
-            try(h := inverseOfMap(f2, AssumeDominant=>true, Strategy=>o.Strategy,
-		     HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount); )
-	     
-	     	
-        
-           then ( 
-	                         if (o.Verbose === true) then print "isEmbedding is checking if the inverse map is a regular map";
-	   flag = isRegularMap(h);
-	   )
-       else(
-	   flag=false
-	   );
-          );                
+            try(h := inverseOfMap(f2, AssumeDominant=>true, Strategy=>o.Strategy,HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount); ) then 
+            ( 
+	            if (o.Verbose === true) then print "isEmbedding: checking if the inverse map is a regular map";
+        	    flag = isRegularMap(h);
+	        )
+            else(
+	            flag=false
+	        );
+       );                
        flag        
 );
     
@@ -1281,6 +1277,18 @@ doc ///
             By increasing the HybridLimit value (default 15), you can weight HybridStrategy it more towards SimisStrategy.  Infinity will behave just like SimisStrategy.
     SeeAlso
         HybridStrategy
+///
+
+doc ///
+    Key
+        MinorsCount
+    Headline
+        The name of an option controlling the behavior of isBirational and inverseOfMap (and other functions which call those).
+    Description
+    	Text
+            One of the ways to invert a map is to find a nonzero minor of a variant of the jacobialDualMatrix.  This function controls how many minors to check before switching to another strategy (invovling computing a syzygy).  Setting it to zero will mean no minors are checked.  If it is left as null (the default), the functions will try to make an educated guess as to how big to make this, depending on varieties you are working with.
+    SeeAlso
+        inverseOfMap
 ///
 
 doc /// 
@@ -1581,6 +1589,12 @@ doc ///
                 (isEmbedding, RingMap)
                 (isEmbedding, Ideal, Ideal, BasicList)
                 (isEmbedding, Ring, Ring, BasicList)
+                [isEmbedding, AssumeDominant]
+                [isEmbedding, CheckBirational]
+                [isEmbedding, HybridLimit]
+                [isEmbedding, Strategy]
+                [isEmbedding, MinorsCount]
+                [isEmbedding, Verbose]
         Headline
                 Checks whether a map of projective varieties is a closed embedding.
         Usage
@@ -1627,6 +1641,12 @@ doc ///
 	                f=map(R,S, {y,z});
 	                isRegularMap(f)
 	                isEmbedding(f)
+	        Text
+	                If the option Verbose is set to true, the function will describe what it is doing at each step.
+	        Text
+	                If the option AssumeDominant is set to true, the function won't compute the kernel of the ring map.  Otherwise it will.
+	        Text
+	                The remaining options, Strategy, HybridLimit, MinorsCount, and CheckBirational are simply passed when this function calls inverseOfMap.  Note, this function, isEmbedding, will only behave properly if CheckBirational is set to true.
 ///
 
 
@@ -1882,7 +1902,7 @@ doc ///
              an element of the coordinate ring of $X$ .
     Description
         Text
-            Given a map $f : X \to Y$, this finds common factor among the the components of, $f^(-1) \circ f$, which is an element of the coordinate ring of $X$ .
+            Given a map $f : X \to Y$, this finds common factor among the the components of, $f^(-1)$ composed with $f$, which is an element of the coordinate ring of $X$ .
         Text
             If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of f.  
         Text
