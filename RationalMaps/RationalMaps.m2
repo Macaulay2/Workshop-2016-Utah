@@ -31,6 +31,7 @@ export{
 	--"blowUpIdeals", --at some point we should document this and expose it to the user
 	"nonZeroMinor",-- it is internal because the answer is probobalistic and it is controlled by MinorsCount option
     "isSameMap", 
+     "sourceInversionFactor",
     --"simisAlgebra", --at some point we should document this and expose it to the user
     --**********************************
     --*************OPTIONS**************
@@ -275,13 +276,13 @@ isRegularMap(RingMap) := (ff) ->(
     g:=map(RR,tR,0|vars RR);
     trim g(L2)); 
 
-blowUpIdeals(Ideal, Ideal):=(a,b)->(
-    blowUpIdeals(a, first entries gens b)
+blowUpIdeals(Ideal, Ideal):=o->(a,b)->(
+    blowUpIdeals(a, first entries gens b,Strategy=>o.Strategy)
     );
 
 --Matrix M consists of elements in the ring of a 
-blowUpIdeals(Ideal, Matrix):=(a,M)->(
-    blowUpIdeals(a, first entries gens M)
+blowUpIdeals(Ideal, Matrix):=o->(a,M)->(
+    blowUpIdeals(a, first entries gens M,Strategy=>o.Strategy)
     );
     
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -330,7 +331,7 @@ simisAlgebra(Ideal, Matrix,ZZ):=(a,M,m)->(
 
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
- relationType=method();
+ relationType=method(Options => {Strategy=>ReesStrategy, Verbose=>true});
  --this function computes the "relation type" of an ideal in a ring R.
  --Let R be the ring given bythe  ideal a and L be a list of elements in R.
  --the relation type is the biggest degree in terms of new variables in the
@@ -339,18 +340,19 @@ simisAlgebra(Ideal, Matrix,ZZ):=(a,M,m)->(
  
  relationType(Ideal,BasicList):=o->(a,L)->(
      S:=ring L_0;
-     J:=blowUpIdeals(a,L);
+     J:=blowUpIdeals(a,L,Strategy=>o.Strategy);
+     if (o.Verbose) then print"blowUpIdeals computed.";
      n:=numgens J;
      L2:={};
      for i from 0 to n-1 do L2=append(L2,(degree J_i)_1);
      max L2);
  
- relationType(Ideal,Ideal):=(a,b)->(
-     relationType(ideal,first entries gens b)
+ relationType(Ideal,Ideal):=o->(a,b)->(
+     relationType(ideal,first entries gens b, Strategy=>o.Strategy)
      );
  
- relationType(Ring,Ideal):=(R1,b)->(
-     relationType(ideal R1,first entries gens b)
+ relationType(Ring,Ideal):=o->(R1,b)->(
+     relationType(ideal R1,first entries gens b,Strategy=>o.Strategy)
      );
      
      
@@ -903,7 +905,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
                                                --Baisis of J we only compute the parts of degree (1,m) or less, 
         )
         else( --we are running the hybrid strategy, so we compute the whole gb
-            if (o.Verbose === true) then print("inverseOfMapSimis:  We give up, we'll just compute the whole Groebner basis of the rees ideal.  Increase HybridLimit and rerun to avoid this." );
+            if (o.Verbose === true) then print("inverseOfMapSimis:  We give up, using all of the previous computations, we  compute the whole Groebner basis of the rees ideal.  Increase HybridLimit and rerun to avoid this." );
             M=gb(J); -- probably this should be DegreeLimit=>{1,infinity}, not sure if that works or not
             giveUp = true;
         );                                              
@@ -1020,12 +1022,10 @@ isEmbedding(Ring, Ring, BasicList) := o-> (R1, S1, f1)->(
 
 isEmbedding(RingMap):= o-> (f1)->(
     f2:=null;
-    h:=null;
     if (o.AssumeDominant==false) then(
-	if (o.Verbose === true) then print "isEmbedding: About to find the image of the map.";
-	  if (o.Verbose === true) then print "If you know the image, you may want to set AssumeDominant=>true option if this is slow.";
-       
-	 f2 = mapOntoImage(f1);
+	                                 if (o.Verbose === true) then print "isEmbedding: About to find the image of the map.";
+	                                 if (o.Verbose === true) then print "If you know the image, you may want to set AssumeDominant=>true option if this is slow.";
+        f2 = mapOntoImage(f1);
 	); 
     if (o.AssumeDominant==true) then( 
 	f2=f1;
@@ -1033,18 +1033,22 @@ isEmbedding(RingMap):= o-> (f1)->(
      	if (o.Verbose === true) then print "isEmbedding is checking if the map is a regular map";
         flag := isRegularMap(f2);
         if (flag == true) then (
-	   if (o.Verbose === true) then print "isEmbedding is computing the inverse  map";
+	                          if (o.Verbose === true) then (print "isEmbedding is computing the inverse  map");
         
-            h = inverseOfMap(f2, AssumeDominant=>true, Strategy=>o.Strategy,
-		     HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount); 
+            try(h := inverseOfMap(f2, AssumeDominant=>true, Strategy=>o.Strategy,
+		     HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount); )
 	     
-	     	if (o.Verbose === true) then print "isEmbedding is checking if the inverse map is a regular map";
+	     	
         
-            flag = isRegularMap(h);
+           then ( 
+	                         if (o.Verbose === true) then print "isEmbedding is checking if the inverse map is a regular map";
+	   flag = isRegularMap(h);
+	   )
+       else(
+	   flag=false
+	   );
           );                
-            
-       
-      flag        
+       flag        
 );
     
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1135,6 +1139,34 @@ jacobianDualMatrix(RingMap) := o->(f)->(
     jacobianDualMatrix(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
     );
 
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--SourceInversionFactor  is an invariant associated to a rational map which is useful in computation of symbolic powers
+sourceInversionFactor=method(Options => {AssumeDominant=>false, CheckBirational=>false, Strategy=>HybridStrategy,
+	 HybridLimit=>15, Verbose=>true, MinorsCount=>0});
+sourceInversionFactor(RingMap):=o->(f)->(
+         R:=  target f;
+	 x:=R_0;
+	 f2:=f;
+	 if (o.AssumeDominant==false) then(
+	                                 if (o.Verbose === true) then print "sourceInversionFactor: About to find the image of the map.";
+	                                 if (o.Verbose === true) then print "If you know the image, you may want to set AssumeDominant=>true option if this is slow.";
+        f2 = mapOntoImage(f);
+        ); 
+    
+	invf2:=inverseOfMap(f2, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,
+	 HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount);
+        I:=ideal(matrix((f2)*invf2));
+	s:=quotient(ideal(I_0),ideal(x));
+	s_0
+	
+	);
+	
+	
+	 
+	 
+	 
+    
 
 
 --****************************************************--
@@ -1828,6 +1860,50 @@ doc ///
     Caveat
         Only works for irreducible varieties right now.  Also see the function invertBirMap in the package Cremona, which for certain types of maps from projective space is sometimes faster.  Additionally, also compare with the function invertBirationalMap of the package Parametrization.        
 ///
+doc ///
+    Key
+        sourceInversionFactor
+		(sourceInversionFactor, RingMap)
+		[sourceInversionFactor, AssumeDominant]
+		[sourceInversionFactor, Strategy]
+        [sourceInversionFactor, CheckBirational]
+        [sourceInversionFactor, HybridLimit]
+	[sourceInversionFactor, Verbose]
+	[sourceInversionFactor,MinorsCount]
+    Headline
+        Computes the the common factor among the the components of the composition of the inverse map and the original map.
+    Usage
+         s = sourceInversionFactor(g)
+    Inputs
+        g: RingMap
+            Your birational map $f : X \to Y$.
+    Outputs
+        s: RingElement
+             an element of the coordinate ring of $X$ .
+    Description
+        Text
+            Given a map $f : X \to Y$, this finds common factor among the the components of, $f^(-1) \circ f$, which is an element of the coordinate ring of $X$ .
+        Text
+            If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of f.  
+        Text
+            The Strategy option can be set to HybridStrategy (default), SimisStrategy, ReesStrategy, or SaturationStrategy.  Note SimisStrategy will never terminate for non-birational maps. If CheckBirational is set to false (default is true), then no check for birationality will be done.  If it is set to true and the map is not birational, an error will be thrown if you are not using SimisStrategy. The option HybridLimit can weight the HybridStrategy between ReesStrategy and SimisStrategy, the default value is 15 and increasing it will weight towards SimisStrategy.
+        Example
+            R = ZZ/7[x,y,z];
+            S = ZZ/7[a,b,c];
+            h = map(R, S, {y*z, x*z, x*y});
+            sourceInversionFactor h
+        Example
+             S=QQ[a,b,c,d];
+             g=(b^2-a*c)*c*d;
+             phi=map(S,S,transpose jacobian ideal g);
+             sourceInversionFactor(phi, Verbose=>false)
+            
+        
+    Caveat
+        Only works for irreducible varieties right now.  Also see the function invertBirMap in the package Cremona, which for certain types of maps from projective space is sometimes faster.  Additionally, also compare with the function invertBirationalMap of the package Parametrization.        
+///
+
+
 
 --******************************************
 --******************************************
@@ -2108,7 +2184,7 @@ TEST /// --test #30
     --Let's do the twisted cubic curve
     P3 = ZZ/101[x,y,z,w];
     C = ZZ/101[a,b];
-    h = map(C, P3, {a^3, a^2*b, a*b^2, b^3});
+    h = map(C, P3, {a^3, (a^2)*b, a*b^2, b^3});
     assert(isEmbedding(h) == true)
 ///
 
