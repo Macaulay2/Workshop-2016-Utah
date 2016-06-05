@@ -1864,8 +1864,14 @@ doc ///
             g = inverseOfMap(h)
             baseLocusOfMap(g)
             baseLocusOfMap(h)
+	Text
+	    The next example, is a Birational map on $\mathbb{P}^4$. The default option is slower than the follwoing setting
+	Example
+	    Q=QQ[x,y,z,t,u];
+            phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
+            time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, MinorsCount=>5000)  
         Text
-            Finally, we do a more complicated example.
+            Finally, we do an example of plane Cremona maps whose source is not minimally embedded.
         Example
             R=QQ[x,y,z,t]/(z-2*t);
             F = {y*z*(x-z)*(x-2*y), x*z*(y-z)*(x-2*y),y*x*(y-z)*(x-z)};
@@ -1902,7 +1908,7 @@ doc ///
              an element of the coordinate ring of $X$ .
     Description
         Text
-            Given a map $f : X \to Y$, this finds common factor among the the components of, $f^(-1)$ composed with $f$, which is an element of the coordinate ring of $X$ .
+            Given a map $f : X \to Y$, this finds common factor among the the components of, $f^{(-1)}$ composed with $f$, which is an element of the coordinate ring of $X$ .
         Text
             If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of f.  
         Text
