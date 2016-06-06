@@ -30,9 +30,9 @@ export{
 	"mapOntoImage",
 	--"blowUpIdeals", --at some point we should document this and expose it to the user
 	"nonZeroMinor",-- it is internal because the answer is probobalistic and it is controlled by MinorsCount option
-    "isSameMap", 
-     "sourceInversionFactor",
-    --"simisAlgebra", --at some point we should document this and expose it to the user
+        "isSameMap", 
+        "sourceInversionFactor",
+        --"simisAlgebra", --at some point we should document this and expose it to the user
     --**********************************
     --*************OPTIONS**************
     --**********************************
@@ -53,8 +53,6 @@ export{
 --************************************************************--
 ----------------------------------------------------------------
 
-
---***Karl:  I dislike how this returns stuff.   The image of a map is not an ideal.  Hence I renamed it
 idealOfImageOfMap = method();
 
 idealOfImageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
@@ -80,7 +78,6 @@ idealOfImageOfMap(Ring,Ring,BasicList) := (R,S,g) -> (
 	);
 
 idealOfImageOfMap(RingMap) := (p) -> (
-        --idealOfImageOfMap(target p, source p, first entries matrix p)
         h := map(target p, ambient source p,p);
         im := ker h;
 	im
@@ -110,7 +107,6 @@ dimImage(Ring,Ring,BasicList) := (R,S,g) -> (
         );
 
 dimImage(RingMap) := (p) -> (
-	--dimImage(target p, source p, first entries matrix p)
 	I := idealOfImageOfMap(p);
 	(dim I) - 1
 );
@@ -383,7 +379,7 @@ isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStra
 
 --X = Proj R
 --Y = Proj S
---This madfp is given by a list of elements in R, all homogeneous
+--This map is given by a list of elements in R, all homogeneous
 --of the same degree.  
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
@@ -821,17 +817,6 @@ inverseOfMapRees(RingMap) := o->(f)->(
         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
         psi=map(ring(Inv#0),Rlin1,matrix{Inv});
     );
-    --if (o#Verbose) then ( --the logic here isn't right.  Verbose should just control if things are printed, not what functions are run
---        Inv =syz(transpose barJD,SyzygyLimit =>1);
---        psi = map(source f, Rlin1, sub(transpose Inv, source f));    
---    )
---    else (
---	 Col=(nonZeroMinor(barJD,jdd,o.MinorsCount))#0;
---         SbarJD=submatrix(barJD,,Col);
---	 
---         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
---         psi=map(ring(Inv#0),Rlin1,matrix{Inv});
---      	);
        psi*phi
 );
 
@@ -898,7 +883,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     M := null;
     while (flag == false) do (
 --  Jr:= simisAlgebra(di1,bm1,secdeg);
- --THe following is substituing simisAlgebra, we don't call that because we want to save the sotred groebner basis
+ --THe following is substituing simisAlgebra, we don't call that because we want to save the stored groebner basis
         if (o.Verbose === true) then print("inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree " | toString({1, secdeg}) | "." );
         if (secdeg < o.HybridLimit) then (
             M=gb(J,DegreeLimit=>{1,secdeg}); --instead of computing the whole Grob. 
@@ -1187,12 +1172,19 @@ document {
 	},
     BOLD "Functionality overlap with other packages:\n\n",BR{},BR{},
     BOLD "Parametrization.m2",  
-      ":  While the ", TO "Parametrization", " focuses on mostly on curves, it also includes a function ", TO "invertBirationalMap", " which has the same functionality as ", TO "inverseOfMap", ".  On the other hand, these two functions were implemented somewhat differently and so sometimes one function can be substantially faster than the other.\n", BR{}, BR{},
+      ":  While the ", TO "Parametrization", " focuses on mostly on curves, it also includes a function ", TO "invertBirationalMap", " 
+      which has the same functionality as ", TO "inverseOfMap", ".  On the other hand, these two functions were implemented somewhat differently and so sometimes one function can be substantially faster than the other.\n", BR{}, BR{},
     BOLD "Cremona.m2",  
-    ":  The package ", TO "Cremona", " focuses on very fast probabilistic computation in general cases and very fast deterministic computation for special kinds of maps from projective space.  In particular, ",BR{},
+    ":  The package ", TO "Cremona", " focuses on  fast probabilistic computations in general cases and  deterministic computations for special
+     kinds of maps from projective space.  More precisely, ",BR{},
     UL {
-        {TO "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer that is frequently substantially faster than what this package can provide with ", TO "isBirationalMap", ".", },
-        {TO "invertBirMap", " gives a very fast computation of the inverse of a birational map if the source is projective space ", EM " and ", "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ", TO "invertBirationalMap", " from ", TO "Parametrization", ".  In some cases, our function ", TO "inverseOfMap", " appears to be competitive however."},
+        {TO "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the
+	     source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer. 
+	      In some cases, the speed of the latter  is comparable with ", TO "isBirationalMap", " with ", TT   "AssumeDominant=>true." },
+        {TO "invertBirMap", " gives a  fast computation of the inverse of a birational map if the source is projective space ", EM " and ",
+	     "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ",
+	      TO "invertBirationalMap", " from ", TO "Parametrization", ".  In some cases, our function ", TO "inverseOfMap",
+	       " appears to be competitive however."},
     },
 }
 
@@ -1213,10 +1205,12 @@ doc ///
     Key
         ReesStrategy
     Headline
-        A strategy for inverseOfMap
+        A strategy for inverseOfMap, isBirationalMap, relationType and is Embedding. 
     Description
     	Text
-            It is a valid value for the Strategy Option for inverseOfMap (and other functions).
+            It is a valid value for the Strategy Option for inverseOfMap (and other functions). By choosing Strategy=>ReesStrategy, the equation of the
+	    ideal of definition of the Rees algebra are generated by the known elimination technique.  
+	    E.g. Vasconcelos, Rees algebras, multiplicities, algorithms. Springer Monographs in Mathematics. Springer-Verlag, Berlin, 2005.
     SeeAlso
         SaturationStrategy
         SimisStrategy
@@ -1228,38 +1222,47 @@ doc ///
     Key
         SaturationStrategy
     Headline
-        A strategy for inverseOfMap
+        A strategy for inverseOfMap, isBirationalMap, relationType and is Embedding. 
     Description
     	Text
-            It is a valid value for the Strategy Option for inverseOfMap (and other functions).  This appears to be slower in some examples.  
-    SeeAlso
-        ReesStrategy
-        SimisStrategy
-        HybridStrategy
-///
-
-doc ///
-    Key
-        SimisStrategy
-    Headline
-        A strategy for inverseOfMap
-    Description
-    	Text
-            It is a valid value for the Strategy Option for inverseOfMap (and other functions).  
+            It is a valid value for the Strategy Option for inverseOfMap (and other functions). By choosing Strategy=>SaturationStrategy, 
+	    the equation of the ideal of definition of the Rees algebra are generated by saturating the ideal of definition of the symmetric algebra into a non-zero element.
+	    Notice that in this package (and in particular in this Strategy Option) the rings are assumed to be integral domains.
+	    This Strategy appears to be slower in some examples.  
     SeeAlso
         ReesStrategy
+        SimisStrategy
+        HybridStrategy
+///
+
+doc ///
+    Key
+        SimisStrategy
+    Headline
+        A strategy for inverseOfMap, isBirationalMap and isEmbedding.
+    Description
+    	Text
+            It is a valid value for the Strategy Option for inverseOfMap (and other functions). Considering the bigraded structure of the 
+	    equations of the ideal of definition of Rees algerba, SimisStrategy is looking for all Grobner basis with first degree 1. The advantage 
+	    of this restriction is that only this part of the Rees ideal is enough to decide Birationality and to compute the inverse map; so that
+	    this Strategy reduces the number of computations. A disadvatage of this Strategy is that if the given map is not birational this Strategy may never
+	    end because the jacobianDualMatrix will not attain its maximum rank. To circumvent this problem we consider  HybridStrategy.
+    SeeAlso
+        ReesStrategy
         SaturationStrategy
         HybridStrategy
 ///
 
 doc ///
     Key
-        HybridStrategy
+        HybridStrategy 
     Headline
-        A strategy for inverseOfMap
+        A strategy for inverseOfMap,  isBirationalMap and isEmbedding.
     Description
     	Text
-            It is a valid value for the Strategy Option for inverseOfMap.  This is currently the default strategy.  It is a combination of ReesStrategy and SimisStrategy.  By increasing the HybridLimit value (default 15), you can weight it more towards SimisStrategy.
+            It is a valid value for the Strategy Option for inverseOfMap.  
+	    This is currently the default strategy.  It is a combination of ReesStrategy and SimisStrategy.  
+	    By increasing the HybridLimit value (default 15), you can weight it more towards SimisStrategy.
     SeeAlso
         ReesStrategy
         SaturationStrategy
@@ -1274,7 +1277,8 @@ doc ///
         An option to control HybridStrategy
     Description
     	Text
-            By increasing the HybridLimit value (default 15), you can weight HybridStrategy it more towards SimisStrategy.  Infinity will behave just like SimisStrategy.
+            By increasing the HybridLimit value (default 15), you can weight HybridStrategy it more towards SimisStrategy. 
+	     Infinity will behave just like SimisStrategy.
     SeeAlso
         HybridStrategy
 ///
@@ -1286,7 +1290,11 @@ doc ///
         The name of an option controlling the behavior of isBirational and inverseOfMap (and other functions which call those).
     Description
     	Text
-            One of the ways to invert a map is to find a nonzero minor of a variant of the jacobialDualMatrix.  This function controls how many minors to check before switching to another strategy (invovling computing a syzygy).  Setting it to zero will mean no minors are checked.  If it is left as null (the default), the functions will try to make an educated guess as to how big to make this, depending on varieties you are working with.
+            One of the ways to invert a map is to find a nonzero minor of a variant of the jacobialDualMatrix. 
+	     This function controls how many (randomly chosen) minors to check before switching to another strategy (invovling computing a syzygy).  
+	     Setting it to zero will mean no minors are checked.  
+	     If it is left as null (the default), the functions will try to make an educated guess as to how big to make this, 
+	     depending on varieties you are working with.
     SeeAlso
         inverseOfMap
 ///
