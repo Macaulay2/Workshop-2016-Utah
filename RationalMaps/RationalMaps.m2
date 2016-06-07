@@ -1188,18 +1188,123 @@ document {
     },
 }
 
+--***************************************************************
+document {
+  Key => {[isBirationalMap,Verbose],
+	  [isBirationalOntoImage,Verbose],
+	   [isEmbedding, Verbose],
+	  [relationType,Verbose],
+	  [inverseOfMap, Verbose],
+	  [sourceInversionFactor, Verbose]},
+    Headline => "generate informative output",
+    "If this option is set, functions will generate additional output. Default is true. "}
+
+--***************************************************************
+
+document{
+    Key=>{CheckBirational, [isEmbedding, CheckBirational],
+	[inverseOfMap, CheckBirational],
+	[sourceInversionFactor, CheckBirational]},
+    Headline=> "If true, functions will check birationality.",
+    Usage =>"  CheckBirational=>b",    
+      "If true, inverseOfMap, isEmbedding and sourceInversionFactor  will check whether the passed map is birational.  
+      If it is not birational, it will throw an error."
+
+}
+--***************************************************************
+
+document{
+    Key=>{HybridLimit, [isBirationalMap,HybridLimit],
+       	  [inverseOfMap, HybridLimit],
+          [isBirationalOntoImage,HybridLimit],
+	  [isEmbedding, HybridLimit],
+	  [sourceInversionFactor, HybridLimit]},
+    Headline=>"An option to control HybridStrategy",
+       "By increasing the HybridLimit value (default 15), you can weight 
+       HybridStrategy it more towards SimisStrategy. 
+	     Infinity will behave just like SimisStrategy.",
+    SeeAlso=>
+        HybridStrategy
+}
+--***************************************************************
+document{
+    Key=>{AssumeDominant, [isBirationalMap, AssumeDominant],
+	[isBirationalOntoImage, AssumeDominant],
+	[isEmbedding, AssumeDominant],
+	[jacobianDualMatrix,AssumeDominant],
+	[inverseOfMap, AssumeDominant],
+	[sourceInversionFactor, AssumeDominant] },
+    Headline=>"
+        If true, certain functions assume that the map from X to Y is dominant.",
+    Usage=>"AssumeDominant=>b",   
+       " If true, certain functions assume that $f : X \to Y$ is dominant.
+         In other words that the closure of $f(X)$ is equal to $Y$. 
+	  In practice, this means that a kernel of a ring map will
+	   not be computed.",
+}
+--***************************************************************
+
+document{
+    Key=>{MinorsCount, [isEmbedding, MinorsCount],
+	[inverseOfMap, MinorsCount],
+	[sourceInversionFactor,MinorsCount] },
+    Headline=>" An option controlling the behavior of isBirational and inverseOfMap
+     (and other functions which call those).",
+            "One of the ways to invert a map is to find a nonzero minor of a variant of the jacobialDualMatrix. 
+	     This function controls how many (randomly chosen) minors to check before switching to another strategy (invovling computing a syzygy).  
+	     Setting it to zero will mean no minors are checked.  
+	     If it is left as null (the default), the functions will try to make an educated guess as to how big to make this, 
+	     depending on varieties you are working with.",
+    SeeAlso=>
+        inverseOfMap
+}
+--***************************************************************
+document{
+    Key=>{[sourceInversionFactor, Strategy],
+	[isBirationalMap, Strategy],
+	[isBirationalOntoImage,Strategy],
+	[jacobianDualMatrix,Strategy],
+	[isEmbedding, Strategy],
+	[relationType,Strategy],
+	[inverseOfMap, Strategy]
+	 },
+    Headline=>" Determines the desired Strategy in each function.",
+            "In sourceInversionFactor, isBirationalMap, isBirationalOntoImage,
+	    isEmbeddinga and inverseOfMap, Strategy may assumed any of three options
+	    ReesStrategy, SimisStrategy or  HybridStrategy (default). These functions as well as relationType
+	     and jacobianDualMatrix may also attain the Strategy=>SaturationStrategy or ReesStrategy (default).  ",
+    
+}
+--***************************************************************
+document{ 
+    Key=>{ SaturateOutput, [baseLocusOfMap, SaturateOutput]},
+    Headline =>"If false, certain functions will not saturate their output.",
+    Usage =>"SaturateOutput=>b",    
+    "  If SaturateOutput is true (the default), then functions will saturate their output.  
+    Otherwise they will not.  It may be beneficial not to saturate in certain circumstances.",
+}
+--***************************************************************
+
+
 doc ///
     Key
-        CheckBirational
+        HybridStrategy 
     Headline
-        If true, inverseOfMap will check birationality.
-    Usage
-        CheckBirational=>b    
+        A strategy for inverseOfMap,  isBirationalMap and isEmbedding.
     Description
     	Text
-            If true, inverseOfMap will check whether the passed map is birational.  If it is not birational, it will throw an error.
-
+            It is a valid value for the Strategy Option for inverseOfMap.  
+	    This is currently the default strategy.  It is a combination of ReesStrategy and SimisStrategy.  
+	    By increasing the HybridLimit value (default 15), you can weight it more towards SimisStrategy.
+    SeeAlso
+        ReesStrategy
+        SaturationStrategy
+        SimisStrategy
+        HybridLimit
 ///
+
+--***************************************************************
+
 
 doc ///
     Key
@@ -1217,6 +1322,7 @@ doc ///
         HybridStrategy
 
 ///
+--***************************************************************
 
 doc ///
     Key
@@ -1234,6 +1340,7 @@ doc ///
         SimisStrategy
         HybridStrategy
 ///
+--***************************************************************
 
 doc ///
     Key
@@ -1253,75 +1360,9 @@ doc ///
         HybridStrategy
 ///
 
-doc ///
-    Key
-        HybridStrategy 
-    Headline
-        A strategy for inverseOfMap,  isBirationalMap and isEmbedding.
-    Description
-    	Text
-            It is a valid value for the Strategy Option for inverseOfMap.  
-	    This is currently the default strategy.  It is a combination of ReesStrategy and SimisStrategy.  
-	    By increasing the HybridLimit value (default 15), you can weight it more towards SimisStrategy.
-    SeeAlso
-        ReesStrategy
-        SaturationStrategy
-        SimisStrategy
-        HybridLimit
-///
+--***************************************************************
 
-doc ///
-    Key
-        HybridLimit
-    Headline
-        An option to control HybridStrategy
-    Description
-    	Text
-            By increasing the HybridLimit value (default 15), you can weight HybridStrategy it more towards SimisStrategy. 
-	     Infinity will behave just like SimisStrategy.
-    SeeAlso
-        HybridStrategy
-///
 
-doc ///
-    Key
-        MinorsCount
-    Headline
-        The name of an option controlling the behavior of isBirational and inverseOfMap (and other functions which call those).
-    Description
-    	Text
-            One of the ways to invert a map is to find a nonzero minor of a variant of the jacobialDualMatrix. 
-	     This function controls how many (randomly chosen) minors to check before switching to another strategy (invovling computing a syzygy).  
-	     Setting it to zero will mean no minors are checked.  
-	     If it is left as null (the default), the functions will try to make an educated guess as to how big to make this, 
-	     depending on varieties you are working with.
-    SeeAlso
-        inverseOfMap
-///
-
-doc /// 
-    Key
-        AssumeDominant
-    Headline
-        If true, certain functions assume that from X to Y are dominant.
-    Usage
-        AssumeDominant=>b    
-    Description
-    	Text
-            If true, certain functions assume that $f : X \to Y$ is dominant.  In other words that the closure of $f(X)$ is equal to $Y$.  In practice, this means that a kernel of a ring map will not be computed.
-///
-
-doc /// 
-    Key
-        SaturateOutput
-    Headline
-        If false, certain functions will not saturate their output.
-    Usage
-        SaturateOutput=>b    
-    Description
-    	Text
-            If SaturateOutput is true (the default), then functions will saturate their output.  Otherwise they will not.  It may be beneficial not to saturate in certain circumstances.
-///
 
 doc /// 
     Key
@@ -1329,7 +1370,10 @@ doc ///
         (isBirationalMap, Ideal, Ideal, BasicList)
         (isBirationalMap, Ring, Ring, BasicList)
         (isBirationalMap, RingMap)
-        [isBirationalMap, AssumeDominant]
+       -- [isBirationalMap, AssumeDominant]
+       --[isBirationalMap, Strategy]
+	--[isBirationalMap,Verbose]
+	--[isBirationalMap,HybridLimit]
     Headline
         Checks if a map between projective varieties is birational.
     Usage
@@ -1359,26 +1403,27 @@ doc ///
             R=QQ[x,y,z];
             S=QQ[a,b,c];
             Pi = map(R, S, {x*y, x*z, y*z});
-            isBirationalMap(Pi)
+            isBirationalMap(Pi, Verbose=>false, Strategy=>SimisStrategy )
         Text   
             We can also verify that a cover of $P^1$ by an elliptic curve is not birational.
         Example
             R=QQ[x,y,z]/(x^3+y^3-z^3);
             S=QQ[s,t];
             Pi = map(R, S, {x, y-z});            
-            isBirationalMap(Pi)
+            isBirationalMap(Pi) --There is a bug if we put  Strategy=>SaturationStrategy JUne7
         Text
             Note the Frobenius map is not birational.
         Example
             R = ZZ/5[x,y,z]/(x^3+y^3-z^3);
             S = ZZ/5[a,b,c]/(a^3+b^3-b^3);
             h = map(R, S, {x^5, y^5, z^5});
-            isBirationalMap(h)
+            isBirationalMap(h, Strategy=>ReesStrategy)
     SeeAlso
         isBirationalOntoImage
     Caveat
         Also see the very fast probabilisitc birationality checking of the Cremona package: isBirational
 ///                     
+--***************************************************************
 
 doc /// 
         Key
@@ -1386,7 +1431,10 @@ doc ///
 		(isBirationalOntoImage, Ideal, Ideal, BasicList)
 		(isBirationalOntoImage, Ring, Ring, BasicList)
 		(isBirationalOntoImage, RingMap)
-		[isBirationalOntoImage, AssumeDominant]
+		--[isBirationalOntoImage, AssumeDominant]
+	--	[isBirationalOntoImage,Strategy]
+		--[isBirationalOntoImage,Verbose]
+		--[isBirationalOntoImage,HybridLimit]
         Headline
                 Checks if a map between projective varieties is birational onto its image.
         Usage
@@ -1421,6 +1469,7 @@ doc ///
         SeeAlso 
             isBirationalMap
 ///                     
+--***************************************************************
 
 
 doc ///
@@ -1468,6 +1517,7 @@ doc ///
 			f = matrix {{u,0,v,0}};
 			idealOfImageOfMap(a,b,f)
 ///
+--***************************************************************
 
 doc ///
 	Key 
@@ -1475,8 +1525,8 @@ doc ///
 		(jacobianDualMatrix,Ideal,Ideal,BasicList)
 		(jacobianDualMatrix,Ring,Ring,BasicList)
 		(jacobianDualMatrix,RingMap)
-		[jacobianDualMatrix,AssumeDominant]
-		[jacobianDualMatrix,Strategy]
+	--	[jacobianDualMatrix,AssumeDominant]
+	--	[jacobianDualMatrix,Strategy]
 	Headline
 		Computes the Jacobian Dual Matrix, a matrix describing the syzygies of the inverse map.
 	Usage
@@ -1503,6 +1553,7 @@ doc ///
 		Text
 			This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the AssumeDominant option is set to true, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the Strategy option are ReesStrategy and SaturationStrategy.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390–413.
 ///
+--***************************************************************
 			
 doc ///
         Key
@@ -1549,6 +1600,7 @@ doc ///
 			f = matrix {{u,0,v,0}};
 			dimImage(a,b,f)
 ///
+--***************************************************************
 
 
 doc ///
@@ -1590,6 +1642,7 @@ doc ///
 	                mapOntoImage(f)
 	                mapOntoImage(R,S,{x^2,x*y,y^2})
 ///
+--***************************************************************
 
 doc ///
         Key
@@ -1597,12 +1650,12 @@ doc ///
                 (isEmbedding, RingMap)
                 (isEmbedding, Ideal, Ideal, BasicList)
                 (isEmbedding, Ring, Ring, BasicList)
-                [isEmbedding, AssumeDominant]
-                [isEmbedding, CheckBirational]
-                [isEmbedding, HybridLimit]
-                [isEmbedding, Strategy]
-                [isEmbedding, MinorsCount]
-                [isEmbedding, Verbose]
+             --   [isEmbedding, AssumeDominant]
+                --[isEmbedding, CheckBirational]
+                --[isEmbedding, HybridLimit]
+               -- [isEmbedding, Strategy]
+               -- [isEmbedding, MinorsCount]
+                --[isEmbedding, Verbose]
         Headline
                 Checks whether a map of projective varieties is a closed embedding.
         Usage
@@ -1657,6 +1710,7 @@ doc ///
 	                The remaining options, Strategy, HybridLimit, MinorsCount, and CheckBirational are simply passed when this function calls inverseOfMap.  Note, this function, isEmbedding, will only behave properly if CheckBirational is set to true.
 ///
 
+--***************************************************************
 
 
 doc ///
@@ -1665,7 +1719,7 @@ doc ///
         (baseLocusOfMap, Matrix)
         (baseLocusOfMap, List)
         (baseLocusOfMap, RingMap)
-        [baseLocusOfMap, SaturateOutput]
+--        [baseLocusOfMap, SaturateOutput]
     Headline
         Computes base locus of a map from a projective variety to projective space
     Usage
@@ -1708,6 +1762,7 @@ doc ///
         Text
             The base locus is exactly the three points one expects.
 ///
+--***************************************************************
 
 doc ///
     Key
@@ -1715,6 +1770,8 @@ doc ///
         (relationType, Ideal,BasicList)
         (relationType, Ideal,Ideal)
         (relationType, Ring,Ideal)
+--	[relationType,Strategy]
+--	[relationType,Verbose]
     Headline
         Given an ideal in a ring this computes the maximum degree, of the new variables, of the minimal generators of the defining ideal of the associated Rees algebra.
     Usage
@@ -1742,6 +1799,7 @@ doc ///
             J = minors (2,M)
             relationType(R,J)
 ///
+--***************************************************************
 
 doc ///
     Key
@@ -1787,6 +1845,7 @@ doc ///
 --            L2 = first entries gens minors(2,B)                   
 --            isSameMapToPn(L1,L2)
 ///
+--***************************************************************
 
 doc ///
     Key
@@ -1821,6 +1880,7 @@ doc ///
             f = {a, b, c};
             isRegularMap({a,b,c})
 ///  
+--***************************************************************
 
 doc ///
     Key
@@ -1828,10 +1888,12 @@ doc ///
 		(inverseOfMap, Ideal, Ideal, BasicList)
 		(inverseOfMap, Ring, Ring, BasicList)
 		(inverseOfMap, RingMap)
-		[inverseOfMap, AssumeDominant]
-		[inverseOfMap, Strategy]
-        [inverseOfMap, CheckBirational]
-        [inverseOfMap, HybridLimit]
+--		[inverseOfMap, AssumeDominant]
+--		[inverseOfMap, Strategy]
+--               [inverseOfMap, CheckBirational]
+--               [inverseOfMap, HybridLimit, MinorsCount]
+--		[inverseOfMap, Verbose]
+--		[inverseOfMap, MinorsCount]
     Headline
         Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational onto its image.
     Usage
@@ -1894,16 +1956,18 @@ doc ///
     Caveat
         Only works for irreducible varieties right now.  Also see the function invertBirMap in the package Cremona, which for certain types of maps from projective space is sometimes faster.  Additionally, also compare with the function invertBirationalMap of the package Parametrization.        
 ///
+--***************************************************************
+
 doc ///
     Key
         sourceInversionFactor
 		(sourceInversionFactor, RingMap)
-		[sourceInversionFactor, AssumeDominant]
-		[sourceInversionFactor, Strategy]
-        [sourceInversionFactor, CheckBirational]
-        [sourceInversionFactor, HybridLimit]
-	[sourceInversionFactor, Verbose]
-	[sourceInversionFactor,MinorsCount]
+--     	[sourceInversionFactor, AssumeDominant]
+--       [sourceInversionFactor, Strategy]
+--       [sourceInversionFactor, CheckBirational]
+--       [sourceInversionFactor, HybridLimit]
+--       [sourceInversionFactor, Verbose]
+--	 [sourceInversionFactor,MinorsCount]
     Headline
         Computes the the common factor among the the components of the composition of the inverse map and the original map.
     Usage
