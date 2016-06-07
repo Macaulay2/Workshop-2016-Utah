@@ -115,12 +115,14 @@ ethRoot ( ZZ, Matrix ) := opts -> (e, A) -> mEthRoot (e,A)  --- MK
 
 getFieldGenRoot = (e,p,q,k) -> (
     s := floorLog(p,q);
-    --Gets the exponent s such that q = p^s.
+    -- Gets the exponent s such that q = p^s.
     a := (gens k)#0;
     a^(p^(s-e%s))
-    --Gets the p^e-th root of the cyclic generator a for the field extension k over ZZ/p.  If 1,a,..,a^t is a basis for k over
-    --ZZ/p and c = c_0 + c_1a + .. + c_ta^t in k, then replacing a with its p^e-th root in the preceding expansion using 
-    --substitute(c,a => getFieldGenRoot(e,p,q,k)) yields the p^e-th root of c.
+    -- Gets the p^e-th root of the cyclic generator a for the field extension k 
+    -- over ZZ/p.  If 1,a,..,a^t is a basis for k over ZZ/p and 
+    -- c = c_0 + c_1a + .. + c_ta^t in k, then replacing a with its p^e-th root 
+    -- in the preceding expansion using substitute(c,a => getFieldGenRoot(e,p,q,k))
+    -- yields the p^e-th root of c.
 )
 
 
@@ -214,28 +216,31 @@ ethRootSafe( ZZ, ZZ, RingElement ) := ( e, a, f ) ->
 ethRootSafeList = method();
 
 ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
-        R := ring I;
-        p := char R;
-        
-        aListRem := aList % p^e;
-        aListQuot := aList // p^e;
-        
-        expOfaList := apply(aListRem, z -> basePExp( p, z ) );
-        
-        aPowerList := apply(elmtList, expOfaList, (f, z) -> f^(z#0));
-        
-        IN1 := I*ideal(product(aPowerList));
-        if (e > 0) then (
-                IN1 = ethRoot( 1, IN1 );
-                i := 1;
-                while(i < e) do (
-                        aPowerList = apply(elmtList, expOfaList, (f, z) -> f^(z#i));
-                        IN1 = ethRoot( 1, IN1*ideal(product(aPowerList)) );
-                        i = i + 1;
-                )
-        );
-        aPowerList = apply(elmtList, aListQuot, (f, z) -> f^z);
-        IN1*ideal(product(aPowerList))
+    R := ring I;
+    p := char R;
+    
+    aListRem := aList % p^e;
+    aListQuot := aList // p^e;
+    
+    -- gives the basePexpansion of each element of aListRem
+    -- expOfaList is thus a list of lists.
+    expOfaList := apply(aListRem, z -> basePExp( p, z ) );
+    
+    -- this computes { ... f_i^b_i ... } where b_i = a_i % p
+    aPowerList := apply(elmtList, expOfaList, (f, z) -> f^(z#0));
+    
+    IN1 := I*ideal(product(aPowerList));
+    if (e > 0) then (
+        IN1 = ethRoot( 1, IN1 );
+        i := 1;
+        while(i < e) do (
+            aPowerList = apply(elmtList, expOfaList, (f, z) -> f^(z#i));
+            IN1 = ethRoot( 1, IN1*ideal(product(aPowerList)) );
+            i = i + 1;
+        )
+    );
+    aPowerList = apply(elmtList, aListQuot, (f, z) -> f^z);
+    IN1*ideal(product(aPowerList))
 )
 
 ethRootSafeList( ZZ, List, List ) := ( e, a, F ) ->
@@ -243,32 +248,41 @@ ethRootSafeList( ZZ, List, List ) := ( e, a, F ) ->
 	
 
 -- DS: what does fancyEthRoot do?
+-- is it (I^m)^[1/p^e]? Then it's just a special case of ethRootSafeList, no?
 fancyEthRoot = (e,m,I) ->
 (
+    if (e < 0) then (error "expected a nonnegative integer e"); 
 	G:=first entries mingens I;
 	k:=#G;
-	P:=allPartitions(m,k);
+	P:=allPartitions(m,k); --partitions of m of size k
+	                       --this function is used here and only here
+
+	                       --it seems like the point of this function
+	                       --is just to find the generators of I^m where 
+	                       --each generator of I appears
 	R:=ring(I);
 	p:=char(R);
 	answer:=ideal(0_R);
-	apply(P, u->
+	apply(P, u-> -- take one of your partitions and call it P
 	{
-	---print("Partition: ",u);
 		a:=ideal(1_R);
-		U:=apply(u, v->baseP1(v,p,e));
+		U:=apply(u, v->baseP1(v,p,e)); -- so we're replacing each element of  P with its
+		                               -- base P expansion (but stopping at p^e)
 		for i from 0 to e do
 		{
 			j:=e-i;
 			g:=1_R;
-			for l from 0 to k-1 do g=g*(G#l)^((U#l)#j); 
+			for l from 0 to k-1 do g=g*(G#l)^((U#l)#j);  -- take each generator of I and raise it to 
+			                                             -- the the coefficient of p^j of the base-p expansion
+			                                             -- of appropriate element of your partition, a la the method
+			                                             -- of EthRootSafe. 
+			                                             -- Then multiply these together. 
 			a=ideal(g)*a;
-			if (i<e) then a=ethRoot( 1, a );
----print(g,answer);
+			if (i<e) then a=ethRoot( 1, a ); -- so we're iteratively doing answer = (prevanswer*f^a_1*... *f_k^a_k)^[1/p]
 		};
-		answer=answer+a;
+		answer=answer+a; --adding up the above results for each partition
 	});
---	ideal((answer))
-    answer
+	answer
 )
 
 
@@ -279,11 +293,13 @@ smartEthRoot = method();
 smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
 --the idealList, can take a list of ideals, a list of elements, or a mix of lists of ideals or elements
     idealList = apply(idealList, jj -> (if (class jj === Ideal) then (jj) else (ideal(jj))));
+
+    
 );
 
 --this function is the same as the above, it just explicitly adds J to the end of the ideal list and 1 to the end of the exponent list
 smartEthRoot(ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
-);
+   smartEthRoot(e, append(exponentList, 1), append(idealList, J));
 ----------------------------------------------------------------
 --************************************************************--
 --Functions for computing test ideals, and related objects.   --

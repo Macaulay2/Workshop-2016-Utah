@@ -252,11 +252,13 @@ digit ( ZZ, ZZ, List ) := ( p, e, u ) -> apply( u, x -> digit( p, e, x ) )
 basePExp = method(); 
 
 --Computes the terminating base p expansion of a positive integer.
---Gives expansion in reverse...
+--Gives expansion in reverse... so from left to right it gives
+--the coefficient of 1, then of p, then of p^2, and so on
 basePExp( ZZ, ZZ ) := ( p, N ) ->
 (
     if N < 0 then error "basePExp: Expected N to be positive";
-    if N < p then {N} else prepend( N % p, basePExp(p, N // p))
+    if N < p then {N} else prepend( N % p, basePExp(p, N // p)) 
+    -- would this be faster if it were tail-recursive? we could do this w/ a helper function.
 )
 
 --Creates a list of the first e digits of the non-terminating base p expansion of x in [0,1].
@@ -283,6 +285,8 @@ truncatedBasePExp ( ZZ, ZZ, List ) := ( p, e, u ) -> apply( u, x -> truncatedBas
 --===================================================================================
 
 --- write n=a*p^e+a_{e-1} p^{e-1} + \dots + a_0 where 0\leq e_j <p 
+--- DS: so it's just like doing basePExp but giving up after p^e and just returning whatever number's left
+--- DS: this could be merged with basePExp. Should it be? 
 baseP1 = ( n, p, e ) ->
 (
     a:=n//(p^e);
