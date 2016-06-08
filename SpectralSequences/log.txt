@@ -2,9 +2,11 @@
 
 * Comment out the “experimental” change of rings code — this should be deleted
 
-* Added code for a new method for tensor that does pushforwards of complexes and corresponding documentation
+* Added code for a new method for tensor that does tensor products of complexes with respect to a ring map and corresponding documentation
 
 * (Adam)  I've noticed some that when we are looking at keys ChainComplex, we should probably take keys complete ChainComplex.  I've added this to the file only in cases where I think it's necessary - i.e. when we do precisely "keys Chaincomplex"
 
-* 
+* (Nathan) I updated the above log about the tensor method.  To do: integrate the experimental push-forward code and then write the corresponding documentation.  It’s probably a good idea to take “complete ChainComplex” whenever we have a method that uses chainComplexes just to be safe.
+
+
 
