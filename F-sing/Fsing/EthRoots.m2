@@ -317,11 +317,19 @@ smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
     );
 
 );
+
 --this function is the same as the above, it just explicitly adds J to the end of the ideal list and 1 to the end of the exponent list
-smartEthRoot(ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
+smartEthRoot( ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
    smartEthRoot(e, append(exponentList, 1), append(idealList, J));
 
+smartEthRoot( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> 
+    smartEthRoot(e, {a, 1}, {f, I});
 
+smartEthRoot( ZZ, ZZ, RingElement ) := ( e, a, f ) -> smartEthRoot(e, {a}, {f}); 
+
+smartEthRoot( ZZ, ZZ, Ideal ) := ( e, m, I ) -> fancyEthRoot( e, {m}, {I} );
+
+-- this a slow but easy to write implementation of smartEthRoot
 smartEthRootRecursive = method();
 smartEthRootRecursive(ZZ, List, List) := (e, exponentList, idealList) -> (
     if e == 0 then (
