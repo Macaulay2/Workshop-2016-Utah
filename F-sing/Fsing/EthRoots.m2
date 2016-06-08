@@ -292,14 +292,56 @@ smartEthRoot = method();
 
 smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
 --the idealList, can take a list of ideals, a list of elements, or a mix of lists of ideals or elements
-    idealList = apply(idealList, jj -> (if (class jj === Ideal) then (jj) else (ideal(jj))));
+    -- make a list of the number of generators of each ideal in idealList
+    minGensList = apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
 
+    -- see what's the biggest power of p smaller than a/m where 'a' is in exponentList
+    -- and m is in minGensList. I.e. we want to find the largest e such that a >= mp^e
+    minGensLog = apply(minGensList, exponentList, (mm, aa) -> (
+        n = floorLog(p, aa//mm);
+        if (n > e) then e else n
+    ));
+
+    tripleList = sort apply(minGensLog, idealList, exponentList, (a,b,c) -> {a,b,c});
+
+    j := 0;
+
+    R := ring(idealList#0);
+    answer :=  ideal(1_R);
     
-);
+    for i from 0 to e do (
+        if i == tripleList#j#0 then (
+            answer = answer*
+            j = j+1;
+        );
+    );
 
+);
 --this function is the same as the above, it just explicitly adds J to the end of the ideal list and 1 to the end of the exponent list
 smartEthRoot(ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
    smartEthRoot(e, append(exponentList, 1), append(idealList, J));
+
+smartEthRootRecursive(ZZ, List, List) := (e, exponentList, idealList) -> (
+    if e == 0 then (
+        I := idealList#0^(exponentList#0);
+        for j from 1 to length(idealList) - 1 do I = I*(idealList#j)^(exponentList#j);
+        return I;
+    );
+
+    R := ring(idealList#0);
+    p := char(R);
+    minGensList = apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
+
+    nsList = apply(exponentList, minGensList, (mm, aa) -> (
+       max(0, floor(aa/p - mm + 1)) 
+    ));
+    I := R;
+    for j from 0 to length(idealList) - 1 do I = I*(idealList#j)^(exponentList#j - nsList#j * p);
+    I = ethRoot(1, I);
+    smartEthRootRecursive(e - 1, append(nsList, 1), append(idealList, I))
+);
+
+
 ----------------------------------------------------------------
 --************************************************************--
 --Functions for computing test ideals, and related objects.   --
