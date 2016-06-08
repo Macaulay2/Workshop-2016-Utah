@@ -3,3 +3,8 @@
 * Comment out the “experimental” change of rings code — this should be deleted
 
 * Added code for a new method for tensor that does pushforwards of complexes and corresponding documentation
+
+* (Adam)  I've noticed some that when we are looking at keys ChainComplex, we should probably take keys complete ChainComplex.  I've added this to the file only in cases where I think it's necessary - i.e. when we do precisely "keys Chaincomplex"
+
+* 
+

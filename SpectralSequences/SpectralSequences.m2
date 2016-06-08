@@ -95,7 +95,7 @@ ReverseDictionary = value Core#"private dictionary"#"ReverseDictionary"
 spots = method()
 
 spots ChainComplex := List => (
-  C -> sort select(keys C,i -> class i === ZZ))
+  C -> sort select(keys complete C,i -> class i === ZZ))
 
 max ChainComplex := K -> max spots K
 min ChainComplex := K -> min spots K
@@ -1001,11 +1001,11 @@ tensor(RingMap,ChainComplex) := ChainComplex =>
          k := min C; 
     D := chainComplex(
 	if even(k) then apply(
-	    drop(select(keys C, 
+	    drop(select(keys complete C, 
 	    	i -> instance(i,ZZ)),1), 
 	    j -> f ** C.dd_j)
 	else apply(
-	    drop(select(keys C, 
+	    drop(select(keys complete C, 
 	    	i -> instance(i,ZZ)),1), 
 	    j -> (-1) * (f ** C.dd_j)));
     D[-k]
