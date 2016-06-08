@@ -396,7 +396,7 @@ isBirationalMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
    
         if (dim ((im1*S^1)/(im*S^1)) <= 0) then( --first check if the image is the closure of the image is even the right thing
            
-	     if (o.Strategy==ReesStrategy) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>ReesStrategy, Verbose=>o.Verbose))
+	     if (o.Strategy==ReesStrategy or o.Strategy==SaturationStrategy ) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>o.Strategy, Verbose=>o.Verbose))
 	                             
              else if (o.Strategy==HybridStrategy) then ( isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>HybridStrategy, HybridLimit=>o.HybridLimit,Verbose=>o.Verbose))
                                       
@@ -1269,7 +1269,7 @@ document{
 	[inverseOfMap, Strategy]
 	 },
     Headline=>" Determines the desired Strategy in each function.",
-            "In sourceInversionFactor, isBirationalMap, isBirationalOntoImage,
+       "In sourceInversionFactor, isBirationalMap, isBirationalOntoImage,
 	    isEmbeddinga and inverseOfMap, Strategy may assumed any of three options
 	    ReesStrategy, SimisStrategy or  HybridStrategy (default). These functions as well as relationType
 	     and jacobianDualMatrix may also attain the Strategy=>SaturationStrategy or ReesStrategy (default).  ",
@@ -1410,14 +1410,14 @@ doc ///
             R=QQ[x,y,z]/(x^3+y^3-z^3);
             S=QQ[s,t];
             Pi = map(R, S, {x, y-z});            
-            isBirationalMap(Pi) --There is a bug if we put  Strategy=>SaturationStrategy JUne7
+            isBirationalMap(Pi) 
         Text
             Note the Frobenius map is not birational.
         Example
             R = ZZ/5[x,y,z]/(x^3+y^3-z^3);
             S = ZZ/5[a,b,c]/(a^3+b^3-b^3);
             h = map(R, S, {x^5, y^5, z^5});
-            isBirationalMap(h, Strategy=>ReesStrategy)
+            isBirationalMap(h, Strategy=>SaturationStrategy)
     SeeAlso
         isBirationalOntoImage
     Caveat
@@ -1438,9 +1438,9 @@ doc ///
         Headline
                 Checks if a map between projective varieties is birational onto its image.
         Usage
-                val = isBirationalMap(a,b,f)
-                val = isBirationalMap(R,S,f)
-                val = isBirationalMap(Pi)
+                val = isBirationalOntoImage(a,b,f)
+                val = isBirationalOntoImage(R,S,f)
+                val = isBirationalOntoImage(Pi)
         Inputs
                 a:Ideal
                         defining equations for X		
@@ -1456,7 +1456,7 @@ doc ///
                         A ring map S to R corresponding to X mapping to Y
         Outputs
                 val:Boolean
-                        true if the map is birational, false if otherwise
+                        true if the map is birational onto its image, false if otherwise
         Description
                 Text   
                         This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling isBirationalOntoImage.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its defining ideals must be prime.  In the following example, the map is not birational, but it is birational onto its image.
@@ -1464,8 +1464,22 @@ doc ///
                         R=QQ[x,y];
                         S=QQ[a,b,c,d];
                         Pi = map(R, S, {x^3, x^2*y, x*y^2, y^3});
-                        isBirationalOntoImage(Pi)
-                        isBirationalMap(Pi)                       
+                        isBirationalOntoImage(Pi, Verbose=>false)
+                        isBirationalMap(Pi,  Verbose=>false)    
+		Text
+                        Sub-Hankel matrices have homaloidal determinants.
+                Example
+                        R = QQ[z_0..z_6];
+			H=map(R^4,4,(i,j)->R_(i+j));
+                        SH=sub(H,{z_5=>0,z_6=>0})
+			sh=map(R, R, transpose jacobian ideal det SH ); 
+			isBirationalOntoImage(sh, Verbose=>false) 
+			S=QQ[t_0..t_4];
+			li=map(S,R,matrix{{t_0..t_4,0,0}});
+			phi=li*sh;
+			isBirationalOntoImage(phi, HybridLimit=>2) 
+		      
+			              
         SeeAlso 
             isBirationalMap
 ///                     
@@ -1528,7 +1542,7 @@ doc ///
 	--	[jacobianDualMatrix,AssumeDominant]
 	--	[jacobianDualMatrix,Strategy]
 	Headline
-		Computes the Jacobian Dual Matrix, a matrix describing the syzygies of the inverse map.
+		Computes the Jacobian Dual Matrix, a matrix whose kernel describing the syzygies of the inverse map.
 	Usage
 		M = jacobianDualMatrix(a,b,g)
 		M = jacobianDualMatrix(R,S,g)
@@ -1548,10 +1562,16 @@ doc ///
 			projective rational map given by polynomial representatives
 	Outputs
 		M:Matrix
-			Returns a matrix describing the syzygies of the inverse map, if it exists.
+			Returns a matrix over the coordinate ring of the image, the kernel of this matrix
+			 describing the syzygies of the inverse map, if it exists.
 	Description
 		Text
 			This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the AssumeDominant option is set to true, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the Strategy option are ReesStrategy and SaturationStrategy.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390–413.
+		Example
+                       R=QQ[x,y];
+                       S=QQ[a,b,c,d];
+                       Pi = map(R, S, {x^3, x^2*y, x*y^2, y^3});
+		       jacobianDualMatrix(Pi, Strategy=>SaturationStrategy)	
 ///
 --***************************************************************
 			
@@ -2155,7 +2175,7 @@ TEST /// --test #15 (a map from the blowup of P^2 at a point back down to P^2)
     M = matrix{{a,b,c},{d,e,f}};
     blowUpSubvar = P5/(minors(2, M) + ideal(b-d));
     f = {a, b, c};
-    assert(isBirationalOntoImage(blowUpSubvar, QQ[x,y,z], f) == true)
+    assert(isBirationalOntoImage(blowUpSubvar, QQ[x,y,z], f, Verbose=>false) == true)
 ///
 
 TEST /// --test #16 (quadratic cremona transformation)
@@ -2215,14 +2235,14 @@ TEST /// --test #23 (let's map an elliptic curve onto P^1)
     R = QQ[x,y,z]/(x^3+y^3-z^3);
     S = QQ[a,b];
     f = map(R, S, {x, y-z});
-    assert(isBirationalOntoImage(f) == false)
+    assert(isBirationalOntoImage(f, Strategy=>SaturationStrategy) == false)
 ///
 
 TEST /// --test #24 (3rd veronese embedding of P^1)
     R = QQ[x,y];
     S = QQ[a,b,c,d];
     f = map(R, S, {x^3,x^2*y,x*y^2,x^3});
-    assert(isBirationalOntoImage(f) == true)
+    assert(isBirationalOntoImage(f, HybridLimit=>20) == true)
 ///
 
 TEST /// --test #25 (Frobenius on an elliptic curve)
@@ -2258,7 +2278,7 @@ TEST /// --test #28 (quadratic cremona)
     R = ZZ/11[x,y,z];
     S = ZZ/11[a,b,c];
     h = map(R, S, {y*z, x*z, x*y});
-    g = inverseOfMap(h);
+    g = inverseOfMap(h,AssumeDominant=>true);
     assert(isSameMap(first entries matrix g, {b*c, a*c, a*b}))
 ///
 
@@ -2283,7 +2303,7 @@ TEST /// --test #30
     P3 = ZZ/101[x,y,z,w];
     C = ZZ/101[a,b];
     h = map(C, P3, {a^3, (a^2)*b, a*b^2, b^3});
-    assert(isEmbedding(h) == true)
+    assert(isEmbedding(h, MinorsCount=>5000) == true)
 ///
 
 TEST /// --test #31
