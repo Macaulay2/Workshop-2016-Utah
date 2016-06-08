@@ -321,6 +321,8 @@ smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
 smartEthRoot(ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
    smartEthRoot(e, append(exponentList, 1), append(idealList, J));
 
+
+smartEthRootRecursive = method();
 smartEthRootRecursive(ZZ, List, List) := (e, exponentList, idealList) -> (
     if e == 0 then (
         I := idealList#0^(exponentList#0);
