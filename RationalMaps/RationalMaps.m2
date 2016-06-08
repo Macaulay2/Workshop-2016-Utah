@@ -1410,7 +1410,7 @@ doc ///
             R=QQ[x,y,z]/(x^3+y^3-z^3);
             S=QQ[s,t];
             Pi = map(R, S, {x, y-z});            
-            isBirationalMap(Pi) 
+            isBirationalMap(Pi, Verbose=>false) 
         Text
             Note the Frobenius map is not birational.
         Example
@@ -1706,14 +1706,14 @@ doc ///
 	                R = ZZ/7[x,y];
 	                S = ZZ/7[a,b,c];
 	                f = map(R, S, {x^2, x*y, y^2});
-	                isEmbedding(f)
+	                isEmbedding(f, Verbose=>false)
 	        Text
 	                Now consider the projection from a point on the plane to the line at infinity.
 	        Example
 	                R=QQ[x,y,z];
 	                S=QQ[a,b];
 	                f=map(R, S, {y,z});
-	                isEmbedding(f)
+	                isEmbedding(f, Verbose=>false)
 	        Text 
 	                That is obviously not an embedding.  It is even not an embedding when we restrict to a quadratic curve, even though it is a regular map.
 	        Example
@@ -1943,7 +1943,7 @@ doc ///
             R = ZZ/7[x,y,z];
             S = ZZ/7[a,b,c];
             h = map(R, S, {y*z, x*z, x*y});
-            inverseOfMap h
+            inverseOfMap (h, Verbose=>false)
         Text
             Notice that the leading minus signs do not change the projective map.  Next let us compute the inverse of the blowup of $P^2$ at a point.
         Example
@@ -1951,7 +1951,7 @@ doc ///
             M = matrix{{a,b,c},{d,e,f}};
             blowUpSubvar = P5/(minors(2, M)+ideal(b - d));
             h = map(blowUpSubvar, QQ[x,y,z],{a, b, c});
-            g = inverseOfMap(h)
+            g = inverseOfMap(h, Verbose=>false)
             baseLocusOfMap(g)
             baseLocusOfMap(h)
 	Text
