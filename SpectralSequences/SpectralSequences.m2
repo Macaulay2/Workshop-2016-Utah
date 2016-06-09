@@ -463,7 +463,7 @@ yComplex := (T,n) ->
     )
 
 
--- experimental I-adic filtration code --
+-- I-adic filtration code --
 -- the following script allows us to multiply a chain complex by an ideal
 Ideal * ChainComplex := ChainComplex => (I,C) -> (
     D := new ChainComplex;
@@ -931,7 +931,6 @@ basis (List,SpectralSequencePage) := opts -> (deg,E) -> (
     )
 --
 --
--- Some more experimental code --
 --
 -- Can we write a short script in general to compute the edge complex?
 -- Ans: yes.
@@ -971,8 +970,33 @@ associatedGradedHomologyObject(ZZ,ZZ,FilteredComplex) := (p,n,K) -> (
 
 -----------------------------------------------------------
 -----------------------------------------------------------
--- change of rings scratch experimental code --
+-- change of rings --
+-- the following relies on the pushFwd method from the package "PushForward.m2"
 
+pushFwd(RingMap,ChainComplex):=o->(f,C) ->
+(    pushFwdC := chainComplex(source f);
+     maps := apply(spots C, i-> (i,pushFwd(f,C.dd_i)));
+     for i from min C to max C do (
+	 pushFwdC.dd_(maps#i_0) = maps#i_1 
+	 );
+    pushFwdC
+    )
+
+
+--Compute change of rings for Tor
+
+changeOfRingsTor = method()
+changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
+    -- f : R --> S a finite ring map, N an S module, M an R module
+    F := complete res N;
+    pushFwdF := pushFwd(f,F);
+    G := complete res M;
+    E := spectralSequence(filteredComplex(G)** pushFwdF);
+    EE := spectralSequence((G) ** (filteredComplex pushFwdF));
+    (E,EE) 
+)
+
+-- old change of rings --
 --pushFwdChainComplex = method()
 --pushFwdChainComplex(ChainComplex,RingMap) := (C,f) -> (
 --    D := new ChainComplex;
