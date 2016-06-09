@@ -68,7 +68,7 @@ export {
    "pageMap", 
    "page" ,
   "prunningMaps", "edgeComplex",
-  "filteredHomologyObject", "associatedGradedHomologyObject", "netPage" 
+  "filteredHomologyObject", "associatedGradedHomologyObject", "netPage", "changeOfRingsTor" 
   }
 
 
@@ -2337,9 +2337,44 @@ doc ///
 	 SpectralSequencePageMap
 	 "Examples of filtered complexes and spectral sequences"   
      ///
- 
 
-
+doc ///
+     Key
+       changeOfRingsTor
+     Headline
+         compute the change of rings spectral sequence
+     Usage
+          E = changeOfRingsTor(M,N,f)
+     Inputs
+     	 M:Module
+	 N:Module
+	 f:RingMap
+     Outputs
+     	  E:Sequence
+     Description
+          Text
+	       This method computes the change of ring spectral sequence for a finite ring map.
+	  Example
+	       k=QQ;
+	       R=k[a,b,c];
+	       S=k[s,t];
+	       f = map(S,R,{s^2,s*t,t^2});
+	       kappa = coker vars S;
+	       kkappa = coker vars R;
+	       (E,EE) = changeOfRingsTor(kkappa,kappa,f);
+	       e = prune E
+	       ee = prune EE
+	       e^0
+	       e^1
+	       e^2
+	       e^infinity
+	       ee^0
+	       ee^1
+	       ee^2
+	       (ee^2).dd
+	       ee^3
+	       ee^infinity   	      
+     ///
 
 doc ///
     	  Key
