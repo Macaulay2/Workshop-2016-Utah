@@ -29,7 +29,7 @@ export{
 	"inverseOfMap",
 	"mapOntoImage",
 	--"blowUpIdeals", --at some point we should document this and expose it to the user
-	"nonZeroMinor",-- it is internal because the answer is probobalistic and it is controlled by MinorsCount option
+	--"nonZeroMinor",-- it is internal because the answer is probobalistic (either it finds one or it doesn't) and it is controlled by MinorsCount option
         "isSameMap", 
         "sourceInversionFactor",
         --"simisAlgebra", --at some point we should document this and expose it to the user
@@ -373,7 +373,7 @@ simisAlgebra(Ideal, Matrix,ZZ):=(a,M,m)->(
  d);
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStrategy,Verbose=>true, HybridLimit=>15});
+isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStrategy,Verbose=>true, HybridLimit=>15, Verbose=>true});
 
 --this checks whether a map X -> Y is birational.
 
@@ -385,6 +385,7 @@ isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStra
 --defining ideal of Y = im
 --list of elements = bm
 isBirationalMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
+    if (o.Verbose) then (print "Starting isBirationalMap" );
     R:=ring di;
     S:=ring im;
     im1 := im;
@@ -432,6 +433,7 @@ isBirationalOntoImageRees := method(Options => {AssumeDominant=>false,  Strategy
 
 --*****************************Strategies
 isBirationalOntoImage(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
+    if (o.Verbose) then (print "Starting isBirationalOntoImage" );
     if ((o.Strategy == ReesStrategy) or (o.Strategy == SaturationStrategy)) then (        
         isBirationalOntoImageRees(di,im,bm, AssumeDominant=>o.AssumeDominant,  Strategy=>o.Strategy,Verbose=>o.Verbose)
     )
@@ -636,7 +638,7 @@ if isSameDegree(bm)==false then error "Expected a list of homogenous elements of
 --find a full rank minor of a matrix (of a specified size), tries minorCount times
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-nonZeroMinor =method(Options => {Verbose=>true});
+nonZeroMinor :=method(Options => {Verbose=>true});
 nonZeroMinor(Matrix,ZZ,ZZ):=o->(M,ra,minorCount)->(
     if (o.Verbose == true) then print("Starting nonZeroMinor, looking for rank: " | ra | ", we will run it " | minorCount | " times.  If this is slow, rerun with MinorsCount=>0.");
     cc:=numColumns(M);
@@ -2252,7 +2254,7 @@ TEST /// --test #25 (Frobenius on an elliptic curve)
     assert(isBirationalMap(h) == false)
 ///                        
 	-------------------------------------
-	----- inverseOfMap  -----------------
+	----- Tests for inverseOfMap  -------
 	-------------------------------------
 
 TEST /// --test #26
@@ -2264,14 +2266,15 @@ TEST /// --test #26
     M = matrix{{a,b,c},{d,e,f}}
     blowUpSubvar = P5/(minors(2, M)+ideal(b - d))
     h = map(blowUpSubvar, QQ[x,y,z],{a, b, c})
-    assert(baseLocusOfMap(inverseOfMap(h)) == ideal(x,y)) 
+    assert( (baseLocusOfMap(inverseOfMap(h)) == ideal(x,y)) and (baseLocusOfMap(inverseOfMap(h, Strategy=>ReesStrategy)) == ideal(x,y)) ) 
 ///
 
 TEST /// --test #27
     R =  QQ[a..d]/(a*d - b*c);
     S = QQ[x,y,z];
     f = inverseOfMap(R, S, {a,b,c});
-    assert(isSameMap(first entries matrix f, {x^2, x*y, x*z, y*z}))
+    g = inverseOfMap(R, S, {a,b,c},Strategy=>ReesStrategy);
+    assert( (isSameMap(first entries matrix f, {x^2, x*y, x*z, y*z})) and (isSameMap(first entries matrix g, {x^2, x*y, x*z, y*z})) )
 /// 
 
 TEST /// --test #28 (quadratic cremona)
@@ -2279,7 +2282,8 @@ TEST /// --test #28 (quadratic cremona)
     S = ZZ/11[a,b,c];
     h = map(R, S, {y*z, x*z, x*y});
     g = inverseOfMap(h,AssumeDominant=>true);
-    assert(isSameMap(first entries matrix g, {b*c, a*c, a*b}))
+    f = inverseOfMap(h,AssumeDominant=>true, Strategy=>ReesStrategy);
+    assert( (isSameMap(first entries matrix g, {b*c, a*c, a*b})) and (isSameMap(first entries matrix f, {b*c, a*c, a*b})) )
 ///
 
 -----------------------------------
