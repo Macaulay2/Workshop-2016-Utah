@@ -1,5 +1,5 @@
 newPackage( "RationalMaps",
-Version => "0.2", Date => "May 28th, 2016", Authors => {
+Version => "0.2", Date => "June 10th, 2016", Authors => {
      {Name => "Karl Schwede",
      Email=> "kschwede@gmail.com",
      HomePage=> "http://www.math.utah.edu/~schwede"
@@ -1184,9 +1184,9 @@ document {
 	     source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer. 
 	      In some cases, the speed of the latter  is comparable with ", TO "isBirationalMap", " with ", TT   "AssumeDominant=>true." },
         {TO "invertBirMap", " gives a  fast computation of the inverse of a birational map if the source is projective space ", EM " and ",
-	     "the map has maximal linear rank.  If you pass this function a map not from projective space, then it calls ",
-	      TO "invertBirationalMap", " from ", TO "Parametrization", ".  In some cases, our function ", TO "inverseOfMap",
-	       " appears to be competitive however."},
+	     "the map has maximal linear rank.   In some cases, our function ", TO "inverseOfMap",
+	       " appears to be competitive however.  If you pass invertBirMap a map not from projective space, then it calls ",
+	      TO "invertBirationalMap", " from ", TO "Parametrization", "."},
     },
 }
 
@@ -2350,7 +2350,7 @@ TEST /// --test #33, maps between cones over elliptic curves and their blowups
 ///
 ----Version information----
 --0.1  First version.
---0.2  Substantial improvements in speed.
+--0.2  Substantial improvements in speed and documentation.
 
 ----FUTURE PLANS------
 --1.  Handle multi-graded rings (multi-graded maps etc.)
