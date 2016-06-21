@@ -74,7 +74,7 @@ tauAOverPEMinus1Poly = ( f, a, e ) ->
      I*ideal(f^k)
 )
 
---a slightly faster tauPoly
+--Computes the test ideal of (R, f^t), where t is rational and R is a polynomial ring. 
 tauPoly = ( f, t ) -> 
 (
      R := ring f; 
@@ -101,26 +101,9 @@ tauPoly = ( f, t ) ->
 --Inputs are Jk, a nonzero ideal contained in the test ideal
 --hk, the multiple used to form phi of the ambient ring.  ek is the power associated with hk
 --a1 and e1 and fm are as above
-tauAOverPEMinus1QGorAmbOld = (Sk, Jk, hk, ek, fm, a1, e1) -> (
-     pp := char Sk;
-     et := lcm(ek, e1);
-     hk1 := (hk)^(numerator ((pp^et - 1)/(pp^ek - 1)));  
-       --hk for higher powers are simply appropriate powers of hk for lower powers, 
-       --may as well take advantage of that
-     a3 := numerator (a1*(pp^et - 1)/(pp^e1 - 1)); --we need to use a common e for both the 
-                                               --index of R and of our divisor.
-     
-     a2 := a3 % (pp^et - 1);
-     k2 := a3 // (pp^et - 1); --it seems faster to use the fact 
-                              --that tau(f^(1+k)) = f*tau(f^k) 
-     fpow := fm^a2; 
-     
-     Iasc := ascendIdeal(et, fpow*hk1, Jk*ideal(fm) );
-    
-     Iasc*ideal(fm^k2)
-)
 
-tauAOverPEMinus1QGorAmb = (Sk, Jk, hk, ek, fm, a1, e1) -> (
+tauAOverPEMinus1QGorAmb = (Sk, Jk, hk, ek, fm, a1, e1) -> 
+(
      pp := char Sk;
      et := lcm(ek, e1);
      
@@ -143,7 +126,8 @@ tauAOverPEMinus1QGorAmb = (Sk, Jk, hk, ek, fm, a1, e1) -> (
 
 --Computes the test ideal of (Rk, fk^t1).  Here we assume the index of the canonical
 --divides (p^ek - 1)
-tauQGor = (Rk, ek, fk, t1) -> (
+tauQGor = (Rk, ek, fk, t1) -> 
+(
      Sk := ambient Rk;
      pp := char Sk;
      L1 := divideFraction(pp,t1); --this breaks up t1 into the pieces we need
@@ -195,7 +179,7 @@ tauQGor = (Rk, ek, fk, t1) -> (
 )
 
 --Computes tau(Rk,fk^tk), assuming Gorenstein rings
-tauGor = (Rg,fg,tg) -> tauQGor (Rg,1,fg,tg)
+tauGor = ( R, f, t ) -> tauQGor( R, 1, f, t )
 
 
 ----------------------------------------------------------------
@@ -204,15 +188,15 @@ tauGor = (Rg,fg,tg) -> tauQGor (Rg,1,fg,tg)
 --************************************************************--
 ----------------------------------------------------------------
 
-flattenedReesAlgebra = (I1) -> (--takes an ideal, forms the rees algebra, and returns the rees algebra in two ways, first with flattened variables and the second without
-	S1 := reesAlgebra I1;
+--takes an ideal, forms the rees algebra, and returns the rees algebra in two ways, first with flattened variables and the second without
+flattenedReesAlgebra = I -> 
+(
+	S1 := reesAlgebra I;
 	J1 := ideal S1;
 	tempMonoid := S1.FlatMonoid;
-	k1 := coefficientRing (ring I1);
-	S2 := k1 tempMonoid;
-	
-	J2 := sub(J1, S2);
-	
+	k := coefficientRing (ring I);
+	S2 := k tempMonoid;
+	J2 := sub(J1, S2);	
 	(S2/J2, S1)
 )
 
