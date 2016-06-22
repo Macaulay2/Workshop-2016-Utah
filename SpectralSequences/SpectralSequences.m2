@@ -198,6 +198,36 @@ truncate(ChainComplex,ZZ):= (C,q) ->(
 	       	     else K.dd_i = map(0*C_(i-1), C_i, 0*C.dd_i) )); 		
      K)
 
+
+-- the following relies on the pushFwd method from the package "PushForward.m2"
+
+pushFwd(RingMap,ChainComplex):=o->(f,C) ->
+(    pushFwdC := chainComplex(source f);
+     maps := apply(spots C, i-> (i,pushFwd(f,C.dd_i)));
+     for i from min C to max C do (
+	 pushFwdC.dd_(maps#i_0) = maps#i_1 
+	 );
+    pushFwdC
+    )
+
+
+-- New method for tensor that returns the tensor product of a complex via a ring map
+tensor(RingMap,ChainComplex) := ChainComplex => 
+ opts -> (f,C) -> (
+         k := min C; 
+    D := chainComplex(
+	if even(k) then apply(
+	    drop(select(keys complete C, 
+	    	i -> instance(i,ZZ)),1), 
+	    j -> f ** C.dd_j)
+	else apply(
+	    drop(select(keys complete C, 
+	    	i -> instance(i,ZZ)),1), 
+	    j -> (-1) * (f ** C.dd_j)));
+    D[-k]
+    )
+
+
 ----------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------
@@ -971,17 +1001,6 @@ associatedGradedHomologyObject(ZZ,ZZ,FilteredComplex) := (p,n,K) -> (
 -----------------------------------------------------------
 -----------------------------------------------------------
 -- change of rings --
--- the following relies on the pushFwd method from the package "PushForward.m2"
-
-pushFwd(RingMap,ChainComplex):=o->(f,C) ->
-(    pushFwdC := chainComplex(source f);
-     maps := apply(spots C, i-> (i,pushFwd(f,C.dd_i)));
-     for i from min C to max C do (
-	 pushFwdC.dd_(maps#i_0) = maps#i_1 
-	 );
-    pushFwdC
-    )
-
 
 --Compute change of rings for Tor
 
@@ -996,44 +1015,9 @@ changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
     (E,EE) 
 )
 
--- old change of rings --
---pushFwdChainComplex = method()
---pushFwdChainComplex(ChainComplex,RingMap) := (C,f) -> (
---    D := new ChainComplex;
---    D.ring = source f;
---    for i from min C to max C do
---    D.dd _i = pushFwd(C.dd_i,f);    
---    D
---    )
-
--- changeOfRingsTor = method()
--- changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
---    -- f : R --> S, N an S module, M an R module
---    F := complete res N;
---    FR := pushFwdChainComplex(F,f);
---    G := complete res M;
---    spectralSequence((G) ** (filteredComplex FR) )
---    )
-
 -----------------------------------------------------------
 -----------------------------------------------------------
 
-
--- New method for tensor that returns the tensor product of a complex via a ring map
-tensor(RingMap,ChainComplex) := ChainComplex => 
- opts -> (f,C) -> (
-         k := min C; 
-    D := chainComplex(
-	if even(k) then apply(
-	    drop(select(keys complete C, 
-	    	i -> instance(i,ZZ)),1), 
-	    j -> f ** C.dd_j)
-	else apply(
-	    drop(select(keys complete C, 
-	    	i -> instance(i,ZZ)),1), 
-	    j -> (-1) * (f ** C.dd_j)));
-    D[-k]
-    )
 
 
 beginDocumentation()
