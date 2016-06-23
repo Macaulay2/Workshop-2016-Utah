@@ -138,7 +138,10 @@ ethRootMonStrat = (e,p,q,k,f,R) -> (
     expDecomp := apply(exponents(f),exponent->{coefficient(R_exponent,f)*R_(exponent //p^e),exponent%p^e});
     --Gets the exponent vectors of each monomial X^u of the polynomial f, and associates to u the two-element list whose
     --first entry is cX^v and second entry is w, where c is the coefficient of X^u in f and u = p^e*v + w. 
-    if q > p then expDecomp = apply(expDecomp, pair -> {substitute(pair#0,(gens k)#0 => getFieldGenRoot(e,p,q,k)),pair#1});
+    if q > p then (
+	substRule := ( (gens k)#0 => getFieldGenRoot(e,p,q,k) );
+	expDecomp = apply( expDecomp, pair -> { substitute( pair#0, substRule ), pair#1 } );
+    );
     remainders := partition(x-> x#1, expDecomp);
     --Sorts the preceding list of two-element lists into a hash table with keys the remainder w of the exponent vector.
     --The value of each key is a list of two-element lists {cX^v,w} with the same remainder.

@@ -68,7 +68,7 @@ export {
    "pageMap", 
    "page" ,
   "prunningMaps", "edgeComplex",
-  "filteredHomologyObject", "associatedGradedHomologyObject", "netPage" 
+  "filteredHomologyObject", "associatedGradedHomologyObject", "netPage", "changeOfRingsTor" 
   }
 
 
@@ -197,6 +197,36 @@ truncate(ChainComplex,ZZ):= (C,q) ->(
 	       	     else if i < q + m then K.dd_i = inducedMap(0*C_(i-1),0*C_i,C.dd_i)
 	       	     else K.dd_i = map(0*C_(i-1), C_i, 0*C.dd_i) )); 		
      K)
+
+
+-- the following relies on the pushFwd method from the package "PushForward.m2"
+
+pushFwd(RingMap,ChainComplex):=o->(f,C) ->
+(    pushFwdC := chainComplex(source f);
+     maps := apply(spots C, i-> (i,pushFwd(f,C.dd_i)));
+     for i from min C to max C do (
+	 pushFwdC.dd_(maps#i_0) = maps#i_1 
+	 );
+    pushFwdC
+    )
+
+
+-- New method for tensor that returns the tensor product of a complex via a ring map
+tensor(RingMap,ChainComplex) := ChainComplex => 
+ opts -> (f,C) -> (
+         k := min C; 
+    D := chainComplex(
+	if even(k) then apply(
+	    drop(select(keys complete C, 
+	    	i -> instance(i,ZZ)),1), 
+	    j -> f ** C.dd_j)
+	else apply(
+	    drop(select(keys complete C, 
+	    	i -> instance(i,ZZ)),1), 
+	    j -> (-1) * (f ** C.dd_j)));
+    D[-k]
+    )
+
 
 ----------------------------------------------------------------------------------
 
@@ -463,7 +493,7 @@ yComplex := (T,n) ->
     )
 
 
--- experimental I-adic filtration code --
+-- I-adic filtration code --
 -- the following script allows us to multiply a chain complex by an ideal
 Ideal * ChainComplex := ChainComplex => (I,C) -> (
     D := new ChainComplex;
@@ -931,7 +961,6 @@ basis (List,SpectralSequencePage) := opts -> (deg,E) -> (
     )
 --
 --
--- Some more experimental code --
 --
 -- Can we write a short script in general to compute the edge complex?
 -- Ans: yes.
@@ -971,45 +1000,24 @@ associatedGradedHomologyObject(ZZ,ZZ,FilteredComplex) := (p,n,K) -> (
 
 -----------------------------------------------------------
 -----------------------------------------------------------
--- change of rings scratch experimental code --
+-- change of rings --
 
---pushFwdChainComplex = method()
---pushFwdChainComplex(ChainComplex,RingMap) := (C,f) -> (
---    D := new ChainComplex;
---    D.ring = source f;
---    for i from min C to max C do
---    D.dd _i = pushFwd(C.dd_i,f);    
---    D
---    )
+--Compute change of rings for Tor
 
--- changeOfRingsTor = method()
--- changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
---    -- f : R --> S, N an S module, M an R module
---    F := complete res N;
---    FR := pushFwdChainComplex(F,f);
---    G := complete res M;
---    spectralSequence((G) ** (filteredComplex FR) )
---    )
+changeOfRingsTor = method()
+changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
+    -- f : R --> S a finite ring map, N an S module, M an R module
+    F := complete res N;
+    pushFwdF := pushFwd(f,F);
+    G := complete res M;
+    E := spectralSequence(filteredComplex(G)** pushFwdF);
+    EE := spectralSequence((G) ** (filteredComplex pushFwdF));
+    (E,EE) 
+)
 
 -----------------------------------------------------------
 -----------------------------------------------------------
 
-
--- New method for tensor that returns the tensor product of a complex via a ring map
-tensor(RingMap,ChainComplex) := ChainComplex => 
- opts -> (f,C) -> (
-         k := min C; 
-    D := chainComplex(
-	if even(k) then apply(
-	    drop(select(keys complete C, 
-	    	i -> instance(i,ZZ)),1), 
-	    j -> f ** C.dd_j)
-	else apply(
-	    drop(select(keys complete C, 
-	    	i -> instance(i,ZZ)),1), 
-	    j -> (-1) * (f ** C.dd_j)));
-    D[-k]
-    )
 
 
 beginDocumentation()
@@ -2313,9 +2321,44 @@ doc ///
 	 SpectralSequencePageMap
 	 "Examples of filtered complexes and spectral sequences"   
      ///
- 
 
-
+doc ///
+     Key
+       changeOfRingsTor
+     Headline
+         compute the change of rings spectral sequence
+     Usage
+          E = changeOfRingsTor(M,N,f)
+     Inputs
+     	 M:Module
+	 N:Module
+	 f:RingMap
+     Outputs
+     	  E:Sequence
+     Description
+          Text
+	       This method computes the change of ring spectral sequence for a finite ring map.
+	  Example
+	       k=QQ;
+	       R=k[a,b,c];
+	       S=k[s,t];
+	       f = map(S,R,{s^2,s*t,t^2});
+	       kappa = coker vars S;
+	       kkappa = coker vars R;
+	       (E,EE) = changeOfRingsTor(kkappa,kappa,f);
+	       e = prune E
+	       ee = prune EE
+	       e^0
+	       e^1
+	       e^2
+	       e^infinity
+	       ee^0
+	       ee^1
+	       ee^2
+	       (ee^2).dd
+	       ee^3
+	       ee^infinity   	      
+     ///
 
 doc ///
     	  Key
