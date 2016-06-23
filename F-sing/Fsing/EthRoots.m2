@@ -304,11 +304,16 @@ smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
 
     tripleList = sort apply(minGensLog, idealList, exponentList, (a,b,c) -> {a,b,c});
 
-    j := 0;
 
     R := ring(idealList#0);
     answer :=  ideal(1_R);
+    p := char(R);
+
+    for i from 0 to length(idealList) - 1 do (
+        answer = answer*(idealList#j)^(exponentList#j - p^minGensLog#j)
+    );
     
+    j := 0;
     for i from 0 to e do (
         if i == tripleList#j#0 then (
             answer = answer*
