@@ -1468,6 +1468,57 @@ doc ///
 		prune HH K_infinity
 ///
 
+  doc ///
+    Key
+      "A spectral sequence with nonzero maps on every page."
+   -- Headline
+     --	  nonzero maps on higher page numbers
+    Description
+    	  Text
+	       Here we give an example of a spectral sequence that takes n+2 steps to degenerate, where
+	       n is the embedding dimesion of the ring.  We present this when n = 2 but the user with 
+	       computational power can easily do a bigger case. 	       
+     	  Example
+    	       S = ZZ/101[x,y];
+	       I = ideal(x^2,x*y,y^2);
+	       R = S/I;
+	       kR = coker vars R;
+	       kS = coker vars S;
+	       CS = res kS;
+	       CR = res(kR,LengthLimit=>6);
+	       CS' = CS**R;
+	       E = prune spectralSequence (CS' ** filteredComplex CR);
+    	  Text
+	       Since this spectral sequence only consists of $k$ vector spaces, and all are generated
+	       in a single degree, for ease of presentation we may as well just look at the rank and degree
+	       which we can easily encode in a matrix with $rt^d$ encoding the rank $r$ and degree $d$ of each
+	       vector space $E_{i,j}$.
+    	  Example
+               use ZZ[t]
+    	       easyPresentation = (P,n,m) -> (
+		  transpose matrix apply(n, 
+		      i-> apply(m, 
+			  j-> (rank (P_{i,j}))*t^(
+			      if (L = unique flatten degrees P_{i,j})!= {} then first L else 0)
+			  )
+		      ));
+          Text
+	       To see what we're going for, we compute the E_infinity page and also some earlier pages.  
+	       Notice that it's clear that all terms except those in the top row of the matrix must eventually
+	       disappear, but for this to happen, there must a map of the right degree mapping to them.
+          Example	       
+	       easyPresentation(E_infinity,6,3)
+	       easyPresentation(E_1,6,3)
+	       easyPresentation(E_2,6,3)
+	       easyPresentation(E_3,6,3)
+	       easyPresentation(E_4,6,3)
+	       rank (E_2).dd_{3,0}
+	       rank (E_3).dd_{3,0}
+	  Text 
+	       The final two computations are meant to explain that the copy of $k^8$ in degree 3 that 
+	       appears on the $E_1$ cancels with an E_2 map from E_2_{0,1} and with an E_3 map from E_3_{0,2}
+///
+
  doc ///
     Key
       --"The quotient map SS ^2 --> RR PP ^2"-- maybe better to call this 
@@ -2344,7 +2395,7 @@ doc ///
 	       S=k[s,t];
 	       f = map(S,R,{s^2,s*t,t^2});
 	       kappa = coker vars S;
-	       kkappa = coker vars R;
+	       kkappa = coker vars R
 	       (E,EE) = changeOfRingsTor(kkappa,kappa,f);
 	       e = prune E
 	       ee = prune EE
