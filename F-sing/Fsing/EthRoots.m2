@@ -293,38 +293,38 @@ fancyEthRoot = (e,m,I) ->
 --it will take 
 smartEthRoot = method();
 
-smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
---the idealList, can take a list of ideals, a list of elements, or a mix of lists of ideals or elements
-    -- make a list of the number of generators of each ideal in idealList
-    minGensList = apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
-
-    -- see what's the biggest power of p smaller than a/m where 'a' is in exponentList
-    -- and m is in minGensList. I.e. we want to find the largest e such that a >= mp^e
-    minGensLog = apply(minGensList, exponentList, (mm, aa) -> (
-        n = floorLog(p, aa//mm);
-        if (n > e) then e else n
-    ));
-
-    tripleList = sort apply(minGensLog, idealList, exponentList, (a,b,c) -> {a,b,c});
-
-
-    R := ring(idealList#0);
-    answer :=  ideal(1_R);
-    p := char(R);
-
-    for i from 0 to length(idealList) - 1 do (
-        answer = answer*(idealList#j)^(exponentList#j - p^minGensLog#j)
-    );
-    
-    j := 0;
-    for i from 0 to e do (
-        if i == tripleList#j#0 then (
-            answer = answer*
-            j = j+1;
-        );
-    );
-
-);
+--smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
+----the idealList, can take a list of ideals, a list of elements, or a mix of lists of ideals or elements
+--    -- make a list of the number of generators of each ideal in idealList
+--    minGensList = apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
+--
+--    -- see what's the biggest power of p smaller than a/m where 'a' is in exponentList
+--    -- and m is in minGensList. I.e. we want to find the largest e such that a >= mp^e
+--    minGensLog = apply(minGensList, exponentList, (mm, aa) -> (
+--        n = floorLog(p, aa//mm);
+--        if (n > e) then e else n
+--    ));
+--
+--    tripleList = sort apply(minGensLog, idealList, exponentList, (a,b,c) -> {a,b,c});
+--
+--
+--    R := ring(idealList#0);
+--    answer :=  ideal(1_R);
+--    p := char(R);
+--
+--    for i from 0 to length(idealList) - 1 do (
+--        answer = answer*(idealList#j)^(exponentList#j - p^minGensLog#j)
+--    );
+--    
+--    j := 0;
+--    for i from 0 to e do (
+--        if i == tripleList#j#0 then (
+--            answer = answer*
+--            j = j+1;
+--        );
+--    );
+--
+--);
 
 --this function is the same as the above, it just explicitly adds J to the end of the ideal list and 1 to the end of the exponent list
 smartEthRoot( ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
@@ -338,10 +338,13 @@ smartEthRoot( ZZ, ZZ, RingElement ) := ( e, a, f ) -> smartEthRoot(e, {a}, {f});
 smartEthRoot( ZZ, ZZ, Ideal ) := ( e, m, I ) -> fancyEthRoot( e, {m}, {I} );
 
 -- this a slow but easy to write implementation of smartEthRoot
-smartEthRootRecursive = method();
-smartEthRootRecursive(ZZ, List, List) := (e, exponentList, idealList) -> (
+smartEthRoot= method();
+smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
+    --include the following line to set a break point: 
+    --error "break here";
+    I := null;
     if e == 0 then (
-        I := idealList#0^(exponentList#0);
+        I = idealList#0^(exponentList#0);
         for j from 1 to length(idealList) - 1 do I = I*(idealList#j)^(exponentList#j);
         return I;
     );
@@ -350,13 +353,16 @@ smartEthRootRecursive(ZZ, List, List) := (e, exponentList, idealList) -> (
     p := char(R);
     minGensList = apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
 
-    nsList = apply(exponentList, minGensList, (mm, aa) -> (
+    -- find max n such that a - (n-1)p > m*p. This is the number of copies of $I$ we can
+    -- move outside the pth root. 
+
+    nsList = apply(exponentList, minGensList, (aa, mm) -> (
        max(0, floor(aa/p - mm + 1)) 
     ));
-    I := R;
+    I = R;
     for j from 0 to length(idealList) - 1 do I = I*(idealList#j)^(exponentList#j - nsList#j * p);
     I = ethRoot(1, I);
-    smartEthRootRecursive(e - 1, append(nsList, 1), append(idealList, I))
+    smartEthRoot(e - 1, append(nsList, 1), append(idealList, I))
 );
 
 
