@@ -74,9 +74,9 @@ ethRoot ( ZZ, Ideal ) := Ideal => opts -> (e,I) -> (
     --Produces a list of the generators of I.
     if #G == 0 then ideal(0_R) 
     else if opts.EthRootStrategy == MonomialBasis then (
-	L := sum( apply( G, f -> ethRootMonStrat(e,p,q,k,f,R) ) );
-	L = first entries mingens L;
-	ideal(L)
+	    L := sum( apply( G, f -> ethRootMonStrat(e,p,q,k,f,R) ) );
+    	L = first entries mingens L;
+	    ideal(L)
 	)
     else ethRootSubStrat(e,p,q,k,I,R)  
 )
@@ -378,6 +378,31 @@ smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
 --Jk is the given ideal, ek is the power of Frobenius to use, hk is the function to multiply 
 --trace by to give phi:  phi(_) = Tr^(ek)(hk._)
 --This is based on ideas of Moty Katzman, and his star closure
+
+--this is a new ascendIdeal written by Karl.  It ascends but does it in a possibly non-polynomial ring.  Probably it should replace the old version eventually.
+ascendIdealNew = method(Options => {EthRootStrategy => Substitution});
+
+ascendIdealNew(ZZ, RingElement, Ideal) := o->(ek, hk, Jk) -> (
+    Rk := ring Jk;
+    Ik := ideal Rk;
+    Sk := ambient Rk;
+    
+    pp := char Sk;
+    IN := sub(Jk, Sk);
+    IP := ideal(0_Sk);
+     --we want to make the largest ideal that is phi-stable, following Moty Katzman's idea
+     --we do the following
+    while (isSubset(IN+Ik, IP+Ik) == false) do(
+        print "Step";
+        IP = IN;
+        IN = ethRoot(ek,ideal(hk)*IP, EthRootStrategy => o.EthRootStrategy)+IP
+    );
+
+    --trim the output
+    trim IP
+)
+
+
 ascendIdeal = (ek, hk, Jk) -> (
      Sk := ring Jk;
      pp := char Sk;
@@ -388,7 +413,7 @@ ascendIdeal = (ek, hk, Jk) -> (
      while (isSubset(IN, IP) == false) do(
      	  IP = IN;
 --	  error "help";
-	  IN = ethRoot(ek,ideal(hk)*IP)+IP
+	  IN = ethRoot(ek,ideal(hk)*IP, EthRootStrategy => MonomialBasis)+IP
      );
 
      --trim the output
@@ -404,7 +429,7 @@ ascendIdealSafe = ( ak, ek, hk, Jk) -> (
      --we want to make the largest ideal that is phi-stable, following Moty Katzman's idea
      --we do the following
      while (isSubset(IN, IP) == false) do(
-     	  IP = IN;
+        IP = IN;
 --	  error "help";
 	  	IN = ethRootSafe( ek, ak, hk, IP )+IP
      );
