@@ -380,9 +380,9 @@ smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
 --This is based on ideas of Moty Katzman, and his star closure
 
 --this is a new ascendIdeal written by Karl.  It ascends but does it in a possibly non-polynomial ring.  Probably it should replace the old version eventually.
-ascendIdealNew = method(Options => {EthRootStrategy => Substitution});
+ascendIdeal = method(Options => {EthRootStrategy => Substitution});
 
-ascendIdealNew(ZZ, RingElement, Ideal) := o->(ek, hk, Jk) -> (
+ascendIdeal(ZZ, RingElement, Ideal) := o->(ek, hk, Jk) -> (
     Rk := ring Jk;
     Ik := ideal Rk;
     Sk := ambient Rk;
@@ -393,7 +393,7 @@ ascendIdealNew(ZZ, RingElement, Ideal) := o->(ek, hk, Jk) -> (
      --we want to make the largest ideal that is phi-stable, following Moty Katzman's idea
      --we do the following
     while (isSubset(IN+Ik, IP+Ik) == false) do(
-        print "Step";
+        --print "Step";
         IP = IN;
         IN = ethRoot(ek,ideal(hk)*IP, EthRootStrategy => o.EthRootStrategy)+IP
     );
@@ -403,7 +403,7 @@ ascendIdealNew(ZZ, RingElement, Ideal) := o->(ek, hk, Jk) -> (
 )
 
 
-ascendIdeal = (ek, hk, Jk) -> (
+ascendIdealOld = (ek, hk, Jk) -> (
      Sk := ring Jk;
      pp := char Sk;
      IN := Jk;

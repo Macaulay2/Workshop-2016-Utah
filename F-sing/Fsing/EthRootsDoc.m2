@@ -2,9 +2,9 @@ doc ///
     Key
         ascendIdeal
     Headline
-        Finds the smallest phi-stable ideal containing a given ideal in a polynomial ring.
+        Finds the smallest phi-stable ideal containing a given ideal in a quotient of a polynomial ring.
     Usage
-        ascendIdeal(J, h, e)
+        ascendIdeal(e, h, J)
     Inputs
         J:Ideal 
         h:RingElement
@@ -13,7 +13,7 @@ doc ///
         :Ideal
     Description
         Text
-            Let phi be the p^(-e) linear map obtained by multiplying e-th Frobenius trace by h.  Then this function finds the smallest phi-stable ideal containing J.  The idea is to consider the ascending chain J, J+phi(J), J+phi(J)+phi^2(J), etc.  We return the stable value.  For instance, this can be used to compute the test ideal.  This method appared first in the work of Mordechai Katzman on star closure.
+            Let phi be the p^(-e) linear map obtained by multiplying e-th Frobenius trace by h.  Then this function finds the smallest phi-stable ideal containing J.  The idea is to consider the ascending chain J, J+phi(J), J+phi(J)+phi^2(J), etc.  We return the stable value.  For instance, this can be used to compute the test ideal.  Note if the ideal J is not an ideal in a polynomial ring, the function will do the computation with e-th Frobenius trace in the ambient polynomial ring, but will do the comparison inside the quotient ring (to see if we are done).  This method appared first in the work of Mordechai Katzman on star closure.  
 ///
 
 doc ///
