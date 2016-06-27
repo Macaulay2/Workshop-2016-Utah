@@ -1010,8 +1010,8 @@ changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
     F := complete res N;
     pushFwdF := pushFwd(f,F);
     G := complete res M;
-    E := spectralSequence(filteredComplex(G)** pushFwdF);
-    EE := spectralSequence((G) ** (filteredComplex pushFwdF));
+    E := spectralSequence(filteredComplex(G) ** pushFwdF);
+    EE := spectralSequence(G ** (filteredComplex pushFwdF));
     (E,EE) 
 )
 
@@ -2395,7 +2395,7 @@ doc ///
 	       S=k[s,t];
 	       f = map(S,R,{s^2,s*t,t^2});
 	       kappa = coker vars S;
-	       kkappa = coker vars R
+	       kkappa = coker vars R;
 	       (E,EE) = changeOfRingsTor(kkappa,kappa,f);
 	       e = prune E
 	       ee = prune EE
