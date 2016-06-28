@@ -1507,11 +1507,11 @@ doc ///
 	       Notice that it's clear that all terms except those in the top row of the matrix must eventually
 	       disappear, but for this to happen, there must a map of the right degree mapping to them.
           Example	       
-	       easyPresentation(E_infinity,6,3)
-	       easyPresentation(E_1,6,3)
-	       easyPresentation(E_2,6,3)
-	       easyPresentation(E_3,6,3)
-	       easyPresentation(E_4,6,3)
+--	       easyPresentation(E_infinity,6,3)
+--	       easyPresentation(E_1,6,3)
+--	       easyPresentation(E_2,6,3)
+--	       easyPresentation(E_3,6,3)
+--	       easyPresentation(E_4,6,3)
 	       rank (E_2).dd_{3,0}
 	       rank (E_3).dd_{3,0}
 	  Text 
