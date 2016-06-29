@@ -1035,7 +1035,7 @@ undocumented {page, --prunningMaps,-- PageMap, --spots,
     (symbol _, PageMap, List),
     (ring, Page),
     (spectralSequencePageMap, FilteredComplex, ZZ),
-    (spots, FilteredComplex),
+  --  (spots, FilteredComplex),
     (spots, PageMap),
  --   (spots, SpectralSequencePageMap),
     (support, SpectralSequencePage),
@@ -2269,6 +2269,24 @@ doc ///
 	  Description
 	       Text
 	       	   Returns a list of all the spots where the given chain complex has a module.
+    	  SeeAlso
+	      		      
+///
+
+doc ///
+          Key
+       	   (spots, FilteredComplex)
+          Headline
+	       which spots does the given filtered complex has a module.
+     	  Usage
+	       s = spots L
+	  Inputs
+	       L:FilteredComplex   	  
+	  Outputs
+	       s:List
+	  Description
+	       Text
+	       	   Returns a list of all the spots where the given filtered complex has a module.
     	  SeeAlso
 	      		      
 ///
