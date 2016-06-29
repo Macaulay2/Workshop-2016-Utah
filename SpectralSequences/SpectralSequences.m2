@@ -1038,19 +1038,13 @@ undocumented {page,
     (support, SpectralSequencePage),
    ReducedHomology, sourcePruningMap, targetPruningMap,
    pageMap,
-      (describe, SpectralSequence),
-      (describe, SpectralSequencePage),
-      (describe, SpectralSequencePageMap),
       ErMaps,
       (ErMaps,FilteredComplex, ZZ, ZZ, ZZ),
---      (support, Page),
       (support, PageMap),
       (page,List, List, Page),
    (expression, SpectralSequence),
    spectralSequencePageMap,
    Shift,
-   (describe, Page),
-   (describe, PageMap),
    (support, FilteredComplex)
     }
 
@@ -2114,6 +2108,23 @@ doc ///
 
 
 doc ///
+          Key
+       	   (describe, SpectralSequence)
+          Headline
+	       real description
+     	  Usage
+	       describe S
+	  Description
+	       Text
+	       	   see describe
+    	  SeeAlso
+	      	describe	      
+///
+
+
+
+
+doc ///
      Key
      	  SpectralSequencePage
      Headline
@@ -2156,6 +2167,24 @@ doc ///
 ///	       
 
 
+
+doc ///
+          Key
+       	   (describe, SpectralSequencePage)
+          Headline
+	       real description
+     	  Usage
+	       describe S
+	  Description
+	       Text
+	       	   see describe
+    	  SeeAlso
+	      	describe	      
+///
+
+
+
+
 doc ///
      Key
      	  SpectralSequencePageMap
@@ -2188,6 +2217,21 @@ doc ///
 
 
 doc ///
+          Key
+       	   (describe, SpectralSequencePageMap)
+          Headline
+	       real description
+     	  Usage
+	       describe S
+	  Description
+	       Text
+	       	   see describe
+    	  SeeAlso
+	      	describe	      
+///
+
+
+doc ///
      Key
      	  Page
      Headline
@@ -2214,6 +2258,22 @@ doc ///
        (symbol ^, SpectralSequence, InfiniteNumber)
        (symbol _, SpectralSequence, InfiniteNumber)	       
 ///	       
+
+
+
+doc ///
+          Key
+       	   (describe, Page)
+          Headline
+	       real description
+     	  Usage
+	       describe S
+	  Description
+	       Text
+	       	   see describe
+    	  SeeAlso
+	      	describe	      
+///
 
 
 doc ///

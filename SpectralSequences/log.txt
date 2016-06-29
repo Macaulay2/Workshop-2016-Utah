@@ -16,3 +16,7 @@
 (min, FilteredComplex)
 (max, FilteredComplex)
 (support, Page)
+(describe, Page)
+(describe, SpectralSequence)
+(describe, SpectralSequencePage)
+(describe, SpectralSequencePageMap)
