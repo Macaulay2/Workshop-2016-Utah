@@ -1038,12 +1038,12 @@ undocumented {page,
     (support, SpectralSequencePage),
    ReducedHomology, sourcePruningMap, targetPruningMap,
    pageMap,
-   (describe, SpectralSequence),
-   (describe, SpectralSequencePage),
+      (describe, SpectralSequence),
+      (describe, SpectralSequencePage),
       (describe, SpectralSequencePageMap),
       ErMaps,
       (ErMaps,FilteredComplex, ZZ, ZZ, ZZ),
-      (support, Page),
+--      (support, Page),
       (support, PageMap),
       (page,List, List, Page),
    (expression, SpectralSequence),
@@ -2230,6 +2230,25 @@ doc ///
 	  Description
 	       Text
 	       	   Returns a list of all the spots where the given page has a module.
+    	  SeeAlso
+	      		      
+///
+
+
+doc ///
+          Key
+       	   (support, Page)
+          Headline
+	       which non-zero modules appear in the given page.
+     	  Usage
+	       l = support P
+	  Inputs
+	       P:Page	  
+	  Outputs
+	       l:List 
+	  Description
+	       Text
+	       	   Returns a list of all the non-zero modules appearing in the given page has a module.
     	  SeeAlso
 	      		      
 ///
