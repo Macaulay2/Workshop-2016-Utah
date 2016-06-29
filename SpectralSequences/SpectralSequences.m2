@@ -1338,7 +1338,8 @@ doc ///
 	     E'' ^1 .dd	      
      SeeAlso   
 	  "Balancing Tor"	     
-///     
+///  
+   
 doc ///
      Key
         "How to make filtered complexes from chain complex maps"
@@ -1410,7 +1411,7 @@ doc ///
 -- Examples
 ---
 
-  doc ///
+doc ///
     Key
       "A spectral sequence which fails to degenerate quickly"
    -- Headline
@@ -1468,9 +1469,9 @@ doc ///
 		prune HH K_infinity
 ///
 
-  doc ///
+doc ///
     Key
-      "A spectral sequence with nonzero maps on every page."
+      "A spectral sequence with nonzero maps on every page"
    -- Headline
      --	  nonzero maps on higher page numbers
     Description
@@ -1519,7 +1520,7 @@ doc ///
 	       appears on the $E_1$ cancels with an E_2 map from E_2_{0,1} and with an E_3 map from E_3_{0,2}
 ///
 
- doc ///
+doc ///
     Key
       --"The quotient map SS ^2 --> RR PP ^2"-- maybe better to call this 
       "Identifying anti-podal points of the two sphere"
@@ -1588,7 +1589,7 @@ doc ///
 	      E^1 .dd
 	      E^2
 	      E^2 .dd
-	     ///
+///
 
 doc///
     Key
@@ -1684,7 +1685,7 @@ doc ///
 	      E^2
 ///
 
-  doc ///
+doc ///
     Key
       "Spectral sequences and non-Koszul syzygies"
     Description
@@ -1740,7 +1741,8 @@ doc ///
 		-- this is what is predicted by the paper.
 		isIsomorphism(E^2 .dd_{3, -1})	      
 ///	  
-     doc ///
+     
+doc ///
      Key
        "Spectral sequences and connecting morphisms"
      Description
@@ -1790,7 +1792,8 @@ doc ///
 		prune connectingMorphism(Hom(G, f), - 2) == E^1 .dd_{1, -2} 
      
 ///     
-     doc ///
+     
+doc ///
      Key
        "Spectral sequences and hypercohomology calculations"
    --  Headline
@@ -1982,7 +1985,7 @@ doc ///
 		   Thus the E^3 page appears to have been computed correctly.		
 ///	       
  
- doc ///
+doc ///
       Key
       	   "Balancing Tor"
      Description
@@ -2046,7 +2049,7 @@ doc ///
 -- Types
 --
 
-    doc ///
+doc ///
      Key
      	  FilteredComplex
      Headline
@@ -2337,7 +2340,7 @@ doc ///
 	 (symbol ^,SpectralSequence,ZZ)
      	 (spectralSequence, FilteredComplex) 
 	 "Examples of filtered complexes and spectral sequences"   
-    ///
+///
 
 doc ///
      Key
@@ -2371,7 +2374,7 @@ doc ///
      	 (spectralSequence, FilteredComplex)	       
 	 SpectralSequencePageMap
 	 "Examples of filtered complexes and spectral sequences"   
-     ///
+///
 
 doc ///
      Key
@@ -2394,22 +2397,22 @@ doc ///
 	       R=k[a,b,c];
 	       S=k[s,t];
 	       f = map(S,R,{s^2,s*t,t^2});
-	       kappa = coker vars S;
-	       kkappa = coker vars R;
-	       (E,EE) = changeOfRingsTor(kkappa,kappa,f);
-	       e = prune E
-	       ee = prune EE
-	       e^0
-	       e^1
-	       e^2
-	       e^infinity
-	       ee^0
-	       ee^1
-	       ee^2
-	       (ee^2).dd
-	       ee^3
-	       ee^infinity   	      
-     ///
+--	       kappa = coker vars S;
+--	       kkappa = coker vars R;
+--	       (E,EE) = changeOfRingsTor(kkappa,kappa,f);
+--	       e = prune E
+--	       ee = prune EE
+--	       e^0
+--	       e^1
+--	       e^2
+--	       e^infinity
+--	       ee^0
+--	       ee^1
+--	       ee^2
+--	       (ee^2).dd
+--	       ee^3
+--	       ee^infinity   	      
+///
 
 doc ///
     	  Key
@@ -2511,7 +2514,7 @@ doc ///
 	      PageMap  
 ///	       
 
-  doc ///
+doc ///
      Key 
       (filteredComplex, List)
      Headline 
@@ -2612,7 +2615,7 @@ doc ///
 	    K = filteredComplex C
      SeeAlso 
 	  (truncate, ChainComplex,ZZ)
-    /// 
+/// 
 
 doc ///
      Key 
@@ -2650,7 +2653,7 @@ doc ///
      SeeAlso
           --(_, FilteredComplex,InfiniteNumber)
           --(^,FilteredComplex,InfiniteNumber)
-    /// 
+/// 
 
 
 doc ///
@@ -2686,7 +2689,7 @@ doc ///
 	       basis(0,E^3)
      SeeAlso
      	 basis	       
-    ///
+///
   
 doc ///
      Key
@@ -2715,7 +2718,7 @@ doc ///
 	  Example
 	       E = prune spectralSequence K;
 	       hilbertPolynomial(E^3)
-    ///
+///
 
 doc ///
      Key
@@ -2742,7 +2745,7 @@ doc ///
 	(symbol _, FilteredComplex, InfiniteNumber)
 	(symbol ^, FilteredComplex, ZZ)
 	(symbol ^, FilteredComplex, InfiniteNumber)	       	       	       	       
-    ///
+///
 
 doc ///
      Key
@@ -2824,7 +2827,7 @@ doc ///
 	 (prune, SpectralSequence)
      	 minimalPresentation
 	 prune	       	       
-    ///
+///
 
 
 doc ///
@@ -2848,8 +2851,9 @@ doc ///
 	      C = koszul vars A
 	      K = filteredComplex C;
 	      E = spectralSequence K
-    ///
-    doc ///
+///
+    
+doc ///
      Key
      	   (Hom, FilteredComplex, ChainComplex)
 	   (Hom, ChainComplex, FilteredComplex)
@@ -2874,8 +2878,9 @@ doc ///
 	     F'' = Hom(B,filteredComplex C)   
      SeeAlso
      	 "Filtrations and homomorphism complexes"	       
-    ///
-    doc ///
+///
+    
+doc ///
      Key
      	   (chainComplex, SpectralSequence)
      Headline
@@ -2895,9 +2900,9 @@ doc ///
 	      K = filteredComplex C;
 	      E = spectralSequence K
 	      chainComplex E
-    ///
+///
 
- doc ///
+doc ///
      Key
      	  (spectralSequencePage, FilteredComplex, ZZ)
 	 -- spectralSequencePage
@@ -2935,7 +2940,7 @@ doc ///
 	       E^infinity      
      SeeAlso
      	   "Examples of filtered complexes and spectral sequences"            
-     ///
+///
  
 
 
@@ -2989,10 +2994,10 @@ doc ///
 	    netPage(E_2,{-5,0},{7,1})
      SeeAlso 
 	  (net, Page)
-    /// 
+/// 
 
     
-     doc ///
+doc ///
      Key
      	  (symbol _, SpectralSequence, ZZ)
      Headline
@@ -3029,9 +3034,9 @@ doc ///
      SeeAlso
      	   (symbol ^,SpectralSequence,ZZ)
      	   "Examples of filtered complexes and spectral sequences"            	      
-     ///
+///
 
-     doc ///
+doc ///
      Key
      	  (symbol _, SpectralSequencePageMap, List)
      Headline
@@ -3064,7 +3069,7 @@ doc ///
      SeeAlso
      	  (symbol ^, SpectralSequencePageMap, List)
 	  "Examples of filtered complexes and spectral sequences"            	      	      	  	      
-     ///
+///
 
 doc ///
      Key
@@ -3098,7 +3103,7 @@ doc ///
      SeeAlso
       	  (symbol _, SpectralSequencePageMap, List)
 	  "Examples of filtered complexes and spectral sequences"            	      	      
-     ///
+///
          
      
 doc ///
@@ -3138,7 +3143,7 @@ doc ///
      SeeAlso
      	   (symbol _, SpectralSequence, ZZ)
      	   "Examples of filtered complexes and spectral sequences"            	      	      
-     ///
+///
 
 doc ///
      Key
@@ -3156,11 +3161,9 @@ doc ///
      Description
      	  Text 
 	      Returns the infinity page a spectral sequence.
-     ///
+///
 
-
-
-  doc ///
+doc ///
      Key
      	  (symbol ^, SpectralSequencePage, List)
      Headline
@@ -3187,7 +3190,7 @@ doc ///
 	      E^0 _{1,0}
      SeeAlso
      	  "Examples of filtered complexes and spectral sequences"            	      	      	      
-    ///
+///
 
 doc ///
      Key
@@ -3217,7 +3220,7 @@ doc ///
 	      E_0 ^{-1,0}
      SeeAlso
      	  "Examples of filtered complexes and spectral sequences"            	      	      	      
-    ///
+///
 
 
 doc ///
@@ -3247,7 +3250,7 @@ doc ///
 	      F'' = B ** (filteredComplex C)             
      SeeAlso
           "Filtrations and tensor product complexes"	       
-    ///
+///
     
 doc ///
      Key
@@ -3274,7 +3277,7 @@ doc ///
 	      tensor(f,C)            
      SeeAlso
           "Filtrations and tensor product complexes"	       
-    ///
+///
         
     
     
@@ -3300,7 +3303,7 @@ doc ///
 	      C = koszul vars A;
 	      K = filteredComplex C
 	      inducedMap(K,1)     
-    ///
+///
     
 doc ///
      Key
@@ -3336,7 +3339,7 @@ doc ///
      SeeAlso    
      	  (symbol ^, FilteredComplex, ZZ)  
 	  (symbol ^, FilteredComplex, InfiniteNumber)         
-    ///
+///
 
 doc ///
      Key
@@ -3372,10 +3375,10 @@ doc ///
      SeeAlso
      	  (symbol _, FilteredComplex, ZZ)
 	  (symbol _, FilteredComplex, InfiniteNumber)	       
-    ///
+///
 
 
-  doc ///
+doc ///
      Key
      	  connectingMorphism
      Headline
@@ -3446,8 +3449,8 @@ doc ///
 	       K = filteredComplex(reverse {simplicialComplex {s}, simplicialComplex {s,t}, simplicialComplex {s,t,u}, simplicialComplex {s*t, u}, simplicialComplex {s*t, u, v}, simplicialComplex {s*t, u, v, w}, simplicialComplex {s*t, s*w ,u, v}, simplicialComplex {s*t, s*w ,t * w, u, v}, simplicialComplex {s*t, s*w ,t * w, u * v}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w, s*u*w}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w, s*u*w,s*t*u}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w, s*u*w,s*t*u, s*u*v}, simplicialComplex {s*t, s*w ,t * w, u * v, s * v, s*u, u * w, t* u, t*u*w, s*u*w,s*t*u, s*u*v, s*t*w}}, ReducedHomology => false);
 	       E = prune spectralSequence K
 	       e = spectralSequence K
---	       apply(keys support E^11, i -> homologyIsomorphism(E, i#0, i#1, 11))
---	       apply(keys support e^11, i -> homologyIsomorphism(e, i#0, i#1, 11))
+	       apply(keys support E^11, i -> homologyIsomorphism(E, i#0, i#1, 11))
+	       apply(keys support e^11, i -> homologyIsomorphism(e, i#0, i#1, 11))
      SeeAlso
      	 homologyIsomorphism	       
 ///
@@ -3511,7 +3514,7 @@ doc ///
 	       G2 = minimalPresentation(D^2)
 	       G2.dd
 	       D^infinity 	             	          
-  ///	 
+///	 
   
 doc ///
      Key
@@ -3521,7 +3524,7 @@ doc ///
      SeeAlso
         (filteredHomologyObject, ZZ, ZZ, FilteredComplex)
 	(associatedGradedHomologyObject, ZZ, ZZ, FilteredComplex)	  	  
-  ///   
+///   
 
 doc ///
      Key
@@ -3542,12 +3545,12 @@ doc ///
      SeeAlso
 	(associatedGradedHomologyObject, ZZ, ZZ, FilteredComplex)	  	  
 	       
-   ///
+///
    
 doc ///
      Key
           associatedGradedHomologyObject
-  ///   
+///   
    	       
 doc ///
      Key
@@ -3565,7 +3568,7 @@ doc ///
      Description
 	  Text
 	       Computes the assocaited graded homology object determined by the filtered chain complex
-   ///	       
+///	       
   	  
 doc ///
      Key
@@ -3705,8 +3708,8 @@ doc ///
 	      J = ideal vars B
 	      C = complete res monomialCurveIdeal(B,{1,3,4})
 	      K = filteredComplex(J,C,4)
-	 Text
-	      Here are higher some pages of the associated spectral sequence:
+--	 Text
+--	      Here are higher some pages of the associated spectral sequence:
 ///
 --	 Example
 --	       e = prune spectralSequence K
