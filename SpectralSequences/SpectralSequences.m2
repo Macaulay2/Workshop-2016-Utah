@@ -1022,7 +1022,7 @@ changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
 
 beginDocumentation()
 
-undocumented {page, --prunningMaps,-- PageMap, --spots, 
+undocumented {page,  
     (degree, Page),
     (net, FilteredComplex),
     (net, Page),
@@ -1030,14 +1030,11 @@ undocumented {page, --prunningMaps,-- PageMap, --spots,
     (net, SpectralSequencePage),
     (net, SpectralSequence),
     (symbol _, Page, List),
-  --  (page, List, List, Page),
     (page, SpectralSequencePage),
     (symbol _, PageMap, List),
     (ring, Page),
     (spectralSequencePageMap, FilteredComplex, ZZ),
-  --  (spots, FilteredComplex),
     (spots, PageMap),
- --   (spots, SpectralSequencePageMap),
     (support, SpectralSequencePage),
    ReducedHomology, sourcePruningMap, targetPruningMap,
    pageMap,
@@ -1046,22 +1043,14 @@ undocumented {page, --prunningMaps,-- PageMap, --spots,
       (describe, SpectralSequencePageMap),
       ErMaps,
       (ErMaps,FilteredComplex, ZZ, ZZ, ZZ),
-      (spots, Page),
       (support, Page),
       (support, PageMap),
       (page,List, List, Page),
    (expression, SpectralSequence),
    spectralSequencePageMap,
- --  (support,ChainComplex),
- --  (truncate, ChainComplex,ZZ),
-   --homologyIsomorphism, 
    Shift,
- --  prunningMaps, 
-  -- (prunningMaps, SpectralSequencePage),
    (describe, Page),
    (describe, PageMap),
---   (max, FilteredComplex),
---   (min, FilteredComplex),
    (support, FilteredComplex)
     }
 
@@ -2225,6 +2214,26 @@ doc ///
        (symbol ^, SpectralSequence, InfiniteNumber)
        (symbol _, SpectralSequence, InfiniteNumber)	       
 ///	       
+
+
+doc ///
+          Key
+       	   (spots, Page)
+          Headline
+	       which spots does the given page has a module.
+     	  Usage
+	       s = spots P
+	  Inputs
+	       P:Page	  
+	  Outputs
+	       s:List 
+	  Description
+	       Text
+	       	   Returns a list of all the spots where the given page has a module.
+    	  SeeAlso
+	      		      
+///
+
 
 doc ///
      Key
