@@ -12,3 +12,5 @@
 
 *(E) Added documentation for:
 (spots, FilteredComplex)
+(min, FilteredComplex)
+(max, FilteredComplex)

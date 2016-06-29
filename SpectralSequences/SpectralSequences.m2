@@ -1060,8 +1060,8 @@ undocumented {page, --prunningMaps,-- PageMap, --spots,
   -- (prunningMaps, SpectralSequencePage),
    (describe, Page),
    (describe, PageMap),
-   (max, FilteredComplex),
-   (min, FilteredComplex),
+--   (max, FilteredComplex),
+--   (min, FilteredComplex),
    (support, FilteredComplex)
     }
 
@@ -2273,25 +2273,6 @@ doc ///
 	      		      
 ///
 
-doc ///
-          Key
-       	   (spots, FilteredComplex)
-          Headline
-	       which spots does the given filtered complex has a module.
-     	  Usage
-	       s = spots L
-	  Inputs
-	       L:FilteredComplex   	  
-	  Outputs
-	       s:List
-	  Description
-	       Text
-	       	   Returns a list of all the spots where the given filtered complex has a module.
-    	  SeeAlso
-	      		      
-///
-
-
 
 doc ///
           Key
@@ -2321,6 +2302,62 @@ doc ///
     	      "Filtered complexes and simplicial complexes"		      
 ///
 
+
+doc ///
+          Key
+       	   (spots, FilteredComplex)
+          Headline
+	       which spots does the given filtered complex has a module.
+     	  Usage
+	       s = spots L
+	  Inputs
+	       L:FilteredComplex   	  
+	  Outputs
+	       s:List
+	  Description
+	       Text
+	       	   Returns a list of all the spots where the given filtered complex has a module.
+    	  SeeAlso
+	      		      
+///
+
+doc ///
+          Key
+       	   (max, FilteredComplex)
+          Headline
+	       maximum spot where the given filtered complex has a module.
+     	  Usage
+	       m = max L
+	  Inputs
+	       L:FilteredComplex   	  
+	  Outputs
+	       m:ZZ
+	  Description
+	       Text
+	       	   Returns the maximum spot where the given filtered complex has a module.
+    	  SeeAlso
+	      		      
+///
+
+
+
+doc ///
+          Key
+       	   (min, FilteredComplex)
+          Headline
+	       minimum spot where the given filtered complex has a module.
+     	  Usage
+	       m = min L
+	  Inputs
+	       L:FilteredComplex   	  
+	  Outputs
+	       m:ZZ
+	  Description
+	       Text
+	       	   Returns the minimum spot where the given filtered complex has a module.
+    	  SeeAlso
+	      		      
+///
 
 doc ///
      Key
