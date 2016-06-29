@@ -10,3 +10,5 @@
 
 
 
+*(E) Added documentation for:
+(spots, FilteredComplex)
