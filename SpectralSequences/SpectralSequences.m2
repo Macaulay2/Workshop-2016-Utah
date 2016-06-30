@@ -2534,7 +2534,7 @@ doc ///
      	  E:Sequence
      Description
           Text
-	       This method computes the change of ring spectral sequence for a finite ring map.
+	       This method computes the change of ring spectral sequence for cetain kinds of ring maps.
 	  Example
 	       k=QQ;
 	       R=k[a,b,c];
@@ -3424,7 +3424,7 @@ doc ///
         
     
     
- doc ///
+doc ///
      Key
      	  (inducedMap, FilteredComplex, ZZ)
      Headline
