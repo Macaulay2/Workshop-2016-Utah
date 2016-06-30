@@ -89,21 +89,59 @@ ethRoot ( ZZ, MonomialIdeal ) := Ideal => opts -> (e,I) -> (
      G := I_*;
      if #G == 0 then ideal( 0_R ) else ideal( apply( G, f -> R_((exponents(f))#0//p^e )))
 )
+
+------------------------------------------------------------------------------
+
+ethRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
+    --idealList is a list of ideals and/or ring elements. 
+    --exponentList is a list of exponents we're taking these ideals/elemetns to
+
+    --include the following line to set a break point: 
+    --error "break here";
+    I := null;
+    if e == 0 then (
+        I = idealList#0^(exponentList#0);
+        for j from 1 to length(idealList) - 1 do I = I*(idealList#j)^(exponentList#j);
+        return I;
+    );
+
+    R := ring(idealList#0);
+    p := char(R);
+    minGensList = apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
+
+    -- find max n such that a - (n-1)p > m*p. This is the number of copies of $I$ we can
+    -- move outside the pth root. 
+
+    nsList = apply(exponentList, minGensList, (aa, mm) -> (
+       max(0, floor(aa/p - mm + 1)) 
+    ));
+    I = R;
+    for j from 0 to length(idealList) - 1 do I = I*(idealList#j)^(exponentList#j - nsList#j * p);
+    I = ethRoot(1, I);
+    ethRoot(e - 1, append(nsList, 1), append(idealList, I))
+);
+
+
 -----------------------------------------------------------------------------
 
 ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootSafe ( e, a, f, I ) ---MK
+ -- in the future, ethRootSafe should be subsumed by ethRoot(ZZ, List, List). When this happens,
+ -- the above line should end with ethRootSafe ( e, {a, 1}, {f, I} ) 
 
 -----------------------------------------------------------------------------
 
 ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootSafe ( e, a, f ) ---MK
+ -- in the future, ethRootSafe should be subsumed by ethRoot(ZZ, List, List). When this happens,
+ -- the above line should end with ethRootSafe ( e, {a}, {f} ) 
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> fancyEthRoot( e, m, I )  --- MK
+ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> ethRoot( e, {m}, {I} )
 
 -----------------------------------------------------------------------------
 
-ethRoot ( RingElement, ZZ, ZZ ) := opts -> ( f, a, e ) -> ethRoot( ideal( f ), a, e )
+ethRoot( ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
+   smartEthRoot(e, append(exponentList, 1), append(idealList, J));
 
 -----------------------------------------------------------------------------
 
@@ -287,83 +325,6 @@ fancyEthRoot = (e,m,I) ->
 	});
 	answer
 )
-
-
---this is a working name for a function which should generalize both ethRootSafe and fancyEthRoot
---it will take 
-smartEthRoot = method();
-
---smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
-----the idealList, can take a list of ideals, a list of elements, or a mix of lists of ideals or elements
---    -- make a list of the number of generators of each ideal in idealList
---    minGensList = apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
---
---    -- see what's the biggest power of p smaller than a/m where 'a' is in exponentList
---    -- and m is in minGensList. I.e. we want to find the largest e such that a >= mp^e
---    minGensLog = apply(minGensList, exponentList, (mm, aa) -> (
---        n = floorLog(p, aa//mm);
---        if (n > e) then e else n
---    ));
---
---    tripleList = sort apply(minGensLog, idealList, exponentList, (a,b,c) -> {a,b,c});
---
---
---    R := ring(idealList#0);
---    answer :=  ideal(1_R);
---    p := char(R);
---
---    for i from 0 to length(idealList) - 1 do (
---        answer = answer*(idealList#j)^(exponentList#j - p^minGensLog#j)
---    );
---    
---    j := 0;
---    for i from 0 to e do (
---        if i == tripleList#j#0 then (
---            answer = answer*
---            j = j+1;
---        );
---    );
---
---);
-
---this function is the same as the above, it just explicitly adds J to the end of the ideal list and 1 to the end of the exponent list
-smartEthRoot( ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
-   smartEthRoot(e, append(exponentList, 1), append(idealList, J));
-
-smartEthRoot( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> 
-    smartEthRoot(e, {a, 1}, {f, I});
-
-smartEthRoot( ZZ, ZZ, RingElement ) := ( e, a, f ) -> smartEthRoot(e, {a}, {f}); 
-
-smartEthRoot( ZZ, ZZ, Ideal ) := ( e, m, I ) -> fancyEthRoot( e, {m}, {I} );
-
--- this a slow but easy to write implementation of smartEthRoot
-smartEthRoot= method();
-smartEthRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
-    --include the following line to set a break point: 
-    --error "break here";
-    I := null;
-    if e == 0 then (
-        I = idealList#0^(exponentList#0);
-        for j from 1 to length(idealList) - 1 do I = I*(idealList#j)^(exponentList#j);
-        return I;
-    );
-
-    R := ring(idealList#0);
-    p := char(R);
-    minGensList = apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
-
-    -- find max n such that a - (n-1)p > m*p. This is the number of copies of $I$ we can
-    -- move outside the pth root. 
-
-    nsList = apply(exponentList, minGensList, (aa, mm) -> (
-       max(0, floor(aa/p - mm + 1)) 
-    ));
-    I = R;
-    for j from 0 to length(idealList) - 1 do I = I*(idealList#j)^(exponentList#j - nsList#j * p);
-    I = ethRoot(1, I);
-    smartEthRoot(e - 1, append(nsList, 1), append(idealList, I))
-);
 
 
 ----------------------------------------------------------------
