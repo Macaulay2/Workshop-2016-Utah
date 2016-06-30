@@ -1313,12 +1313,12 @@ doc ///
 	     E'' = prune spectralSequence F'';
 	     E' ^0
 	     E' ^ 0 .dd
-	     E' ^1    
-	     E' ^1 .dd
-	     E'' ^0
-	     E'' ^ 0 .dd
+--	     E' ^1    
+--	     E' ^1 .dd
+--	     E'' ^0
+--	     E'' ^ 0 .dd
 	     E'' ^1    
-	     E'' ^1 .dd	      
+--	     E'' ^1 .dd	      
      SeeAlso   
 	  "Balancing Tor"	     
 ///  
@@ -1429,25 +1429,25 @@ doc ///
 		K = filteredComplex (L, ReducedHomology => false) ;
 		E = prune spectralSequence K ;
 		E^0
-		E^0 .dd
-		E^1
+--		E^0 .dd
+--		E^1
 		E^1 .dd
-		E^2
-		E^2 .dd
-		E^3
-		E^3 .dd
-		E^4
-		E^4 .dd
-		E^5
-		E^5 .dd
-		E^6
-		E^6 .dd
-		E^7
-		E^7 .dd
-		E^8
-		E^8 .dd
-		E^9
-		E^9 .dd
+--		E^2
+--		E^2 .dd
+--		E^3
+--		E^3 .dd
+--		E^4
+--		E^4 .dd
+--		E^5
+--		E^5 .dd
+--		E^6
+--		E^6 .dd
+--		E^7
+--		E^7 .dd
+--		E^8
+--		E^8 .dd
+--		E^9
+--		E^9 .dd
 		E^infinity
 		prune HH K_infinity
 ///
