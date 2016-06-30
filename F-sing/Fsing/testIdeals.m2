@@ -162,14 +162,14 @@ tauQGor = (Rk, ek, fk, t1) ->
      if (e1 != 0) then (
           I1 = tauAOverPEMinus1QGorAmb(Sk,Jk,hk,ek,fm,a2,e1);
           if (pPow != 0) then (
-          	I2 = ethRootSafe(pPow, numerator((pp^pPow - 1)/(pp^ek - 1)), hk, I1 )
+          	I2 = ethRootRingElements(pPow, numerator((pp^pPow - 1)/(pp^ek - 1)), hk, I1 )
 		)
 		else I2 = I1
      )
      else (
 	  	I1 = ascendIdeal(ek, hk, Jk);
 	  	if (pPow != 0) then (
-	  		I2 = ethRootSafeList( pPow, (numerator((pp^pPow - 1)/(pp^ek - 1)), a2), (hk, fm), I1 )
+	  		I2 = ethRootRingElements( pPow, (numerator((pp^pPow - 1)/(pp^ek - 1)), a2), (hk, fm), I1 )
 	  	)
 	  	else I2 = I1
      );
@@ -234,7 +234,7 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
 	descend := ideal(sub(1, R1)); --dummy variables for checking whether we are done
 	
 	while (flag == false) do (
-		ascend = fancyEthRoot(I1, a1*p1^(i1-e1), i1);
+		ascend = ethRoot(I1, a1*p1^(i1-e1), i1);
 		if (o.Verbose == true) then (print  "Ascending ideal"; print ascend);
 		
 		flag = isSubset(descend, ascend);

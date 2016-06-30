@@ -168,7 +168,7 @@ paraTestModule ={AscentCount=>false} >> o -> (fk, t1) -> ( --maintained by Karl
 			
 	secondTau := firstTau;
 	if (bb != 0) then
-		secondTau = ethRootSafe(u1, firstTau, floor((pp^bb-1)/(pp-1)) , bb); --??? REORDER PARAMETERS
+		secondTau = ethRootRingElements(u1, firstTau, floor((pp^bb-1)/(pp-1)) , bb); --??? REORDER PARAMETERS
 
 	if (o.AscentCount == false) then (sub(secondTau, R1), omegaAmb, u1) else (sub(secondTau, R1), omegaAmb, u1, ascendingCount)
 )

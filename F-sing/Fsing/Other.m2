@@ -31,7 +31,7 @@ sigmaAOverPEMinus1Poly ={HSL=> false}>> o -> (fm, a1, e1) -> (
      --our initial value is something containing sigma.  This stops after finitely many steps.  
      while (IN != IP) do(
 		IP = IN;
-	  	IN = ethRootSafe(e2,a2,fm,IP); -- ethRoot(e2,ideal(fpow)*IP);
+	  	IN = ethRootRingElements(e2,a2,fm,IP); -- ethRoot(e2,ideal(fpow)*IP);
 	  	count = count + 1
      );
 
