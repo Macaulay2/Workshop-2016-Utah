@@ -7,9 +7,9 @@
 
 -- eR: gone
 
--- ethRootSafe: (f,I,a,e) -> (e,a,f,I), (f,a,e) -> (e,a,f)
+-- ethRootRingElements: (f,I,a,e) -> (e,a,f,I), (f,a,e) -> (e,a,f)
 		
--- ethRootSafeList: (fList,I,aList,e) -> (e,aList,fList,I), (fList,aList,e) -> (e,aList,fList)
+-- ethRootRingElements: (fList,I,aList,e) -> (e,aList,fList,I), (fList,aList,e) -> (e,aList,fList)
 
 -- mEthRoot, mEthRootOneElement: (A,e) -> (e,A)
 
@@ -36,8 +36,8 @@
 -- getFieldGenRoot 
 -- ethRootMonStrat 
 -- ethRootSubStrat 
--- ethRootSafe
--- ethRootSafeList 
+-- ethRootRingElements
+-- ethRootRingElements 
 -- ascendIdeal 
 -- ascendIdealSafe 
 -- ascendIdealSafeList 
@@ -92,7 +92,7 @@ ethRoot ( ZZ, MonomialIdeal ) := Ideal => opts -> (e,I) -> (
 
 ------------------------------------------------------------------------------
 
-ethRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
+ethRoot(ZZ, List, List) := opts -> (e, exponentList, idealList) -> (
     --idealList is a list of ideals and/or ring elements. 
     --exponentList is a list of exponents we're taking these ideals/elemetns to
 
@@ -124,15 +124,15 @@ ethRoot(ZZ, List, List) := (e, exponentList, idealList) -> (
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootSafe ( e, a, f, I ) ---MK
- -- in the future, ethRootSafe should be subsumed by ethRoot(ZZ, List, List). When this happens,
- -- the above line should end with ethRootSafe ( e, {a, 1}, {f, I} ) 
+ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootRingElements ( e, a, f, I ) ---MK
+ -- in the future, ethRootRingElements should be subsumed by ethRoot(ZZ, List, List). When this happens,
+ -- the above line should end with ethRoot( e, {a, 1}, {f, I} ) 
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootSafe ( e, a, f ) ---MK
- -- in the future, ethRootSafe should be subsumed by ethRoot(ZZ, List, List). When this happens,
- -- the above line should end with ethRootSafe ( e, {a}, {f} ) 
+ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootRingElements ( e, a, f ) ---MK
+ -- in the future, ethRootRingElements should be subsumed by ethRoot(ZZ, List, List). When this happens,
+ -- the above line should end with ethRoot( e, {a}, {f} ) 
 
 -----------------------------------------------------------------------------
 
@@ -140,7 +140,7 @@ ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> ethRoot( e, {m}, {I} )
 
 -----------------------------------------------------------------------------
 
-ethRoot( ZZ, List, List, Ideal) := (e, exponentList, idealList, J) ->
+ethRoot( ZZ, List, List, Ideal) := opts -> (e, exponentList, idealList, J) ->
    smartEthRoot(e, append(exponentList, 1), append(idealList, J));
 
 -----------------------------------------------------------------------------
@@ -220,43 +220,13 @@ ethRootSubStrat = (e,p,q,k,I,R) -> (
     substitute(ideal L, R)
 )
 
---This tries to compute (f^a*I)^{[1/p^e]} in such a way that we don't blow exponent buffers.  It can be much faster as well.
---We should probably just use it.  It relies on the fact that (f^(ap+b))^{[1/p^2]} = (f^a(f^b)^{[1/p]})^{[1/p]}.
-ethRootSafe = method(); 
-
-ethRootSafe( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> (
-	R := ring I;
-	p := char R;
-	
-	aRem := a%(p^e);
-	aQuot := floor(a/p^e);
-	
-	expOfA := basePExp(p,aRem); --this gives digits of aRem base p as a list, left-endian first 
-	zeros := apply(e-#expOfA,i->0);
-	expOfA = expOfA|zeros;
-	
-	IN1 := I;
-	
-	if (e > 0) then (
-		IN1 = IN1*ideal(f^(expOfA#0));
-		IN1 = ethRoot( 1, IN1 );
-		i := 1;
-	
-		while(i < #expOfA) do (
-			IN1 = ethRoot( 1, IN1*ideal(f^(expOfA#i)) );
-			i = i + 1;
-		)
-	);
-	IN1*ideal(f^(aQuot))
-)
-
-ethRootSafe( ZZ, ZZ, RingElement ) := ( e, a, f ) -> 
-    ethRootSafe( e, a, f, ideal( 1_(ring f) ) )
-
+ethRootRingElements = method(); 
 --This tries to compute (f1^a1*f2^a2*...fk^ak*I)^{[1/p^e]} in such a way that we don't blow exponent buffers.  It can be much faster as well.
-ethRootSafeList = method();
+--We should probably just use it.  It relies on the fact that (f^(ap+b))^{[1/p^2]} = (f^a(f^b)^{[1/p]})^{[1/p]}.
 
-ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
+--It's a special case of ethRoot(ZZ, List, List) that's optimized for lots of principal ideals
+
+ethRootRingElements( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
     R := ring I;
     p := char R;
     
@@ -284,47 +254,14 @@ ethRootSafeList( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
     IN1*ideal(product(aPowerList))
 )
 
-ethRootSafeList( ZZ, List, List ) := ( e, a, F ) ->
-    ethRootSafeList( e, a, F, ideal( 1_( ring( F#0 )  ) ) )
-	
 
--- DS: what does fancyEthRoot do?
--- is it (I^m)^[1/p^e]? Then it's just a special case of ethRootSafeList, no?
-fancyEthRoot = (e,m,I) ->
-(
-    if (e < 0) then (error "expected a nonnegative integer e"); 
-	G:=first entries mingens I;
-	k:=#G;
-	P:=allPartitions(m,k); --partitions of m of size k
-	                       --this function is used here and only here
 
-	                       --it seems like the point of this function
-	                       --is just to find the generators of I^m where 
-	                       --each generator of I appears
-	R:=ring(I);
-	p:=char(R);
-	answer:=ideal(0_R);
-	apply(P, u-> -- take one of your partitions and call it P
-	{
-		a:=ideal(1_R);
-		U:=apply(u, v->baseP1(v,p,e)); -- so we're replacing each element of  P with its
-		                               -- base P expansion (but stopping at p^e)
-		for i from 0 to e do
-		{
-			j:=e-i;
-			g:=1_R;
-			for l from 0 to k-1 do g=g*(G#l)^((U#l)#j);  -- take each generator of I and raise it to 
-			                                             -- the the coefficient of p^j of the base-p expansion
-			                                             -- of appropriate element of your partition, a la the method
-			                                             -- of EthRootSafe. 
-			                                             -- Then multiply these together. 
-			a=ideal(g)*a;
-			if (i<e) then a=ethRoot( 1, a ); -- so we're iteratively doing answer = (prevanswer*f^a_1*... *f_k^a_k)^[1/p]
-		};
-		answer=answer+a; --adding up the above results for each partition
-	});
-	answer
-)
+ethRootRingElements( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> 
+    ethRootRingElements(e, {a}, {f}, I);
+
+ethRootRingElements( ZZ, ZZ, RingElement ) := ( e, a, f ) -> 
+    ethRootRingElements( e, {a}, {f}, ideal( 1_(ring f) ) );
+
 
 
 ----------------------------------------------------------------
@@ -368,7 +305,7 @@ ascendIdealSafe = ( ak, ek, hk, Jk) -> (
      while (isSubset(IN, IP) == false) do(
      	  IP = IN;
 --	  error "help";
-	  	IN = ethRootSafe( ek, ak, hk, IP )+IP
+	  	IN = ethRootRingElements( ek, ak, hk, IP )+IP
      );
 
      --trim the output
@@ -389,7 +326,7 @@ ascendIdealSafeList ={AscentCount=>false} >> o ->  (akList, ek, hkList, Jk) -> (
 	while (isSubset(IN, IP) == false) do(
 		i1 = i1 + 1; --
 		IP = IN;
-		IN = ethRootSafeList( ek, akList, hkList, IP ) + IP
+		IN = ethRootRingElements( ek, akList, hkList, IP ) + IP
 	);
 	
 	--trim the output
