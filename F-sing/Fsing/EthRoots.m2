@@ -61,7 +61,7 @@ ethRoot = method(Options => {EthRootStrategy => Substitution});
 -- substitution strategy...
 
 ethRoot ( ZZ, Ideal ) := Ideal => opts -> (e,I) -> (
-    if (not e >= 0) then (error "ethRoot: Expected second argument to be a nonnegative integer.");
+    if (not e >= 0) then (error "ethRoot: Expected first argument to be a nonnegative integer.");
     R := ring I;
     if (class R =!= PolynomialRing) then (error "ethRoot: Expected an ideal in a PolynomialRing.");
     p := char R;
@@ -141,7 +141,7 @@ ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> ethRoot( e, {m}, {I} )
 -----------------------------------------------------------------------------
 
 ethRoot( ZZ, List, List, Ideal) := opts -> (e, exponentList, idealList, J) ->
-   smartEthRoot(e, append(exponentList, 1), append(idealList, J));
+   ethRoot(e, append(exponentList, 1), append(idealList, J));
 
 -----------------------------------------------------------------------------
 

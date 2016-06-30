@@ -41,10 +41,22 @@ doc ///
     Headline
         Computes $I^{[1/p^e]}$ in a polynomial ring over a perfect field
     Usage
-        ethRoot(I,e) 
+        ethRoot(e, I) 
+        ethRoot(e, exponentList, idealList)
+        ethRoot (e, a, f, I)
+        ethRoot (e, a, f)
+        ethRoot (e, m, I)
+        ethRoot(e, exponentList, idealList, I)
+        ethRoot(e, A)
     Inputs
-        I:Ideal
         e:ZZ
+        I:Ideal
+        exponentList:List
+        idealList:List
+        a:ZZ
+        f:RingElement
+        m:ZZ
+        a:Matrix
     Outputs
         :Ideal
     Description
@@ -54,16 +66,20 @@ doc ///
 
 doc ///
     Key
-        ethRootSafe
+        ethRootRingElements
     Headline
-        Computes (f^a*I)^{[1/p^e]} in such a way that we don not blow exponent buffers.
+        This is a version of ethRoot that's optimized for lists of principal ideals. 
     Usage
-        ethRootSafe(f, I, a, e)
+        ethRootRingElements(e, aList, elmList, I)
+        ethRootRingElements(e, a, f, I)
+        ethRootRingElements(e, a, f)
     Inputs
         f:RingElement
         I:Ideal
         a:ZZ
         e:ZZ
+        aList:List
+        elmList:List
      Outputs
          :Ideal
      Description
