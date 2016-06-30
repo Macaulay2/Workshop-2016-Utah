@@ -383,7 +383,7 @@ ascendIdeal = (ek, hk, Jk) -> (
      pp := char Sk;
      IN := Jk;
      IP := ideal(0_Sk);
-     --we want to make the largest ideal that is phi-stable, following Moty Katzman's idea
+     --we want to make the smallest ideal that is phi-stable, following Moty Katzman's idea
      --we do the following
      while (isSubset(IN, IP) == false) do(
      	  IP = IN;
@@ -396,6 +396,7 @@ ascendIdeal = (ek, hk, Jk) -> (
 )
 
 --Works like ascendIdeal but tries to minimize the exponents elements are taken to
+-- what's ak?
 ascendIdealSafe = ( ak, ek, hk, Jk) -> (
 	Sk := ring Jk;
      pp := char Sk;
