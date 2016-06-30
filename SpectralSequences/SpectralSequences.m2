@@ -850,7 +850,7 @@ rpqHomology(SpectralSequence,ZZ,ZZ,ZZ) := (E,p,q,r) -> (
 homologyIsomorphism = method()
 homologyIsomorphism(SpectralSequence,ZZ,ZZ,ZZ) := (E,p,q,r) -> (
     if E.Prune == false then 
-inducedMap(source (E^(r+1) .dd_{p,q}),rpqHomology(E,p,q,r), id_(E^(r+1) .filteredComplex _infinity _(p+q)))
+inducedMap(source (E^(r+1) .dd_{p,q}),rpqHomology(E,p,q,r), id_(E^(r+1) .filteredComplex _infinity _(p+q)), Verify=>false) -- if Verify not set to false can get error when running on M2 1.9
     else
     rpqPruneIsomorphism(E,p,q,r)
   ) 
@@ -859,7 +859,7 @@ rpqPruneIsomorphism = method()
 rpqPruneIsomorphism(SpectralSequence,ZZ,ZZ,ZZ) := (E,p,q,r) -> (    
     M := rpqHomology(E,p,q,r);
     f := inducedMap(target (E^(r + 1) .dd_{p,q}) .cache.sourcePruningMap,
-	    M, (E^r .dd_{p,q}).cache.sourcePruningMap);
+	    M, (E^r .dd_{p,q}).cache.sourcePruningMap, Verify=>false); -- if Verify not set to false can get error when running on M2 1.9
 	inverse((E^(r + 1) .dd_{p,q}) .cache.sourcePruningMap) * f    
   ) 
 
@@ -3851,22 +3851,21 @@ doc ///
 	      J = ideal vars B
 	      C = complete res monomialCurveIdeal(B,{1,3,4})
 	      K = filteredComplex(J,C,4)
---	 Text
---	      Here are higher some pages of the associated spectral sequence:
+	 Text
+	      Here are higher some pages of the associated spectral sequence:
+	 Example
+	       e = prune spectralSequence K
+	       e^2
+	       e^3
+	       e^3 .dd
+	       e^4
+	       e^4 .dd
+	       assert(all(keys support e^0, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,0)))
+	       assert(all(keys support e^1, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,1)))
+	       assert(all(keys support e^2, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,2)))
+	       assert(all(keys support e^3, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,3)))
+	       assert(all(keys support e^4, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,4)))
 ///
---	 Example
---	       e = prune spectralSequence K
---	       e^2
---	       e^3
---	       e^3 .dd
---	       e^4
---	       e^4 .dd
-	  --     assert(all(keys support e^0, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,0)))
-	   --    assert(all(keys support e^1, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,1)))
-	   --    assert(all(keys support e^2, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,2)))
-	    --   assert(all(keys support e^3, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,3)))
-	   --    assert(all(keys support e^4, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,4)))
---///
 
 
 doc ///
