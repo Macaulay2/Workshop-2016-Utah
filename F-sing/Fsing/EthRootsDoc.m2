@@ -121,5 +121,17 @@ doc ///
          :Ideal
      Description
         Text
-            Computes the 1/p^e-th root of (f^a*I).  It does it while trying to minimize the power that f gets raised to (in case a is a large number).  This can either be faster or slower than ethRoot.
+            This is a version of ethRoot that's optimized for lists of principal ideals. For instance,
+        Example 
+            kk = ZZ/5;
+            R = kk[x,y,z];
+            I1 = (x^10, y^10, z^10);
+            f1 = x^100;
+            f2 = y^30 + z^50;
+            ethRootRingElements(2, {2, 3}, {f1, f2}, I)
+        Text
+            The above example computes the ideal (f1^2*f2^3*I)^[1/25]. One could compute the same ideal by calling
+        Example
+            ethRoot(2, {2,3,1}, {f1, f2, I})
+
 ///
