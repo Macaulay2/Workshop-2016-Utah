@@ -8,5 +8,15 @@
 
 * (Nathan) I updated the above log about the tensor method.  To do: integrate the experimental push-forward code and then write the corresponding documentation.  It’s probably a good idea to take “complete ChainComplex” whenever we have a method that uses chainComplexes just to be safe.
 
+*Deleted all the previously undocumented methods that have been documented from the “undocumented” list
 
-
+*(E) Added documentation for:
+(spots, FilteredComplex)
+(spots, Page)
+(min, FilteredComplex)
+(max, FilteredComplex)
+(support, Page)
+(describe, Page)
+(describe, SpectralSequence)
+(describe, SpectralSequencePage)
+(describe, SpectralSequencePageMap)

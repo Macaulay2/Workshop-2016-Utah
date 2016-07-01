@@ -8,8 +8,24 @@
 --This function computes the parameter test module of a ring, it returns it as a submodule of a canonical ideal.
 --this is a slightly modified function originally written by Moty Katzman for "Parameter test ideals of Cohen Macaulay rings"
 --it returns the lift of the canonical module to the ambient ring
+needsPackage "Divisor";
 
-canonicalIdeal ={FullMap=> false} >> o -> (R1) -> (
+canonicalIdeal = (R1) -> (
+    S1 := ambient R1;
+	I1 := ideal R1;
+	dR := dim R1;
+	dS := dim S1;
+	varList := first entries vars S1;
+	degList := {};
+	if (#(degree(varList#0)) == 1) then (
+		degList = apply(varList, q -> (degree(q))#0); )
+	else (
+		degList = apply(varList, q -> (degree(q))); );
+	M1 := (Ext^(dS - dR)(S1^1/I1, S1^{-(sum degList)}))**R1;
+	moduleToIdeal(M1)
+)
+
+oldCanonicalIdeal ={FullMap=> false} >> o -> (R1) -> (
 	S1 := ambient R1;
 	I1 := ideal(R1);
 	d1 := (dim S1) - (dim R1);
@@ -33,10 +49,7 @@ canonicalIdeal ={FullMap=> false} >> o -> (R1) -> (
 			answer=substitute(mingens ideal t,S1);
 			break;
 		};
-	});
-	
-	
-	
+	});		
 	if (o.FullMap == true) then (ideal answer, map(R1^1, myExt**R1, matrix {answer2}), (myExt**S1^{-degShift})**R1) else ideal answer
 )
 
@@ -85,7 +98,7 @@ paraTestModuleAmbient (Ring) := (R1) -> (
 	
 	u1 := finduOfIdeal(canIdeal, I1); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
 	
-	tauOut := ascendIdeal(1, u1 tau0);
+	tauOut := ascendIdeal(1, u1, tau0);
 	
 	(sub(tauOut, R1), sub(canIdeal, R1), u1)
 )
@@ -172,4 +185,47 @@ paraTestModule ={AscentCount=>false} >> o -> (fk, t1) -> ( --maintained by Karl
 
 	if (o.AscentCount == false) then (sub(secondTau, R1), omegaAmb, u1) else (sub(secondTau, R1), omegaAmb, u1, ascendingCount)
 )
+
+
+--****************************************************
+--*****Karl is starting a rewrite of some of this*****
+--****************************************************
+
+--this function finds the generators of the intersection of 
+--J^{[p]} : J and I^{[p]} : I where I is the defining ideal and J is the canonical
+--ideal lifted to the ambient ring (in a maximal way).
+findusOfIdeal = (canIdeal, defIdeal) -> (
+	Ip := frobeniusPower(1, defIdeal);
+	tempIdeal := intersect( (frobeniusPower(1,canIdeal)) : canIdeal, Ip : defIdeal );
+	
+	M1 := compress ((gens tempIdeal)%(gens Ip));
+	first entries M1
+)
+
+testModule = method(); --a rewritten function to construct the (parameter) test (sub)module of a given ring.  
+                       --it returns two ideals and an element.  
+                       --The first ideal is an ideal isomorphic to the test module and the
+                       --and the second is an ideal isomorphic to the canonical module, in which the parameter
+                       --resides.  The locus where these two ideals differ (plus the non-CM locus) is the
+                       --locus where the ring does not have rational singularities.
+                       --the final element is the element of the ambient polynomial ring which is used to induce
+                       --the canonical trace map
+
+testModule(Ring) := (R1) -> (
+    S1 := ambient R1;
+	I1 := ideal R1;
+    J1 := sub(canonicalIdeal(R1), S1);
+    C1 := findTestElementAmbient(R1);
+    
+    u1 := findusOfIdeal(J1+I1, I1);
+    if (#u1 > 1) then(
+        error "Too many generators, this function needs to be rewritten to find a/the single generator"
+    )
+    else (
+        u1 = u1#0;
+    );
+    tau = ascendIdeal(1, u1, C1*J1*R1);
+    (sub(tau, R1), sub(J1, R1), u1)
+);
+
 

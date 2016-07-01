@@ -1,3 +1,11 @@
 Todo List
 
 1) There are several examples that we had to comment out in order for the package to install. These should be tested and either fixed or deleted.
+
+
+2) In the documentation for 
+(basis, List, SpectralSequencePage)
+(basis, ZZ, SpectralSequencePage)
+
+there is a commented out note that says the output is a matrix, but should instead be changed to be a page
+
