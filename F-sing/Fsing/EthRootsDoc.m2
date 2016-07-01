@@ -38,6 +38,13 @@ doc ///
 doc ///
     Key
         ethRoot
+        (ethRoot, ZZ, Ideal)
+        (ethRoot, ZZ, MonomialIdeal)
+        (ethRoot, ZZ, List, List)
+        (ethRoot, ZZ, ZZ, RingElement, Ideal)
+        (ethRoot, ZZ, ZZ, RingElement)
+        (ethRoot, ZZ, List, List, Ideal)
+        (ethRoot, ZZ, Matrix)
     Headline
         Computes $I^{[1/p^e]}$ in a polynomial ring over a perfect field
     Usage
@@ -50,18 +57,48 @@ doc ///
         ethRoot(e, A)
     Inputs
         e:ZZ
+            The power of p to which you're taking the ideal. E.g. to find the (p^2)th root of an ideal, set e = 2. 
         I:Ideal
-        exponentList:List
+            The ideal you're taking the root of.
         idealList:List
+            A list of ideals whose product you want to take the root of. 
+        exponentList:List
+            A list of exponents to which you're raising the above ideals. E.g. to find the root of I^2*J^3, set idealList = {I, J} and exponentList = {2, 3}. 
         a:ZZ
+            The exponent you're raising f to.
         f:RingElement
         m:ZZ
-        a:Matrix
+            The exponent you're raising I to. 
+        A:Matrix
     Outputs
         :Ideal
     Description
         Text
             In a polynomial ring k[x1, ..., xn], I^{[1/p^e]} is the smallest ideal J such that J^{[p^e]} = FrobeniusPower(J,e) \supseteq I.  This function computes it.
+
+            There are many ways to call ethRoot. The simplest way is to call ethRoot(e, I). For instance, 
+        Example
+            kk = ZZ/5;
+            R = kk[x,y,z];
+            I = ideal(x^50*z^95, y^100+z^27);
+            ethRoot(2, I)
+        Text
+            This computes I^{[1/p^e]}, i.e. the (p^e)th root of I. Often, one wants to compute the ethRoot of some product of ideals. This is best accomplished by calling the following version of ethRoot:
+        Example 
+            kk = ZZ/5;
+            R = kk[x,y,z];
+            I1 = (x^10, y^10, z^10);
+            I2 = (x^20*y^100, x + z^100);
+            I3 = (x^50*y^50*z^50);
+            ethRoot(1, {4,5,6}, {I1, I2, I3})
+        Text
+            The above example computes the ideal (I1^4*I2^5*I3^6)^[1/p]. For legacy reasons, you can specify the last ideal in your list using ethRoot(e, exponentList, idealList, I). This last ideal is just raised to the first power. 
+
+            The implementation of this function is not optimal, especially if many of the ideals are principal. In that case, ethRootRingElements should be faster. 
+
+            Finally, you can also call ethRoot(e, a, f). This computes the eth root of the principal ideal f^a. Calling ethRoot(e, m, I) computes the eth root of the ideal I^m, and calling ethRoot(e, a, f, I) computes the eth root of the product f^a*I. 
+    SeeAlso
+        ethRootRingElements
 ///
 
 doc ///
