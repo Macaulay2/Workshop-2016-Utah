@@ -940,7 +940,7 @@ hilbertPolynomial (SpectralSequencePage) := Page => o -> (E) -> (
     )
 
 pruningMaps = method()
-pruningMaps(SpectralSequencePage) := (E) -> ( if E.Prune == false then error "page is not prunned"
+pruningMaps(SpectralSequencePage) := (E) -> ( if E.Prune == false then error "page is not pruned"
     else
     P := new PageMap;
     P.degree = E.dd.degree;
@@ -1087,6 +1087,7 @@ document {
     TO "Spectral sequences and connecting morphisms",
     TO "Spectral sequences and non-Koszul syzygies",
     TO "A spectral sequence which fails to degenerate quickly",
+    TO "Seeing Cancellations",
     TO "Edge homomorphisms",
   },
 
@@ -1454,7 +1455,7 @@ doc ///
 
 doc ///
     Key
-      "A spectral sequence with nonzero maps on every page"
+      "Seeing Cancellations"
    -- Headline
      --	  nonzero maps on higher page numbers
     Description
@@ -2916,8 +2917,8 @@ doc ///
 	       C = complete res monomialCurveIdeal(B,{1,3,4});
 	       K = filteredComplex(J,C,4);
 	  Text
-	       Compare some pages of the non-prunned version of the spectral sequence
-	       with that of the prunned version.
+	       Compare some pages of the non-pruned version of the spectral sequence
+	       with that of the pruned version.
 	  Example
 	       E = prune spectralSequence K;
 	       e = spectralSequence K;
