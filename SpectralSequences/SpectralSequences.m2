@@ -67,7 +67,7 @@ export {
    "PageMap", 
    "pageMap", 
    "page" ,
-  "prunningMaps", "edgeComplex",
+  "pruningMaps", "edgeComplex",
   "filteredHomologyObject", "associatedGradedHomologyObject", "netPage", "changeOfRingsTor" 
   }
 
@@ -939,8 +939,8 @@ hilbertPolynomial (SpectralSequencePage) := Page => o -> (E) -> (
     P
     )
 
-prunningMaps = method()
-prunningMaps(SpectralSequencePage) := (E) -> ( if E.Prune == false then error "page is not prunned"
+pruningMaps = method()
+pruningMaps(SpectralSequencePage) := (E) -> ( if E.Prune == false then error "page is not prunned"
     else
     P := new PageMap;
     P.degree = E.dd.degree;
@@ -1482,7 +1482,7 @@ doc ///
     	       easyPresentation = (P,n,m) -> (
 		  transpose matrix apply(n, 
 		      i-> apply(m, 
-			  j-> (rank (P_{i,j}))*t^(
+			  j-> (length (P_{i,j}))*t^(
 			      if (L = unique flatten degrees P_{i,j})!= {} then first L else 0)
 			  )
 		      ));
@@ -1491,11 +1491,10 @@ doc ///
 	       Notice that it's clear that all terms except those in the top row of the matrix must eventually
 	       disappear, but for this to happen, there must a map of the right degree mapping to them.
           Example	       
---	       easyPresentation(E_infinity,6,3)
---	       easyPresentation(E_1,6,3)
---	       easyPresentation(E_2,6,3)
---	       easyPresentation(E_3,6,3)
---	       easyPresentation(E_4,6,3)
+	       easyPresentation(E_infinity,6,3)
+	       easyPresentation(E_1,6,3)
+	       easyPresentation(E_2,6,3)
+	       easyPresentation(E_3,6,3)
 	       rank (E_2).dd_{3,0}
 	       rank (E_3).dd_{3,0}
 	  Text 
@@ -2322,7 +2321,7 @@ doc ///
      Description
      	  Text
 	       A page map is a collection of homomorphisms which are indexed by lists of integers.  This is a parent class for the type @TO"SpectralSequencePageMap"@.  The output of the 
-	       method {\tt prunningMaps(SpectralSequencePage)} is an example of a {\tt Page} which is not a {\tt SpectralSequencePage}.
+	       method {\tt pruningMaps(SpectralSequencePage)} is an example of a {\tt Page} which is not a {\tt SpectralSequencePage}.
 	       
 	       As a specific example consider the filtered complex $K$ below, obtained by multiplying the minimal free resolution of
 	       the rational quartic space curve by sucessive powers of the irrelevant ideal.
@@ -2332,12 +2331,12 @@ doc ///
 	       C = complete res monomialCurveIdeal(B,{1,3,4});
 	       K = filteredComplex(J,C,4);
 	  Text
-	       We compute an example of a prunning map below.
+	       We compute an example of a pruning map below.
 	  Example
 	       E = prune spectralSequence K;
-	       prunningMaps E^2
+	       pruningMaps E^2
      SeeAlso
-     	 (prunningMaps,SpectralSequencePage)  
+     	 (pruningMaps,SpectralSequencePage)  
 	 prune  
 ///	       
 
@@ -2576,18 +2575,18 @@ doc ///
 
 doc ///
      Key
-	  prunningMaps
+	  pruningMaps
      Headline 
-	  compute the prunning maps on a spectral sequence page
+	  compute the pruning maps on a spectral sequence page
      Usage
-     	  d = prunningMaps E
+     	  d = pruningMaps E
      Inputs
      	  E:SpectralSequencePage
      Outputs
      	  d:PageMap
      Description
      	  Text 
-	       Returns the prunning maps which are cached in the process of prunning the spectral sequence page.
+	       Returns the pruning maps which are cached in the process of pruning the spectral sequence page.
 	       
 	       As a specific example consider the filtered complex $K$ below, obtained by multiplying the minimal free resolution of
 	       the rational quartic space curve by sucessive powers of the irrelevant ideal.
@@ -2597,10 +2596,10 @@ doc ///
 	       C = complete res monomialCurveIdeal(B,{1,3,4});
 	       K = filteredComplex(J,C,4);
 	  Text
-	       We compute an example of a prunning map below.
+	       We compute an example of a pruning map below.
 	  Example
 	       E = prune spectralSequence K;
-	       prunningMaps E^2
+	       pruningMaps E^2
      
      SeeAlso
 	      (prune, SpectralSequence)
@@ -2631,12 +2630,12 @@ doc ///
 
 doc ///
     	  Key
-	    (prunningMaps, SpectralSequencePage)
+	    (pruningMaps, SpectralSequencePage)
 	  Headline 
-	    compute the prunning maps on a spectral sequence page
+	    compute the pruning maps on a spectral sequence page
      Description
      	  Text 
-	       Returns the prunning maps which are cached in the process of prunning the spectral sequence page.
+	       Returns the pruning maps which are cached in the process of pruning the spectral sequence page.
 	       
 	       As a specific example consider the filtered complex $K$ below, obtained by multiplying the minimal free resolution of
 	       the rational quartic space curve by sucessive powers of the irrelevant ideal.
@@ -2646,10 +2645,10 @@ doc ///
 	       C = complete res monomialCurveIdeal(B,{1,3,4});
 	       K = filteredComplex(J,C,4);
 	  Text
-	       We compute an example of a prunning map below.
+	       We compute an example of a pruning map below.
 	  Example
 	       E = prune spectralSequence K;
-	       prunningMaps E^2
+	       pruningMaps E^2
      
      SeeAlso
 	      (prune, SpectralSequence)
@@ -2929,7 +2928,7 @@ doc ///
 	 (prune, SpectralSequencePage)
      	 minimalPresentation
 	 prune
-	 prunningMaps	       
+	 pruningMaps	       
 ///
 
 doc ///
