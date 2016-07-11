@@ -1073,6 +1073,7 @@ document {
     TO "A spectral sequence which fails to degenerate quickly",
     TO "Seeing Cancellations",
     TO "Edge homomorphisms",
+    TO "Examples of change of rings Spectral Sequences"
   },
 
   SUBSECTION "More easy topological examples",
@@ -1115,10 +1116,14 @@ doc ///
 	       $\bullet$ @TO"Spectral sequences and connecting morphisms"@
     	       
 	       $\bullet$ @TO"Spectral sequences and non-Koszul syzygies"@
+	       
+	       $\bullet$ @TO"Seeing Cancellations"@
     	       
 	       $\bullet$ @TO"A spectral sequence which fails to degenerate quickly"@
 	       
 	       $\bullet$ @TO"Edge homomorphisms"@
+	       
+	       $\bullet$ @TO"Examples of change of rings Spectral Sequences"@
  
                {\bf More easy topological examples}
 	       
@@ -1128,7 +1133,6 @@ doc ///
 	       
 	       $\bullet$ @TO"The trivial fibration over the sphere with fibers the sphere"@
 	       
-	       $\bullet$ @TO"Examples of change of rings Spectral Sequences"@
  
  	  	  
 ///
@@ -2013,8 +2017,6 @@ doc ///
 doc ///
      Key
      	  "Examples of change of rings Spectral Sequences"
-     Headline
-     	  Change of rings Spectral Sequences
      Description
      	  Text
 	       Here are some examples of change of rings spectral sequences. 
