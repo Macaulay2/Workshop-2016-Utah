@@ -1127,6 +1127,8 @@ doc ///
 	       $\bullet$ @TO"The fibration of the Klein Bottle over the sphere with fibers the sphere"@ 
 	       
 	       $\bullet$ @TO"The trivial fibration over the sphere with fibers the sphere"@
+	       
+	       $\bullet$ @TO"Examples of change of rings Spectral Sequences"@
  
  	  	  
 ///
@@ -2021,7 +2023,7 @@ doc ///
 	       there is a spectral sequence E with E^2_{p,q} = Tor^S_p(Tor^R(M,S),N)
 	       that abuts to Tor^R_*(M,N).
      	  Example
-	       {\bf First example}
+--	       First example
 	       k=QQ;
 	       R=k[a,b,c];
 	       S=k[s,t];
@@ -2029,6 +2031,7 @@ doc ///
 	       N = coker vars S;
 	       M = coker vars R;
 	       F := complete res N;
+	       pushFwdF := pushFwd(f,F);
 	       G := complete res M;
 	       E := spectralSequence(filteredComplex(G) ** pushFwdF);
 	       EE := spectralSequence(G ** (filteredComplex pushFwdF));
