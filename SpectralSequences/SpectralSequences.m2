@@ -68,7 +68,7 @@ export {
    "pageMap", 
    "page" ,
   "pruningMaps", "edgeComplex",
-  "filteredHomologyObject", "associatedGradedHomologyObject", "netPage", "changeOfRingsTor" 
+  "filteredHomologyObject", "associatedGradedHomologyObject", "netPage"
   }
 
 
@@ -998,22 +998,6 @@ associatedGradedHomologyObject(ZZ,ZZ,FilteredComplex) := (p,n,K) -> (
     )
 
 
------------------------------------------------------------
------------------------------------------------------------
--- change of rings --
-
---Compute change of rings for Tor
-
-changeOfRingsTor = method()
-changeOfRingsTor(Module,Module,RingMap) := (M,N,f) -> (
-    -- f : R --> S a finite ring map, N an S module, M an R module
-    F := complete res N;
-    pushFwdF := pushFwd(f,F);
-    G := complete res M;
-    E := spectralSequence(filteredComplex(G) ** pushFwdF);
-    EE := spectralSequence(G ** (filteredComplex pushFwdF));
-    (E,EE) 
-)
 
 -----------------------------------------------------------
 -----------------------------------------------------------
@@ -2024,6 +2008,42 @@ doc ///
 ///	       	 
 
 
+doc ///
+     Key
+     	  "Examples of change of rings Spectral Sequences"
+     Headline
+     	  Change of rings Spectral Sequences
+     Description
+     	  Text
+	       Here are some examples of change of rings spectral sequences. 
+	  Text
+	       Given a ring map f: R -> S, an R-module M and an R-module S,
+	       there is a spectral sequence E with E^2_{p,q} = Tor^S_p(Tor^R(M,S),N)
+	       that abuts to Tor^R_*(M,N).
+     	  Example
+	       {\bf First example}
+	       k=QQ;
+	       R=k[a,b,c];
+	       S=k[s,t];
+	       f = map(S,R,{s^2,s*t,t^2});
+	       N = coker vars S;
+	       M = coker vars R;
+	       F := complete res N;
+	       G := complete res M;
+	       E := spectralSequence(filteredComplex(G) ** pushFwdF);
+	       EE := spectralSequence(G ** (filteredComplex pushFwdF));
+      	       e = prune E
+	       ee = prune EE
+	       e^0
+	       e^1
+	       e^2
+	       e^infinity
+	       ee^0
+     SeeAlso
+	    "Filtrations and tensor product complexes"	    
+ 	  	  
+///
+
 --------------------------------------------
 -- Documentation of methods and functions --
 --------------------------------------------
@@ -2519,43 +2539,7 @@ doc ///
 	 "Examples of filtered complexes and spectral sequences"   
 ///
 
-doc ///
-     Key
-       changeOfRingsTor
-     Headline
-         compute the change of rings spectral sequence
-     Usage
-          E = changeOfRingsTor(M,N,f)
-     Inputs
-     	 M:Module
-	 N:Module
-	 f:RingMap
-     Outputs
-     	  E:Sequence
-     Description
-          Text
-	       This method computes the change of ring spectral sequence for cetain kinds of ring maps.
-	  Example
-	       k=QQ;
-	       R=k[a,b,c];
-	       S=k[s,t];
-	       f = map(S,R,{s^2,s*t,t^2});
---	       kappa = coker vars S;
---	       kkappa = coker vars R;
---	       (E,EE) = changeOfRingsTor(kkappa,kappa,f);
---	       e = prune E
---	       ee = prune EE
---	       e^0
---	       e^1
---	       e^2
---	       e^infinity
---	       ee^0
---	       ee^1
---	       ee^2
---	       (ee^2).dd
---	       ee^3
---	       ee^infinity   	      
-///
+
 
 doc ///
     	  Key
