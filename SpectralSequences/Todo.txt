@@ -9,3 +9,16 @@ Todo List
 
 there is a commented out note that says the output is a matrix, but should instead be changed to be a page
 
+
+
+3) Comment lines we might want to delete:
+
+
+Line 754 -- is this what we want??  Or do we only want to view the nonzero modules?
+I guess this is a comment on the support. Should we change the code?
+Later in the code for the support:
+-- this can problably be made more efficient.... 
+Should we worry about this at all at this point?
+
+Line 2895, 3928 — do we want to include this example? This comment is old, I don’t know why it was written.
+

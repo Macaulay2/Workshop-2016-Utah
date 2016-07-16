@@ -962,8 +962,6 @@ basis (List,SpectralSequencePage) := opts -> (deg,E) -> (
 --
 --
 --
--- Can we write a short script in general to compute the edge complex?
--- Ans: yes.
 
 edgeComplex = method()
 
@@ -983,7 +981,7 @@ edgeComplex(SpectralSequence) := (E) -> (
     c)
     )
 
--- maybe better to make new type ?!  
+ 
 filteredHomologyObject = method()
 
 filteredHomologyObject(ZZ, ZZ,FilteredComplex) := (p,n,K) -> (
@@ -1249,12 +1247,8 @@ doc ///
 	     E'' = prune spectralSequence F'' ;
 	     E' ^0
 	     E' ^ 0 .dd
-	     E' ^1    
-	     E' ^1 .dd
 	     E'' ^0
-	     E'' ^ 0 .dd
 	     E'' ^1    
-	     E'' ^1 .dd
 ///
 
 doc ///
@@ -1304,12 +1298,7 @@ doc ///
 	     E'' = prune spectralSequence F'';
 	     E' ^0
 	     E' ^ 0 .dd
---	     E' ^1    
---	     E' ^1 .dd
---	     E'' ^0
---	     E'' ^ 0 .dd
-	     E'' ^1    
---	     E'' ^1 .dd	      
+	     E'' ^1         
      SeeAlso   
 	  "Balancing Tor"	     
 ///  
@@ -1420,25 +1409,11 @@ doc ///
 		K = filteredComplex (L, ReducedHomology => false) ;
 		E = prune spectralSequence K ;
 		E^0
---		E^0 .dd
---		E^1
 		E^1 .dd
---		E^2
---		E^2 .dd
---		E^3
---		E^3 .dd
---		E^4
---		E^4 .dd
---		E^5
---		E^5 .dd
---		E^6
---		E^6 .dd
---		E^7
---		E^7 .dd
---		E^8
---		E^8 .dd
---		E^9
---		E^9 .dd
+		E^8
+		E^8 .dd
+		E^9
+		E^9 .dd
 		E^infinity
 		prune HH K_infinity
 ///
@@ -1495,7 +1470,6 @@ doc ///
 
 doc ///
     Key
-      --"The quotient map SS ^2 --> RR PP ^2"-- maybe better to call this 
       "Identifying anti-podal points of the two sphere"
     Description
     	  Text
@@ -1614,8 +1588,7 @@ doc///
 
 doc ///
     Key
-      "The trivial fibration over the sphere with fibers the sphere"--"The trivial fibration SS^1 --> SS^1 x SS^1 --> SS^1"
-      -- maybe better to call this the trivial fibration over the sphere with fiber the sphere
+      "The trivial fibration over the sphere with fibers the sphere"--"The trivial fibration over the sphere with fiber the sphere"
     Description
          Text
 	      In this example we compute the spectral sequence associated to the 
@@ -2037,8 +2010,8 @@ doc ///
 	       G := complete res M;
 	       E := spectralSequence(filteredComplex(G) ** pushFwdF);
 	       EE := spectralSequence(G ** (filteredComplex pushFwdF));
-      	       e = prune E
-	       ee = prune EE
+      	       e = prune E;
+	       ee = prune EE;
 	       e^0
 	       e^1
 	       e^2
@@ -2126,8 +2099,6 @@ doc ///
      	 "Filtered complexes and simplicial complexes"
 	 "Filtrations and tensor product complexes"
 	 "Filtrations and homomorphism complexes"
-	 -- "spectral sequences"
-	 -- "spectral sequence page"	
 ///
 
 
