@@ -3816,10 +3816,10 @@ doc ///
 	 Example
 	       e = prune spectralSequence K
 	       e^2
-	       e^3
-	       e^3 .dd
-	       e^4
-	       e^4 .dd
+--	       e^3
+--	       e^3 .dd
+--	       e^4
+--	       e^4 .dd
 	       assert(all(keys support e^0, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,0)))
 	       assert(all(keys support e^1, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,1)))
 	       assert(all(keys support e^2, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,2)))
