@@ -27,8 +27,8 @@ newPackage(
       HomePage => "http://www.math.berkeley.edu/~daffyd"},
     {
       Name => "Adam Boocher", 
-      Email => "aboocher@math.berkeley.edu", 
-      HomePage => "http://www.math.berkeley.edu/~aboocher"},
+      Email => "boocher@math.utah.edu", 
+      HomePage => "http://www.math.utah.edu/~boocher"},
        {
       Name => "Nathan Grieve", 
       Email => "n.grieve@unb.ca",
@@ -751,12 +751,12 @@ SpectralSequencePage ^ List := Module => (E,i)-> (E_(-i))
 
 -- view the modules on a Spectral Sequence Page.  We are refering to these
 -- as the support of the page.
--- is this what we want??  Or do we only want to view the nonzero modules?
 
-support SpectralSequencePage := E -> (
-     new HashTable from apply(spots E.dd, i -> i=> source E.dd #i) )
 
--- this can problably be made more efficient....   
+
+
+
+
 page SpectralSequencePage := Page => opts -> E -> ( 
     	K := E.filteredComplex;
 	s := E.number;
@@ -1033,11 +1033,11 @@ undocumented {page,
 document { 
   Key => SpectralSequences,
   Headline => "a package for working with filtered complexes and spectral sequences",
-   "Spectral sequences, although technical and subtle, can be very useful in applications---especially when they degenerate quickly.
-   By contrast little is known about their general structure when they fail to degenerate quickly.
-   Alleviating this dichotomy is one of the motivations behind this package.  Its purpose
+   "Spectral sequences, although notoriously technical, are very useful in applications---especially when they degenerate quickly.
+   By contrast, little is known about their general structure when they fail to degenerate quickly.  Even in cases when the terms in the spectral sequences are well understood, the maps remain mysterious.
+   One of the motivations behind this package is to shed light on spectral sequences through examples.  Its purpose
    is to allow for effective calculations of particular kinds of spectral sequences.
-   As one general example situation, which illustrates some capabilities of this package,
+   As one general situation, which illustrates some capabilities of this package,
    let k be a computable field, S a k-algebra of finite type, C a bounded chain complex of
  finitely generated S-modules, and FC a bounded ascending filtration of C.  This package is
  capable of computing, under these assumptions, the spectral sequence---especially the differentials on each page---determined by FC.
@@ -1150,9 +1150,9 @@ doc ///
 	      Here are some higher pages of the associated spectral sequence:
 	 Example
 	       E = prune spectralSequence K
-	       E^2
-	       E^3
-	       E^3 .dd
+--	       E^2
+--	       E^3
+--	       E^3 .dd
 	       E^4
 	       E^4 .dd
 ///
@@ -1453,7 +1453,7 @@ doc ///
 			  )
 		      ));
           Text
-	       To see what we're going for, we compute the E_infinity page and also some earlier pages.  
+	       To see what we're going for, we compute the E_{infinity} page and also some earlier pages.  
 	       Notice that it's clear that all terms except those in the top row of the matrix must eventually
 	       disappear, but for this to happen, there must a map of the right degree mapping to them.
           Example	       
@@ -1465,7 +1465,7 @@ doc ///
 	       rank (E_3).dd_{3,0}
 	  Text 
 	       The final two computations are meant to explain that the copy of $k^8$ in degree 3 that 
-	       appears on the $E_1$ cancels with an E_2 map from E_2_{0,1} and with an E_3 map from E_3_{0,2}
+	       appears on the $E_1$ cancels with an E_2 map from E_{2_{1,1}} and with an E_3 map from E_{3_{0,2}}
 ///
 
 doc ///
@@ -2004,13 +2004,13 @@ doc ///
 	       S=k[s,t];
 	       f = map(S,R,{s^2,s*t,t^2});
 	       N = coker vars S;
-	       M = coker vars R;
+	       M = coker vars R --;
 	       F := complete res N;
 	       pushFwdF := pushFwd(f,F);
 	       G := complete res M;
 	       E := spectralSequence(filteredComplex(G) ** pushFwdF);
 	       EE := spectralSequence(G ** (filteredComplex pushFwdF));
-      	       e = prune E;
+     	       e = prune E;
 	       ee = prune EE;
 	       e^0
 	       e^1
