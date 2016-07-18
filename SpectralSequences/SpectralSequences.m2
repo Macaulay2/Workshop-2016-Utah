@@ -130,7 +130,7 @@ isWellDefined ChainComplexMap := Boolean => f -> (
 
 -- Computes the total complex of the Hom double complex of two chain complexes
 -- This code is different from that in ChainComplexExtras.  We need this version
--- so that the indicies are cached.
+-- so that the indices are cached.
 Hom (ChainComplex, ChainComplex) := ChainComplex => (C,D) -> (
   if C.ring =!= D.ring then error "expected chain complexes over the same ring";
   E := chainComplex (lookup( Hom, GradedModule, GradedModule))(C,D);
