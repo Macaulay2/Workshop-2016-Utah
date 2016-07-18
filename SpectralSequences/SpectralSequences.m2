@@ -2468,10 +2468,10 @@ doc ///
 	       K = filteredComplex(J,C,4);
 	       E = spectralSequence K
 	  Text
-	       To view pages and or maps we proceed, for example, as follows
+	       To view pages and or maps we proceed, for example, as follows (note we supress the output of the E^0.dd command to prevent excessive output)
 	  Example
 	       E^0
-	       E^0 .dd
+	       E^0 .dd;
 	       E^infinity                   
      SeeAlso
      	 SpectralSequence
