@@ -390,17 +390,18 @@ minimalCompatible(ZZ,Matrix,Matrix) := (e,A,U) -> Mstar (e,A,U)
 -----------------------------------------------------------------------------
 
 
-getExponents=(f)->(
-answer:={};
-t:=terms(first first entries f);
-apply(t, i->
-{
-	exps:=first exponents(i);
-	c:=(coefficients(i))#1;
-	c=first first entries c;
-	answer=append(answer,(c,exps));
-});
-answer
+getExponents = method();
+getExponents(Matrix):= (f)-> (
+    answer:={};
+    t:=terms(first first entries f);
+    apply(t, i->
+    {
+        exps:=first exponents(i);
+        c:=(coefficients(i))#1;
+        c=first first entries c;
+        answer=append(answer,(c,exps));
+    });
+    answer
 )
 
 mEthRootOfOneElement= (e,v) ->(
@@ -463,7 +464,9 @@ mEthRootOfOneElement= (e,v) ->(
 mEthRoot = (e,A) ->(
 	local i;
 	local answer;
-	answer1:=apply(1..(rank source A), i->mEthRootOfOneElement (e, A_{i-1}));
+	                                 --i->first entries mEthRootOfOneElement (e, A_{i-1}));
+	answer1:=apply(1..(rank source A), i-> mEthRootOfOneElement (e, A_{i-1}));
+	--the above subscript denotes taking the ith column of A
 	if (#answer1==0) then 
 	{
 		answer=A;
@@ -472,16 +475,13 @@ mEthRoot = (e,A) ->(
 	{
 		answer=answer1#0;
 		apply(2..(#answer1), i->answer=answer | answer1#(i-1));
+		--this apply statement turns a list of columns into a matrix
+		--is there no better way?
+
+	    --answer = matrix toList answer1;
 	};
 	mingens( image answer )
 )	
-
-
-
-
-
-
-
 
 --- Mstar is the implementaion of the star closure operation desribed in 
 --- M Katzman's "Parameter test ideals of Cohen Macaulay rings" 
@@ -500,18 +500,18 @@ Mstar = (e,A,U) ->(
 	}
 	else
 	{
-		f:=true;
+		flag:=true;
 		Ne:=sum toList(apply(0..(e-1), i->p^i));
 		lastA:= A;
-		while (f) do
+		while (flag) do
 		{
-			f=false;
+			flag=false;
 			A1:=mEthRoot(e, mingens image ((U^Ne)*lastA));
 			A1=A1 | lastA;
 			t1:=compress ((A1))%((lastA));
 			if (t1!=0) then 
 			{
-				f=true;
+				flag=true;
 				lastA=mingens image A1;
 			};
 		};
@@ -520,7 +520,4 @@ Mstar = (e,A,U) ->(
 	use(R);
 	answer
 )
-
-
---- end of MK ---------------------------------------------------------------------------------------------------
 

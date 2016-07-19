@@ -22,7 +22,7 @@
 
 doc ///
      Key
-     	basePExp
+     	fastExp
      Headline
         Computes
      Usage

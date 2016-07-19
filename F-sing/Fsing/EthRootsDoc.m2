@@ -1,3 +1,17 @@
+-------------------------------------------------------
+---------- List of functions to document---------------
+-----------(as of 2016-07-18 --------------------------
+-------------------------------------------------------
+-- ethRoot
+-- ethRootRingElements
+-- minimalCompatible 
+-- Mstar 
+-------------------------------------------------------
+-------------------------------------------------------
+-------------------------------------------------------
+
+
+
 doc ///
     Key
         ascendIdeal
@@ -134,4 +148,45 @@ doc ///
         Example
             ethRoot(2, {2,3,1}, {f1, f2, I})
 
+///
+
+doc ///
+    Key
+        minimalCompatible
+    Headline
+        This function computes minimal compatible ideals and submodules. 
+    Usage
+        J = minimalCompatible(e, f, I)
+        J = minimalCompatible(a, e, f, I)
+        M = minimalCompatible(e, A, U)
+    Inputs
+        e: ZZ
+        f: RingElement
+        a:ZZ
+        I:Ideal
+        A:Matrix
+        U:Matrix
+    Outputs
+        J:ideal
+        M:Matrix
+    Description
+        Text
+            minimalCompatible is a method for:
+            (1) finding the smallest ideal $J$ which satisfies $uJ\subset J^{[p^e]}$ and $I \subset J$ for a given ideal $I$ and a given ring element $u$, and
+            (2) finding the smallest submodule $V$ of a free module which satisfies $UV\subset V^{[p^e]}$ and image$(A)\subset V$ for given matrices $A$ and $U$. 
+
+///
+
+doc ///
+    Key
+        mEthRoot
+    Headline
+        This function computes p^eth roots of matrices
+    Usage
+        mEthRoot(e, A)
+    Inputs
+        e: ZZ
+        A: Matrix
+    Outputs
+        :Matrix
 ///

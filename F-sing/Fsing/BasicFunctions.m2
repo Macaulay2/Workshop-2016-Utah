@@ -284,7 +284,7 @@ truncatedBasePExp ( ZZ, ZZ, List ) := ( p, e, u ) -> apply( u, x -> truncatedBas
 
 --===================================================================================
 
---- write n=a*p^e+a_{e-1} p^{e-1} + \dots + a_0 where 0\leq e_j <p 
+--- write n=a*p^e+a_{e-1} p^{e-1} + \dots + a_0 where 0\leq a_j <p 
 --- DS: so it's just like doing basePExp but giving up after p^e and just returning whatever number's left
 --- DS: this could be merged with basePExp. Should it be? 
 baseP1 = ( n, p, e ) ->
