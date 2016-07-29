@@ -16,6 +16,7 @@
 -- If there is no such unique element, the function returns an error.
 needs "BasicFunctions.m2" 
 needs "EthRoots.m2"
+needs "frobeniusPowers.m2"
 
 findQGorGen=method()
 
@@ -171,7 +172,7 @@ tauQGor = (Rk, ek, fk, t1) ->
      else (
 	  	I1 = ascendIdeal(ek, hk, Jk);
 	  	if (pPow != 0) then (
-	  		I2 = ethRootRingElements( pPow, (numerator((pp^pPow - 1)/(pp^ek - 1)), a2), (hk, fm), I1 )
+	  		I2 = ethRootRingElements( pPow, {numerator((pp^pPow - 1)/(pp^ek - 1)), a2}, {hk, fm}, I1 )
 	  	)
 	  	else I2 = I1
      );

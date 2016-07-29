@@ -254,7 +254,7 @@ ethRootRingElements( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
     IN1*ideal(product(aPowerList))
 )
 
-
+ethRootRingElements( ZZ, Sequence, Sequence, Ideal ) := (a, b, c, d) -> ethRootRingElements(a, toList b, toList c, d);
 
 ethRootRingElements( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> 
     ethRootRingElements(e, {a}, {f}, I);
