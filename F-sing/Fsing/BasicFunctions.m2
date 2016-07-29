@@ -129,7 +129,7 @@ divideFraction( ZZ, QQ ) := ( p, t ) ->
      );
      {a,b,c}
 )
-
+divideFraction( ZZ, ZZ ) := (p, t) -> divideFraction(p, t/1)
 --===================================================================================
      
 --Finds the a/p^e nearest t from above.
