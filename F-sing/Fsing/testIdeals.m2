@@ -14,6 +14,8 @@
 -- This function computes the element f in the ambient ring S of R=S/I such that
 -- I^{[p^e]}:I = (f) + I^{[p^e]}.
 -- If there is no such unique element, the function returns an error.
+needs "BasicFunctions.m2" 
+needs "EthRoots.m2"
 
 findQGorGen=method()
 
