@@ -201,6 +201,7 @@ findNumberBetweenWithDenom( ZZ, ZZ, ZZ) := ( myDenom, firstN, secondN) ->
      else {}
 )
 
+--for backwards compatibility
 findNumberBetweenWithDenom( ZZ, List ) := (a, L) -> findNumberBetweenWithDenom(a, L#0, L#1);
 
 --===================================================================================
@@ -225,6 +226,7 @@ findNumberBetween( ZZ, ZZ, ZZ) := ( maxDenom, firstN, secondN)->
      sort(toList set outList)
 )
 
+--for backwards compatibility
 findNumberBetween( ZZ, List ) := ( maxDenom, myInterv )-> findNumberBetween( maxDenom, myInterv#0, myInterv#1);
 
 --===================================================================================
