@@ -209,8 +209,18 @@ needsPackage "Divisor";
 
 tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- computes \tau(I^{a/p^e}) for I an ideal in a polynomial ring
 	if ( not(codim(I1) > 1)) then error "We can only handle ideals of codimension > 1 at this time.";
-	
-	--this function currently doesn't take advantage of Skoda's theorem, this will need to be done
+
+	R1 := ring I1;
+	p1 := char R1;
+
+    -- Skoda's theorem
+    n:= numgens I1;
+    mSkoda := 0;
+    if (a1 > p1^e1*n) then (
+        mSkoda = floor(a/p1^e1) + 1 - n;
+        a1 = a1 - mSkoda *p1^e1;
+    );
+
 
 	reesList := flattenedReesAlgebra I1;
 	A1 := reesList#0; --this one has flattened variables
@@ -231,9 +241,7 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
 
 	flag := false;
 	i1 := e1;
-	R1 := ring I1;
-	p1 := char R1;
-	ascend := I1; --dummy variables for checking whether we are done
+		ascend := I1; --dummy variables for checking whether we are done
 	descend := ideal(sub(1, R1)); --dummy variables for checking whether we are done
 	
 	while (flag == false) do (
@@ -262,7 +270,7 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
 		if (o.Verbose==true) then (print "Loop complete, continue?"; print (not flag) );
 	);
 	
-	ascend
+	ascend*I1^mSkoda
 )
 
 
