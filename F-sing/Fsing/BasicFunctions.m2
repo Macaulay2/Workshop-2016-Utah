@@ -186,20 +186,22 @@ findNumberBetweenWithDenom = method();
 
 --This function finds rational numbers in the range of the interval
 --with the given denominator
-findNumberBetweenWithDenom( ZZ, List ) := ( myDenom, myInterv ) ->
+findNumberBetweenWithDenom( ZZ, ZZ, ZZ) := ( myDenom, firstN, secondN) ->
 (
-     upperBound := floor((myInterv#1)*myDenom)/myDenom; 
-          --finds the number with denominator myDenom less than the upper 
-	  --bound of myInterv
-     lowerBound := ceiling((myInterv#0)*myDenom)/myDenom; 
-          --finds the number with denominator myDenom greater than the lower
-	  -- bound of myInterv
+     upperBound := floor((secondN)*myDenom)/myDenom; 
+          --finds the number with denominator myDenom less than the second number
+     lowerBound := ceiling((firstN)*myDenom)/myDenom; 
+          --finds the number with denominator myDenom greater than the first number
+
      if (upperBound >= lowerBound) then (
 	  --first we check whether there is anything to search for
+
 	  apply( 1+numerator((upperBound-lowerBound)*myDenom), i-> lowerBound+(i/myDenom) )
      )
      else {}
 )
+
+findNumberBetweenWithDenom( ZZ, List ) := (a, L) -> findNumberBetweenWithDenom(a, L#0, L#1);
 
 --===================================================================================
 
@@ -207,7 +209,7 @@ findNumberBetween = method();
 
 --This function finds rational numbers in the range of 
 --the interval; the max denominator allowed is listed. 
-findNumberBetween( ZZ, List ) := ( maxDenom, myInterv )->
+findNumberBetween( ZZ, ZZ, ZZ) := ( maxDenom, firstN, secondN)->
 (
      divisionChecks :=  new MutableList from maxDenom:true; 
          -- creates a list with maxDenom elements all set to true.
@@ -215,13 +217,15 @@ findNumberBetween( ZZ, List ) := ( maxDenom, myInterv )->
      i := maxDenom;
      while (i > 0) do (
 	  if ((divisionChecks#(i-1)) == true) then --if we need to do a computation..
-	      outList = join(outList,findNumberBetweenWithDenom(i,myInterv));
+	      outList = join(outList,findNumberBetweenWithDenom(i, firstN, secondN ));
 	  factorList := getFactorList(i);
      	  apply(factorList, j-> (divisionChecks#(j-1) = false) );
 	  i = i - 1;
      );
      sort(toList set outList)
 )
+
+findNumberBetween( ZZ, List ) := ( maxDenom, myInterv )-> findNumberBetween( maxDenom, myInterv#0, myInterv#1);
 
 --===================================================================================
 
