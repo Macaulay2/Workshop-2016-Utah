@@ -433,9 +433,9 @@ guessFPT ={OutputRange=>false}>>o -> (ff, e1, maxDenom) ->(
      nn := nu(e1,ff);
      pp := char ring ff;
      if (o.OutputRange == false) then 
-          findNumberBetween( maxDenom, {nn/(pp^e1-1), (nn+1)/(pp^e1)} )
+          findNumberBetween( maxDenom, nn/(pp^e1-1), (nn+1)/(pp^e1) )
      else
-          {{ nn/(pp^e1-1), (nn+1)/(pp^e1)}, findNumberBetween( maxDenom, {nn/(pp^e1-1), (nn+1)/(pp^e1)} )}
+          { {nn/(pp^e1-1), (nn+1)/(pp^e1)}, findNumberBetween( maxDenom, nn/(pp^e1-1), (nn+1)/(pp^e1) ) }
 )
 
 --F-pure threshold estimation, at the origin

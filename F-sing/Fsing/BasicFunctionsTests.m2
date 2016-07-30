@@ -122,25 +122,25 @@ assert(J == {2, 3, 12, 4, 6})
 
 -- findNumberBetweenWithDenom test1
 TEST ///
-time J = findNumberBetweenWithDenom(3, {0, 1});
+time J = findNumberBetweenWithDenom(3, 0, 1);
 assert(J == {0, 1/3, 2/3, 1})
 ///
 
 -- findNumberBetweenWithDenom test2
 TEST ///
-time J = findNumberBetweenWithDenom(4, {1, 2});
+time J = findNumberBetweenWithDenom(4, 1, 2);
 assert(J == {1, 5/4, 3/2, 7/4, 2})
 ///
 
 -- findNumberBetween test1
 TEST ///
-time J = findNumberBetween(3, {1, 2});
+time J = findNumberBetween(3, 1, 2);
 assert(J == {0, 4/3, 3/2, 5/3, 1})
 ///
 
 -- findNumberBetween test2
 TEST ///
-time J = findNumberBetween(4, {1, 2});
+time J = findNumberBetween(4, 1, 2);
 assert(J == {1, 5/4, 4/3, 3/2, 5/3, 7/4, 2})
 ///
 
