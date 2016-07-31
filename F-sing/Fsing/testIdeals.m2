@@ -17,6 +17,7 @@
 needs "BasicFunctions.m2" 
 needs "EthRoots.m2"
 needs "frobeniusPowers.m2"
+needs "parameterTestIdeal.m2"
 
 findQGorGen=method()
 
@@ -230,7 +231,7 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
  	
  	IRees := sub(I1, A2);
  	
- 	canList := canonicalIdeal(A1, FullMap=>true);
+ 	canList := canonicalIdeal(A1);
  	canIdeal := canList#0;
  	canMap := canList#1;
  	
