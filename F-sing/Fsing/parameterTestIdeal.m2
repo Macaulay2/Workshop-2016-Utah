@@ -10,7 +10,9 @@
 --it returns the lift of the canonical module to the ambient ring
 needsPackage "Divisor";
 
-canonicalIdeal = (R1) -> (
+canonicalIdeal = method();
+
+canonicalIdeal(Ring) := (R1) -> (
     S1 := ambient R1;
 	I1 := ideal R1;
 	dR := dim R1;
@@ -23,34 +25,6 @@ canonicalIdeal = (R1) -> (
 		degList = apply(varList, q -> (degree(q))); );
 	M1 := (Ext^(dS - dR)(S1^1/I1, S1^{-(sum degList)}))**R1;
 	moduleToIdeal(M1)
-)
-
-oldCanonicalIdeal ={FullMap=> false} >> o -> (R1) -> (
-	S1 := ambient R1;
-	I1 := ideal(R1);
-	d1 := (dim S1) - (dim R1);
-	local answer2;
-	
-	degShift := sum degrees S1;
-	myExt := prune( Ext^d1(S1^1/I1, S1^{-degShift}));
-	canModuleMatrix := relations(myExt);
-	
-	answer:=0;
-	s1:=syz transpose substitute(canModuleMatrix,R1);
-	s2:=entries transpose s1;
-	--use S1;
-	apply(s2, t->
-	{
-		s3:=substitute(syz gens ideal t,S1);
----		print(s3%canModuleMatrix);
-		if ((s3%canModuleMatrix)==0) then
-		{
-			answer2 = t;
-			answer=substitute(mingens ideal t,S1);
-			break;
-		};
-	});		
-	if (o.FullMap == true) then (ideal answer, map(R1^1, myExt**R1, matrix {answer2}), (myExt**S1^{-degShift})**R1) else ideal answer
 )
 
 --moduleToIdeal = (M1, R1) -> (--turns a module to an ideal of a ring, it returns the lift of the ideal to the ambient ring
@@ -91,33 +65,20 @@ paraTestModuleAmbient (Ring) := (R1) -> (
 	S1 := ambient R1;
 	I1 := ideal(R1);
 	
-	canIdeal := canonicalIdeal(R1);
+	canIdeal := sub(canonicalIdeal(R1), S1) + I1;
 	
-	J1 := findTestElementAmbient(R1);
+	J1 := (findTestElementAmbient(R1));
 	tau0 := J1*canIdeal; --this is the starting test element times the ideal
 	
 	u1 := finduOfIdeal(canIdeal, I1); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
 	
 	tauOut := ascendIdeal(1, u1, tau0);
 	
-	(sub(tauOut, R1), sub(canIdeal, R1), u1)
+	(sub(tauOut, R1), sub(canIdeal, R1), 
+	u1)
 )
 
-paraTestModuleAmbient (Ring, Ideal) := (R1, canIdeal) -> (
-	S1 := ambient R1;
-	I1 := ideal(R1);
-	
-	J1 := findTestElementAmbient(R1);
-	tau0 := J1*canIdeal; --this is the starting test element times the ideal
-	
-	u1 := finduOfIdeal(canIdeal, I1); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
-	
-	tauOut := ascendIdeal(1, u1, tau0);
-	
-	(sub(tauOut, R1), sub(canIdeal, R1), u1)
-)
-
-paraTestModuleAmbient (Ring, Ideal) := (R1, canIdeal) -> (
+paraTestModuleAmbient (Ring, Ideal) := (R1, canIdeal) -> (--it expects the canonical ideal to be lifted to the ambient ring
 	S1 := ambient R1;
 	I1 := ideal(R1);
 	
@@ -136,15 +97,15 @@ paraTestIdealAmbient = (R1) -> (
 	tempList := paraTestModuleAmbient(R1);
 	(tempList#0) : (tempList#1)
 )
-
+paraTestModule = method(Options=>{AscentCount=>false})
 --this computes the parameter test module \tau(R, f^t).  It does not assume that R is a polynomial ring.
-paraTestModule ={AscentCount=>false} >> o -> (fk, t1) -> ( --maintained by Karl
+paraTestModule(QQ, RingElement) := o -> (t1, fk) -> ( --maintained by Karl
 	R1 := ring fk;
 	S1 := ambient R1;
 	f1 := sub(fk, S1);
 	I1 := ideal R1;
 	pp := char R1;
-	funList := divideFraction(t1, pp);
+	funList := divideFraction(pp, t1);
 	
 	aa := funList#0;
 	bb := funList#1;
@@ -155,7 +116,7 @@ paraTestModule ={AscentCount=>false} >> o -> (fk, t1) -> ( --maintained by Karl
 --	omegaAmb := sub(tempList#1, S1);
 --	u1 := tempList#2;
 
-	omegaAmb := canonicalIdeal(R1);
+	omegaAmb := sub(canonicalIdeal(R1), S1) + I1;
 	J1 := findTestElementAmbient(R1)*omegaAmb;
 	u1 := finduOfIdeal(omegaAmb, I1);
 
@@ -168,8 +129,8 @@ paraTestModule ={AscentCount=>false} >> o -> (fk, t1) -> ( --maintained by Karl
 --	assert false;
 	if (cc != 0) then	
 --??? REORDER PARAMETERS
-		if (o.AscentCount == false) then (firstTau = ascendIdealSafeList( J1*ideal(f1^(pp^bb*ceiling(t1))), (f1, u1), (aa, uPower), cc))
-		else (tempList = ascendIdealSafeList( J1*ideal(f1^(pp^bb*ceiling(t1))), (f1, u1), (aa, uPower), cc, AscentCount=>true);
+		if (o.AscentCount == false) then (firstTau = ascendIdealSafeList( (aa, uPower), cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))) ))
+		else (tempList = ascendIdealSafeList(  (aa, uPower), cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))), AscentCount=>true);
 			firstTau = tempList#0;
 			ascendingCount = tempList#1;
 		)
@@ -177,11 +138,58 @@ paraTestModule ={AscentCount=>false} >> o -> (fk, t1) -> ( --maintained by Karl
 		--I should write an ascendIdealSafe that works for multiple elements raised to powers...	
 	else 
 --		firstTau = ascendIdeal(1, u1^(uPower), J1)*ideal(f1^aa);
-		firstTau = ascendIdealSafe(J1, u1, uPower, 1); --??? REORDER PARAMETERS
+		firstTau = ascendIdealSafeList( {uPower},  1, u1, J1);
 			
 	secondTau := firstTau;
 	if (bb != 0) then
-		secondTau = ethRootRingElements(u1, firstTau, floor((pp^bb-1)/(pp-1)) , bb); --??? REORDER PARAMETERS
+		secondTau = ethRootRingElements(bb, floor((pp^bb-1)/(pp-1)), u1, firstTau); --??? REORDER PARAMETERS
+
+	if (o.AscentCount == false) then (sub(secondTau, R1), omegaAmb, u1) else (sub(secondTau, R1), omegaAmb, u1, ascendingCount)
+)
+
+--this computes the parameter test module \tau(R, f^t).  It does not assume that R is a polynomial ring.
+paraTestModule(QQ, RingElement, Ideal, RingElement) := o -> (t1, fk, omegaAmb, u1) -> ( --maintained by Karl
+	R1 := ring fk;
+	S1 := ambient R1;
+	f1 := sub(fk, S1);
+	I1 := ideal R1;
+	pp := char R1;
+	funList := divideFraction(pp, t1);
+	
+	aa := funList#0;
+	bb := funList#1;
+	cc := funList#2;
+	
+--	tempList := paraTestModuleAmbient(R1);
+--	tauAmb := sub(tempList#0, S1);
+--	omegaAmb := sub(tempList#1, S1);
+--	u1 := tempList#2;
+
+	J1 := findTestElementAmbient(R1)*omegaAmb;
+
+	uPower := 1;
+	if (cc != 0) then
+		uPower = floor((pp^cc-1)/(pp-1));
+	firstTau := J1;
+	local tempList;
+	ascendingCount := 0;
+--	assert false;
+	if (cc != 0) then	
+--??? REORDER PARAMETERS
+		if (o.AscentCount == false) then (firstTau = ascendIdealSafeList( (aa, uPower), cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))) ))
+		else (tempList = ascendIdealSafeList(  (aa, uPower), cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))), AscentCount=>true);
+			firstTau = tempList#0;
+			ascendingCount = tempList#1;
+		)
+--		firstTau = ascendIdeal(cc, f1^aa*u1^(uPower), J1*ideal(f1^(aa)))
+		--I should write an ascendIdealSafe that works for multiple elements raised to powers...	
+	else 
+--		firstTau = ascendIdeal(1, u1^(uPower), J1)*ideal(f1^aa);
+		firstTau = ascendIdealSafeList( {uPower},  1, {u1}, J1);
+			
+	secondTau := firstTau;
+	if (bb != 0) then
+		secondTau = ethRootRingElements(bb, floor((pp^bb-1)/(pp-1)), u1, firstTau); --??? REORDER PARAMETERS
 
 	if (o.AscentCount == false) then (sub(secondTau, R1), omegaAmb, u1) else (sub(secondTau, R1), omegaAmb, u1, ascendingCount)
 )
