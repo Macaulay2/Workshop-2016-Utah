@@ -293,18 +293,20 @@ truncatedBasePExp ( ZZ, ZZ, List ) := ( p, e, u ) -> apply( u, x -> truncatedBas
 --- write n=a*p^e+a_{e-1} p^{e-1} + \dots + a_0 where 0\leq a_j <p 
 --- DS: so it's just like doing basePExp but giving up after p^e and just returning whatever number's left
 --- DS: this could be merged with basePExp. Should it be? 
-baseP1 = ( n, p, e ) ->
+--- note: I changed the calling order here should change to be consistent with basePExp
+--- The change I made was switching the order of the first two arguments
+baseP1 = ( p, n, e ) ->
 (
     a:=n//(p^e);
-    answer:=1:a;
+    answer:=1:a; -- this generates the list (a)
     m:=n-a*(p^e);
     f:=e-1; 
     while (f>=0) do
     (
-	d:=m//(p^f);
-	answer=append(answer,d);
-	m=m-d*(p^f);
-	f=f-1;
+        d:=m//(p^f);
+        answer=append(answer,d);
+        m=m-d*(p^f);
+        f=f-1;
     );
     answer
 )	
