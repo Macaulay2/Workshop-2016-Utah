@@ -14,10 +14,10 @@
 -- This function computes the element f in the ambient ring S of R=S/I such that
 -- I^{[p^e]}:I = (f) + I^{[p^e]}.
 -- If there is no such unique element, the function returns an error.
-needs "BasicFunctions.m2" 
-needs "EthRoots.m2"
-needs "frobeniusPowers.m2"
-needs "parameterTestIdeal.m2"
+--needs "BasicFunctions.m2" 
+--needs "EthRoots.m2"
+--needs "frobeniusPowers.m2"
+--needs "parameterTestIdeal.m2"
 
 findQGorGen=method()
 
@@ -218,7 +218,7 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
     n:= numgens I1;
     mSkoda := 0;
     if (a1 > p1^e1*n) then (
-        mSkoda = floor(a/p1^e1) + 1 - n;
+        mSkoda = floor(a1/p1^e1) + 1 - n;
         a1 = a1 - mSkoda *p1^e1;
     );
 
@@ -231,7 +231,9 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
  	
  	IRees := sub(I1, A2);
  	
- 	canList := canonicalIdeal(A1);
+ 	canList := oldCanonicalIdeal(A1, FullMap => true);
+    --canonicalIdeal doesn't return a list though ?
+
  	canIdeal := canList#0;
  	canMap := canList#1;
  	
@@ -246,8 +248,9 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
 	descend := ideal(sub(1, R1)); --dummy variables for checking whether we are done
 	
 	while (flag == false) do (
-		ascend = ethRoot(I1, a1*p1^(i1-e1), i1);
-		if (o.Verbose == true) then (print  "Ascending ideal"; print ascend);
+		if (o.Verbose == true) then (print  "Ascending ideal");
+		ascend = ethRoot(i1, a1*p1^(i1-e1), I1);
+		if (o.Verbose == true) then (print ascend);
 		
 		flag = isSubset(descend, ascend);
 		if (o.Verbose == true) then (print "flag"; print flag);
@@ -255,7 +258,7 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
 			
 			myDirectImage := HH_0(directImageComplex(IRees^(a1*p1^(i1-e1))*newKer, Regularity=>(10+a1))); 	
  	
-		 	directIdeal := moduleToIdeal(myDirectImage, R1);
+		 	directIdeal := moduleToIdeal(myDirectImage**R1); --probably the tensor product is unnecessary
  			if ( codim(directIdeal)==1) then error "This function produced a codimension 1 ideal.";
  	
  			descend = ethRoot(i1,directIdeal);

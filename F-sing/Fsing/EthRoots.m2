@@ -49,7 +49,7 @@
 -------------------------------------------------------
 -------------------------------------------------------
 
-needs "BasicFunctions.m2" -- maybe this should be removed
+--needs "BasicFunctions.m2" -- maybe this should be removed
                           -- when we publish this package
 
 ethRoot = method(Options => {EthRootStrategy => Substitution});
