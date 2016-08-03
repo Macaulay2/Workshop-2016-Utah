@@ -131,9 +131,9 @@ doc ///
         e:ZZ
         aList:List
         elmList:List
-     Outputs
-         :Ideal
-     Description
+    Outputs
+        :Ideal 
+    Description
         Text
             This is a version of ethRoot that's optimized for lists of principal ideals. For instance,
         Example 
@@ -160,14 +160,14 @@ doc ///
         J = minimalCompatible(a, e, f, I)
         M = minimalCompatible(e, A, U)
     Inputs
-        e: ZZ
-        f: RingElement
+        e:ZZ
+        f:RingElement
         a:ZZ
         I:Ideal
         A:Matrix
         U:Matrix
     Outputs
-        J:ideal
+        J:Ideal
         M:Matrix
     Description
         Text
