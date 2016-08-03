@@ -237,7 +237,7 @@ ethRootRingElements( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
     
     -- gives the basePexpansion of each element of aListRem
     -- expOfaList is thus a list of lists.
-    expOfaList := apply(aListRem, z -> basePExp( p, z ) );
+    expOfaList := apply(aListRem, z -> reverse toList baseP1( p, z, e ) );
     
     -- this computes { ... f_i^b_i ... } where b_i = a_i % p
     aPowerList := apply(elmtList, expOfaList, (f, z) -> f^(z#0));
