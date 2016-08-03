@@ -49,8 +49,10 @@
 -------------------------------------------------------
 -------------------------------------------------------
 
---needs "BasicFunctions.m2" -- maybe this should be removed
+if  (not (class Fsing === Package)) then (
+    needs "BasicFunctions.m2" -- maybe this should be removed
                           -- when we publish this package
+)                          
 
 ethRoot = method(Options => {EthRootStrategy => Substitution});
 --ethRoot takes two strategy options: Substitution and MonomialBasis

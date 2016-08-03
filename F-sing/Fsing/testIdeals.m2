@@ -14,10 +14,18 @@
 -- This function computes the element f in the ambient ring S of R=S/I such that
 -- I^{[p^e]}:I = (f) + I^{[p^e]}.
 -- If there is no such unique element, the function returns an error.
---needs "BasicFunctions.m2" 
---needs "EthRoots.m2"
---needs "frobeniusPowers.m2"
---needs "parameterTestIdeal.m2"
+if  (not (class Fsing === Package)) then (
+    needs "BasicFunctions.m2";
+    needs "EthRoots.m2";
+    needs "frobeniusPowers.m2";
+    needs "parameterTestIdeal.m2";
+);
+
+needsPackage "Divisor";
+
+--*********************
+--Preliminary functions
+--*********************
 
 findQGorGen=method()
 
@@ -43,18 +51,69 @@ findQGorGen ( Ring ) := R -> findQGorGen( R, 1 )
 --One could make this faster by not computing the entire Jacobian / singular locus
 --instead, if we just find one element of the Jacobian not in I, then that would also work
 --and perhaps be substantially faster
-findTestElementAmbient = R -> 
+findTestElementAmbient = method()
+randomSubset = method()
+
+findTestElementAmbient(Ring) := (R) ->
 (
-     J := ideal singularLocus( R );
-     if isSubset( J, ideal R ) then 
-          error "findTestElementAmbient: No test elements found; is the ring non-reduced?";	  
-     J          
+	I = ideal R;
+	n = #gens R - dim R;
+	M = jacobian I;
+	r = rank target M;
+	c = rank source M;
+	testEle = ideal(sub(0,ambient R));
+	while(isSubset(testEle, I))
+	do(
+	   testEle = minors(n,M, First =>{randomSubset(r,n),randomSubset(c,n)}, Limit =>1);
+	);
+	testEle
 )
 
+randomSubset(ZZ,ZZ) := (m,n) ->
+(
+	L = for i from 0 to m-1 list i;
+	for i from 0 to m-n-1 do (L = delete(L#(random(0,m-1-i)),L));
+	L
+)
+
+--****************************
+--****************************
+--**New test ideal functions**
+--****************************
+--****************************
+
+testIdeal = method(Options => {MaxCartierIndex => 100});
+
+testIdeal(Ring) := o->(R1) -> (
+    canIdeal := canonicalIdeal(R1);
+    --this should be rewritten so as not to use the Divisor package version of Q-Cartier checking, 
+    --since that will compute a Grobner basis / associated primes unnecessarily
+    cartIndex := isQCartier(o.MaxCartierIndex, divisor(canIdeal));
+    gg := first first entries gens trim canIdeal;
+    dualCanIdeal := (ideal(gg) : canIdeal);
+    nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
+    gensList := first entries gens nMinusKX;
+    
+    runningIdeal := ideal(sub(0, R1));
+    omegaAmb := sub(canIdeal, ambient R1) + ideal(R1);
+	u1 := finduOfIdeal(omegaAmb, ideal R1);
+    
+    print gensList;
+    for x in gensList do (
+        runningIdeal = runningIdeal + (paraTestModule(1/cartIndex, x, omegaAmb, u1))#0;        
+    );
+    
+    newDenom := reflexifyIdeal(canIdeal*dualCanIdeal);
+    (runningIdeal*R1) : newDenom
+)
+
+--*************
+--all the below versions should eventually be deprecated
+--*************
 
 --Outputs the test ideal of a (Q-)Gorenstein ring (with no pair or exponent)
 --e is the number such that the index divides (p^e - 1)
---It actually spits out the appropriate stable/fixed ideal inside the ambient ring
+--It actually spits ourt the appropriate stable/fixed ideal inside the ambient ring
 tauQGorAmb = ( R, e ) -> 
 (
      J := findTestElementAmbient( R );
