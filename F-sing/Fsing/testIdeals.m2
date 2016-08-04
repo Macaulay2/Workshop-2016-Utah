@@ -56,12 +56,12 @@ randomSubset = method()
 
 findTestElementAmbient(Ring) := (R) ->
 (
-	I = ideal R;
-	n = #gens R - dim R;
-	M = jacobian I;
-	r = rank target M;
-	c = rank source M;
-	testEle = ideal(sub(0,ambient R));
+	I := ideal R;
+	n := #gens R - dim R;
+	M := jacobian I;
+	r := rank target M;
+	c := rank source M;
+	testEle := ideal(sub(0,ambient R));
 	while(isSubset(testEle, I))
 	do(
 	   testEle = minors(n,M, First =>{randomSubset(r,n),randomSubset(c,n)}, Limit =>1);
