@@ -82,29 +82,87 @@ randomSubset(ZZ,ZZ) := (m,n) ->
 --****************************
 --****************************
 
+--gets a nonzero generator of an ideal.
+getNonzeroGenerator := (I2) -> (
+    i := 0;
+    flag := false;
+    genList := first entries gens I2;
+    localZero := sub(0, ring I2);
+    while ((i < #genList) and (flag == false)) do (
+        if (genList#i != localZero) then (            
+            flag = true;
+        );
+        i = i + 1;
+    );
+    if (flag == true) then (
+        genList#(i-1)
+    )
+    else (
+        null
+    )
+);
+
+--the following function should go elsewhere, it checks whether a given ideal is locally principal (really, invertible), if it is locally principal, it returns the inverse ideal.
+isLocallyPrincipalIdeal := (I2) -> (
+    localGen := getNonzeroGenerator(I2);
+    if (localGen === null) then (
+        return {false, sub(0, ring I2)};
+    );
+    inverseIdeal := (ideal(localGen) : I2);
+    idealProduct := inverseIdeal*I2;
+    isLocPrinc := (reflexifyIdeal(idealProduct, KnownNormal=>true) == idealProduct);
+    if (isLocPrinc == true) then (
+        return {true, inverseIdeal};
+    )
+    else (
+        return {false, sub(0, ring I2)};
+    );
+    
+);
+
 testIdeal = method(Options => {MaxCartierIndex => 100});
 
 testIdeal(Ring) := o->(R1) -> (
+    --it appears in some examples that calling the old tauGorAmb function is faster.  We may want to adjust this function to work in that way.
     canIdeal := canonicalIdeal(R1);
-    --this should be rewritten so as not to use the Divisor package version of Q-Cartier checking, 
-    --since that will compute a Grobner basis / associated primes unnecessarily
-    cartIndex := isQCartier(o.MaxCartierIndex, divisor(canIdeal));
-    gg := first first entries gens trim canIdeal;
-    dualCanIdeal := (ideal(gg) : canIdeal);
-    nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
-    gensList := first entries gens nMinusKX;
+    cartIndex := 0;
+    fflag := false;
+    curIdeal := ideal(sub(0, R1));
+    locPrincList := null;
+    while ( (fflag == false) and (cartIndex < o.MaxCartierIndex) ) do (
+        cartIndex = cartIndex + 1;
+        curIdeal = reflexivePower(cartIndex, canIdeal);
+        locPrincList = isLocallyPrincipalIdeal(curIdeal);
+        if (locPrincList#0 == true) then (            
+            fflag = true;
+        );
+       -- if (cartIndex == 2) then 1/0;
+    );
+    if (fflag == false) then error "testIdeal: Ring does not appear to be Q-Cartier, perhaps increase the option MaxCartierIndex";
+    nMinusKX := locPrincList#1;
+    
+--    cartIndex := isQCartier(o.MaxCartierIndex, divisor(canIdeal));
+    --gg := first first entries gens trim canIdeal;
+    --dualCanIdeal := (ideal(gg) : canIdeal);
+--    nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
+    gensList := first entries gens trim nMinusKX;
     
     runningIdeal := ideal(sub(0, R1));
     omegaAmb := sub(canIdeal, ambient R1) + ideal(R1);
 	u1 := finduOfIdeal(omegaAmb, ideal R1);
     
-    print gensList;
+--    print gensList;
+    1/0;
     for x in gensList do (
         runningIdeal = runningIdeal + (paraTestModule(1/cartIndex, x, omegaAmb, u1))#0;        
     );
     
     newDenom := reflexifyIdeal(canIdeal*dualCanIdeal);
     (runningIdeal*R1) : newDenom
+)
+
+testIdeal(QQ, RingElement, Ring) := o->(t1, f1, R1) -> (
+    --this computes \tau(R, f^t)
 )
 
 --*************
