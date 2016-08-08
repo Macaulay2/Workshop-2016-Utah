@@ -334,10 +334,50 @@ of an arbitrary $(\edim(R)-1)\times \edim(R)$ submatrix of $\psi$ of rank $\edim
 \end{enumerate}
 
 \end{theorem}
-As it is expected, the most expensive part to apply this theorem is computing the Rees ideal ${\mathcal J}$. In Package {\textsc RationalMaps} we use {\textsc ReesStrategy} to compute the Rees equations. The algorithm is the standard elimination order, however we do not use the package {\textsc ReesAlgebra} since verifying birationality according to Theorem \ref{T birationality}, we only need to compute a special part of the Rees ideal namely elements of first degree $1$, this idea is applied in the {\textsc SimisStrategy}. More precisely, if the given map $\mathfrak{F}$ is birational after computing the Rees equations upto a certain degree $(1,N)$ where $N$ is a sufficiently big number, the jacobian dual rank attains its maximum value $\edim(R)-1$; so that we will be able to compute the inverse map.  The dark side of {\textsc SimisStrategy} is that if $\mathfrak{F}$ is not birational that desired number $N$ cannot be found and the process never ends. For this reason,  we consider the {\textsc HybridStrategy}  between {\textsc ReesStrategy} and {\textsc SimisStrategy}. {\textsc HybridLimit} is an option to change  {\textsc SimisStrategy} to  \textsc{ReesStrategy} if the computations upto degree $(1, \textsc{HybridLimit})$ do not lead to   ${\rm rank}(\psi)=\edim(R)-1$. 
-The default value for {\textsc HybridLimit} is $15$. The change from  {\textsc SimisStrategy} to  {\textsc ReesStrategy} is in such a way that the computed  generators of   Rees ideal  in { \textsc SimisStrategy} are not lost and the program just tries to compute other generators of Rees ideals while keeping the found generators.  Yet, still there is another method to compute Rees ideal which is {\textsc SaturationStrategy} in this option the whole Rees ideal is computing by saturating the  ideal of definition of Symmetric algebra with respect to a non-zero element in $R$ (We assume $R$ to be a domain). This Strategy appears to be slower in some examples however one may improve this option by stoping the computation of the saturation in a certain step.
+As it is expected, the most expensive part to apply this theorem is computing the Rees ideal ${\mathcal J}$. In the package {\textsc RationalMaps} we use {\textsc ReesStrategy} to compute the Rees equations. The algorithm is the standard elimination order, however we do not use the package {\textsc ReesAlgebra} since verifying birationality according to Theorem \ref{T birationality}, we only need to compute a special part of the Rees ideal namely elements of first degree $1$, this idea is applied in the {\textsc SimisStrategy}. More precisely, if the given map $\mathfrak{F}$ is birational, after computing the Rees equations upto a certain degree $(1,N)$ where $N$ is a sufficiently big number, the jacobian dual rank attains its maximum value $\edim(R)-1$; so that we will be able to compute the inverse map.  The dark side of {\textsc SimisStrategy} is that if $\mathfrak{F}$ is not birational,  the desired number $N$ cannot be found and the process never ends. To provide a definitive answer for birationality,  we consider the {\textsc HybridStrategy}  between {\textsc ReesStrategy} and {\textsc SimisStrategy}. {\textsc HybridLimit} is an option to switch   {\textsc SimisStrategy} to  \textsc{ReesStrategy}, if the computations upto degree $(1, \textsc{HybridLimit})$ do not lead to   ${\rm rank}(\psi)=\edim(R)-1$. 
+The default value for {\textsc HybridLimit} is $15$. The change from  {\textsc SimisStrategy} to  {\textsc ReesStrategy} is in such a way that the computed  generators of   Rees ideal  in { \textsc SimisStrategy} are not lost and the program just tries to compute other generators of Rees ideals while keeping the found generators.  Yet, still there is another method to compute Rees ideal which is {\textsc SaturationStrategy} in this option the whole Rees ideal is computed by saturating the  ideal of definition of Symmetric algebra with respect to a non-zero element in $R$ (We assume $R$ to be a domain). This Strategy appears to be slower in some examples however one may improve this option by stoping the computation of the saturation in a certain step.
 
-Computing the inverse map is the most important part of this program, which is done by function {\sc inverseOfMap}. According to Theorem \ref{T birationality} there are two way to compute the inverse $(1)$ to find any syzygy of the jacobian dual matrix and $(2)$ to find a sub-matrix of $\psi$ of rank $\edim(R)-1$. Either ways has its own benefit, case $(1)$ is quite fast in many cases, however case $(2)$ is very useful if the rank of the jacobian dual matrix  $\psi$ is relatively smaller than the degree of the entries of $\psi$. Choosing each of these options is controlled by option {\sc MinorsCount}. Setting it to zero will mean no minors are checked and the inverse of map is computed by looking at the syzygies of $\psi$.  If it is left as null (the default), the functions will try to make an educated guess as to how big to make this, depending on varieties you are working with.......
+Computing the inverse map is the most important part of this program, which is done by function {\sc inverseOfMap}. According to Theorem \ref{T birationality} there are two ways to compute the inverse map: $(1)$ to find any syzygy of the jacobian dual matrix and $(2)$ to find a sub-matrix of $\psi$ of rank $\edim(R)-1$. Either ways has its own benefit, case $(1)$ is quite fast in many cases, however case $(2)$ is very useful if the rank of the jacobian dual matrix  $\psi$ is relatively smaller than the degree of the entries of $\psi$. Choosing each of these options is controlled by option {\sc MinorsCount}. Setting {\sc MinorsCount} zero will mean no minors are checked and the inverse of map is computed by looking at the syzygies of $\psi$.  If it is left as null (the default), the functions will try to make an educated guess as to how big to make this, depending on varieties the user is working with.
+ 
+ In addition, to improve the speed of the function {\sc inverseOfMap}, we consider two other options {\sc AssumeDominant} and {\sc CheckBirational}. If {\sc AssumeDominant} is set  to be true,  then  {\sc inverseOfMap} assumes that the map from $X$ to $Y$ is dominant and do not compute the image of the map which is time consuming in certain cases.
+ Similarly, if {\sc CheckBirational} set false, {\sc inverseOfMap} will  not check birationality although it still computes the jacobian dual matrix. 
+ 
+\scriptsize{
+\begin{verbatim}
+
+i1 : loadPackage "RationalMaps"
+
+o1 = RationalMaps
+
+o1 : Package
+
+i2 : Q=QQ[x,y,z,t,u];
+
+i3 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
+
+o3 : RingMap Q <--- Q
+
+i4 : time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, MinorsCount=>5000)
+
+Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 1}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 2}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 4}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 7}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 11}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 16}.
+inverseOfMapSimis:  We give up. Using all of the previous computations,
+                                  we  compute the whole Groebner basis of the rees ideal. 
+                                  Increase HybridLimit and rerun to avoid this.
+inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  5 columns  and about  20 rows.
+inverseOfMapSimis: Looking for a nonzero minor
+Starting nonZeroMinor, looking for rank: 4, we will run it 5000 times. 
+                                         If this is slow, rerun with MinorsCount=>0.
+nonZeroMinor: Found a nonzero minor
+inverseOfMapSimis: We found a nonzero minor.
+     -- used 1.42382 seconds
+
+    \end{verbatim}}
 
 \section{Embeddings}
 
