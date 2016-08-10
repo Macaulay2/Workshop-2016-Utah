@@ -534,7 +534,7 @@ degree Page := C -> C.dd.degree
 
 
 netPage = method()
-netPage (Page,List,List) := (E,mins,maxs) -> (
+netPage(Page,List,List) := (E,mins,maxs) -> (
     newmaxQ := maxs#1;
     newminQ := mins#1;
     newmaxP := maxs#0;
@@ -3049,17 +3049,17 @@ doc ///
 
 doc ///
      Key 
-          (netPage, Page, List, List)
+         (netPage, Page, List, List)
      Headline 
          display a small portion of a given Spectral Sequence page
      Usage 
-         E' = netPage (E,{minP,minQ},{maxP,maxQ})
+         E' = netPage(E,L1,L2)
      Inputs 
 	  E: Page
 	  L1: List
-	  -- A list {minP,minQ}, the bottom left corner coordinates that we intend to display
+	  -- A list {minP,minQ}, the bottom left corner coordinates to display
 	  L2: List
-	   -- A list {maxP,maxQ}, the top right corner coordinates that we intend to display
+	   -- A list {maxP,maxQ}, the top right corner coordinates to display
      Outputs
           E': Net
      Description	  
