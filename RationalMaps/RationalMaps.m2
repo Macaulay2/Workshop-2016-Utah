@@ -1,5 +1,5 @@
 newPackage( "RationalMaps",
-Version => "0.2", Date => "June 10th, 2016", Authors => {
+Version => "0.21", Date => "August 22nd, 2016", Authors => {
      {Name => "Karl Schwede",
      Email=> "kschwede@gmail.com",
      HomePage=> "http://www.math.utah.edu/~schwede"
@@ -1961,7 +1961,7 @@ doc ///
 	Example
 	    Q=QQ[x,y,z,t,u];
             phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
-            time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, MinorsCount=>5000)  
+            time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, MinorsCount=>100000)  
         Text
             Finally, we do an example of plane Cremona maps whose source is not minimally embedded.
         Example
@@ -2351,6 +2351,7 @@ TEST /// --test #33, maps between cones over elliptic curves and their blowups
 ----Version information----
 --0.1  First version.
 --0.2  Substantial improvements in speed and documentation.
+--0.21 Minor changes especially to documentation.
 
 ----FUTURE PLANS------
 --1.  Handle multi-graded rings (multi-graded maps etc.)
