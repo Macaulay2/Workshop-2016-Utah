@@ -9,14 +9,25 @@
   \href{http://www.ams.org/mathscinet-getitem?mr=#1}{#2}
 }
 \providecommand{\href}[2]{#2}
-\begin{thebibliography}{DHS12}
+\begin{thebibliography}{HKS92}
 
 \bibitem[DHS12]{DoriaHassanzadehSimisBirationality}
 {\sc A.~V. Doria, S.~H. Hassanzadeh, and A.~Simis}: \emph{A characteristic-free
   criterion of birationality}, Adv. Math. \textbf{230} (2012), no.~1, 390--413.
   {\sf\scriptsize 2900548}
 
-\bibitem[Sim04]{SimisCremonaTransforms}
-  {\sc Simis, Aron}: \emph{Cremona transformations and some related algebras}, J. Algebra. \textbf{280} (2004), no.~1, 162--179. {\sf\scriptsize 2081926}
+\bibitem[HKS92]{HulekKatzSchreyer}
+{\sc K.~Hulek, S.~Katz, and F.-O. Schreyer}: \emph{Cremona transformations and
+  syzygies}, Math. Z. \textbf{209} (1992), no.~3, 419--443. {\sf\scriptsize
+  1152265}
+
+\bibitem[RS01]{RussoSimisCompositio}
+{\sc F.~Russo and A.~Simis}: \emph{On birational maps and {J}acobian matrices},
+  Compositio Math. \textbf{126} (2001), no.~3, 335--358. {\sf\scriptsize
+  1834742}
+
+\bibitem[Sim04]{SimisCremona}
+{\sc A.~Simis}: \emph{Cremona transformations and some related algebras}, J.
+  Algebra \textbf{280} (2004), no.~1, 162--179. {\sf\scriptsize 2081926}
 
 \end{thebibliography}

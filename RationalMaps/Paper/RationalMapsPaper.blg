@@ -2,51 +2,45 @@ This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: RationalMapsPaper.aux
 The style file: skalpha.bst
-Database file #1: MainBib.bib
-Illegal end of database file---line 15996 of file MainBib.bib
- : 
- : 
-(Error may have been on previous line)
-I'm skipping whatever remains of this entry
-You've used 1 entry,
+Database file #1: MainBib.bib.bib
+You've used 4 entries,
             2709 wiz_defined-function locations,
-            583 strings with 4902 characters,
-and the built_in function-call counts, 500 in all, are:
-= -- 43
-> -- 25
-< -- 0
-+ -- 10
-- -- 9
-* -- 50
-:= -- 86
-add.period$ -- 1
-call.type$ -- 1
-change.case$ -- 7
-chr.to.int$ -- 1
-cite$ -- 1
-duplicate$ -- 15
-empty$ -- 33
-format.name$ -- 10
-if$ -- 90
+            610 strings with 5329 characters,
+and the built_in function-call counts, 1732 in all, are:
+= -- 160
+> -- 77
+< -- 1
++ -- 27
+- -- 26
+* -- 176
+:= -- 282
+add.period$ -- 4
+call.type$ -- 4
+change.case$ -- 25
+chr.to.int$ -- 4
+cite$ -- 4
+duplicate$ -- 61
+empty$ -- 129
+format.name$ -- 31
+if$ -- 331
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 2
-newline$ -- 14
-num.names$ -- 3
-pop$ -- 4
+missing$ -- 8
+newline$ -- 23
+num.names$ -- 12
+pop$ -- 14
 preamble$ -- 2
-purify$ -- 8
+purify$ -- 29
 quote$ -- 0
-skip$ -- 11
+skip$ -- 43
 stack$ -- 0
-substring$ -- 33
-swap$ -- 3
-text.length$ -- 0
-text.prefix$ -- 0
+substring$ -- 129
+swap$ -- 12
+text.length$ -- 1
+text.prefix$ -- 1
 top$ -- 0
-type$ -- 8
+type$ -- 32
 warning$ -- 0
-while$ -- 5
-width$ -- 2
-write$ -- 22
-(There was 1 error message)
+while$ -- 19
+width$ -- 6
+write$ -- 58
