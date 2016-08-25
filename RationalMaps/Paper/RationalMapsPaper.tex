@@ -256,7 +256,7 @@ o4 : Ideal of R
 
 \section{Birationality and Inverse Maps}
 
-Again, a rational map $\mathfrak{F}:X\subseteq \P^n\dasharrow \P^m$ between projective spaces is defined by $m+1$ forms $\ff=\{f_0,\ldots f_m\}$ of the same degree in $n+1$ variables, not all vanishing.  Let $\ff=\{f_0,\ldots,f_m\}\subset R$ be an ordered set of forms of the same degree,
+Again, a rational map $\mathfrak{F}:X\subseteq \P^n\dasharrow Y \subseteq \P^m$ between projective spaces is defined by $m+1$ forms $\ff=\{f_0,\ldots f_m\}$ of the same degree in $n+1$ variables, not all vanishing.  Let $\ff=\{f_0,\ldots,f_m\}\subset R$ be an ordered set of forms of the same degree,
 where $R$, the coordinate ring of $X$,  denotes a standard graded $k$-algebra, with $k$ a field and $\dim R\geq 1$.
 Thus, one has a presentation $R\simeq k[x_0,\ldots, x_n]=k[\XX]/\mathfrak{a}$ with $k[\XX]=k[X_0,\ldots, X_n]$
 standard graded and $\mathfrak{a}$ a homogeneous ideal.
@@ -292,25 +292,24 @@ of forms of bidegree $(1,q)$, for various $q$'s.
 Let $\{P_1,\ldots,P_s\}\subset k[\XX,\YY]$ denote liftings of these biforms and let $\{\ell_1,\ldots,\ell_r\}\subset k[\XX]$ be  a $k$-vector space
 basis of ${\mathfrak a}_1$.
 Consider the Jacobian matrix of the polynomials $\{\ell_1,\ldots,\ell_r, P_1,\ldots,P_s\}$ with respect to $\XX$. This is a matrix with entries in $k[\YY]$.
-Write $\psi$ for the corresponding matrix over $S=k[\YY]/{\mathfrak b}$ {\color{red} What's b?}. This matrix is called  called the {\bf weak Jacobian dual matrix}  associated to
+Write $\psi$ for the corresponding matrix over $S=k[\YY]/{\mathfrak b}$, the coordinate ring of $Y$. This matrix is called  called the {\bf weak Jacobian dual matrix}  associated to
 the given set of generators of $({\mathcal J}_{1,*})$.
 Note that a weak Jacobian matrix $\psi$ is not uniquely defined due to the lack of uniqueness in the expression of
 an individual form and to the choice of bihomogeneous generators. However, it is shown in \cite[Lemma 2.13]{DoriaHassanzadehSimisBirationality} that if the weak Jacobian matrix associated  to one set of bihomogeneous minimal generators of
-$({\mathcal J}_{1,*})$ has {\color{red} finite?} rank over $S$ then the weak Jacobian matrix associated to any other
+$({\mathcal J}_{1,*})$ has (finite) rank over $S$ then the weak Jacobian matrix associated to any other
 set of bihomogeneous minimal generators of
-$({\mathcal J}_{1,*})$ has {\color{red} finite?} rank over $S$ and the two ranks coincide.
+$({\mathcal J}_{1,*})$ has (finite) rank over $S$ and the two ranks coincide.
 
 %========================================================================
 The main theorem of loc.cit. is the following:
 \begin{theorem} \label{T birationality}Let $X\subseteq \P^n$ be non-degenerate. Then $\mathfrak{F}$ is birational if and only if ${\rm rank}(\psi)=\edim(R)-1(=n).$
 Moreover
 \begin{enumerate}
-  \item[{\rm (i)}] A rational $(n+1)$-datum {\color{red} what's a rational datum?} in
-$S$ representing the inverse map is given by the coordinates of any homogeneous vector of positive degree
+  \item[{\rm (i)}] We get a representative for the inverse of $\mathfrak{F}$ by taking the coordinates of any homogeneous vector of positive degree
 in the {\rm (}rank one{\rm )} null space of $\psi$ over $S$ for which these coordinates generate an ideal containing
 a regular element.
 
-\item[{\rm (ii)}] If, further, $R$ is a domain, a rational $(n+1)$-datum as in {\rm (i)}
+\item[{\rm (ii)}] If, further, $R$ is a domain, the representative of $\mathfrak{F}$ in {\rm (i)}
 can be taken to be the set of the {\rm (}ordered, signed{\rm )} $(\edim(R)-1)$-minors
 of an arbitrary $(\edim(R)-1)\times \edim(R)$ submatrix of $\psi$ of rank $\edim(R)-1$.
 \end{enumerate}
