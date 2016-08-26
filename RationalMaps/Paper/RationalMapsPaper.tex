@@ -401,9 +401,9 @@ o9 = true
 
 We note that our package has some overlaps in functionality with other packages.
 
-While the {\tt Parametrization} package focuses mostly on curves, it also includes a function called {\tt invertBirationalMap} which has the same functionality as {\tt inverseOfMap}. On the other hand, these two functions were implemented somewhat differently and so sometimes one function can be substantially faster than the other.
+While the {\tt Parametrization} package \cite{ParametrizationPackage} focuses mostly on curves, it also includes a function called {\tt invertBirationalMap} which has the same functionality as {\tt inverseOfMap}. On the other hand, these two functions were implemented somewhat differently and so sometimes one function can be substantially faster than the other.
 
-The package {\tt Cremona} focuses on very fast probabilistic computation in general cases and very fast deterministic computation for special kinds of maps from projective space. In particular, in {\tt Cremona},
+The package {\tt Cremona} \cite{CremonaPackage} focuses on very fast probabilistic computation in general cases and very fast deterministic computation for special kinds of maps from projective space. In particular, in {\tt Cremona},
 
 \begin{itemize}
 \item{}     {\tt isBirational} gives a probabilisitc answer to the question of whether a map between varieties is birational. Furthermore, if the source is projective space, then {\tt degreeOfRationalMap} with {\tt MathMode=>true} can give a deterministic answer that is frequently faster than what our package can provide with {\tt isBirationalMap}.
