@@ -1184,9 +1184,9 @@ document {
 	     source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer. 
 	      In some cases, the speed of the latter  is comparable with ", TO "isBirationalMap", " with ", TT   "AssumeDominant=>true." },
         {TO "invertBirMap", " gives a  fast computation of the inverse of a birational map if the source is projective space ", EM " and ",
-	     "the map has maximal linear rank.   In some cases, our function ", TO "inverseOfMap",
-	       " appears to be competitive however.  If you pass invertBirMap a map not from projective space, then it calls ",
-	      TO "invertBirationalMap", " from ", TO "Parametrization", "."},
+	     "the map has maximal linear rank.   In some cases, even if the map has maximal linear rank, our function ", TO "inverseOfMap",
+	       " appears to be competitive however.  If you pass invertBirMap a map not from projective space, then it calls a modified version ",
+	      TO "invertBirationalMap", " copied from ", TO "Parametrization", "."},
     },
 }
 
@@ -2360,5 +2360,8 @@ TEST /// --test #33, maps between cones over elliptic curves and their blowups
 --4.  Make faster.
 ------a) maybe add multi-core support?  
 ------b) find the relevant low degree part of the blowup ideal
+------c) be smarter when looking at ranks of matrices, in particular 
+---------when trying to show that the rank is at least x, we should evaluate
+---------the variables appropriately to some (large) field randomly, and then
+---------check the rank there.
 --5.  Check for smoothness/flatness of map (find loci)?
---6.  Maybe run isBirationalMap with a hybrid strategy too?
