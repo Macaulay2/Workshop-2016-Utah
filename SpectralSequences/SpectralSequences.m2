@@ -1461,11 +1461,11 @@ doc ///
 	       easyPresentation(E_1,6,3)
 	       easyPresentation(E_2,6,3)
 	       easyPresentation(E_3,6,3)
-	       rank (E_2).dd_{3,0}
-	       rank (E_3).dd_{3,0}
+               length image ((E_2).dd_{3,0})
+	       length image (E_3).dd_{3,0}
 	  Text 
 	       The final two computations are meant to explain that the copy of $k^8$ in degree 3 that 
-	       appears on the $E_1$ cancels with an E_2 map from E_{2_{1,1}} and with an E_3 map from E_{3_{0,2}}
+	       appears on the $E_1$ cancels in two steps via an $E_2$ map with $k^6$ and via an $E_3$ map with a $k^2$.
 ///
 
 doc ///
