@@ -2274,6 +2274,7 @@ doc ///
 
 doc ///
           Key
+	   spots
        	   (spots, Page)
           Headline
 	       which spots does the given page has a module.
