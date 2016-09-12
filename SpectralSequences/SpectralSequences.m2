@@ -2585,7 +2585,7 @@ doc ///
 		    spots D
 		    support D
     	  SeeAlso
-	       spots		     	    
+	       (spots, ChainComplex)	     	    
 ///	       
 
 
@@ -3049,7 +3049,8 @@ doc ///
 
 doc ///
      Key 
-         (netPage, Page, List, List)
+         netPage
+	 (netPage,Page,List,List)
      Headline 
          display a small portion of a given Spectral Sequence page
      Usage 
@@ -3095,8 +3096,6 @@ doc ///
 	    E0 = C' ** (filteredComplex D);
 	    E = prune spectralSequence E0;
 	    netPage(E_2,{-5,0},{7,1})
-     SeeAlso 
-	  (net, Page)
 /// 
 
     
@@ -3792,7 +3791,7 @@ doc ///
 
 doc ///
      Key
-     	  (filteredComplex, Ideal,ChainComplex,ZZ)
+     	  (filteredComplex, Ideal, ChainComplex, ZZ)
      Headline
      	  I-adic filtrations of chain complexes
      Usage 
