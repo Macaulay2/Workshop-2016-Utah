@@ -1018,7 +1018,8 @@ undocumented {page,
     (spectralSequencePageMap, FilteredComplex, ZZ),
     (spots, PageMap),
     (support, SpectralSequencePage),
-   ReducedHomology, sourcePruningMap, targetPruningMap,
+ --  ReducedHomology, 
+   sourcePruningMap, targetPruningMap,
    pageMap,
       ErMaps,
       (ErMaps,FilteredComplex, ZZ, ZZ, ZZ),
@@ -1026,9 +1027,24 @@ undocumented {page,
       (page,List, List, Page),
    (expression, SpectralSequence),
    spectralSequencePageMap,
-   Shift,
+--   Shift,
    (support, FilteredComplex)
     }
+
+
+document {
+  Key => {
+    Shift
+  },
+  Headline => "name for an optional argument"
+}
+
+document {
+  Key => {
+    ReducedHomology
+  },
+  Headline => "name for an optional argument"
+}
 
 doc ///
           Key
@@ -1044,13 +1060,14 @@ doc ///
 
 doc ///
           Key
-           [filteredComplex,symbol ReducedHomology]
+           [filteredComplex, ReducedHomology]
 ///
 
 doc ///
           Key
-           [filteredComplex,symbol Shift]
+           [filteredComplex, Shift]
 ///
+
 
 
 document { 
