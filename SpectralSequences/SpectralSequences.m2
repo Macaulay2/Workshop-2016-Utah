@@ -2338,6 +2338,20 @@ doc ///
 	 prune  
 ///	       
 
+doc ///
+          Key
+       	   (describe, PageMap)
+          Headline
+	       real description
+     	  Usage
+	       describe S
+	  Description
+	       Text
+	       	   see describe
+    	  SeeAlso
+	      	describe	      
+///
+
 --- functions and methods --- 
 
 doc ///
