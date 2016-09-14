@@ -1030,6 +1030,29 @@ undocumented {page,
    (support, FilteredComplex)
     }
 
+doc ///
+          Key
+           [spectralSequence,Prune]
+
+///
+
+doc ///
+          Key
+           [spectralSequencePage,Prune]
+
+///
+
+doc ///
+          Key
+           [filteredComplex,symbol ReducedHomology]
+///
+
+doc ///
+          Key
+           [filteredComplex,symbol Shift]
+///
+
+
 document { 
   Key => SpectralSequences,
   Headline => "a package for working with filtered complexes and spectral sequences",
