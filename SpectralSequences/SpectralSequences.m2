@@ -66,7 +66,7 @@ export {
    "Page", 
    "PageMap", 
 --   "pageMap", 
---   "page" ,
+   "page" ,
   "pruningMaps", "edgeComplex",
   "filteredHomologyObject", "associatedGradedHomologyObject", "netPage"
   }
@@ -4230,8 +4230,40 @@ assert(all(keys support e^11, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,1
 assert(all(keys support e^12, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,12)))
 ///
 
+TEST ///
+restart
+needsPackage "SpectralSequences";
+B = QQ[a..d];
+J = ideal vars B;
+C = complete res monomialCurveIdeal(B,{1,3,4});
+K = filteredComplex(J,C,4);
+e = prune spectralSequence K;
+assert(all(keys support e^0, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,0)))
+assert(all(keys support e^1, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,1)))
+assert(all(keys support e^2, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,2)))
+assert(all(keys support e^3, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,3)))
+assert(all(keys support e^4, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,4)))
+///
 
 
+TEST ///
+restart
+needsPackage "SpectralSequences";
+S = ZZ/101[x,y];
+I = ideal(x^2,x*y,y^2);
+R = S/I;
+kR = coker vars R;
+kS = coker vars S;
+CS = res kS;
+CR = res(kR,LengthLimit=>6);
+CS' = CS**R;
+E = prune spectralSequence (CS' ** filteredComplex CR);
+assert(all(keys support E^0, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,0)))
+assert(all(keys support E^1, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,1)))
+assert(all(keys support E^2, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,2)))
+assert(all(keys support E^3, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,3)))
+assert(all(keys support E^4, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,4)))
+///
 end
 
 ---
