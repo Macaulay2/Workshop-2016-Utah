@@ -65,7 +65,7 @@ export {
   "targetPruningMap",
    "Page", 
    "PageMap", 
---   "pageMap", 
+   "pageMap", 
    "page" ,
   "pruningMaps", "edgeComplex",
   "filteredHomologyObject", "associatedGradedHomologyObject", "netPage"
@@ -1005,7 +1005,7 @@ associatedGradedHomologyObject(ZZ,ZZ,FilteredComplex) := (p,n,K) -> (
 beginDocumentation()
 
 undocumented {
---    page,  
+ --   page,  
 --    (degree, Page),
 --    (net, FilteredComplex),
 --    (net, Page),
@@ -1081,6 +1081,16 @@ doc ///
 doc ///
           Key
            [filteredComplex, Shift]
+///
+
+doc ///
+          Key
+           [page,Prune]
+///
+
+doc ///
+          Key
+            [spectralSequencePageMap,Prune]
 ///
 
 
@@ -2313,6 +2323,26 @@ doc ///
            (degree, Page)
 ///
 
+doc ///
+          Key
+           spectralSequencePageMap
+///
+
+doc ///
+          Key
+           pageMap
+///
+
+doc ///
+          Key
+           (page,List,List,Page)
+///
+
+
+doc ///
+          Key
+           page
+///
 
 
 doc ///
@@ -4258,11 +4288,11 @@ CS = res kS;
 CR = res(kR,LengthLimit=>6);
 CS' = CS**R;
 E = prune spectralSequence (CS' ** filteredComplex CR);
-assert(all(keys support E^0, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,0)))
-assert(all(keys support E^1, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,1)))
-assert(all(keys support E^2, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,2)))
-assert(all(keys support E^3, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,3)))
-assert(all(keys support E^4, j -> isIsomorphism homologyIsomorphism(e,j#0,j#1,4)))
+assert(all(keys support E^0, j -> isIsomorphism homologyIsomorphism(E,j#0,j#1,0)))
+assert(all(keys support E^1, j -> isIsomorphism homologyIsomorphism(E,j#0,j#1,1)))
+assert(all(keys support E^2, j -> isIsomorphism homologyIsomorphism(E,j#0,j#1,2)))
+assert(all(keys support E^3, j -> isIsomorphism homologyIsomorphism(E,j#0,j#1,3)))
+assert(all(keys support E^4, j -> isIsomorphism homologyIsomorphism(E,j#0,j#1,4)))
 ///
 end
 
