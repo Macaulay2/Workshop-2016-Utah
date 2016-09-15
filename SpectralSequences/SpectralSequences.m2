@@ -65,8 +65,8 @@ export {
   "targetPruningMap",
    "Page", 
    "PageMap", 
-   "pageMap", 
-   "page" ,
+--   "pageMap", 
+--   "page" ,
   "pruningMaps", "edgeComplex",
   "filteredHomologyObject", "associatedGradedHomologyObject", "netPage"
   }
@@ -1004,31 +1004,32 @@ associatedGradedHomologyObject(ZZ,ZZ,FilteredComplex) := (p,n,K) -> (
 
 beginDocumentation()
 
-undocumented {page,  
-    (degree, Page),
-    (net, FilteredComplex),
-    (net, Page),
-    (net, PageMap),
-    (net, SpectralSequencePage),
-    (net, SpectralSequence),
-    (symbol _, Page, List),
-    (page, SpectralSequencePage),
-    (symbol _, PageMap, List),
-    (ring, Page),
-    (spectralSequencePageMap, FilteredComplex, ZZ),
-    (spots, PageMap),
-    (support, SpectralSequencePage),
+undocumented {
+--    page,  
+--    (degree, Page),
+--    (net, FilteredComplex),
+--    (net, Page),
+--    (net, PageMap),
+--    (net, SpectralSequencePage),
+--    (net, SpectralSequence),
+--    (symbol _, Page, List),
+--    (page, SpectralSequencePage),
+--    (symbol _, PageMap, List),
+--    (ring, Page),
+--    (spectralSequencePageMap, FilteredComplex, ZZ),
+--    (spots, PageMap),
+--    (support, SpectralSequencePage),
  --  ReducedHomology, 
-   sourcePruningMap, targetPruningMap,
-   pageMap,
-      ErMaps,
-      (ErMaps,FilteredComplex, ZZ, ZZ, ZZ),
-      (support, PageMap),
-      (page,List, List, Page),
-   (expression, SpectralSequence),
-   spectralSequencePageMap,
+--sourcePruningMap, targetPruningMap,
+--   pageMap,
+--      ErMaps,
+--      (ErMaps,FilteredComplex, ZZ, ZZ, ZZ),
+--      (support, PageMap),
+--      (page,List, List, Page),
+--   (expression, SpectralSequence),
+--   spectralSequencePageMap,
 --   Shift,
-   (support, FilteredComplex)
+--   (support, FilteredComplex)
     }
 
 
@@ -1045,6 +1046,20 @@ document {
   },
   Headline => "name for an optional argument"
 }
+
+
+doc ///
+          Key
+           targetPruningMap
+///
+
+
+doc ///
+          Key
+           sourcePruningMap
+///
+
+
 
 doc ///
           Key
@@ -2159,7 +2174,6 @@ doc ///
 
 
 
-
 doc ///
      Key
      	  SpectralSequencePage
@@ -2201,6 +2215,103 @@ doc ///
 	"SpectralSequencePageMap"
 	"Page"	            	    	      
 ///	       
+
+
+doc ///
+          Key
+           (support, FilteredComplex)
+///
+
+
+doc ///
+          Key
+           (expression, SpectralSequence)
+///
+
+
+doc ///
+          Key
+           (support, PageMap)
+///
+
+
+doc ///
+          Key
+           (support, SpectralSequencePage)
+///
+
+
+doc ///
+          Key
+           (spots, PageMap)
+///
+
+
+doc ///
+          Key
+           (spectralSequencePageMap, FilteredComplex, ZZ)
+///
+
+
+
+doc ///
+          Key
+           (ring, Page)
+///
+
+
+doc ///
+          Key
+           (symbol _, PageMap, List)
+///
+
+
+doc ///
+          Key
+           (page, SpectralSequencePage)
+///
+
+
+doc ///
+          Key
+           (symbol _, Page, List)
+///
+
+
+
+doc ///
+          Key
+           (net, SpectralSequence)
+///
+
+
+doc ///
+          Key
+           (net, SpectralSequencePage)
+///
+
+
+doc ///
+          Key
+           (net, PageMap)
+///
+
+doc ///
+          Key
+           (net, Page)
+///
+
+
+doc ///
+          Key
+           (net, FilteredComplex)
+///
+
+
+doc ///
+          Key
+           (degree, Page)
+///
 
 
 
