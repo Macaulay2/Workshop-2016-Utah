@@ -1298,7 +1298,10 @@ doc ///
              The second is obtained by letting $F''_n (Hom(B, C)) := \prod_{p + q = k , q \leq n} Hom_S(B_{-p}, C_q)$
 	     and the differentials $\partial := d' + d''$.
     	     
-             In {\it Macaulay2}, using this package, we can compute these filtered complexes as follows.  
+             In {\it Macaulay2}, using this package, $F'$ and $F''$ as defined above are
+	     computed as illustrated in the following example, by using 
+	     Hom(filteredComplex B, C) or Hom(B,filteredComplex C).
+	     
 	 Example
 	     A = QQ[x,y,z,w];
 	     B = res monomialCurveIdeal(A, {1,2,3});
@@ -1306,6 +1309,7 @@ doc ///
 	     F' = Hom(filteredComplex B, C)
 	     F'' = Hom(B,filteredComplex C)
 	 Text
+	     Notice that the display above shows that these are different filtered complexes.
 	     The resulting spectral sequences take the form:
 	 Example
 	     E' = prune spectralSequence F';
@@ -1738,7 +1742,7 @@ doc ///
 		E^2_{3,-1}
 		basis({0,0}, E^2_{3, -1} ** R^{{2, 3}})
 		E^2 .dd_{3, -1}
-		E^2 .dd
+--		E^2 .dd
 		basis({0,0}, image E^2 .dd_{3,-1} ** R^{{2,3}})
 		basis({0,0}, E^2_{1,0} ** R^{{2,3}})
 		-- this shows that there is a 1 dimensional space of non-Koszul syzygies of bi-degree (2,3)
@@ -2028,23 +2032,23 @@ doc ///
 	       The zeroth pages takes the form:
 	  Example
 	       E^0
-	       E^0 .dd 
+	       E^0 .dd
 	       F^0 
-	       F^0 .dd
+--	       F^0 .dd
 	  Text
 	      The first pages take the form:
 	  Example          
 	       E^1
-	       E^1 .dd
+--	       E^1 .dd
     	       F^1
-	       F^1 .dd
+--	       F^1 .dd
 	 Text 
 	       The second pages take the form:      
          Example
      	       E^2
-	       E^2 .dd
+--	       E^2 .dd
     	       F^2
-	       F^2 .dd
+--	       F^2 .dd
 	 Text
 	       Observe that $E^2$ and $F^2$ are equal as they should.	 
      SeeAlso
