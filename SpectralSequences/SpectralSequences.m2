@@ -1117,7 +1117,7 @@ document {
    -- {HREF("","")},},
    SUBSECTION "First examples which show how to use this package",
    UL {
-    TO "How to make filtered complexes from chain complex maps", --"How to work with filtered complexes", --"Making filtered chain complexes from chain complex maps",
+    TO "Constructors used in this package", --"How to work with filtered complexes", --"Making filtered chain complexes from chain complex maps",
     TO "Filtrations and tensor product complexes",
     TO "Filtrations and homomorphism complexes",
     TO "Filtered complexes and simplicial complexes",
@@ -1157,7 +1157,7 @@ doc ///
 	       
 	       {\bf First examples which show how to use this package}
     	       
-	       $\bullet$ @TO"How to make filtered complexes from chain complex maps"@
+	       $\bullet$ @TO"Constructors used in this package"@
     	       
 	       $\bullet$ @TO"Filtrations and tensor product complexes"@
     	       
@@ -1263,7 +1263,7 @@ doc ///
 	      e^2 .dd
 	      e^infinity
      SeeAlso
-     	  "How to make filtered complexes from chain complex maps"
+     	  "Constructors used in this package"
 	  "Filtrations and tensor product complexes"
 	  "Filtrations and homomorphism complexes"
 ///
@@ -1375,7 +1375,7 @@ doc ///
    
 doc ///
      Key
-        "How to make filtered complexes from chain complex maps"
+        "Constructors used in this package"
    --  Headline
      --	  the most primitive way to make filtered complexes
      Description
@@ -2127,7 +2127,7 @@ doc ///
 	  chain complexes are ascending.  Filtrations on degree $1$ chain complexes are
 	  descending.
     SeeAlso
-    	  "How to make filtered complexes from chain complex maps"
+    	  "Constructors used in this package"
 	  "Filtered complexes and simplicial complexes"
 	  "Filtrations and tensor product complexes"
 	  "Filtrations and homomorphism complexes"	  
@@ -2605,7 +2605,7 @@ doc ///
 	       	    This is the primitive filtered complex constructor.   
     	  SeeAlso
 	      FilteredComplex
-	      "How to make filtered complexes from chain complex maps"
+	      "Constructors used in this package"
     	      "Filtrations and tensor product complexes"
     	      "Filtrations and homomorphism complexes"
     	      "Filtered complexes and simplicial complexes"		      
