@@ -1232,7 +1232,7 @@ doc ///
      	    complexes:
      	  Example
 	      A = QQ[x,y,z,w];	     
-	      F2D = simplicialComplex {x*y*z, x*y, y*z, w*z};
+	      F2D = simplicialComplex {x*y*z, w*z};
 	      F1D = simplicialComplex {x*y, w};
 	      F0D = simplicialComplex {x,w};
 	      K = filteredComplex{F2D, F1D, F0D}
@@ -1300,9 +1300,9 @@ doc ///
     	     
              In {\it Macaulay2}, using this package, we can compute these filtered complexes as follows.  
 	 Example
-	     A = QQ[x,y];
-	     B = koszul vars A;
-	     C = koszul vars A;
+	     A = QQ[x,y,z,w];
+	     B = res monomialCurveIdeal(A, {1,2,3});
+	     C = res monomialCurveIdeal(A, {1,3,4});
 	     F' = Hom(filteredComplex B, C)
 	     F'' = Hom(B,filteredComplex C)
 	 Text
@@ -1351,18 +1351,19 @@ doc ///
 	    --To obtain the chain complex $ F'' B \otimes_S C$ we use the syntax 
 	    --$ B\otimes(filteredComplex C)$.
     	  Example
-	      A = QQ[x,y];
-	      B = koszul vars A;
-	      C = koszul vars A;
+	      A = QQ[x,y,z,w];
+	      B = res monomialCurveIdeal(A,{1,2,3});
+	      C = res monomialCurveIdeal(A,{1,3,4});
 	      F' = (filteredComplex B) ** C
 	      F'' = B ** (filteredComplex C)  
 	 Text
-	     The resulting spectral sequences take the form:
+	     The pages of the resulting spectral sequences take the form:
 	 Example
 	     E' = prune spectralSequence F';
 	     E'' = prune spectralSequence F'';
 	     E' ^0
-	     E' ^ 0 .dd
+	     E' ^ 1
+	     E'' ^0
 	     E'' ^1         
      SeeAlso   
 	  "Balancing Tor"	     
@@ -3176,13 +3177,13 @@ doc ///
 	      Returns the filtrations of the Hom complex determined by the double complex.  Here is 
 	      an example which illustrates the syntax. 
 	  Example
-	     A = QQ[x,y];
-	     B = koszul vars A;
-	     C = koszul vars A;
+	     A = QQ[x,y,z,w];
+	     B = res monomialCurveIdeal(A, {1,2,3});
+	     C = res monomialCurveIdeal(A, {1,3,4});
 	     F' = Hom(filteredComplex B, C)
 	     F'' = Hom(B,filteredComplex C)   
      SeeAlso
-     	 "Filtrations and homomorphism complexes"	       
+     	 "Filtrations and tensor product complexes"	       
 ///
     
 doc ///
