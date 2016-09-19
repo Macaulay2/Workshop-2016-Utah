@@ -1115,9 +1115,9 @@ document {
    -- {HREF("","")},
    -- {HREF("","")},
    -- {HREF("","")},},
-   SUBSECTION "First examples which show how to use this package",
+   SUBSECTION "Constructors used in this package",
    UL {
-    TO "Constructors used in this package", --"How to work with filtered complexes", --"Making filtered chain complexes from chain complex maps",
+    TO "How to make filtered complexes from chain complex maps", --"How to work with filtered complexes", --"Making filtered chain complexes from chain complex maps",
     TO "Filtrations and tensor product complexes",
     TO "Filtrations and homomorphism complexes",
     TO "Filtered complexes and simplicial complexes",
@@ -1157,7 +1157,7 @@ doc ///
 	       
 	       {\bf First examples which show how to use this package}
     	       
-	       $\bullet$ @TO"Constructors used in this package"@
+	       $\bullet$ @TO"How to make filtered complexes from chain complex maps"@
     	       
 	       $\bullet$ @TO"Filtrations and tensor product complexes"@
     	       
@@ -1263,7 +1263,7 @@ doc ///
 	      e^2 .dd
 	      e^infinity
      SeeAlso
-     	  "Constructors used in this package"
+     	  "How to make filtered complexes from chain complex maps"
 	  "Filtrations and tensor product complexes"
 	  "Filtrations and homomorphism complexes"
 ///
@@ -1375,7 +1375,7 @@ doc ///
    
 doc ///
      Key
-        "Constructors used in this package"
+        "How to make filtered complexes from chain complex maps"
    --  Headline
      --	  the most primitive way to make filtered complexes
      Description
@@ -2127,7 +2127,7 @@ doc ///
 	  chain complexes are ascending.  Filtrations on degree $1$ chain complexes are
 	  descending.
     SeeAlso
-    	  "Constructors used in this package"
+    	  "How to make filtered complexes from chain complex maps"
 	  "Filtered complexes and simplicial complexes"
 	  "Filtrations and tensor product complexes"
 	  "Filtrations and homomorphism complexes"	  
@@ -2605,7 +2605,7 @@ doc ///
 	       	    This is the primitive filtered complex constructor.   
     	  SeeAlso
 	      FilteredComplex
-	      "Constructors used in this package"
+	      "How to make filtered complexes from chain complex maps"
     	      "Filtrations and tensor product complexes"
     	      "Filtrations and homomorphism complexes"
     	      "Filtered complexes and simplicial complexes"		      
