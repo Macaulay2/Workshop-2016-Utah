@@ -2061,8 +2061,8 @@ doc ///
 	       Here are some examples of change of rings spectral sequences. 
 	  Text
 	       Given a ring map f: R -> S, an R-module M and an R-module S,
-	       there is a spectral sequence E with E^2_{p,q} = Tor^S_p(Tor^R(M,S),N)
-	       that abuts to Tor^R_*(M,N).
+	       there is a spectral sequence E with E^2_{p,q} = Tor^S_p(Tor^R_q(M,S),N)
+	       that abuts to Tor^R_{p+q}(M,N).
      	  Example
 --	       First example
 	       k=QQ;
@@ -2227,7 +2227,6 @@ doc ///
 	"Page"	            	    	      
 ///	       
 
-
 doc ///
           Key
            (support, FilteredComplex)
@@ -2260,7 +2259,20 @@ doc ///
 
 doc ///
           Key
+	   spectralSequencePageMap
            (spectralSequencePageMap, FilteredComplex, ZZ)
+     Headline 
+	  compute the maps on a spectral sequence page 
+     Usage 
+         d = spectralSequencePageMap(FilteredComplex, ZZ)
+     Inputs
+	 K:FilteredComplex
+	 n:ZZ	 
+     Outputs
+         D:SpectralSequencePageMap 
+     Description
+	  Text
+	       Returns the differentials of a spectral sequence page.
 ///
 
 
@@ -2324,10 +2336,10 @@ doc ///
            (degree, Page)
 ///
 
-doc ///
-          Key
-           spectralSequencePageMap
-///
+--doc ///
+--          Key
+--           spectralSequencePageMap
+--///
 
 doc ///
           Key
@@ -2336,14 +2348,20 @@ doc ///
 
 doc ///
           Key
+	   page
            (page,List,List,Page)
+     	  Description
+	       Text
+	           adds keys to a a page.
+          SeeAlso
+                Page       	   
 ///
 
 
-doc ///
-          Key
-           page
-///
+--doc ///
+--          Key
+--           page
+--///
 
 
 doc ///
@@ -3852,13 +3870,14 @@ doc ///
 	       
 ///
    
-doc ///
-     Key
-          associatedGradedHomologyObject
-///   
+--doc ///
+--     Key
+--          associatedGradedHomologyObject     	  
+--///   
    	       
 doc ///
-     Key
+     Key  
+          associatedGradedHomologyObject
 	  (associatedGradedHomologyObject, ZZ, ZZ, FilteredComplex)
      Headline 
 	  compute the associated graded homology object 
