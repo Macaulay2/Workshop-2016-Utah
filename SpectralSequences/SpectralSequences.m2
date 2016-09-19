@@ -1126,7 +1126,7 @@ document {
     },
     
  
-  SUBSECTION "More elaborate examples which illustrate this package",
+  SUBSECTION "Other examples which illustrate this package",
   UL {
     TO "Computing the Serre Spectral Sequence associated to a Hopf Fibration",
     TO "Balancing Tor",
