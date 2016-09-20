@@ -18,8 +18,8 @@
 newPackage(
   "SpectralSequences",
 --  AuxiliaryFiles => true,
-  Version => "0.7",
-  Date => "26 May 2016",
+  Version => "1.0",
+  Date => "20 September 2016",
   Authors => {
        {
       Name => "David Berlekamp", 
