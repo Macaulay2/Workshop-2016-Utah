@@ -32,7 +32,11 @@ newPackage(
        {
       Name => "Nathan Grieve", 
       Email => "n.grieve@unb.ca",
-      HomePage => "http://www.math.unb.ca/~ngrieve"},             
+      HomePage => "http://www.math.unb.ca/~ngrieve"},  
+  {
+      Name => "Eloisa Grifo", 
+      Email => "eloisa.grifo@virginia.edu",
+      HomePage => "http://people.virginia.edu/~er2eq/"},             
     {
       Name => "Gregory G. Smith", 
       Email => "ggsmith@mast.queensu.ca", 
