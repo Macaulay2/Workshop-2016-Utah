@@ -78,8 +78,8 @@ fasterFloorLog = ( b, x ) -> (
     );
 
     -- binary search
-    lowerbound = 0;
-    upperbound = oldflog; 
+    lowerbound := 0;
+    upperbound := oldflog; 
     while (lowerbound + 1 < upperbound ) do ( --maybe the answer is between these two
         mid := ceiling ((lowerbound + upperbound)/2);
         if (oldpowerofb * b^mid > x)

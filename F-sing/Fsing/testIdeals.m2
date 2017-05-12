@@ -71,7 +71,8 @@ findTestElementAmbient(Ring) := (R) ->
 
 randomSubset(ZZ,ZZ) := (m,n) ->
 (
-	L = for i from 0 to m-1 list i;
+	--L = for i from 0 to m-1 list i;
+	L := toList(0..m-1);
 	for i from 0 to m-n-1 do (L = delete(L#(random(0,m-1-i)),L));
 	L
 )
@@ -142,8 +143,8 @@ testIdeal(Ring) := o->(R1) -> (
     nMinusKX := locPrincList#1;
     
 --    cartIndex := isQCartier(o.MaxCartierIndex, divisor(canIdeal));
-    --gg := first first entries gens trim canIdeal;
-    --dualCanIdeal := (ideal(gg) : canIdeal);
+    gg := first first entries gens trim canIdeal;
+    dualCanIdeal := (ideal(gg) : canIdeal);
 --    nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
     gensList := first entries gens trim nMinusKX;
     
@@ -348,7 +349,7 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
  	
  	IRees := sub(I1, A2);
  	
- 	canList := oldCanonicalIdeal(A1, FullMap => true);
+ 	canList := canonicalIdeal(A1, FullMap => true);
     --canonicalIdeal doesn't return a list though ?
 
  	canIdeal := canList#0;

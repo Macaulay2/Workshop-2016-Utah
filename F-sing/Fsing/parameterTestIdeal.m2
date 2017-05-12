@@ -232,7 +232,7 @@ testModule(Ring) := (R1) -> (
     else (
         u1 = u1#0;
     );
-    tau = ascendIdeal(1, u1, C1*J1*R1);
+    tau := ascendIdeal(1, u1, C1*J1*R1);
     (sub(tau, R1), sub(J1, R1), u1)
 );
 

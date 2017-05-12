@@ -109,12 +109,12 @@ ethRoot(ZZ, List, List) := opts -> (e, exponentList, idealList) -> (
 
     R := ring(idealList#0);
     p := char(R);
-    minGensList = apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
+    minGensList := apply(idealList, jj -> (if (class jj === Ideal) then #(first entries mingens (jj)) else 1 ));
 
     -- find max n such that a - (n-1)p > m*p. This is the number of copies of $I$ we can
     -- move outside the pth root. 
 
-    nsList = apply(exponentList, minGensList, (aa, mm) -> (
+    nsList := apply(exponentList, minGensList, (aa, mm) -> (
        max(0, floor(aa/p - mm + 1)) 
     ));
     I = R;
