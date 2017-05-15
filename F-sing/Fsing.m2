@@ -50,7 +50,8 @@ AuxiliaryFiles=>true
 --- *** Reorganized by subpackages, so we know where to find stuff *** PT
 
 export{
---BasicFunctions (BasicFunctions.m2)
+--BasicFunctions (BasicFunctions.m2) 
+--Karl: Seems ok
     "carryTest",  
     "basePExp",    
     "digit", 	   
@@ -141,6 +142,7 @@ export{
     "tauPoly",
     "tauQGor",    
     "tauQGorAmb",--needs optimization
+    "MaxCartierIndex", --the cartier index limit in the test ideal method
 
 
 -- Other.m2
@@ -229,5 +231,5 @@ load "./Fsing/generatingMorphismDoc.m2"
 
 load "./Fsing/parameterTestIdealDoc.m2"
 
-load "./Fsing/FpureDoc.m2"
+load "./Fsing/FPureDoc.m2"
 
