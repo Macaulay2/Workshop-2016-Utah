@@ -101,12 +101,12 @@ doc ///
         Example 
             kk = ZZ/5;
             R = kk[x,y,z];
-            I1 = (x^10, y^10, z^10);
-            I2 = (x^20*y^100, x + z^100);
-            I3 = (x^50*y^50*z^50);
+            I1 = ideal(x^10, y^10, z^10);
+            I2 = ideal(x^20*y^100, x + z^100);
+            I3 = ideal(x^50*y^50*z^50);
             ethRoot(1, {4,5,6}, {I1, I2, I3})
         Text
-            The above example computes the ideal (I1^4*I2^5*I3^6)^[1/p]. For legacy reasons, you can specify the last ideal in your list using ethRoot(e, exponentList, idealList, I). This last ideal is just raised to the first power. 
+            The above example computes the ideal (I1^4*I2^5*I3^6)^{[1/p]}	. For legacy reasons, you can specify the last ideal in your list using ethRoot(e, exponentList, idealList, I). This last ideal is just raised to the first power. 
 
             The implementation of this function is not optimal, especially if many of the ideals are principal. In that case, ethRootRingElements should be faster. 
 
@@ -139,14 +139,14 @@ doc ///
         Example 
             kk = ZZ/5;
             R = kk[x,y,z];
-            I1 = (x^10, y^10, z^10);
+            I1 = ideal(x^10, y^10, z^10);
             f1 = x^100;
             f2 = y^30 + z^50;
-            ethRootRingElements(2, {2, 3}, {f1, f2}, I)
+            ethRootRingElements(2, {2, 3}, {f1, f2}, I1)
         Text
-            The above example computes the ideal (f1^2*f2^3*I)^[1/25]. One could compute the same ideal by calling
+            The above example computes the ideal (f1^2*f2^3*I)^{[1/25]}. One could compute the same ideal by calling
         Example
-            ethRoot(2, {2,3,1}, {f1, f2, I})
+            ethRoot(2, {2,3,1}, {f1, f2, I1})
 
 ///
 
