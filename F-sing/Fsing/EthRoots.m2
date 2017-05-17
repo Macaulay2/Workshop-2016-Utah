@@ -13,8 +13,6 @@
 
 -- mEthRoot, mEthRootOneElement: (A,e) -> (e,A)
 
--- fancyEthRoot (I,m,e) -> (e, m, I)
-
 -- EXTERNAL: basePExp
 
 --*************************************************

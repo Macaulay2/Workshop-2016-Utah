@@ -28,3 +28,34 @@ TEST ///  -- test 2
     fg = (gens kk)#0;
     assert( (getFieldGenRoot(6,5,5^4, kk))^(5^6) == fg)
 ///
+
+TEST /// -- test 3 (ascend ideal test)
+    pp = 5;
+    R = ZZ/pp[x,y,z];
+    ff = x^3 + y^3 + z^3;
+    cc = x;
+    testIdeal = ascendIdeal(1, ff^(pp-1), ideal(cc)); --this should be the test ideal
+    assert(testIdeal == ideal(x,y,z))
+///
+
+TEST ///  --test 4 (ascend ideal test 2)
+    pp = 13;
+    R = ZZ/pp[x,y,z];
+    ff = x^4 + y^4 + z^4;
+    cc = x^3;
+    testIdeal = ascendIdeal(1, ff^(pp-1), ideal(cc)); --this should be the test ideal
+    assert(testIdeal == (ideal(x,y,z))^2)
+///
+
+TEST /// --test 5 (ethRoots lists test 1)
+    pp = 5;
+    R = ZZ/5[x,y,z];
+    ff = x^5 + x*y^6 + y^3*z^4 + z^7;
+    II = ideal(x^(2*pp)*x*y + y^(3*pp)*x^2*z, (x*y)^pp*x^3*y*z + (x*z)^pp*x^4*z);
+    out1 = ethRoot(1, ideal(ff^12)*II);
+    out2 = ethRoot(1, {12}, {ff}, II);
+    out3 = ethRoot(1, {12, 1}, {ff, II});
+    assert( (out1 == out2) and (out1 == out3) )
+///
+
+

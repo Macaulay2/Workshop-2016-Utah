@@ -75,13 +75,12 @@ export{
     "AscentCount",
     "boundLargestCompatible", ---MK
     "ethRoot",
-    "ethRootSafe", 	       
-    "ethRootSafeList",    
+    "ethRootRingElements",   
     "EthRootStrategy",    
-    "fancyEthRoot",
     "minimalCompatible",
     "MonomialBasis",	
     "Substitution",
+    "getFieldGenRoot",
     
 --Frobenius Powers (frobeniusPowers.m2)
     "fastExp",
@@ -233,3 +232,4 @@ load "./Fsing/parameterTestIdealDoc.m2"
 
 load "./Fsing/FPureDoc.m2"
 
+load "./Fsing/EthRootsTest.m2"
