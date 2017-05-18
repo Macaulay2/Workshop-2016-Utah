@@ -192,7 +192,7 @@ tauAOverPEMinus1Poly = ( f, a, e ) ->
      b := a % (p^e - 1);
      k := a // (p^e - 1); --it seems faster to use the fact that tau(f^(1+k)) = f*tau(f^k) 
      I := ethRoot( e, a, f, ideal(f) );     
-     I = ascendIdealSafe( b, e, f, I );
+     I = ascendIdealSafe( e, b, f, I );
      I*ideal(f^k)
 )
 
@@ -236,10 +236,10 @@ tauAOverPEMinus1QGorAmb = (Sk, Jk, hk, ek, fm, a1, e1) ->
 	a2 := a3 % (pp^et - 1);
      k2 := a3 // (pp^et - 1); --it seems faster to use the fact that we can do simple Skoda for tau
      
-     Jl := ascendIdealSafe(1, ek, hk, Jk );
-                   
+     Jl := ascendIdealSafe(ek, 1, hk, Jk );
+     expList := (a2, numerator ((pp^et - 1)/(pp^ek - 1)));
         --          assert false;                             
-     Iasc := ascendIdealSafeList( (a2, numerator ((pp^et - 1)/(pp^ek - 1))), et, (fm, hk), Jk*ideal(fm)^(ceiling(a3/(pp^et - 1))) );
+     Iasc := ascendIdealSafeList( et, expList, (fm, hk), Jk*ideal(fm)^(ceiling(a3/(pp^et - 1))) );
 --     assert false;
      
      Iasc*ideal(fm^k2)

@@ -35,7 +35,10 @@ TEST /// -- test 3 (ascend ideal test)
     ff = x^3 + y^3 + z^3;
     cc = x;
     testIdeal = ascendIdeal(1, ff^(pp-1), ideal(cc)); --this should be the test ideal
-    assert(testIdeal == ideal(x,y,z))
+    testIdeal2 = ascendIdealSafe(1, pp-1, ff, ideal(cc));
+    testIdeal3 = ascendIdealSafeList(1, {2, 2}, {ff, ff}, ideal(cc));
+    mm = ideal(x,y,z);
+    assert( (testIdeal == mm) and (testIdeal2 == mm) and (testIdeal3 == mm) )
 ///
 
 TEST ///  --test 4 (ascend ideal test 2)
@@ -44,7 +47,10 @@ TEST ///  --test 4 (ascend ideal test 2)
     ff = x^4 + y^4 + z^4;
     cc = x^3;
     testIdeal = ascendIdeal(1, ff^(pp-1), ideal(cc)); --this should be the test ideal
-    assert(testIdeal == (ideal(x,y,z))^2)
+    testIdeal2 = ascendIdealSafe(1, pp-1, ff, ideal(cc)); --this should be the test ideal
+    testIdeal3 = ascendIdealSafeList(1, {5, 7}, {ff, ff}, ideal(cc));
+    m2 = (ideal(x,y,z))^2;
+    assert( (testIdeal == m2) and (testIdeal2 == m2) and (testIdeal3 == m2) )
 ///
 
 TEST /// --test 5 (ethRoots lists test 1)

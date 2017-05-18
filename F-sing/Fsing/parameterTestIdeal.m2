@@ -130,7 +130,7 @@ paraTestModule(QQ, RingElement) := o -> (t1, fk) -> ( --maintained by Karl
 	if (cc != 0) then	
 --??? REORDER PARAMETERS
 		if (o.AscentCount == false) then (firstTau = ascendIdealSafeList( (aa, uPower), cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))) ))
-		else (tempList = ascendIdealSafeList(  (aa, uPower), cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))), AscentCount=>true);
+		else (tempList = ascendIdealSafeList(  cc, (aa, uPower), (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))), AscentCount=>true);
 			firstTau = tempList#0;
 			ascendingCount = tempList#1;
 		)
@@ -138,7 +138,7 @@ paraTestModule(QQ, RingElement) := o -> (t1, fk) -> ( --maintained by Karl
 		--I should write an ascendIdealSafe that works for multiple elements raised to powers...	
 	else 
 --		firstTau = ascendIdeal(1, u1^(uPower), J1)*ideal(f1^aa);
-		firstTau = ascendIdealSafeList( {uPower},  1, u1, J1);
+		firstTau = ascendIdealSafeList( 1, {uPower}, u1, J1);
 			
 	secondTau := firstTau;
 	if (bb != 0) then
@@ -176,8 +176,8 @@ paraTestModule(QQ, RingElement, Ideal, RingElement) := o -> (t1, fk, omegaAmb, u
 --	assert false;
 	if (cc != 0) then	
 --??? REORDER PARAMETERS
-		if (o.AscentCount == false) then (firstTau = ascendIdealSafeList( (aa, uPower), cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))) ))
-		else (tempList = ascendIdealSafeList(  (aa, uPower), cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))), AscentCount=>true);
+		if (o.AscentCount == false) then (firstTau = ascendIdealSafeList( {aa, uPower}, cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))) ))
+		else (tempList = ascendIdealSafeList(  cc, (aa, uPower), (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))), AscentCount=>true);
 			firstTau = tempList#0;
 			ascendingCount = tempList#1;
 		)
@@ -185,7 +185,7 @@ paraTestModule(QQ, RingElement, Ideal, RingElement) := o -> (t1, fk, omegaAmb, u
 		--I should write an ascendIdealSafe that works for multiple elements raised to powers...	
 	else 
 --		firstTau = ascendIdeal(1, u1^(uPower), J1)*ideal(f1^aa);
-		firstTau = ascendIdealSafeList( {uPower},  1, {u1}, J1);
+		firstTau = ascendIdealSafeList( 1, {uPower},  {u1}, J1);
 			
 	secondTau := firstTau;
 	if (bb != 0) then

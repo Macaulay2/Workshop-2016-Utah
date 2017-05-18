@@ -297,7 +297,7 @@ ascendIdeal(ZZ, RingElement, Ideal) := o->(ek, hk, Jk) -> (
     );
 
     --trim the output
-    trim IP
+    trim (IP*Rk)
 )
 
 
@@ -319,8 +319,8 @@ ascendIdealOld = (ek, hk, Jk) -> (
 )
 
 --Works like ascendIdeal but tries to minimize the exponents elements are taken to
--- what's ak?
-ascendIdealSafe = ( ak, ek, hk, Jk) -> (
+-- what's ak?  Karl: ak is the numerator of the exponent t = ak/(p^ek - 1)
+ascendIdealSafe = ( ek, ak, hk, Jk) -> (
 	Sk := ring Jk;
      pp := char Sk;
      IN := Jk;
@@ -341,7 +341,7 @@ ascendIdealSafe = ( ak, ek, hk, Jk) -> (
 
 
 --works just like ascendIdealSafe but also handles lists of hk to powers...
-ascendIdealSafeList ={AscentCount=>false} >> o ->  (akList, ek, hkList, Jk) -> (
+ascendIdealSafeList ={AscentCount=>false} >> o ->  (ek, akList,  hkList, Jk) -> (
 	Sk := ring Jk;
 	pp := char Sk;
 	IN := Jk;
