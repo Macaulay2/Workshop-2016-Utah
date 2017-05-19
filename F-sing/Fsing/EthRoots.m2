@@ -37,8 +37,6 @@
 -- ethRootRingElements
 -- ethRootRingElements 
 -- ascendIdeal 
--- ascendIdealSafe 
--- ascendIdealSafeList 
 -- getExponents
 -- mEthRootOfOneElement
 -- mEthRoot 
@@ -220,13 +218,13 @@ ethRootSubStrat = (e,p,q,k,I,R) -> (
     substitute(ideal L, R)
 )
 
-ethRootRingElements = method(); 
+ethRootRingElements = method(Options => {EthRootStrategy => Substitution}); 
 --This tries to compute (f1^a1*f2^a2*...fk^ak*I)^{[1/p^e]} in such a way that we don't blow exponent buffers.  It can be much faster as well.
 --We should probably just use it.  It relies on the fact that (f^(ap+b))^{[1/p^2]} = (f^a(f^b)^{[1/p]})^{[1/p]}.
 
 --It's a special case of ethRoot(ZZ, List, List) that's optimized for lots of principal ideals
 
-ethRootRingElements( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
+ethRootRingElements( ZZ, List, List, Ideal ) := o->( e, aList, elmtList, I ) -> (
     R := ring I;
     p := char R;
     
@@ -246,7 +244,7 @@ ethRootRingElements( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
         i := 1;
         while(i < e) do (
             aPowerList = apply(elmtList, expOfaList, (f, z) -> f^(z#i));
-            IN1 = ethRoot( 1, IN1*ideal(product(aPowerList)) );
+            IN1 = ethRoot( 1, IN1*ideal(product(aPowerList)), EthRootStrategy=>o.EthRootStrategy  );
             i = i + 1;
         )
     );
@@ -254,13 +252,13 @@ ethRootRingElements( ZZ, List, List, Ideal ) := ( e, aList, elmtList, I ) -> (
     IN1*ideal(product(aPowerList))
 )
 
-ethRootRingElements( ZZ, Sequence, Sequence, Ideal ) := (a, b, c, d) -> ethRootRingElements(a, toList b, toList c, d);
+ethRootRingElements( ZZ, Sequence, Sequence, Ideal ) := o->(a, b, c, d) -> ethRootRingElements(a, toList b, toList c, d, EthRootStrategy => o.EthRootStrategy);
 
-ethRootRingElements( ZZ, ZZ, RingElement, Ideal ) := ( e, a, f, I ) -> 
-    ethRootRingElements(e, {a}, {f}, I);
+ethRootRingElements( ZZ, ZZ, RingElement, Ideal ) := o->( e, a, f, I ) -> 
+    ethRootRingElements(e, {a}, {f}, I, EthRootStrategy => o.EthRootStrategy);
 
-ethRootRingElements( ZZ, ZZ, RingElement ) := ( e, a, f ) -> 
-    ethRootRingElements( e, {a}, {f}, ideal( 1_(ring f) ) );
+ethRootRingElements( ZZ, ZZ, RingElement ) := o->( e, a, f ) -> 
+    ethRootRingElements( e, {a}, {f}, ideal( 1_(ring f) ), EthRootStrategy => o.EthRootStrategy);
 
 
 
@@ -277,10 +275,24 @@ ethRootRingElements( ZZ, ZZ, RingElement ) := ( e, a, f ) ->
 --trace by to give phi:  phi(_) = Tr^(ek)(hk._)
 --This is based on ideas of Moty Katzman, and his star closure
 
---this is a new ascendIdeal written by Karl.  It ascends but does it in a possibly non-polynomial ring.  Probably it should replace the old version eventually.
-ascendIdeal = method(Options => {EthRootStrategy => Substitution});
+--this is a new ascendIdeal written by Karl.  It ascends but does it in a possibly non-polynomial ring.  
+ascendIdeal = method(Options => {EthRootStrategy => Substitution, AscentCount=>false});
 
 ascendIdeal(ZZ, RingElement, Ideal) := o->(ek, hk, Jk) -> (
+    ascendIdeal(ek, {1}, {hk}, Jk, EthRootStrategy => o.EthRootStrategy, AscentCount=>o.AscentCount)
+)
+
+
+--Works like above ascendIdeal but tries to minimize the exponents elements are taken to
+-- what's ak?  Karl: ak is the numerator of the exponent t = ak/(p^ek - 1)
+
+ascendIdeal(ZZ, ZZ, RingElement, Ideal) := o->( ek, ak, hk, Jk) -> (
+    ascendIdeal(ek, {ak}, {hk}, Jk, EthRootStrategy => o.EthRootStrategy, AscentCount=>o.AscentCount)
+)
+
+
+--handles lists of hk to powers...
+ascendIdeal(ZZ, BasicList, BasicList, Ideal) := o->(ek, akList,  hkList, Jk) -> (
     Rk := ring Jk;
     Ik := ideal Rk;
     Sk := ambient Rk;
@@ -288,77 +300,22 @@ ascendIdeal(ZZ, RingElement, Ideal) := o->(ek, hk, Jk) -> (
     pp := char Sk;
     IN := sub(Jk, Sk);
     IP := ideal(0_Sk);
+    i1 := 0;
      --we want to make the largest ideal that is phi-stable, following Moty Katzman's idea
      --we do the following
     while (isSubset(IN+Ik, IP+Ik) == false) do(
+        i1 = i1 + 1; 
         --print "Step";
         IP = IN;
-        IN = ethRoot(ek,ideal(hk)*IP, EthRootStrategy => o.EthRootStrategy)+IP
+        IN = ethRootRingElements( ek, akList, hkList, IP, EthRootStrategy => o.EthRootStrategy) + IP
     );
 
     --trim the output
-    trim (IP*Rk)
+    if (o.AscentCount == false) then 
+		trim (IP*Rk)
+	else (trim (IP*Rk), i1)    
 )
-
-
-ascendIdealOld = (ek, hk, Jk) -> (
-     Sk := ring Jk;
-     pp := char Sk;
-     IN := Jk;
-     IP := ideal(0_Sk);
-     --we want to make the smallest ideal that is phi-stable, following Moty Katzman's idea
-     --we do the following
-     while (isSubset(IN, IP) == false) do(
-     	  IP = IN;
---	  error "help";
-	  IN = ethRoot(ek,ideal(hk)*IP, EthRootStrategy => MonomialBasis)+IP
-     );
-
-     --trim the output
-     trim IP
-)
-
---Works like ascendIdeal but tries to minimize the exponents elements are taken to
--- what's ak?  Karl: ak is the numerator of the exponent t = ak/(p^ek - 1)
-ascendIdealSafe = ( ek, ak, hk, Jk) -> (
-	Sk := ring Jk;
-     pp := char Sk;
-     IN := Jk;
-     IP := ideal(0_Sk);
-     --we want to make the largest ideal that is phi-stable, following Moty Katzman's idea
-     --we do the following
-     while (isSubset(IN, IP) == false) do(
-        IP = IN;
---	  error "help";
-	  	IN = ethRootRingElements( ek, ak, hk, IP )+IP
-     );
-
-     --trim the output
-     trim IP
-)
-
-
-
-
---works just like ascendIdealSafe but also handles lists of hk to powers...
-ascendIdealSafeList ={AscentCount=>false} >> o ->  (ek, akList,  hkList, Jk) -> (
-	Sk := ring Jk;
-	pp := char Sk;
-	IN := Jk;
-	IP := ideal(0_Sk);
-	i1 := 0;
-	--we ascend the ideal as above
-	while (isSubset(IN, IP) == false) do(
-		i1 = i1 + 1; --
-		IP = IN;
-		IN = ethRootRingElements( ek, akList, hkList, IP ) + IP
-	);
-	
-	--trim the output
-	if (o.AscentCount == false) then 
-		trim IP
-	else (trim IP, i1)
-)
+--		
 
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK
 -- minimalCompatible is a method which is implemented as:
@@ -368,11 +325,11 @@ ascendIdealSafeList ={AscentCount=>false} >> o ->  (ek, akList,  hkList, Jk) -> 
 --     containg a given submodule for a given matrix U.
 --minimalCompatible = method();
 --minimalCompatible(Ideal,RingElement,ZZ) :=  (Jk, hk, ek) -> ascendIdeal (Jk, hk, ek)
---minimalCompatible(Ideal,RingElement,ZZ,ZZ) :=  (Jk, hk, ak, ek) -> ascendIdealSafe (Jk, hk, ak, ek)
+--minimalCompatible(Ideal,RingElement,ZZ,ZZ) :=  (Jk, hk, ak, ek) -> ascendIdeal(Jk, hk, ak, ek)
 --minimalCompatible(Matrix,Matrix,ZZ) := (A,U,e) -> Mstar (A,U,e)
 minimalCompatible = method();
 minimalCompatible(ZZ,RingElement,Ideal) :=  (ek, hk, Jk) -> ascendIdeal (ek, hk, Jk)
-minimalCompatible(ZZ,ZZ,RingElement,Ideal) :=  ( ak, ek,hk,Jk) -> ascendIdealSafe (ak, ek,hk,Jk)
+minimalCompatible(ZZ,ZZ,RingElement,Ideal) :=  ( ak, ek,hk,Jk) -> ascendIdeal (ak, ek,hk,Jk)
 minimalCompatible(ZZ,Matrix,Matrix) := (e,A,U) -> Mstar (e,A,U)
 
 --MKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMKMK

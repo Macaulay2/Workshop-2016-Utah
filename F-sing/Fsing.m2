@@ -51,7 +51,6 @@ AuxiliaryFiles=>true
 
 export{
 --BasicFunctions (BasicFunctions.m2) 
---Karl: Seems ok
     "carryTest",  
     "basePExp",    
     "digit", 	   
@@ -70,8 +69,6 @@ export{
     
 --ethRootFunctions (EthRoots.m2)
     "ascendIdeal", 
-    "ascendIdealSafe",
-    "ascendIdealSafeList",
     "AscentCount",
     "boundLargestCompatible", ---MK
     "ethRoot",
