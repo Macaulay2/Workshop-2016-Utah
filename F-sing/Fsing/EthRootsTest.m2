@@ -55,7 +55,7 @@ TEST ///  --test 4 (ascend ideal test 2)
 
 TEST /// --test 5 (ethRoots lists test 1)
     pp = 5;
-    R = ZZ/5[x,y,z];
+    R = ZZ/pp[x,y,z];
     ff = x^5 + x*y^6 + y^3*z^4 + z^7;
     II = ideal(x^(2*pp)*x*y + y^(3*pp)*x^2*z, (x*y)^pp*x^3*y*z + (x*z)^pp*x^4*z);
     out1 = ethRoot(1, ideal(ff^12)*II);
@@ -64,6 +64,15 @@ TEST /// --test 5 (ethRoots lists test 1)
     assert( (out1 == out2) and (out1 == out3) )
 ///
 
+TEST /// --test6 (compare ethRoot vs ethRootRingElements)
+ pp = 5;
+    R = ZZ/pp[x,y,z];
+    ff = random(3, R) + random(5, R) + random(6, R);
+    ak = 55+random(10);
+    out1 = time ethRoot(2, {ak}, {ff});
+    out2 = time ethRootRingElements(2, ak, ff); 
+    assert( out1 == out2 )
+///
 
 
 
