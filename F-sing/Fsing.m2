@@ -128,6 +128,12 @@ export{
     "setFTData",
     "splittingField",
 
+-- parameterTestIdeal.m2
+    "canonicalIdeal",
+    "findusOfIdeal",
+    "testModule",
+    "randomSubset",
+
 -- testIdeals.m2
     "findQGorGen",
     "findTestElementAmbient",

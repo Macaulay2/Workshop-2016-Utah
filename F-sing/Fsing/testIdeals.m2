@@ -51,6 +51,7 @@ findQGorGen ( Ring ) := R -> findQGorGen( R, 1 )
 --One could make this faster by not computing the entire Jacobian / singular locus
 --instead, if we just find one element of the Jacobian not in I, then that would also work
 --and perhaps be substantially faster
+--it assumes that R is a reduced ring.
 findTestElementAmbient = method()
 randomSubset = method()
 
@@ -61,10 +62,11 @@ findTestElementAmbient(Ring) := (R) ->
 	M := jacobian I;
 	r := rank target M;
 	c := rank source M;
-	testEle := ideal(sub(0,ambient R));
-	while(isSubset(testEle, I))
+	testEle := sub(0,ambient R);
+	primesList := minimalPrimes I;
+	while(any(primesList, II->isSubset(ideal(testEle), II)))
 	do(
-	   testEle = minors(n,M, First =>{randomSubset(r,n),randomSubset(c,n)}, Limit =>1);
+	   testEle = testEle + (random(coefficientRing R))*(first first entries gens minors(n,M, First =>{randomSubset(r,n),randomSubset(c,n)}, Limit =>1));
 	);
 	testEle
 )

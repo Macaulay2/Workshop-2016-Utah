@@ -27,36 +27,18 @@ canonicalIdeal(Ring) := (R1) -> (
 	moduleToIdeal(M1)
 )
 
---moduleToIdeal = (M1, R1) -> (--turns a module to an ideal of a ring, it returns the lift of the ideal to the ambient ring
---	S1 := ambient R1;
----	myMatrix := substitute(relations prune M1, S1);
---	
---	answer:=0;
---	s1:=syz transpose substitute(myMatrix,R1);
---	s2:=entries transpose s1;
---	
---	apply(s2, t->
---	{
---		s3:=substitute(syz gens ideal t,S1);
----		print(s3%canModuleMatrix);
---		if ((s3%myMatrix)==0) then
---		{
---			answer=substitute(mingens ideal t,S1);
---			break;
---		};
---	});
---	ideal answer	
---)
 
 --the following function computes the u of a canonical ideal in a polynomial ring
 --it uses previous work of Katzman
-finduOfIdeal = (canIdeal, defIdeal) -> (
+finduOfIdeal = method();
+
+finduOfIdeal(Ideal, Ideal) := (defIdeal, canIdeal) -> (
 	Ip := frobeniusPower(1, defIdeal);
 	tempIdeal := intersect( (frobeniusPower(1,canIdeal)) : canIdeal, Ip : defIdeal );
 	
 	M1 := compress ((gens tempIdeal)%(gens Ip));
 	first first entries M1
-)
+);
 
 --computes the parameter test submodule of a given ring.  It outputs the parameter test module (as an ideal), it then outputs the canonical module (as an ideal), and finally it outputs the term u used as the action on the ideal
 paraTestModuleAmbient = method();
@@ -70,7 +52,7 @@ paraTestModuleAmbient (Ring) := (R1) -> (
 	J1 := (findTestElementAmbient(R1));
 	tau0 := J1*canIdeal; --this is the starting test element times the ideal
 	
-	u1 := finduOfIdeal(canIdeal, I1); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
+	u1 := finduOfIdeal(I1, canIdeal); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
 	
 	tauOut := ascendIdeal(1, u1, tau0);
 	
@@ -85,7 +67,7 @@ paraTestModuleAmbient (Ring, Ideal) := (R1, canIdeal) -> (--it expects the canon
 	J1 := findTestElementAmbient(R1);
 	tau0 := J1*canIdeal; --this is the starting test element times the ideal
 	
-	u1 := finduOfIdeal(canIdeal, I1); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
+	u1 := finduOfIdeal(I1, canIdeal); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
 	
 	tauOut := ascendIdeal(1, u1, tau0);
 	
@@ -118,7 +100,7 @@ paraTestModule(QQ, RingElement) := o -> (t1, fk) -> ( --maintained by Karl
 
 	omegaAmb := sub(canonicalIdeal(R1), S1) + I1;
 	J1 := findTestElementAmbient(R1)*omegaAmb;
-	u1 := finduOfIdeal(omegaAmb, I1);
+	u1 := finduOfIdeal(I1, omegaAmb);
 
 	uPower := 1;
 	if (cc != 0) then
@@ -202,7 +184,7 @@ paraTestModule(QQ, RingElement, Ideal, RingElement) := o -> (t1, fk, omegaAmb, u
 --this function finds the generators of the intersection of 
 --J^{[p]} : J and I^{[p]} : I where I is the defining ideal and J is the canonical
 --ideal lifted to the ambient ring (in a maximal way).
-findusOfIdeal = (canIdeal, defIdeal) -> (
+findusOfIdeal = (defIdeal, canIdeal) -> (
 	Ip := frobeniusPower(1, defIdeal);
 	tempIdeal := intersect( (frobeniusPower(1,canIdeal)) : canIdeal, Ip : defIdeal );
 	
@@ -225,14 +207,21 @@ testModule(Ring) := (R1) -> (
     J1 := sub(canonicalIdeal(R1), S1);
     C1 := findTestElementAmbient(R1);
     
-    u1 := findusOfIdeal(J1+I1, I1);
+    u1 := findusOfIdeal(I1, J1+I1);
+    tau := I1;
     if (#u1 > 1) then(
-        error "Too many generators, this function needs to be rewritten to find a/the single generator"
+        print "Multiple trace map for omega generators.  Using them all.";
+        j := 0;
+        while (j < #u1) do (
+            tau = tau + ascendIdeal(1, u1, C1*J1*R1);
+            j = j+1;
+        );
     )
     else (
         u1 = u1#0;
+        tau = ascendIdeal(1, u1, C1*J1*R1);
     );
-    tau := ascendIdeal(1, u1, C1*J1*R1);
+
     (sub(tau, R1), sub(J1, R1), u1)
 );
 
