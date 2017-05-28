@@ -1,21 +1,5 @@
 doc ///
     Key
-        paraTestModuleAmbient 
-    Headline
-        (Ask Karl for various versions)
-    Usage
-        paraTestModuleAmbient(u)
-    Inputs
-        u:RingElement
-    Outputs
-        :List
-    Description
-        Text
-            Ask Karl
-///
-
-doc ///
-    Key
         canonicalIdeal 
     Headline
         Given a ring, produces an ideal isomorphic to the canonical module.
@@ -38,8 +22,7 @@ doc ///
             Here's an example in a non-domain.
         Example
             R = ZZ/13[x,y,z]/ideal(x*y, x*z, y*z);
-            canonicalIdeal(R)
-            canonicalIdeal(R)                    
+            canonicalIdeal(R)     
 ///
 
 doc ///
@@ -62,16 +45,47 @@ doc ///
 doc ///
     Key
         testModule
+        (testModule, Ring)
+        (testModule, Ring, Ideal)
+        (testModule, QQ, RingElement)
+        (testModule, QQ, RingElement, Ideal, List)
     Headline
         Finds the parameter test module of a reduced ring.
     Usage
         testModule(R)
+        testModule(R, canIdeal)
+        testModule(tt, ff)
+        testModule(tt, ff, canIdeal, u1)
     Inputs
         R:Ring
+        canIdeal:Ideal
+        tt:QQ
+        tt:ZZ
+        u1:List
     Outputs
         :Sequence
     Description
         Text
-            Computes the parameter test module (as a submodule of the canonical module).  The function returns three values, the parameter test submodule, the canonical module of which it is a subset, and the element u (or us) used to compute this ideal via the method findusOfIdeal.
+            Computes the parameter test module (as a submodule of the canonical module).  The function returns three values, the parameter test submodule, the canonical module of which it is a subset, and the element u (or us) used to compute this ideal via the method findusOfIdeal.  
+        Example
+            R = ZZ/7[x,y,z]/ideal(x^3+y^3+z^3);
+            testModule(R)
+        Text
+            Note this is a Gorenstein ring and so the ambient canonical module is the unit ideal.
+        Example
+            S = ZZ/3[x,y,u,v];
+            T = ZZ/3[a,b];
+            f = map(T, S, {a^3, a^2*b, a*b^2, b^3});
+            R = S/(ker f);
+            testModule(R)
+        Text
+            Note that the output in this case has the parameter test module equal to the canonical module, as it should be.
+        Text
+            This function can also be used to compute the parameter test module of a pair $(R, f^t)$.
+        Example
+            R = ZZ/7[x,y];
+            f = y^2 - x^3;
+            testModule(5/6, f)
+            testModule(5/7, f)
 ///
 

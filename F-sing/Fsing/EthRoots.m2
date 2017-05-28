@@ -307,7 +307,7 @@ ascendIdeal(ZZ, BasicList, BasicList, Ideal) := o->(ek, akList,  hkList, Jk) -> 
         i1 = i1 + 1; 
         --print "Step";
         IP = IN;
-        IN = ethRootRingElements( ek, akList, hkList, IP, EthRootStrategy => o.EthRootStrategy) + IP
+        IN = ethRoot( ek, akList, hkList, IP, EthRootStrategy => o.EthRootStrategy) + IP
     );
 
     --trim the output
