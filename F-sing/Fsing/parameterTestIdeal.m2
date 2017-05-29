@@ -40,143 +40,6 @@ finduOfIdeal(Ideal, Ideal) := (defIdeal, canIdeal) -> (
 	first first entries M1
 );
 
---computes the parameter test submodule of a given ring.  It outputs the parameter test module (as an ideal), it then outputs the canonical module (as an ideal), and finally it outputs the term u used as the action on the ideal
-paraTestModuleAmbient = method();
-
-paraTestModuleAmbient (Ring) := (R1) -> (
-	S1 := ambient R1;
-	I1 := ideal(R1);
-	
-	canIdeal := sub(canonicalIdeal(R1), S1) + I1;
-	
-	J1 := (findTestElementAmbient(R1));
-	tau0 := J1*canIdeal; --this is the starting test element times the ideal
-	
-	u1 := finduOfIdeal(I1, canIdeal); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
-	
-	tauOut := ascendIdeal(1, u1, tau0);
-	
-	(sub(tauOut, R1), sub(canIdeal, R1), 
-	u1)
-)
-
-paraTestModuleAmbient (Ring, Ideal) := (R1, canIdeal) -> (--it expects the canonical ideal to be lifted to the ambient ring
-	S1 := ambient R1;
-	I1 := ideal(R1);
-	
-	J1 := findTestElementAmbient(R1);
-	tau0 := J1*canIdeal; --this is the starting test element times the ideal
-	
-	u1 := finduOfIdeal(I1, canIdeal); --this is the multiplying object that gives us (u*omega)^{[1/p]} \subseteq omega.
-	
-	tauOut := ascendIdeal(1, u1, tau0);
-	
-	(sub(tauOut, R1), sub(canIdeal, R1), u1)
-)
-
---computes the parameter test ideal of an ambient ring
-paraTestIdealAmbient = (R1) -> (
-	tempList := paraTestModuleAmbient(R1);
-	(tempList#0) : (tempList#1)
-)
-paraTestModule = method(Options=>{AscentCount=>false})
---this computes the parameter test module \tau(R, f^t).  It does not assume that R is a polynomial ring.
-paraTestModule(QQ, RingElement) := o -> (t1, fk) -> ( --maintained by Karl
-	R1 := ring fk;
-	S1 := ambient R1;
-	f1 := sub(fk, S1);
-	I1 := ideal R1;
-	pp := char R1;
-	funList := divideFraction(pp, t1);
-	
-	aa := funList#0;
-	bb := funList#1;
-	cc := funList#2;
-	
---	tempList := paraTestModuleAmbient(R1);
---	tauAmb := sub(tempList#0, S1);
---	omegaAmb := sub(tempList#1, S1);
---	u1 := tempList#2;
-
-	omegaAmb := sub(canonicalIdeal(R1), S1) + I1;
-	J1 := findTestElementAmbient(R1)*omegaAmb;
-	u1 := finduOfIdeal(I1, omegaAmb);
-
-	uPower := 1;
-	if (cc != 0) then
-		uPower = floor((pp^cc-1)/(pp-1));
-	firstTau := J1;
-	local tempList;
-	ascendingCount := 0;
---	assert false;
-	if (cc != 0) then	
---??? REORDER PARAMETERS
-		if (o.AscentCount == false) then (firstTau = ascendIdeal( (aa, uPower), cc, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))) ))
-		else (tempList = ascendIdeal(  cc, (aa, uPower), (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))), AscentCount=>true);
-			firstTau = tempList#0;
-			ascendingCount = tempList#1;
-		)
---		firstTau = ascendIdeal(cc, f1^aa*u1^(uPower), J1*ideal(f1^(aa)))
-
-	else 
---		firstTau = ascendIdeal(1, u1^(uPower), J1)*ideal(f1^aa);
-		firstTau = ascendIdeal( 1, uPower, u1, J1);
-			
-	secondTau := firstTau;
-	if (bb != 0) then
-		secondTau = ethRootRingElements(bb, floor((pp^bb-1)/(pp-1)), u1, firstTau); --??? REORDER PARAMETERS
-
-	if (o.AscentCount == false) then (sub(secondTau, R1), omegaAmb, u1) else (sub(secondTau, R1), omegaAmb, u1, ascendingCount)
-)
-
---this computes the parameter test module \tau(R, f^t).  It does not assume that R is a polynomial ring.
-paraTestModule(QQ, RingElement, Ideal, RingElement) := o -> (t1, fk, omegaAmb, u1) -> ( --maintained by Karl
-	R1 := ring fk;
-	S1 := ambient R1;
-	f1 := sub(fk, S1);
-	I1 := ideal R1;
-	pp := char R1;
-	funList := divideFraction(pp, t1);
-	
-	aa := funList#0;
-	bb := funList#1;
-	cc := funList#2;
-	
---	tempList := paraTestModuleAmbient(R1);
---	tauAmb := sub(tempList#0, S1);
---	omegaAmb := sub(tempList#1, S1);
---	u1 := tempList#2;
-
-	J1 := findTestElementAmbient(R1)*omegaAmb;
-
-	uPower := 1;
-	if (cc != 0) then
-		uPower = floor((pp^cc-1)/(pp-1));
-	firstTau := J1;
-	local tempList;
-	ascendingCount := 0;
---	assert false;
-	if (cc != 0) then	
---??? REORDER PARAMETERS
-		if (o.AscentCount == false) then (firstTau = ascendIdeal(cc, {aa, uPower}, (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))) ))
-		else (tempList = ascendIdeal(  cc, (aa, uPower), (f1, u1), J1*ideal(f1^(pp^bb*ceiling(t1))), AscentCount=>true);
-			firstTau = tempList#0;
-			ascendingCount = tempList#1;
-		)
---		firstTau = ascendIdeal(cc, f1^aa*u1^(uPower), J1*ideal(f1^(aa)))
-
-	else 
---		firstTau = ascendIdeal(1, u1^(uPower), J1)*ideal(f1^aa);
-		firstTau = ascendIdeal( 1, {uPower},  {u1}, J1);
-			
-	secondTau := firstTau;
-	if (bb != 0) then
-		secondTau = ethRootRingElements(bb, floor((pp^bb-1)/(pp-1)), u1, firstTau); --??? REORDER PARAMETERS
-
-	if (o.AscentCount == false) then (sub(secondTau, R1), omegaAmb, u1) else (sub(secondTau, R1), omegaAmb, u1, ascendingCount)
-)
-
-
 --****************************************************
 --*****Karl is starting a rewrite of some of this*****
 --****************************************************
@@ -306,11 +169,12 @@ testModule(QQ, RingElement, Ideal, List) := o -> (tt, ff, canIdeal, u1) -> (
     )
     else (
         u1 = u1#0;
-        curTau = ascendIdeal(ccc, {floor((pp^ccc - 1)/(pp-1)),  aaa}, {u1, fff}, (ideal(fff))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
+        curTau = ascendIdeal(ccc, {floor((pp^ccc - 1)/(pp-1)),  aaa}, {u1, fff}, (ideal(fff^(min(1, aaa))))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
                 --note, we only have an ideal(ff) in the test element here since by construction, 
                 --aaa/(pp^ccc-1) is less than 1.
                 --if we need to take more roots, do so...
         curTau = sub(curTau, S1);                
+--        error "Debug me";
         if (bb > 0) then(
             tau = ethRoot(bb, {floor((pp^bb - 1)/(pp-1)), newIntegerPart}, {u1, fff}, curTau, EthRootStrategy => o.EthRootStrategy);
         )
@@ -365,11 +229,12 @@ testModule(List, List, Ideal, List) := o -> (ttList, ffList, canIdeal, u1) -> (
     
     tau := I1;
     curTau := I1;
+    prodList := apply(#ffList, iii -> (ffList#iii)^(min(1, aaListForCsReduced#iii)) );
     if (#u1 > 1) then(
         print "Multiple trace map for omega generators (Macaulay2 failed to find the principal generator of a principal ideal).  Using them all.";
         j := 0;
         while (j < #u1) do (
-            curTau = ascendIdeal(lcmCs, append(aaListForCsReduced, floor((pp^lcmCs - 1)/(pp-1))), append(ffList, u1), (product(ffList))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
+            curTau = ascendIdeal(lcmCs, append(aaListForCsReduced, floor((pp^lcmCs - 1)/(pp-1))), append(ffList, u1), (product(prodList))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
                 --note, we only have an ideal(ff) in the test element here since by construction, 
                 --aaa/(pp^ccc-1) is less than 1.
                 --if we need to take more roots, do so...
@@ -383,7 +248,7 @@ testModule(List, List, Ideal, List) := o -> (ttList, ffList, canIdeal, u1) -> (
     )
     else (
         u1 = u1#0;
-        curTau = ascendIdeal(lcmCs, append(aaListForCsReduced, floor((pp^lcmCs - 1)/(pp-1))), append(ffList, u1), (product(ffList))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
+        curTau = ascendIdeal(lcmCs, append(aaListForCsReduced, floor((pp^lcmCs - 1)/(pp-1))), append(ffList, u1), (product(prodList))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
                 --note, we only have an ideal(ff) in the test element here since by construction, 
                 --aaa/(pp^ccc-1) is less than 1.
                 --if we need to take more roots, do so...
