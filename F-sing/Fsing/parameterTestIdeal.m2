@@ -323,10 +323,88 @@ testModule(QQ, RingElement, Ideal, List) := o -> (tt, ff, canIdeal, u1) -> (
 );
 
 
---todo:
 --Write a testModule function that computes \tau(omega, f^s g^t h^u) for example
-
+--this works similarly to testModule(QQ, RingElement, Ideal, List), but it takes lists of elements.
 testModule(List, List, Ideal, List) := o -> (ttList, ffList, canIdeal, u1) -> (
-    error("Not implemented yet.")
+    ff := ffList#0;
+    R1 := ring ff;
+    pp := char R1;
+    S1 := ambient R1;
+    fff := sub(ff, S1);
+    I1 := ideal R1;
+    J1 := sub(canIdeal, S1);    
+    
+    ffList = apply(ffList, zz->sub(zz, S1));
+    C1 := findTestElementAmbient(R1);
+    fractionDividedList := apply(ttList, tt -> divideFraction(pp, tt));
+    -- fraction divided writes tt = (a/(p^b(p^c-1))
+    -- the point is that
+    -- tau(\omega, f^t) = (tau( omega, f^{a/(p^c-1)}) * u1^{(p^b-1)/(p-1)} )^{[1/p^b]}
+    bbList := apply(fractionDividedList, zz->zz#1);
+    ccList := apply(fractionDividedList, zz->zz#2);
+    --we need to write all of our fractions with the same denominator.
+    lcmCs := lcm(apply(ccList, zz -> (if zz == 0 then 1 else zz))); --take the lcm of the cs, 
+                                                                   --but ignore those cs that
+                                                                   --are equal to zero
+    maxBs := max(bbList);
+    --next we create the list of aa values for ascending the ideal
+    aaListForCs := apply(fractionDividedList, zz -> (
+                                                    if ((zz#2) == 0) then 0 else
+                                                        (zz#0)*floor(pp^(maxBs - (zz#1)))*floor( (pp^lcmCs - 1)/(pp^(zz#2) - 1))
+                                                 )
+                        );
+    --we need to managed the case when ttt = aa/(pp^cc - 1) is huge, we handle this as folows.
+    -- tau(\omega, ff^ttt) = \tau(\omega, ff^{ttt - floor(ttt)} ) * ff^{floor(ttt)}
+    -- we do this because we never want to actually compute ff^{floor(ttt)}                   
+    aaListForCsReduced := apply(aaListForCs, aa -> (aa % (pp^lcmCs - 1)) );
+    aaListForAfterAscension := apply(#fractionDividedList, nn -> (    
+                                                    if ( ((fractionDividedList#nn)#2) > 0 ) then floor((aaListForCs#nn)/(pp^lcmCs - 1)) else
+                                                        ((fractionDividedList#nn)#0)*floor(pp^(maxBs - ((fractionDividedList#nn)#1)))
+                                                 )
+                        );    
+    
+    tau := I1;
+    curTau := I1;
+    if (#u1 > 1) then(
+        print "Multiple trace map for omega generators (Macaulay2 failed to find the principal generator of a principal ideal).  Using them all.";
+        j := 0;
+        while (j < #u1) do (
+            curTau = ascendIdeal(lcmCs, append(aaListForCsReduced, floor((pp^lcmCs - 1)/(pp-1))), append(ffList, u1), (product(ffList))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
+                --note, we only have an ideal(ff) in the test element here since by construction, 
+                --aaa/(pp^ccc-1) is less than 1.
+                --if we need to take more roots, do so...
+            curTau = sub(curTau, S1);                
+            if (maxBs > 0) then(
+                tau = ethRoot(maxBs, append(aaListForAfterAscension, floor((pp^maxBs - 1)/(pp-1))), append(ffList, u1), curTau, EthRootStrategy => o.EthRootStrategy);
+            );            
+            tau = tau + curTau;
+            j = j+1;
+        );                
+    )
+    else (
+        u1 = u1#0;
+        curTau = ascendIdeal(lcmCs, append(aaListForCsReduced, floor((pp^lcmCs - 1)/(pp-1))), append(ffList, u1), (product(ffList))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
+                --note, we only have an ideal(ff) in the test element here since by construction, 
+                --aaa/(pp^ccc-1) is less than 1.
+                --if we need to take more roots, do so...
+        curTau = sub(curTau, S1);                
+        if (maxBs > 0) then(
+            tau = ethRoot(maxBs, append(aaListForAfterAscension, floor((pp^maxBs - 1)/(pp-1))), append(ffList, u1), curTau, EthRootStrategy => o.EthRootStrategy);
+        )
+        else(
+            tau = curTau;
+        );   
+    );
+    
+    (sub(tau, R1), sub(J1, R1), u1)
 );
 
+testModule(List, List) := o-> (ttList, ffList) ->(
+    R1 := ring (ffList#0);
+    S1 := ambient R1;
+    canIdeal := canonicalIdeal(R1);
+    I1 := ideal R1;
+    J1 := sub(canIdeal, S1);
+    u1 := findusOfIdeal(I1, J1+I1);
+    testModule(ttList, ffList, canIdeal, u1, EthRootStrategy => o.EthRootStrategy)    
+);

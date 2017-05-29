@@ -55,21 +55,24 @@ findQGorGen ( Ring ) := R -> findQGorGen( R, 1 )
 findTestElementAmbient = method()
 randomSubset = method()
 
-findTestElementAmbient(Ring) := (R) ->
+findTestElementAmbient(Ring) := (R1) ->
 (
-	I := ideal R;
-	n := #gens R - dim R;
-	M := jacobian I;
-	r := rank target M;
-	c := rank source M;
-	testEle := sub(0,ambient R);
-	primesList := minimalPrimes I;
-	while(any(primesList, II->isSubset(ideal(testEle), II)))
-	do(
-	   testEle = testEle + (random(coefficientRing R))*(first first entries gens minors(n,M, First =>{randomSubset(r,n),randomSubset(c,n)}, Limit =>1));
+	I1 := ideal R1;
+	n1 := #gens R1 - dim R1;
+	M1 := jacobian I1;
+	r1 := rank target M1;
+	c1 := rank source M1;
+	testEle := sub(0,ambient R1);
+	primesList := minimalPrimes I1;
+    curMinor := ideal(sub(0, ambient R1));
+	while(any(primesList, II->isSubset(ideal(testEle), II))) do(
+	    curMinor = first entries gens  minors(n1,M1, First =>{randomSubset(r1,n1),randomSubset(c1,n1)}, Limit =>1);
+	    if (#(curMinor) > 0) then (
+            testEle = testEle + (random(coefficientRing R1))*(first curMinor);
+        );
 	);
 	testEle
-)
+);
 
 randomSubset(ZZ,ZZ) := (m,n) ->
 (
@@ -142,23 +145,24 @@ testIdeal(Ring) := o->(R1) -> (
        -- if (cartIndex == 2) then 1/0;
     );
     if (fflag == false) then error "testIdeal: Ring does not appear to be Q-Cartier, perhaps increase the option MaxCartierIndex";
-    nMinusKX := locPrincList#1;
+--    nMinusKX := locPrincList#1;
     
 --    cartIndex := isQCartier(o.MaxCartierIndex, divisor(canIdeal));
     gg := first first entries gens trim canIdeal;
     dualCanIdeal := (ideal(gg) : canIdeal);
---    nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
+    nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
     gensList := first entries gens trim nMinusKX;
     
     runningIdeal := ideal(sub(0, R1));
     omegaAmb := sub(canIdeal, ambient R1) + ideal(R1);
-	u1 := finduOfIdeal(omegaAmb, ideal R1);
+	u1 := (findusOfIdeal(ideal R1, omegaAmb));
     
 --    print gensList;
-    1/0;
+--    1/0;
     for x in gensList do (
-        runningIdeal = runningIdeal + (paraTestModule(1/cartIndex, x, omegaAmb, u1))#0;        
+        runningIdeal = runningIdeal + (testModule(1/cartIndex, sub(x, R1), canIdeal, u1))#0;        
     );
+--    1/0;
     
     newDenom := reflexifyIdeal(canIdeal*dualCanIdeal);
     (runningIdeal*R1) : newDenom
@@ -179,7 +183,7 @@ tauQGorAmb = ( R, e ) ->
 (
      J := findTestElementAmbient( R );
      h := findQGorGen( R, e);
-     sub( ascendIdeal( e, h, J ), R )
+     sub( ascendIdeal( e, h, ideal(J) ), R )
 )
 
 --Computes the test ideal of an ambient Gorenstein ring
@@ -357,7 +361,7 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
  	canIdeal := canList#0;
  	canMap := canList#1;
  	
- 	paraTest := paraTestModuleAmbient(A1, canIdeal); 
+ 	paraTest := testModule(A1, canIdeal); 
  		
  	newMap := map(A1^1/(paraTest#0), canList#2, matrix(canMap));
  	newKer := (ker newMap)**A2; --this is the parameter test submodule of the canonical module  

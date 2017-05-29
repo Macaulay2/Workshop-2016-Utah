@@ -48,7 +48,11 @@ doc ///
         (testModule, Ring)
         (testModule, Ring, Ideal)
         (testModule, QQ, RingElement)
+        (testModule, ZZ, RingElement)
         (testModule, QQ, RingElement, Ideal, List)
+        (testModule, List, List)
+        (testModule, List, List, Ideal, List)
+        [testModule, EthRootStrategy]
     Headline
         Finds the parameter test module of a reduced ring.
     Usage
@@ -79,7 +83,11 @@ doc ///
             R = S/(ker f);
             testModule(R)
         Text
-            Note that the output in this case has the parameter test module equal to the canonical module, as it should be.
+            Note that the output in this case has the parameter test module equal to the canonical module, as it should be.  Let's a non-Gorenstein example which is not F-rational.
+        Example
+            R = ZZ/5[x,y,z]/ideal(y*z, x*z, x*y);
+            paraTestMod = testModule(R)
+            (paraTestMod#0) : (paraTestMod#1)
         Text
             This function can also be used to compute the parameter test module of a pair $(R, f^t)$.
         Example
@@ -87,5 +95,13 @@ doc ///
             f = y^2 - x^3;
             testModule(5/6, f)
             testModule(5/7, f)
+        Text
+            This can also be used to compute $(R, f^s g^t)$.
+        Example
+            R = ZZ/7[x,y];
+            f = y^2 - x^3;
+            g = x^2 - y^3;
+            testModule({1/2, 1/2}, {f, g})        
+        Text
+            Finally, sometimes you would like to specify the ambient canonical module (and choice of u) across multiple calls of testModule.  Those are what the $canIdeal$ or $u1$ can be used to specify.
 ///
-

@@ -275,7 +275,8 @@ ethRootRingElements( ZZ, ZZ, RingElement ) := o->( e, a, f ) ->
 --trace by to give phi:  phi(_) = Tr^(ek)(hk._)
 --This is based on ideas of Moty Katzman, and his star closure
 
---this is a new ascendIdeal written by Karl.  It ascends but does it in a possibly non-polynomial ring.  
+--this is a new ascendIdeal written by Karl.  It ascends but does it in a possibly non-polynomial ring.
+--the point is the ascending might be faster if we don't care about it mod a certain ideal.  
 ascendIdeal = method(Options => {EthRootStrategy => Substitution, AscentCount=>false});
 
 ascendIdeal(ZZ, RingElement, Ideal) := o->(ek, hk, Jk) -> (

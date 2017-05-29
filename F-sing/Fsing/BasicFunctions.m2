@@ -108,26 +108,32 @@ multOrder( ZZ, ZZ ) := ( a, b ) ->
 
 --===================================================================================
 
-divideFraction = method();
+divideFraction = method(Options => {NoZeroC=>false});
 
 -- This function takes in a fraction t and a prime p and spits out a list
 -- {a,b,c}, where t = a/(p^b*(p^c-1))
 -- if c = 0, then this means that t = a/p^b
-divideFraction( ZZ, QQ ) := ( p, t ) -> 
+--alternately, if NoZeroC => true, then we will always write t = a/p^b(p^c - 1)
+--even if it means increasing a. 
+divideFraction( ZZ, QQ ) := o -> ( p, t ) -> 
 (
-     a := num t; -- finding a is easy, for now
-     den := denom(t);
-     b := 1;
-     while den % p^b == 0 do b = b+1;
-     b = b-1; 
-     temp := denom( t*p^b );
-     local c;
-     if (temp == 1) then c = 0 else 
-     (
-	 c = multOrder( p, temp );  
-     	 a = lift( a*(p^c-1)/temp, ZZ ); -- fix a
-     );
-     {a,b,c}
+    a := num t; -- finding a is easy, for now
+    den := denom(t);
+    b := 1;
+    while den % p^b == 0 do b = b+1;
+    b = b-1; 
+    temp := denom( t*p^b );
+    local c;
+    if (temp == 1) then c = 0 else 
+    (
+        c = multOrder( p, temp );  
+        a = lift( a*(p^c-1)/temp, ZZ ); -- fix a
+    );
+    if ((o.NoZeroC == true) and (c == 0)) then (
+        a = a*(p-1);
+        c = 1;
+    );
+    {a,b,c}
 )
 divideFraction( ZZ, ZZ ) := (p, t) -> divideFraction(p, t/1)
 --===================================================================================

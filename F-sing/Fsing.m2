@@ -66,6 +66,7 @@ export{
     "num",
     "taxicabNorm",
     "truncatedBasePExp",
+    "NoZeroC", --option to force certain behavior from a function
     
 --ethRootFunctions (EthRoots.m2)
     "ascendIdeal", 
@@ -145,7 +146,7 @@ export{
     "tauQGor",    
     "tauQGorAmb",--needs optimization
     "MaxCartierIndex", --the cartier index limit in the test ideal method
-
+    "testIdeal",
 
 -- Other.m2
     "frobenius", 
