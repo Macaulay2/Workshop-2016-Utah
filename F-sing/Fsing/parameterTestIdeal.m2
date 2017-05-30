@@ -80,7 +80,7 @@ testModule(Ring, Ideal) := o->(R1, canIdeal) -> (
     u1 := findusOfIdeal(I1, J1+I1);
     tau := I1;
     if (#u1 > 1) then(
-        print "Multiple trace map for omega generators.  Using them all.";
+        print "testModule: Multiple trace map for omega generators (Macaulay2 failed to find the principal generator of a principal ideal).  Using them all.";
         j := 0;
         while (j < #u1) do (
             tau = tau + ascendIdeal(1, u1#j, C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
@@ -152,7 +152,7 @@ testModule(QQ, RingElement, Ideal, List) := o -> (tt, ff, canIdeal, u1) -> (
     tau := I1;
     curTau := I1;
     if (#u1 > 1) then(
-        print "Multiple trace map for omega generators (Macaulay2 failed to find the principal generator of a principal ideal).  Using them all.";
+        print "testModule: Multiple trace map for omega generators (Macaulay2 failed to find the principal generator of a principal ideal).  Using them all.";
         j := 0;
         while (j < #u1) do (
             curTau = ascendIdeal(ccc, {floor((pp^ccc - 1)/(pp-1)),  aaa}, {u1#j, fff}, (ideal(fff))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
@@ -231,7 +231,7 @@ testModule(List, List, Ideal, List) := o -> (ttList, ffList, canIdeal, u1) -> (
     curTau := I1;
     prodList := apply(#ffList, iii -> (ffList#iii)^(min(1, aaListForCsReduced#iii)) );
     if (#u1 > 1) then(
-        print "Multiple trace map for omega generators (Macaulay2 failed to find the principal generator of a principal ideal).  Using them all.";
+        print "testModule: Multiple trace map for omega generators (Macaulay2 failed to find the principal generator of a principal ideal).  Using them all.";
         j := 0;
         while (j < #u1) do (
             curTau = ascendIdeal(lcmCs, append(aaListForCsReduced, floor((pp^lcmCs - 1)/(pp-1))), append(ffList, u1), (product(prodList))*C1*J1*R1, EthRootStrategy=>o.EthRootStrategy);
@@ -333,8 +333,15 @@ isFrational(Ring) := o->(R1) ->(
     if (flag == true) then (
         --note we don't compute the test module if we know that the ring is not CM.
         MList := testModule(R1);
-        if (isSubset(MList#1, MList#0) == false) then (
-            flag = false;
+        if (o.IsLocal == true) then (
+            paraTestIdeal := (MList#0):(MList#1);
+            maxIdeal := sub(ideal(first entries vars ambient R1), R1);
+            flag = isSubset(paraTestIdeal, maxIdeal);
+        ) 
+        else (
+            if (isSubset(MList#1, MList#0) == false) then (
+                flag = false;
+            )
         );
     );
     
