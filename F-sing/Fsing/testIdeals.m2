@@ -38,8 +38,7 @@ findQGorGen ( Ring, ZZ ) := ( R, e ) ->
      J = trim sub( J, S/Ie ); -- extend colon ideal to S/Ie
      L := J_*; -- grab generators
      if ( #L != 1 ) then 
-	  error "findQGorGen: this ring does not appear to be (Q-)Gorenstein, or you might need to work on 
-	  a smaller chart. Or the index may not divide p^e-1 for the e you have selected.";
+	  error "findQGorGen: this ring does not appear to be (Q-)Gorenstein, or you might need to work on a smaller chart. Or the index may not divide p^e-1 for the e you have selected.";
      lift( L#0, S )
 )
 
@@ -108,7 +107,7 @@ getNonzeroGenerator := (I2) -> (
     )
 );
 
---the following function should go elsewhere, it checks whether a given ideal is locally principal (really, invertible), if it is locally principal, it returns the inverse ideal.
+--the following function should go elsewhere, it checks whether a given ideal is locally principal (really, invertible).  If it is locally principal, it returns the inverse ideal.
 isLocallyPrincipalIdeal := (I2) -> (
     localGen := getNonzeroGenerator(I2);
     if (localGen === null) then (
@@ -131,6 +130,7 @@ testIdeal = method(Options => {MaxCartierIndex => 100});
 testIdeal(Ring) := o->(R1) -> (
     --it appears in some examples that calling the old tauGorAmb function is faster.  We may want to adjust this function to work in that way.
     canIdeal := canonicalIdeal(R1);
+    pp := char R1;
     cartIndex := 0;
     fflag := false;
     curIdeal := ideal(sub(0, R1));
@@ -142,30 +142,31 @@ testIdeal(Ring) := o->(R1) -> (
         if (locPrincList#0 == true) then (            
             fflag = true;
         );
-       -- if (cartIndex == 2) then 1/0;
     );
-    if (fflag == false) then error "testIdeal: Ring does not appear to be Q-Cartier, perhaps increase the option MaxCartierIndex";
---    nMinusKX := locPrincList#1;
-    
---    cartIndex := isQCartier(o.MaxCartierIndex, divisor(canIdeal));
-    gg := first first entries gens trim canIdeal;
-    dualCanIdeal := (ideal(gg) : canIdeal);
-    nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
-    gensList := first entries gens trim nMinusKX;
-    
-    runningIdeal := ideal(sub(0, R1));
-    omegaAmb := sub(canIdeal, ambient R1) + ideal(R1);
-	u1 := (findusOfIdeal(ideal R1, omegaAmb));
+    if (fflag == false) then error "testIdeal: Ring does not appear to be Q-Gorenstein, perhaps increase the option MaxCartierIndex";
+    if ((pp-1)%cartIndex == 0) then ( -- in this case, one should use the old tauQGorAmb
+        tauQGorAmb(1, R1)
+    )
+    else (
+        gg := first first entries gens trim canIdeal;
+        dualCanIdeal := (ideal(gg) : canIdeal);
+        nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
+        gensList := first entries gens trim nMinusKX;
+        
+        runningIdeal := ideal(sub(0, R1));
+        omegaAmb := sub(canIdeal, ambient R1) + ideal(R1);
+    	u1 := (findusOfIdeal(ideal R1, omegaAmb));
     
 --    print gensList;
 --    1/0;
-    for x in gensList do (
-        runningIdeal = runningIdeal + (testModule(1/cartIndex, sub(x, R1), canIdeal, u1))#0;        
-    );
+        for x in gensList do (
+            runningIdeal = runningIdeal + (testModule(1/cartIndex, sub(x, R1), canIdeal, u1))#0;        
+        );
 --    1/0;
     
-    newDenom := reflexifyIdeal(canIdeal*dualCanIdeal);
-    (runningIdeal*R1) : newDenom
+        newDenom := reflexifyIdeal(canIdeal*dualCanIdeal);
+        (runningIdeal*R1) : newDenom
+    )
 )
 
 testIdeal(QQ, RingElement, Ring) := o->(t1, f1, R1) -> (
@@ -179,7 +180,9 @@ testIdeal(QQ, RingElement, Ring) := o->(t1, f1, R1) -> (
 --Outputs the test ideal of a (Q-)Gorenstein ring (with no pair or exponent)
 --e is the number such that the index divides (p^e - 1)
 --It actually spits ourt the appropriate stable/fixed ideal inside the ambient ring
-tauQGorAmb = ( R, e ) -> 
+tauQGorAmb = method();
+
+tauQGorAmb(ZZ, Ring) := ( e, R ) -> 
 (
      J := findTestElementAmbient( R );
      h := findQGorGen( R, e);
@@ -187,7 +190,8 @@ tauQGorAmb = ( R, e ) ->
 )
 
 --Computes the test ideal of an ambient Gorenstein ring
-tauGorAmb = R -> tauQGorAmb( R, 1 )
+tauGorAmb = method();
+tauGorAmb(Ring) := R -> tauQGorAmb( 1, R )
 
 --Computes the test ideal of (R, f^(a/(p^e - 1)))
 --when R is a polynomial ring.  This is based upon ideas of Moty Katzman.
