@@ -41,7 +41,7 @@ finduOfIdeal(Ideal, Ideal) := (defIdeal, canIdeal) -> (
 );
 
 --****************************************************
---*****Karl is starting a rewrite of some of this*****
+--*****Karl rewrote this *****
 --****************************************************
 
 --this function finds the generators of the intersection of 
@@ -272,4 +272,71 @@ testModule(List, List) := o-> (ttList, ffList) ->(
     J1 := sub(canIdeal, S1);
     u1 := findusOfIdeal(I1, J1+I1);
     testModule(ttList, ffList, canIdeal, u1, EthRootStrategy => o.EthRootStrategy)    
+);
+
+
+--Below is an isCohenMacaulay function.  There are other implementations of this in the packages
+--Depth and LexIdeals.  This one has the advantage that it works even if the ring is not local/graded.
+--If you pass it the Local=>true option, then it calls the isCM function in Depth.
+needsPackage "Depth";
+
+--warning, this only works if R is equidimensional.  If Spec R has disjoint components of different dimensions
+--then this function will return false, even if R is Cohen-Macaulay.
+isCohenMacaulay = method(Options => {IsLocal => false});
+
+isCohenMacaulay(Ring) := o->(R1) ->(
+    if (o.IsLocal == true) then (
+        isCM(R1)
+    )
+    else (
+        S1 := ambient R1;
+        I1 := ideal R1;
+        M1 := S1^1/I1;
+        dimS := dim S1;
+        dimR := dim R1;
+        flag := true;
+        P1 := res M1;
+
+        if (length P1 == dimS - dimR) then (
+            true
+        )
+        else if (isHomogeneous(I1) == true) then (
+            false
+        )
+        else (
+            RHom := Hom(P1, S1^1);
+            i := dimS - dimR + 1;
+            while ((flag == true) and (i <= dimS))do (
+                if (dim (HH^i(RHom)) > -1) then (
+                    flag = false;                
+                );
+                i = i+1;
+            );
+            flag
+        )
+    )
+);
+
+--next we write an isFrational function
+
+isFrational = method(Options => {IsLocal => false, AssumeCM => false});
+
+isFrational(Ring) := o->(R1) ->(
+    flag := true;
+    --first verify if it is CM
+    if (o.AssumeCM == false) then(
+        if (not isCohenMacaulay(R1, IsLocal => o.IsLocal)) then (
+            flag = false;
+        );
+    );
+    --next verify if it is Frational
+    if (flag == true) then (
+        --note we don't compute the test module if we know that the ring is not CM.
+        MList := testModule(R1);
+        if (isSubset(MList#1, MList#0) == false) then (
+            flag = false;
+        );
+    );
+    
+    flag 
 );

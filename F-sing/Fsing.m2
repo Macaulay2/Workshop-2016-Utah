@@ -134,6 +134,10 @@ export{
     "findusOfIdeal",
     "testModule",
     "randomSubset",
+    "isCohenMacaulay",
+    "isFrational",
+    "IsLocal", --an option for isCohenMacaulay, isFrational, etc.
+    "AssumeCM", --an option for isFrational, if true then the function won't check if the ring is CM.
 
 -- testIdeals.m2
     "findQGorGen",
