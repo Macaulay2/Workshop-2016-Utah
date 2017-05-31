@@ -29,7 +29,7 @@ needsPackage "Divisor";
 
 findQGorGen=method()
 
-findQGorGen ( Ring, ZZ ) := ( R, e ) -> 
+findQGorGen ( ZZ, Ring ) := ( e, R ) -> 
 (
      S := ambient R; -- the ambient ring
      I := ideal R; -- the defining ideal
@@ -42,7 +42,7 @@ findQGorGen ( Ring, ZZ ) := ( R, e ) ->
      lift( L#0, S )
 )
 
-findQGorGen ( Ring ) := R -> findQGorGen( R, 1 )
+findQGorGen ( Ring ) := R -> findQGorGen( 1, R )
 
 --Finds a test element of a ring R = k[x, y, ...]/I (or at least an ideal 
 --containing a nonzero test element).  It views it as an element of the ambient ring
@@ -125,16 +125,19 @@ isLocallyPrincipalIdeal := (I2) -> (
     
 );
 
+--the following is the new function for computing test ideals written by Karl.
+
 testIdeal = method(Options => {MaxCartierIndex => 100});
 
 testIdeal(Ring) := o->(R1) -> (
-    --it appears in some examples that calling the old tauGorAmb function is faster.  We may want to adjust this function to work in that way.
     canIdeal := canonicalIdeal(R1);
     pp := char R1;
     cartIndex := 0;
     fflag := false;
+    computedFlag := false;
     curIdeal := ideal(sub(0, R1));
     locPrincList := null;
+    computedTau := ideal(sub(0, R1));
     while ( (fflag == false) and (cartIndex < o.MaxCartierIndex) ) do (
         cartIndex = cartIndex + 1;
         curIdeal = reflexivePower(cartIndex, canIdeal);
@@ -144,10 +147,18 @@ testIdeal(Ring) := o->(R1) -> (
         );
     );
     if (fflag == false) then error "testIdeal: Ring does not appear to be Q-Gorenstein, perhaps increase the option MaxCartierIndex";
-    if ((pp-1)%cartIndex == 0) then ( -- in this case, one should use the old tauQGorAmb
-        tauQGorAmb(1, R1)
-    )
-    else (
+    if ((pp-1)%cartIndex == 0) then ( 
+        J1 := findTestElementAmbient( R1 );
+        h1 := sub(0, ambient R1);
+        try (h1 = findQGorGen( 1, R1)) then (
+            computedTau = ascendIdeal(1, h1, sub(ideal(J1), R1) );
+            computedFlag = true;
+        )
+        else (
+            computedFlag = false;
+        );
+    );
+    if (computedFlag == false) then (
         gg := first first entries gens trim canIdeal;
         dualCanIdeal := (ideal(gg) : canIdeal);
         nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
@@ -165,13 +176,84 @@ testIdeal(Ring) := o->(R1) -> (
 --    1/0;
     
         newDenom := reflexifyIdeal(canIdeal*dualCanIdeal);
-        (runningIdeal*R1) : newDenom
-    )
+        computedTau = (runningIdeal*R1) : newDenom;
+    );
+    computedTau
 )
 
 testIdeal(QQ, RingElement, Ring) := o->(t1, f1, R1) -> (
     --this computes \tau(R, f^t)
-)
+    testIdeal({t1}, {f1}, R1)
+);
+
+testIdeal(ZZ, RingElement, Ring) := o->(t1, f1, R1) -> (
+    --this computes \tau(R, f^t)
+    testIdeal({t1/1}, {f1}, R1)
+);
+
+testIdeal(QQ, RingElement) := o->(t1, f1) -> (
+    testIdeal({t1}, {f1}, ring f1)
+);
+
+testIdeal(ZZ, RingElement) := o->(t1, f1) -> (
+    testIdeal({t1/1}, {f1}, ring f1)
+);
+
+testIdeal(List, List) := o->(tList, fList) ->(
+    testIdeal(tList, fList, ring (fList#0))
+);
+
+testIdeal(List, List, Ring) := o->(tList, fList, R1) ->(
+    canIdeal := canonicalIdeal(R1);
+    pp := char R1;
+    cartIndex := 0;
+    fflag := false;
+    computedFlag := false;
+    curIdeal := ideal(sub(0, R1));
+    locPrincList := null;
+    computedTau := ideal(sub(0, R1));
+    while ( (fflag == false) and (cartIndex < o.MaxCartierIndex) ) do (
+        cartIndex = cartIndex + 1;
+        curIdeal = reflexivePower(cartIndex, canIdeal);
+        locPrincList = isLocallyPrincipalIdeal(curIdeal);
+        if (locPrincList#0 == true) then (            
+            fflag = true;
+        );
+    );
+    if (fflag == false) then error "testIdeal: Ring does not appear to be Q-Gorenstein, perhaps increase the option MaxCartierIndex";
+    if ((pp-1)%cartIndex == 0) then ( 
+        J1 := findTestElementAmbient( R1 );
+        h1 := sub(0, ambient R1);
+        try (h1 = findQGorGen( 1, R1)) then (
+            --do stuff
+            computedTau = testModule(tList, fList, ideal(sub(1, R1)), {h1});
+        ) else (
+            computedFlag = false;
+        );
+    );
+    if (computedFlag == false) then (
+        gg := first first entries gens trim canIdeal;
+        dualCanIdeal := (ideal(gg) : canIdeal);
+        nMinusKX := reflexivePower(cartIndex, dualCanIdeal);
+        gensList := first entries gens trim nMinusKX;
+        
+        runningIdeal := ideal(sub(0, R1));
+        omegaAmb := sub(canIdeal, ambient R1) + ideal(R1);
+    	u1 := (findusOfIdeal(ideal R1, omegaAmb));
+    	
+        t2 := append(tList, 1/cartIndex);
+        f2 := fList;
+    
+        for x in gensList do (
+            f2 = append(fList, x);
+            runningIdeal = runningIdeal + (testModule(t2, f2, canIdeal, u1))#0;        
+        );
+    
+        newDenom := reflexifyIdeal(canIdeal*dualCanIdeal);
+        computedTau = (runningIdeal*R1) : newDenom;
+    );
+    computedTau        
+);
 
 --*************
 --all the below versions should eventually be deprecated
@@ -180,18 +262,6 @@ testIdeal(QQ, RingElement, Ring) := o->(t1, f1, R1) -> (
 --Outputs the test ideal of a (Q-)Gorenstein ring (with no pair or exponent)
 --e is the number such that the index divides (p^e - 1)
 --It actually spits ourt the appropriate stable/fixed ideal inside the ambient ring
-tauQGorAmb = method();
-
-tauQGorAmb(ZZ, Ring) := ( e, R ) -> 
-(
-     J := findTestElementAmbient( R );
-     h := findQGorGen( R, e);
-     sub( ascendIdeal( e, h, ideal(J) ), R )
-)
-
---Computes the test ideal of an ambient Gorenstein ring
-tauGorAmb = method();
-tauGorAmb(Ring) := R -> tauQGorAmb( 1, R )
 
 --Computes the test ideal of (R, f^(a/(p^e - 1)))
 --when R is a polynomial ring.  This is based upon ideas of Moty Katzman.
@@ -263,7 +333,7 @@ tauQGor = (Rk, ek, fk, t1) ->
      Sk := ambient Rk;
      pp := char Sk;
      L1 := divideFraction(pp,t1); --this breaks up t1 into the pieces we need
-     hk := findQGorGen(Rk, ek); --the term in the test ideal
+     hk := findQGorGen(ek, Rk); --the term in the test ideal
      Jk := findTestElementAmbient(Rk); --this finds some test elements (lifted on the ambient
                                        --ring).  Right now it is slow because of a call to 
 				       --singularLocus (ie, computing a Jacobian).

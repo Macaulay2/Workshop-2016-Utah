@@ -148,7 +148,6 @@ testModule(QQ, RingElement, Ideal, List) := o -> (tt, ff, canIdeal, u1) -> (
         ccc = 1;
         newIntegerPart = aa;
     );
-    
     tau := I1;
     curTau := I1;
     if (#u1 > 1) then(
@@ -160,9 +159,7 @@ testModule(QQ, RingElement, Ideal, List) := o -> (tt, ff, canIdeal, u1) -> (
                 --aaa/(pp^ccc-1) is less than 1.
                 --if we need to take more roots, do so...
             curTau = sub(curTau, S1);
-            if (bb > 0) then(
-                curTau = ethRoot(bb, {floor((pp^bb - 1)/(pp-1)), newIntegerPart}, {u1#j, fff}, curTau, EthRootStrategy => o.EthRootStrategy);
-            );
+            curTau = ethRoot(bb, {floor((pp^bb - 1)/(pp-1)), newIntegerPart}, {u1#j, fff}, curTau, EthRootStrategy => o.EthRootStrategy);
             tau = tau + curTau;
             j = j+1;
         );                
@@ -174,13 +171,7 @@ testModule(QQ, RingElement, Ideal, List) := o -> (tt, ff, canIdeal, u1) -> (
                 --aaa/(pp^ccc-1) is less than 1.
                 --if we need to take more roots, do so...
         curTau = sub(curTau, S1);                
---        error "Debug me";
-        if (bb > 0) then(
-            tau = ethRoot(bb, {floor((pp^bb - 1)/(pp-1)), newIntegerPart}, {u1, fff}, curTau, EthRootStrategy => o.EthRootStrategy);
-        )
-        else(
-            tau = curTau;
-        );   
+        tau = ethRoot(bb, {floor((pp^bb - 1)/(pp-1)), newIntegerPart}, {u1, fff}, curTau, EthRootStrategy => o.EthRootStrategy);
     );
     
     (sub(tau, R1), sub(J1, R1), u1)
@@ -239,9 +230,9 @@ testModule(List, List, Ideal, List) := o -> (ttList, ffList, canIdeal, u1) -> (
                 --aaa/(pp^ccc-1) is less than 1.
                 --if we need to take more roots, do so...
             curTau = sub(curTau, S1);                
-            if (maxBs > 0) then(
-                tau = ethRoot(maxBs, append(aaListForAfterAscension, floor((pp^maxBs - 1)/(pp-1))), append(ffList, u1), curTau, EthRootStrategy => o.EthRootStrategy);
-            );            
+
+            curTau = ethRoot(maxBs, append(aaListForAfterAscension, floor((pp^maxBs - 1)/(pp-1))), append(ffList, u1), curTau, EthRootStrategy => o.EthRootStrategy);
+
             tau = tau + curTau;
             j = j+1;
         );                
@@ -253,12 +244,7 @@ testModule(List, List, Ideal, List) := o -> (ttList, ffList, canIdeal, u1) -> (
                 --aaa/(pp^ccc-1) is less than 1.
                 --if we need to take more roots, do so...
         curTau = sub(curTau, S1);                
-        if (maxBs > 0) then(
-            tau = ethRoot(maxBs, append(aaListForAfterAscension, floor((pp^maxBs - 1)/(pp-1))), append(ffList, u1), curTau, EthRootStrategy => o.EthRootStrategy);
-        )
-        else(
-            tau = curTau;
-        );   
+        tau = ethRoot(maxBs, append(aaListForAfterAscension, floor((pp^maxBs - 1)/(pp-1))), append(ffList, u1), curTau, EthRootStrategy => o.EthRootStrategy);        
     );
     
     (sub(tau, R1), sub(J1, R1), u1)

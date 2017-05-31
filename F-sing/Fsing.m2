@@ -1,6 +1,6 @@
 newPackage( "Fsing",
 Version => "0.1", 
-Date => "May 8th, 2016", 
+Date => "May 30th, 2017", 
 Authors => {
      {Name => "Erin Bela",
      Email=> "ebela@nd.edu"
@@ -147,8 +147,8 @@ export{
     "tauGorAmb",--needs optimization
     "tauNonPrincipalAOverPEPoly",    
     "tauPoly",
-    "tauQGor",    
-    "tauQGorAmb",--needs optimization
+--    "tauQGor",    --Karl removed  since it is subsumed by the new testIdeal
+--    "tauQGorAmb", --Karl removed  since it is subsumed by the new testIdeal
     "MaxCartierIndex", --the cartier index limit in the test ideal method
     "testIdeal",
 
