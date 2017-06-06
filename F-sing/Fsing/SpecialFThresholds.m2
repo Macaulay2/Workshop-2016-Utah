@@ -1,14 +1,3 @@
--- changes in argument order
- 
--- internal functions acted on:
-
--- internal functions acted to do:
-
--- external functions acted on: floorlog -> floorLog, digit, truncation -->  truncatedBasePExp, 
---   firstCarry, canVector -> getCanVector, isFPTPoly, fastExp, frobeniusPower
-
--- external functions to do: 
-
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
 -- CONTENTS - FPTs of special types of polynomials
@@ -286,9 +275,9 @@ FTData = new Type of HashTable
 
 --setFTData takes a list of generators of the ideal or the ideal itself and a list
 --    of polynomials, and builds an FTData from them.
-setFTData = method()
+setFTData = method( TypicalValue => FTData )
 
-setFTData (List,List) := (gen,polylist) -> 
+setFTData (List,List) := FTData => (gen,polylist) -> 
 (
     	A:=ring gen_0;
     	p:= char A;	
@@ -296,7 +285,7 @@ setFTData (List,List) := (gen,polylist) ->
 	    "numpolys"=>#polylist,"polylist"=>polylist}
 )
 
-setFTData (Ideal,List) := (I,polylist) -> setFTData(I_*,polylist)
+setFTData (Ideal,List) := FTData => (I,polylist) -> setFTData(I_*,polylist)
 
 {*
     Tests and auxiliary functions
@@ -307,33 +296,33 @@ setFTData (Ideal,List) := (I,polylist) -> setFTData(I_*,polylist)
 --and L={L_1,...,L_n} is the "polylist". Then a point a/q (where a=(a_1,...,a_n) is a 
 --nonnegative integer vector and q a power of "char") is in the "upper region" if 
 --L_1^(a_1)...L_n^(a_n) is in I^[q]; otherwise it is in the lower region.
-isInUpperRegion = method()
+isInUpperRegion = method( TypicalValue => Boolean )
 
-isInUpperRegion (List,ZZ,FTData) := (a,q,S) -> 
+isInUpperRegion (List,ZZ,FTData) := Boolean => (a,q,S) -> 
 (
     frob:=ideal apply(S#"gens",f->f^q);
     F:=product(S#"polylist",a,(f,i)->fastExp(i,f));
     (F % frob) == 0
 )
 
-isInUpperRegion (List,FTData) := (u,S) ->
+isInUpperRegion (List,FTData) := Boolean => (u,S) ->
     isInUpperRegion append(getNumAndDenom(u),S)
 
 --isInLoweRegion(a,q,S)/isInLoweRegion(u,S) test if the point u=a/q is in the
 --lower region attached to S.
-isInLowerRegion = method()
+isInLowerRegion = method( TypicalValue => Boolean )
 
-isInLowerRegion (List,ZZ,FTData) := (a,q,S) -> not isInUpperRegion(a,q,S)
+isInLowerRegion (List,ZZ,FTData) := Boolean => (a,q,S) -> not isInUpperRegion(a,q,S)
 
-isInLowerRegion (List,FTData) := (u,S) -> not isInUpperRegion(u,S)
+isInLowerRegion (List,FTData) := Boolean => (u,S) -> not isInUpperRegion(u,S)
 
 --neighborInUpperRegion(a,q,S)/neighborInUpperRegion(u,S): auxiliary commands that, 
 --given a point u=a/q in the upper region, try to find a "neighbor" of the form 
 --(a-e_i)/q that also lies in the upper region. If the search is successful, they return
 --the first such neighbor found; otherwise they return nothing.
-neighborInUpperRegion = method()
+neighborInUpperRegion = method( TypicalValue => Sequence )
 
-neighborInUpperRegion (List,ZZ,FTData) := (a,q,S) ->
+neighborInUpperRegion (List,ZZ,FTData) := Sequence => (a,q,S) ->
 (
     if isInLowerRegion(a,q,S) then (error "Expected point in the upper region.");
     n := S#"numpolys";
@@ -351,7 +340,7 @@ neighborInUpperRegion (List,ZZ,FTData) := (a,q,S) ->
     if (not found) then null else (neighbor,q)
 )
 
-neighborInUpperRegion (List,FTData) := (u,S) -> 
+neighborInUpperRegion (List,FTData) := List => (u,S) -> 
 (
     nbr:=neighborInUpperRegion append(getNumAndDenom(u),S);
     if nbr===null then nbr else (nbr_0)/(nbr_1)
@@ -359,21 +348,21 @@ neighborInUpperRegion (List,FTData) := (u,S) ->
 
 --isCP(a,q,S)/isCP(u,S) test if u=a/q is a critical point, that is, if u is in the
 --upper region but each neighbor (a-e_i)/q (where a_i>0) is not.
-isCP = method()
+isCP = method( TypicalValue => Boolean )
 
-isCP (List,ZZ,FTData) := (a,q,S) -> 
+isCP (List,ZZ,FTData) := Boolean => (a,q,S) -> 
 (
     if isInLowerRegion(a,q,S) then return false;
     neighborInUpperRegion(a,q,S)===null
 )
 
-isCP (List,FTData) := (u,S) -> isCP append(getNumAndDenom(u),S)
+isCP (List,FTData) := Boolean => (u,S) -> isCP append(getNumAndDenom(u),S)
 
 --findCPBelow(u,S) takes a point u in the upper region attached to S and finds a 
 --critical point <= u with the same denominator.
-findCPBelow = method()
+findCPBelow = method( TypicalValue => List )
 
-findCPBelow (List,FTData) := (pt,S) ->
+findCPBelow (List,FTData) := List => (pt,S) ->
 (
     if isInLowerRegion(pt,S) then (error "The point must be in the upper region.");
     nbr:=neighborInUpperRegion(pt,S);
@@ -387,9 +376,9 @@ findCPBelow (List,FTData) := (pt,S) ->
 --binaryFormFPTInternal({a1,...an},S): if S#"polylist={L1,...,Ln} is a list of linear
 --forms, binaryFormFPTInternal({a1,...an},S) finds the FPT of the polynomial
 --F=L1^(a1)...Ln^(an)
-binaryFormFPTInternal = method(Options => {MaxExp => infinity, PrintCP => false, Nontrivial => false})
+binaryFormFPTInternal = method(TypicalValue => QQ, Options => {MaxExp => infinity, PrintCP => false, Nontrivial => false})
 
-binaryFormFPTInternal (List,FTData) := opt -> (a,S) ->
+binaryFormFPTInternal (List,FTData) := QQ => opt -> (a,S) ->
 (
     deg:=taxicabNorm(a);
     pos:=positions(a,k->(k>=deg/2));
@@ -445,12 +434,12 @@ binaryFormFPTInternal (List,FTData) := opt -> (a,S) ->
 )
 
 -----------------------
-binaryFormFPT = method(Options => {MaxExp => infinity, PrintCP => false})
+binaryFormFPT = method(TypicalValue => QQ, Options => {MaxExp => infinity, PrintCP => false})
 
 --binaryFormFPT(RingElement)
 --FPT(F) computes the F-pure threshold of a form F in two variables. 
 --KNOWN ISSUE: if the splitting field of F is too big, factor will not work.
-binaryFormFPT (RingElement) :=  opt ->  F ->
+binaryFormFPT (RingElement) :=  QQ => opt ->  F ->
 (    
    if not isNonConstantBinaryForm(F) then (
 	error "binaryFormFPT expects a nonconstant homogeneous polynomial in 2 variables."
@@ -474,9 +463,19 @@ binaryFormFPT (RingElement) :=  opt ->  F ->
 --Given a list L={L_1,...,L_n} of linear forms in 2 variables and a list m={m_1,...,m_n}
 --of multiplicities, binaryFormFPT(L,m) returns the F-pure threshold of the polynomial 
 --L_1^(m_1)*...*L_n^(m_n). 
-binaryFormFPT (List,List) :=  opt -> (L,m) -> 
+binaryFormFPT (List,List) := QQ => opt -> (L,m) -> 
 (
-    if #L != #m then error "binaryFormFPT: expected listsod same length";
+    -- some checks to see if input makes sense   
+    if #L != #m then error "binaryFormFPT: expected lists of same length";
+    if not uniform( L ) then 
+        error  "binaryFormFPT: expected the entries of the first argument to be elements of the same ring";
+    if not all( L, isLinearBinaryForm ) then 
+        error  "binaryFormFPT: expected the first argument to be a list of linear forms in two variables";
+    if not all( m, x -> (class x) === ZZ ) then 
+        error  "binaryFormFPT: expected the second argument to be a list of positive integers";
+    if not all( m, x -> x > 0 ) then 
+        error  "binaryFormFPT: expected the second argument to be a list of positive integers";
+    -- now pass things to binaryFormFPTInternal 
     binaryFormFPTInternal(m,setFTData(gens ring L_0,L),MaxExp=>(opt.MaxExp),PrintCP=>(opt.PrintCP))
 )
 
@@ -488,14 +487,14 @@ binaryFormFPT (List,List) :=  opt -> (L,m) ->
 
 --factorList(F) factors the RingElement F and returns a list of pairs of the form
 --{factor,multiplicity}.
-factorList = method()
+factorList = method( TypicalValue => List )
 
-factorList (RingElement) := F -> apply( toList( factor(F) ), toList )
+factorList (RingElement) := List => F -> apply( toList( factor(F) ), toList )
 
 --splittingField returns the splittingField of a polynomial over a finite field
-splittingField = method()
+splittingField = method( TypicalValue => GaloisField )
 
-splittingField (RingElement) := F -> 
+splittingField (RingElement) := GaloisField => F -> 
 (
     if not isPolynomialOverFiniteField(F) 
         then (error "splittingField expects a polynomial over a finite field");
@@ -513,9 +512,9 @@ splittingField (RingElement) := F ->
 --variables, and not whether F explicitly involves two variables. (For example, if F=x+y 
 --is an element of QQ[x,y,z], this test will return "false"; if G=x is an element of 
 --QQ[x,y], this test will return "true".)
-isBinaryForm = method()
+isBinaryForm = method( TypicalValue => Boolean )
 
-isBinaryForm (RingElement) := F ->
+isBinaryForm (RingElement) := Boolean => F ->
 (
     R:=ring F;
     isPolynomialRing(R) and numgens(R)==2 and isHomogeneous(F)
@@ -523,20 +522,20 @@ isBinaryForm (RingElement) := F ->
 
 --isNonconstantBinaryForm(F) checks if F is a nonconstant homogeneous polynomial in two 
 --variables. See warning under "isBinaryForm".
-isNonConstantBinaryForm = method()
+isNonConstantBinaryForm = method( TypicalValue => Boolean )
 
-isNonConstantBinaryForm (RingElement) := F -> (isBinaryForm(F) and (degree(F))_0>0)
+isNonConstantBinaryForm (RingElement) := Boolean => F -> (isBinaryForm(F) and (degree(F))_0>0)
 
 --isLinearBinaryForm(F) checks if F is a linearform in two variables. See warning 
 --under "isBinaryForm".
-isLinearBinaryForm = method()
+isLinearBinaryForm = method( TypicalValue => Boolean )
 
-isLinearBinaryForm (RingElement) := F -> (isBinaryForm(F) and (degree(F))_0==1)
+isLinearBinaryForm (RingElement) := Boolean => F -> (isBinaryForm(F) and (degree(F))_0==1)
 
 --isPolynomialOverFiniteField(F) checks if F is a polynomial over a finite field.
-isPolynomialOverFiniteField = method()
+isPolynomialOverFiniteField = method( TypicalValue => Boolean )
 
-isPolynomialOverFiniteField (RingElement) := F ->
+isPolynomialOverFiniteField (RingElement) := Boolean => F ->
 (
     R:=ring F;
     kk:=coefficientRing(R);
