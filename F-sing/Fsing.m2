@@ -51,22 +51,23 @@ AuxiliaryFiles=>true
 
 export{
 --BasicFunctions (BasicFunctions.m2) 
-    "carryTest",  
     "basePExp",    
-    "digit", 	   
+    "carryTest",  
     "denom",   
+    "digit", 	   
     "divideFraction",
+    "fasterFloorLog",
     "firstCarry", 
-    "floorlog",
+    "floorLog",
     "fracPart", 
     "getCanVector",
     "getNumAndDenom", 
     "maxIdeal", 
     "multOrder",
+    "NoZeroC", --option to force certain behavior from a function
     "num",
     "taxicabNorm",
     "truncatedBasePExp",
-    "NoZeroC", --option to force certain behavior from a function
     
 --ethRootFunctions (EthRoots.m2)
     "ascendIdeal", 
@@ -75,10 +76,10 @@ export{
     "ethRoot",
     "ethRootRingElements",   
     "EthRootStrategy",    
+    "getFieldGenRoot",
     "minimalCompatible",
     "MonomialBasis",	
     "Substitution",
-    "getFieldGenRoot",
     
 --Frobenius Powers (frobeniusPowers.m2)
     "fastExp",
@@ -130,18 +131,19 @@ export{
     "splittingField",
 
 -- parameterTestIdeal.m2
+    "AssumeCM", --an option for isFrational, if true then the function won't check if the ring is CM.
     "canonicalIdeal",
     "findusOfIdeal",
-    "testModule",
-    "randomSubset",
     "isCohenMacaulay",
     "isFrational",
     "IsLocal", --an option for isCohenMacaulay, isFrational, etc.
-    "AssumeCM", --an option for isFrational, if true then the function won't check if the ring is CM.
+    "randomSubset",
+    "testModule",
 
 -- testIdeals.m2
     "findQGorGen",
     "findTestElementAmbient",
+    "MaxCartierIndex", --the cartier index limit in the test ideal method
     "tauAOverPEMinus1Poly",
     "tauGor", --needs optimization
     "tauGorAmb",--needs optimization
@@ -149,7 +151,6 @@ export{
     "tauPoly",
 --    "tauQGor",    --Karl removed  since it is subsumed by the new testIdeal
 --    "tauQGorAmb", --Karl removed  since it is subsumed by the new testIdeal
-    "MaxCartierIndex", --the cartier index limit in the test ideal method
     "testIdeal",
 
 -- Other.m2
@@ -164,19 +165,18 @@ export{
     "isMapSplit",
     "isSharplyFPurePoly",
     "sigmaAOverPEMinus1Poly", 
-    "sigmaQGorAmb", --needs optimization  
     "sigmaAOverPEMinus1QGor",  --needs optimization 
+    "sigmaQGorAmb", --needs optimization  
  
 -- Other
-       "findAllCompatibleIdeals", ---MK	
-    
-	"FFiniteSupport", ---MK
-	"findGeneratingMorphisms", ---MK
-	"FPureIdeals",
- 	"FullMap", ---Karl
-	"generatingMorphism", ---MK
-	"generatingRoot", ---MK
-   "paraTestModule", ---MK
+    "FFiniteSupport", ---MK
+    "findAllCompatibleIdeals", ---MK	   
+    "findGeneratingMorphisms", ---MK
+    "FPureIdeals",
+    "FullMap", ---Karl
+    "generatingMorphism", ---MK
+    "generatingRoot", ---MK
+    "paraTestModule", ---MK
     "paraTestModuleAmbient" ---MK  
 }
 

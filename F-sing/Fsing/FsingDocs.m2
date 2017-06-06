@@ -25,11 +25,11 @@ doc ///
 
 doc ///
      Key
-     	floorlog
+     	floorLog
      Headline
         Computes the floor of the log base b of x
      Usage
-     	 floorlog(b,x)
+     	 floorLog(b,x)
      Inputs 
      		b:ZZ
 		x:ZZ		

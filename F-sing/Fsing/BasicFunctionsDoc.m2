@@ -4,7 +4,7 @@
     "denom",   
     "divideFraction",
     "firstCarry", 
-    "floorlog",
+    "floorLog",
     "fracPart", 
     "getCanVector",
     "getNumAndDenom", 
