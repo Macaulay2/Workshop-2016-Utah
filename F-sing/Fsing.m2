@@ -70,7 +70,7 @@ export{
     "truncatedBasePExp",
     
 --ethRootFunctions (EthRoots.m2)
-    "ascendIdeal", 
+    "ascendIdeal", --Karl (still needs more tests / documentation)
     "AscentCount",
     "boundLargestCompatible", ---MK
     "ethRoot",
@@ -92,14 +92,14 @@ export{
 --F-thresholds computations (FThresholds.m2)
     "BinomialCheck",
     "DiagonalCheck", 
-    "estFPT",
+    "estFPT", --Karl (and others, Pedro?, maybe should just be called fpt?)
     "FinalCheck",    
     "FPTApproxList",     
     "FTApproxList",
     "FTHatApproxList", 
-    "guessFPT",
-    "isFJumpingNumberPoly",
-    "isFPTPoly",
+    "guessFPT", --Karl (probably should be incorporated into estFPT
+    "isFJumpingNumberPoly", --Karl (should be redone, so as not to assume a polynomial ring)
+    "isFPTPoly", --Karl (should be redone, so as not to assume a polynomial ring)
     "MultiThread",    
     "nu",
     "nuAlt",
@@ -132,26 +132,26 @@ export{
 
 -- parameterTestIdeal.m2
     "AssumeCM", --an option for isFrational, if true then the function won't check if the ring is CM.
-    "canonicalIdeal",
-    "findusOfIdeal",
-    "isCohenMacaulay",
-    "isFrational",
+    "canonicalIdeal", --Karl (still needs more tests / documentation), this is based on Moty's old code.
+    "findusOfIdeal", --Karl (this is Moty's find u function, but it returns a list if Macaulay2 doesn't identify 1 element).
+    "isCohenMacaulay", --Karl (added recently, if anyone has ideas to improve this...)
+    "isFrational", --Karl (added recently).
     "IsLocal", --an option for isCohenMacaulay, isFrational, etc.
     "randomSubset",
-    "testModule",
+    "testModule", --Karl (this subsumes a bunch of older functions)
 
 -- testIdeals.m2
-    "findQGorGen",
-    "findTestElementAmbient",
+    "findQGorGen", --Karl (this finds y such that I^{[p^e]} : I = (y) + I^{[p^e]}, if it exists)
+    "findTestElementAmbient", --Karl (my students Marcus and Dan did some improvements on this recently, it doesn't compute the whole Jacobian, it just looks at random minors until it finds a good one, it can be much much faster)
     "MaxCartierIndex", --the cartier index limit in the test ideal method
-    "tauAOverPEMinus1Poly",
-    "tauGor", --needs optimization
-    "tauGorAmb",--needs optimization
-    "tauNonPrincipalAOverPEPoly",    
-    "tauPoly",
+    "tauAOverPEMinus1Poly", --Karl (this should be removed)
+    "tauGor", --Karl (this should be removed)
+    "tauGorAmb",--Karl (this should be removed)
+    "tauNonPrincipalAOverPEPoly", --Karl (this should be removed)
+    "tauPoly", --Karl (this should be removed)
 --    "tauQGor",    --Karl removed  since it is subsumed by the new testIdeal
 --    "tauQGorAmb", --Karl removed  since it is subsumed by the new testIdeal
-    "testIdeal",
+    "testIdeal", --Karl (the new version)
 
 -- Other.m2
     "frobenius", 
@@ -160,13 +160,13 @@ export{
     "imageOfRelativeCanonical",
     "imageOfTrace", --doesn't work! 
     "isFPure",  
-    "isFRegularPoly",  
-    "isFRegularQGor",  
+    "isFRegularPoly",  --Karl : this should be removed / replaced with isFRegular
+    "isFRegularQGor",  --Karl : this should be removed / replaced with isFRegular
     "isMapSplit",
-    "isSharplyFPurePoly",
-    "sigmaAOverPEMinus1Poly", 
-    "sigmaAOverPEMinus1QGor",  --needs optimization 
-    "sigmaQGorAmb", --needs optimization  
+    "isSharplyFPurePoly", --Karl needs to be redone
+    "sigmaAOverPEMinus1Poly",  --Karl needs to be redone
+    "sigmaAOverPEMinus1QGor",  --Karl needs to be redone 
+    "sigmaQGorAmb", --Karl needs to be redone
  
 -- Other
     "FFiniteSupport", ---MK
@@ -175,9 +175,9 @@ export{
     "FPureIdeals",
     "FullMap", ---Karl
     "generatingMorphism", ---MK
-    "generatingRoot", ---MK
-    "paraTestModule", ---MK
-    "paraTestModuleAmbient" ---MK  
+    "generatingRoot" ---MK
+--    "paraTestModule", ---MK
+--    "paraTestModuleAmbient" ---MK  
 }
 
 --*************************************************
