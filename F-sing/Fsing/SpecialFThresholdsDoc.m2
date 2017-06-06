@@ -2,7 +2,7 @@ doc ///
      Key
      	binomialFPT
      Headline
-        Computes the F-pure threshold of a binomial polynomial.
+        computes the F-pure threshold of a binomial polynomial
      Usage
      	 binomialFPT(f)
      Inputs 
@@ -18,7 +18,7 @@ doc ///
      Key
      	diagonalFPT
      Headline
-        Computes the F-pure threshold of a diagonal polynomial.
+        computes the F-pure threshold of a diagonal polynomial
      Usage
      	 diagonalFPT(f)
      Inputs 
@@ -33,13 +33,13 @@ doc ///
 
 doc ///
      Key
-     	FPT2VarHomog
-	(FPT2VarHomog,RingElement)
-	(FPT2VarHomog,List,List)
+     	binaryFormFPT
+	(binaryFormFPT,RingElement)
+	(binaryFormFPT,List,List)
      Headline
-        F-pure threshold of a form in two variables
+         computes the F-pure threshold of a form in two variables
      Usage
-     	  fpt=FPT2VarHomog(G), fpt=FPT2VarHomog(factors,multiplicities)
+     	  binaryFormFPT(G), binaryFormFPT(factors,multiplicities)
      Inputs 
 	factors:List
 	    which contains the linear factors of a form G in two variables 
@@ -48,14 +48,22 @@ doc ///
 	G:RingElement
 	    a form in two variables
      Outputs
-        fpt:QQ
+        :QQ
      Description
 	Text
-	    FPT2VarHomog computes the F-pure threshold of a homogeneous polynomial G
+	    binaryFormFPT computes the F-pure threshold of a homogeneous polynomial G
 	    	in two variables. 
-	    The polynomial G can be entered directly, or if the user knows a factorization
-	    	G=L1^(a1)...Ln^(an) into linear forms, that can be used for improved 
-		performance: FPT2VarHomog({L1,...,Ln},{a1,...,an}).
+	Example
+	    R = ZZ/3[x,y];
+	    G = x^5*y^2-x^3*y^4+x*y^6-y^7;
+	    binaryFormFPT(G)
+	Text    
+	    The method used requires factoring G into linear forms in some extension of the base field. If the user knows such a factorization beforehand, the alternate call binaryFormFPT(factors,multiplicities) can be used for improved performance.
+	Example
+	    R = ZZ/5[x,y];
+	    binaryFormFPT( { x, y, x+y, x+2*y, x+3*y }, { 4, 5, 10, 3, 11 } )
+	Text    
+	    This is based on the work of Daniel Hernandez and Pedro Teixeira.
 ///
 
 

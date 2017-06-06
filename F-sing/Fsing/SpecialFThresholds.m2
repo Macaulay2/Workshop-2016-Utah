@@ -15,13 +15,13 @@
 ----------------------------------------------------------------------------------
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--- Main functions: diagonalFPT, binomialFPT, FPT2VarHomog, 
+-- Main functions: diagonalFPT, binomialFPT, binaryFormFPT, 
 
 -- Auxiliary Functions: isDiagonal, factorOutMonomial, monomialFactor
 --    twoIntersection, allIntersections, isInPolytope, isInInteriorPolytope,
 --    polytopeDefiningPoints, maxCoordinateSum, dCalculation, calculateEpsilon
 --    isBinomial, setFTData, isInUpperRegion, isInLowerRegion, 
---    neighborInUpperRegion, isCP, findCPBelow, FPT2VarHomogInternal, 
+--    neighborInUpperRegion, isCP, findCPBelow, binaryFormFPTInternal, 
 --    factorList, splittingField, isBinaryForm, isNonConstantBinaryForm, 
 --    isLinearBinaryForm, isPolynomialOverFiniteField
 
@@ -384,12 +384,12 @@ findCPBelow (List,FTData) := (pt,S) ->
     Computation of FPTs
 *}
 
---FPT2VarHomogInternal({a1,...an},S): if S#"polylist={L1,...,Ln} is a list of linear
---forms, FPT2VarHomogInternal({a1,...an},S) finds the FPT of the polynomial
+--binaryFormFPTInternal({a1,...an},S): if S#"polylist={L1,...,Ln} is a list of linear
+--forms, binaryFormFPTInternal({a1,...an},S) finds the FPT of the polynomial
 --F=L1^(a1)...Ln^(an)
-FPT2VarHomogInternal = method(Options => {MaxExp => infinity, PrintCP => false, Nontrivial => false})
+binaryFormFPTInternal = method(Options => {MaxExp => infinity, PrintCP => false, Nontrivial => false})
 
-FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
+binaryFormFPTInternal (List,FTData) := opt -> (a,S) ->
 (
     deg:=taxicabNorm(a);
     pos:=positions(a,k->(k>=deg/2));
@@ -445,15 +445,15 @@ FPT2VarHomogInternal (List,FTData) := opt -> (a,S) ->
 )
 
 -----------------------
-FPT2VarHomog = method(Options => {MaxExp => infinity, PrintCP => false})
+binaryFormFPT = method(Options => {MaxExp => infinity, PrintCP => false})
 
---FPT2VarHomog(RingElement)
+--binaryFormFPT(RingElement)
 --FPT(F) computes the F-pure threshold of a form F in two variables. 
 --KNOWN ISSUE: if the splitting field of F is too big, factor will not work.
-FPT2VarHomog (RingElement) :=  opt ->  F ->
+binaryFormFPT (RingElement) :=  opt ->  F ->
 (    
    if not isNonConstantBinaryForm(F) then (
-	error "FPT2VarHomog expects a nonconstant homogeneous polynomial in 2 variables."
+	error "binaryFormFPT expects a nonconstant homogeneous polynomial in 2 variables."
     );
     -- because factoring is the weakness of this algorithm, we try to avoid it
     -- by first checking if fpt=lct
@@ -467,16 +467,18 @@ FPT2VarHomog (RingElement) :=  opt ->  F ->
     S:=kk[a,b];
     G:=sub(F,{(vv#0)=>a,(vv#1)=>b});
     (L,m):=toSequence transpose factorList(G);
-    FPT2VarHomogInternal(m,setFTData(S_*,L),MaxExp=>(opt.MaxExp),PrintCP=>(opt.PrintCP),Nontrivial=>true)
+    binaryFormFPTInternal(m,setFTData(S_*,L),MaxExp=>(opt.MaxExp),PrintCP=>(opt.PrintCP),Nontrivial=>true)
 )
 
---FPT2VarHomog(List,List)
+--binaryFormFPT(List,List)
 --Given a list L={L_1,...,L_n} of linear forms in 2 variables and a list m={m_1,...,m_n}
---of multiplicities, FPT2VarHomog(L,m) returns the F-pure threshold of the polynomial 
+--of multiplicities, binaryFormFPT(L,m) returns the F-pure threshold of the polynomial 
 --L_1^(m_1)*...*L_n^(m_n). 
-FPT2VarHomog (List,List) :=  opt -> (L,m) -> 
-    FPT2VarHomogInternal(m,setFTData(gens ring L_0,L),MaxExp=>(opt.MaxExp),PrintCP=>(opt.PrintCP))
-
+binaryFormFPT (List,List) :=  opt -> (L,m) -> 
+(
+    if #L != #m then error "binaryFormFPT: expected listsod same length";
+    binaryFormFPTInternal(m,setFTData(gens ring L_0,L),MaxExp=>(opt.MaxExp),PrintCP=>(opt.PrintCP))
+)
 
 {*
     Miscellaneous.

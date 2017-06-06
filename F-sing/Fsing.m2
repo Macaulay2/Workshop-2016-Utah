@@ -113,12 +113,12 @@ export{
     "OutputRange",
 
 --F-thresholds of special families of polynomials (SpecialFThresholds.m2)
+    "binaryFormFPT",     
+    "binaryFormFPTInternal",
     "binomialFPT",
     "diagonalFPT",
     "factorList",    
     "findCPBelow",
-    "FPT2VarHomog",     
-    "FPT2VarHomogInternal",
     "isBinomial",
     "isCP",
     "isDiagonal",
@@ -240,4 +240,8 @@ load "./Fsing/parameterTestIdealDoc.m2"
 
 load "./Fsing/FPureDoc.m2"
 
+load "./Fsing/BasicFunctionsTests.m2"
+
 load "./Fsing/EthRootsTest.m2"
+
+load "./Fsing/SpecialFThresholdsTest.m2"
