@@ -22,21 +22,19 @@
 
 --Computes the F-pure threshold of a diagonal hypersurface 
 --x_1^(a_1) + ... +x_n^(a_n) using Daniel Hernandez' algorithm
-diagonalFPT = f ->
+diagonalFPT = method( TypicalValue => QQ )
+
+diagonalFPT ( RingElement ) := QQ => f ->
 (
-     p := char ring f;
-     w := apply(terms f, g->first degree(g));
-     y := 0; if firstCarry(p,reciprocal(w))==-1 then for i from 0 to #w-1 do y = y + 1/w#i else
-     (
-	  x := 0; for c from 0 to #w-1 do x = x + truncatedBasePExp( p, firstCarry(p,reciprocal(w))-1, 1/w#c ); 
-	  y = x+1/p^(firstCarry(p,reciprocal(w))-1);
-     );
-     y
+    if not isDiagonal( f ) then error "diagonalFPT: expected a diagonal polynomial over a field of positive characteristic";
+    p := char ring f;
+    w := apply(terms f, g -> 1/( first degree g ) );  
+      -- w = list of reciprocals of the powers of the variables appearing in f
+    fc := firstCarry( p, w );
+    if fc == -1 then sum w
+    else sum( truncatedBasePExp( p, fc-1, w ) ) + 1/p^( fc-1 )
 )
 
---Determines whether a polynomial f is diagonal; i.e., of the form 
---x_1^(a_1)+...+x_n^(a_n) 
-isDiagonal = f -> product(exponents(f),v->#(positions(v,x->x!=0)))==1
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
@@ -48,36 +46,33 @@ isDiagonal = f -> product(exponents(f),v->#(positions(v,x->x!=0)))==1
 --corresponding vectors that omit all a_i and b_i such that a_i=b_i
 factorOutMonomial = ( v, w ) ->
 (
-     diffCoords := positions( v-w, x -> x != 0 );
+     diffCoords := nonzeroPositions( v-w );
      ( v_diffCoords, w_diffCoords )
 )
 
 --Given input vectors v={a_1,...,a_n} and w={b_1,...,b_n}, gives the
 --vector of the a_i for which a_i=b_i
-monomialFactor = ( v, w ) ->
-(
-    equalCoords := positions( v-w, x -> x == 0 );
-    v_equalCoords
-)
+monomialFactor = ( v, w ) -> v_( zeroPositions( v-w ) )
 
 --Given two vectors v={v0,v1} and w={w0,w1} in the real plane, finds 
---the intersection of the associated lines v0*x+w0*y=1 and v1*x+w1*y=1
+--the intersection of the associated lines v0*x+w0*y=1 and v1*x+w1*y=1, if it exists
 twoIntersection = ( v, w ) ->
-    if ( d := v#0*w#1 - v#1*w#0 ) != 0 then { w#1 - w#0 , v#0 - v#1 } / d else {0,0}
+    if ( d := det matrix { v, w } ) != 0 then { w#1 - w#0 , v#0 - v#1 } / d
 
---Given two vectors v={v0,...vn} and w={w0,...,wn}, list the 
---intersections of all lines vi*x+wi*y=1 and vj*x+wj*y=1
-allIntersections = (v,w) ->
+--Given two vectors v={v0,...vn} and w={w0,...,wn}, list the nonnegative 
+--intersections of all lines vi*x+wi*y=1 and vj*x+wj*y=1,
+--and the intersections of the lines vi*x=1 and wi*y=1 with the axes
+allIntersections = ( v, w ) ->
 (
     L1 := apply( subsets( #v, 2 ), k -> twoIntersection( v_k, w_k ) );
-    L1 = select( L1, x -> x != { 0, 0 } );
-    L2 := apply( select( v, x -> x != 0 ) , x -> { 1/x, 0 } );
-    L3 := apply( select( w, x -> x != 0 ) , x -> { 0, 1/x } );
+    L1 = select( L1, x -> x =!= null );
+    L2 := apply( selectNonzero( v ) , x -> { 1/x, 0 } );
+    L3 := apply( selectNonzero( w ) , x -> { 0, 1/x } );
     select( join( L1, L2, L3 ), x -> ( x#0 >= 0 and x#1 >= 0 ) )
 )
 
 --Given a point a=(x,y) in the real plane and two vectors v={v0,...,vn} and w={w0,...,wn}, 
--- checks whether a is in the polytope defined by the equations vi*x+wi*y<=1
+--checks whether a is in the polytope defined by the equations vi*x+wi*y<=1
 isInPolytope = ( a, v, w ) -> all( v, w, (i,j) -> i*a#0 + j*a#1 <= 1 ) 
 
 --Given a point a=(x,y) in the real plane and two vectors
@@ -94,92 +89,70 @@ polytopeDefiningPoints = ( v, w ) ->
 --outputs the one with the largest coordinate sum
 maxCoordinateSum = L ->
 (
-     maxSum := max apply( toList L, sum );
+     maxSum := max apply( L, sum );
      first select( L, v -> sum( v ) == maxSum )
 )
 
 --Finds the "delta" in Daniel Hernandez's algorithm
 --for F-pure thresholds of binomials
-dCalculation = (w,N,p) ->
+dCalculation = ( w, N, p ) ->
 (
-     d := 0; for j from 0 to #w-1 do  d = d + digit(p,N+1,w#j);
-     i := N; while d > p-2 do 
-     (
-	  d = 0; for j from 0 to #w-1 do  d = d + digit(p,i,w#j);
-	  i = i - 1;
-     );
-     i + 1
+    i := N + 1;
+    d := p;    
+    while d > p - 2 do 
+    (
+	d = sum( w, x -> digit( p, i, x ) );
+	i = i - 1;
+    );
+    i + 1
 )
 
---Given the "truncation" point (P1,P2) and two vectors 
---defining the binomial v and w, outputs the "epsilon" in 
---Daniel Hernandez's algorithm for F-thresholds of binomials
-calculateEpsilon = (P1,P2,v,w) ->
+--Given the "truncation" points  P1 and P2 and two vectors v and w defining the binomial,
+--outputs the "epsilon" in Daniel Hernandez's algorithm for F-thresholds of binomials
+calculateEpsilon = ( P1, P2, v, w ) ->
 (
-     X := new MutableList;
-     Y := new MutableList;
-     c:=0; d := 0; for i from 0 to #v-1 do 
-     (
-	  if w#i != 0 then 
-     	  (
-	       X#c = (1 - (v#i)*(P2#0) - (w#i)*(P2#1))/(w#i);
-	       c = c+1;
-	  );
-          if v#i != 0 then 
-	  (
-	       Y#d = (1 - (v#i)*(P1#0) - (w#i)*(P1#1))/(v#i);
-	       d = d+1;
-	  );
-     );
-     i:=0;
-     epsilon:=0;
-     if isInInteriorPolytope(P1,v,w)==false and isInInteriorPolytope(P2,v,w)==false then epsilon = -1 else
-     (
-	  if isInInteriorPolytope(P1,v,w)==false then for i from 0 to #v-1 do X#1 = 0;
-	  if isInInteriorPolytope(P2,v,w)==false then for i from 0 to #v-1 do Y#1 = 0;
-	  M := X#0; 
-	  N := Y#0;
-	  for i from 1 to #X-1 do M = min(M, X#i);
-	  for j from 1 to #Y-1 do N = min(N, Y#j);
-	  epsilon = max(M,N); 
-     );
-     epsilon
+    X := 0;
+    Y := 0;
+    if isInInteriorPolytope( P1, v, w ) then 
+    	-- find how far we can move from P1 in the x direction
+        X = min apply( nonzeroPositions( v ), i -> (1 - (v#i)*(P1#0) - (w#i)*(P1#1))/(v#i) );
+    if isInInteriorPolytope( P2, v, w ) then  
+    	-- find how far we can move from P2 in the y direction
+	Y = min apply( nonzeroPositions( w ), i -> (1 - (v#i)*(P2#0) - (w#i)*(P2#1))/(w#i) );
+    max(X,Y) 
 )
+
 
 --Computes the FPT of a binomial, based on the work of Daniel Hernandez 
 --(implemented by Emily Witt)
-binomialFPT = g ->
-(
-     p := char ring g;
-     v := (exponents(g))#0;
-     w := (exponents(g))#1;
-     FPT := 0;
-     f := monomialFactor(v,w);
-     x := factorOutMonomial(v,w);
-     v = x#0;
-     w = x#1;
-     Q := maxCoordinateSum(polytopeDefiningPoints(v,w));
-     if Q#0+Q#1 > 1 then FPT = 1 else
-     (
-	  L :=  firstCarry(p,Q);
-	  if L == -1 then FPT = Q#0+Q#1 else
-     	  (
-     	       d := dCalculation(Q,L-1,p);
-     	       P := (truncatedBasePExp(p,d,Q#0), truncatedBasePExp(p,d,Q#1));
-     	       P1 := {P#0, P#1+1/p^d};
-     	       P2 := {P#0+1/p^d,P#1};
-     	       FPT = truncatedBasePExp(p,L-1,Q#0+Q#1);
-     	       if calculateEpsilon(P1,P2, v, w) != -1 then FPT = FPT +  calculateEpsilon(P1, P2, v, w);
-     	  );
-     );
-     monFPT := infinity;
-     for i from 0 to #f-1 do (if f#i!=0 then monFPT = min(monFPT, 1/(f#i)););
-     if monFPT != 0 then FPT = min(FPT, monFPT);
-     FPT
-)
+binomialFPT = method( TypicalValue => QQ )
 
---Returns true if the polynomial is binomial.
-isBinomial = f -> #(terms f)<=2
+binomialFPT ( RingElement ) := QQ => g ->
+(
+    if not isBinomial( g ) then error "binomialFPT: expected a binomial over a field of positive characteristic";
+    p := char ring g;
+    ( v, w ) := toSequence exponents( g );
+    FPT := 0;
+    mon := monomialFactor( v, w );
+    ( v, w ) = factorOutMonomial( v, w );
+    maxPt := maxCoordinateSum( polytopeDefiningPoints( v, w ) );
+    if sum maxPt > 1 then FPT = 1 else
+    (
+	L := firstCarry( p, maxPt );
+	if L == -1 then FPT = sum maxPt else
+	(
+	    d := dCalculation( maxPt, L-1, p );
+	    P := truncatedBasePExp( p, d, maxPt );
+	    P1 := P + { 0, 1/p^d };
+	    P2 := P + { 1/p^d, 0 };
+	    FPT = truncatedBasePExp( p, L-1, sum maxPt ) + calculateEpsilon( P1, P2, v, w )
+     	 )
+     );
+     monFPT := min apply( selectNonzero( mon ), x -> 1/x );
+     	 -- monFPT = the FPT of the monomial factored out from g;
+     	 -- if there are no nonzero terms in mon, min will return infinity
+     min( FPT, monFPT )
+)
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
@@ -427,20 +400,20 @@ binaryFormFPT (List,List) := QQ => opt -> (L,m) ->
 --{factor,multiplicity}.
 factorList = method( TypicalValue => List )
 
-factorList (RingElement) := List => F -> apply( toList( factor(F) ), toList )
+factorList (RingElement) := List => F -> apply( toList( factor( F ) ), toList )
 
 --splittingField returns the splittingField of a polynomial over a finite field
 splittingField = method( TypicalValue => GaloisField )
 
 splittingField (RingElement) := GaloisField => F -> 
 (
-    if not isPolynomialOverFiniteField(F) 
+    if not isPolynomialOverFiniteField( F ) 
         then (error "splittingField expects a polynomial over a finite field");
-    p:=char ring F;
-    ord:=(coefficientRing(ring F))#order;
-    factors:=first transpose factorList(F);
-    deg:=lcm select(flatten apply(factors,degree),i->i>0);
-    GF(p,deg*floorLog(p,ord))
+    p := char ring F;
+    ord := ( coefficientRing( ring F ) )#order;
+    factors := first transpose factorList( F );
+    deg := lcm selectPositive( flatten apply( factors, degree ) );
+    GF( p, deg * floorLog( p, ord ) )
 )
 
 -- Some tests
@@ -454,29 +427,62 @@ isBinaryForm = method( TypicalValue => Boolean )
 
 isBinaryForm (RingElement) := Boolean => F ->
 (
-    R:=ring F;
-    isPolynomialRing(R) and numgens(R)==2 and isHomogeneous(F)
+    R := ring F;
+    isPolynomialRing( R ) and numgens( R ) == 2 and isHomogeneous( F )
 )
 
 --isNonconstantBinaryForm(F) checks if F is a nonconstant homogeneous polynomial in two 
 --variables. See warning under "isBinaryForm".
 isNonConstantBinaryForm = method( TypicalValue => Boolean )
 
-isNonConstantBinaryForm (RingElement) := Boolean => F -> (isBinaryForm(F) and (degree(F))_0>0)
+isNonConstantBinaryForm (RingElement) := Boolean => F -> 
+    isBinaryForm( F ) and ( degree F )#0 > 0
 
 --isLinearBinaryForm(F) checks if F is a linearform in two variables. See warning 
 --under "isBinaryForm".
 isLinearBinaryForm = method( TypicalValue => Boolean )
 
-isLinearBinaryForm (RingElement) := Boolean => F -> (isBinaryForm(F) and (degree(F))_0==1)
+isLinearBinaryForm (RingElement) := Boolean => F -> 
+    isBinaryForm F and ( degree F )#0 == 1
 
 --isPolynomialOverFiniteField(F) checks if F is a polynomial over a finite field.
 isPolynomialOverFiniteField = method( TypicalValue => Boolean )
 
 isPolynomialOverFiniteField (RingElement) := Boolean => F ->
 (
-    R:=ring F;
-    kk:=coefficientRing(R);
-    try kk#order then (isPolynomialRing(R) and isField(kk))
+    R := ring F;
+    kk := coefficientRing( R );
+    try kk#order then ( isPolynomialRing( R ) and isField( kk ) )
     	else false   
 )    
+
+--isPolynomialOverPosCharField(F) checks if F is a polynomial over a field
+--of positive characteristic
+isPolynomialOverPosCharField = method( TypicalValue => Boolean )
+
+isPolynomialOverPosCharField (RingElement) := Boolean => F ->
+(
+    R := ring F;
+    kk := coefficientRing R;
+    isPolynomialRing R and isField kk and ( char kk ) > 0
+)    
+
+--Determines whether a polynomial f is diagonal; i.e., of the form 
+--x_1^(a_1)+...+x_n^(a_n) 
+isDiagonal = method( TypicalValue => Boolean )
+
+isDiagonal (RingElement) := Boolean => f ->
+    isPolynomialOverPosCharField( f ) and 
+    ( product( exponents( f ), v -> #(positions( v, x -> x != 0 )) ) == 1 )
+
+--Returns true if the polynomial is a binomial over a field of positive characteristic
+isBinomial = method( TypicalValue => Boolean )
+
+isBinomial (RingElement) := Boolean => f -> 
+    isPolynomialOverPosCharField( f ) and #( terms f ) == 2
+
+--Returns true if the polynomial is a monomial
+isMonomial = method( TypicalValue => Boolean )
+
+isMonomial (RingElement) := Boolean => f -> 
+    isPolynomialRing( ring f ) and #( terms f ) == 1
