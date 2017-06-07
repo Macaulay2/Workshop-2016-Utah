@@ -336,29 +336,23 @@ carryTest = ( p, w ) ->
      c+d+1
 )
 
---Given a vector w={x,y} of rational integers in [0,1], returns the first spot 
---e where the x and y carry in base p; i.e., 
---(the e-th digit of x)+(the e-th digit of y) >= p
--- counting is weird...
+--Given a vector w of rational integers in [0,1], returns the first spot 
+--e where the the sum of the entries in w carry in base p
 firstCarry = ( p, w ) ->
 (   
-    if w#0 < 0 or w#0 > 1 or w#1 < 0 or w#1 > 1 then error "firstCarry: Expected w in [0,1]^2";
-    i:=0;
-    d:=0;
-    carry:=0;
-    zeroTest := false;
-    for j from 0 to #w-1 do if w#j == 0 then zeroTest=true;
-    if zeroTest == true then carry = -1 else
+    if any( w, x -> x < 0 or x > 1 ) then 
+        error "firstCarry: Expected the second argument to be a list of rational numbers in [0,1]";
+    if product( w ) == 0 then -1 else
     (
-	i = 0; while d < p and i < carryTest(p,w) do 
+	i := 0;
+	d := 0;
+	while d < p and i < carryTest(p,w) do 
 	(
 	    i = i + 1;
-	    d = 0; for j from 0 to #w-1 do  d = d + digit(p, i,w#j);
+	    d = sum digit( p, i, w )
 	);
-        if i == carryTest(p,w) then i = -1;
-        carry = i;
-     );
-     carry
+        if i == carryTest(p,w) then -1 else i
+     )
 )
 
 --===================================================================================
@@ -422,6 +416,75 @@ nonzeroPositions = L -> positions( L, x -> x != 0 )
 zeroPositions = L -> positions( L, x -> x == 0 )
 
 --===================================================================================
+
+--*************************************************
+--Tests for various types of polynomials   
+--*************************************************
+
+--===================================================================================
+
+--isPolynomial(F) checks if F is a polynomial
+isPolynomial = method( TypicalValue => Boolean )
+
+isPolynomial (RingElement) := Boolean => F -> isPolynomialRing( ring F ) 
+
+--isPolynomialOverPosCharField(F) checks if F is a polynomial over a field
+--of positive characteristic
+isPolynomialOverPosCharField = method( TypicalValue => Boolean )
+
+isPolynomialOverPosCharField (RingElement) := Boolean => F ->
+    isPolynomial F and isField( kk := coefficientRing ring F ) and ( char kk ) > 0
+
+--isPolynomialOverFiniteField(F) checks if F is a polynomial over a finite field.
+isPolynomialOverFiniteField = method( TypicalValue => Boolean )
+
+isPolynomialOverFiniteField (RingElement) := Boolean => F ->
+    isPolynomialOverPosCharField( F ) and     
+        ( try (coefficientRing ring F)#order then true else false )
+
+--Determines whether a polynomial f is a diagonal polynomial (i.e., of the form 
+--x_1^(a_1)+...+x_n^(a_n)) over a field of positive characteristic 
+isDiagonal = method( TypicalValue => Boolean )
+
+isDiagonal (RingElement) := Boolean => f ->
+    isPolynomialOverPosCharField( f ) and 
+    ( product( exponents( f ), v -> #(positions( v, x -> x != 0 )) ) == 1 )
+
+--Returns true if the polynomial is a monomial
+isMonomial = method( TypicalValue => Boolean )
+
+isMonomial (RingElement) := Boolean => f -> 
+    isPolynomial f and #( terms f ) == 1
+
+--Returns true if the polynomial is a binomial over a field of positive characteristic
+isBinomial = method( TypicalValue => Boolean )
+
+isBinomial (RingElement) := Boolean => f -> 
+    isPolynomialOverPosCharField f and #( terms f ) == 2
+  
+--isBinaryForm(F) checks if F is a homogeneous polynomial in two variables.
+--WARNING: what we are really testing is if the *ring* of F is a polynomial ring in two 
+--variables, and not whether F explicitly involves two variables. (For example, if F=x+y 
+--is an element of QQ[x,y,z], this test will return "false"; if G=x is an element of 
+--QQ[x,y], this test will return "true".)
+isBinaryForm = method( TypicalValue => Boolean )
+
+isBinaryForm (RingElement) := Boolean => F ->
+    isPolynomial F and numgens ring F == 2 and isHomogeneous F 
+
+--isNonconstantBinaryForm(F) checks if F is a nonconstant homogeneous polynomial in two 
+--variables. See warning under "isBinaryForm".
+isNonConstantBinaryForm = method( TypicalValue => Boolean )
+
+isNonConstantBinaryForm (RingElement) := Boolean => F -> 
+    isBinaryForm F  and ( degree F )#0 > 0
+
+--isLinearBinaryForm(F) checks if F is a linearform in two variables. See warning 
+--under "isBinaryForm".
+isLinearBinaryForm = method( TypicalValue => Boolean )
+
+isLinearBinaryForm (RingElement) := Boolean => F -> 
+    isBinaryForm F and ( degree F )#0 == 1
 
 
 --*************************************************
