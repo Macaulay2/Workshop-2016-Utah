@@ -46,118 +46,56 @@ isDiagonal = f -> product(exponents(f),v->#(positions(v,x->x!=0)))==1
 
 --Given input vectors v={a_1,...,a_n} and w={b_1,...,b_n}, gives the
 --corresponding vectors that omit all a_i and b_i such that a_i=b_i
-factorOutMonomial = (v,w) ->
+factorOutMonomial = ( v, w ) ->
 (
-     diffCoords := positions(v-w,x->x!=0);
-     (apply(diffCoords,i->v_i),apply(diffCoords,i->w_i))
+     diffCoords := positions( v-w, x -> x != 0 );
+     ( v_diffCoords, w_diffCoords )
 )
 
 --Given input vectors v={a_1,...,a_n} and w={b_1,...,b_n}, gives the
 --vector of the a_i for which a_i=b_i
-monomialFactor = (v,w) ->
+monomialFactor = ( v, w ) ->
 (
-     equalCoords := positions(v-w,x->x==0);
-     apply(equalCoords,i->v_i)
+    equalCoords := positions( v-w, x -> x == 0 );
+    v_equalCoords
 )
 
 --Given two vectors v={v0,v1} and w={w0,w1} in the real plane, finds 
 --the intersection of the associated lines v0*x+w0*y=1 and v1*x+w1*y=1
-twoIntersection = (v,w) ->
-(
-     if v#0*w#1-v#1*w#0 != 0 then 
-     (
-	  x := (w#1-w#0)/(v#0*w#1-v#1*w#0);
-	  y := (v#0 - v#1)/(v#0*w#1-v#1*w#0);
-	  P := {x,y};
-     ) else P = {0,0};
-P
-)
+twoIntersection = ( v, w ) ->
+    if ( d := v#0*w#1 - v#1*w#0 ) != 0 then { w#1 - w#0 , v#0 - v#1 } / d else {0,0}
 
 --Given two vectors v={v0,...vn} and w={w0,...,wn}, list the 
 --intersections of all lines vi*x+wi*y=1 and vj*x+wj*y=1
 allIntersections = (v,w) ->
 (
-     L := new MutableList;
-     c := 0;
-     for i from 0 to #v-1 do
-     (
-	  for j from i+1 to #v-1 do 
-     	  (
-     	       if twoIntersection({v#i,v#j}, {w#i,w#j}) != {0,0} then 
-     	       (
-	  	    L#c = twoIntersection({v#i,v#j}, {w#i,w#j});
-	  	    c = c+1;
-     	       );
-	  );
-     );
-     for i from 0 to #v-1 do
-     (
-	  if v#i !=0 then  
-	  (
-	       L#c = {1/(v#i), 0};
-	       c = c + 1;
-	  );
-     );
-     for i from 0 to #v-1 do
-     (
-	  if w#i !=0 then  
-	  (
-	       L#c = {0, 1/(w#i)};
-	       c = c + 1;
-	  );
-     ); 
-     K := new MutableList;
-     c = 0; for i from 0 to #L-1 do
-     (
-	  if (L#i)#0 >= 0 and (L#i)#1 >=0 then (K#c = {(L#i)#0, (L#i)#1}; c = c+1);
-     );
-     K
+    L1 := apply( subsets( #v, 2 ), k -> twoIntersection( v_k, w_k ) );
+    L1 = select( L1, x -> x != { 0, 0 } );
+    L2 := apply( select( v, x -> x != 0 ) , x -> { 1/x, 0 } );
+    L3 := apply( select( w, x -> x != 0 ) , x -> { 0, 1/x } );
+    select( join( L1, L2, L3 ), x -> ( x#0 >= 0 and x#1 >= 0 ) )
 )
 
---Given a point a=(x,y) in the real plane and two vectors v={v0,...,vn} and w={w0,...,wn}, checks whether a is in the polytope defined by the equations vi*x+wi*y<=1
-isInPolytope = (a,v,w) ->
-(
-     alert := true;
-     for i from 0 to #v-1 do
-     (
-	  if v#i*a#0 + w#i*a#1 > 1 then alert = false;
-     );
-     alert
-)
+--Given a point a=(x,y) in the real plane and two vectors v={v0,...,vn} and w={w0,...,wn}, 
+-- checks whether a is in the polytope defined by the equations vi*x+wi*y<=1
+isInPolytope = ( a, v, w ) -> all( v, w, (i,j) -> i*a#0 + j*a#1 <= 1 ) 
 
 --Given a point a=(x,y) in the real plane and two vectors
 --v={v0,...,vn} and w={w0,...,wn}, checks whether a is in
---the polytope defined by the equations vi*x+wi*y<=1
-isInInteriorPolytope = (a,v,w) ->
-(
-     alert := true;
-     for i from 0 to #v-1 do
-     (
-	  if v#i*a#0 + w#i*a#1 >= 1 then alert = false;
-     );
-     alert
-)
+--the interion of the polytope defined by the equations vi*x+wi*y<=1
+isInInteriorPolytope = ( a, v, w ) -> all( v, w, (i,j) -> i*a#0 + j*a#1 < 1 )
 
 --Given two vectors v and w of the same length, outputs 
 --a list of the defining vectors of the polytope as in isInPolytope
-polytopeDefiningPoints = (v,w) ->
-(
-     L := allIntersections(v,w);
-     K := new MutableList;
-     c := 0;
-     for j from 0 to #L-1 do
-     (
-	  if isInPolytope(L#j,v,w) == true then (K#c = {(L#j)#0, (L#j)#1}; c = c+1;)
-     );
-     K
-)
+polytopeDefiningPoints = ( v, w ) -> 
+    select( allIntersections( v, w ), a -> isInPolytope( a, v, w ) )
 
 --Given a list of coordinates in the real plane, 
 --outputs the one with the largest coordinate sum
 maxCoordinateSum = L ->
 (
-     maxSum :=max apply(L,sum);
-     first select(1,L,v->sum(v)==maxSum)
+     maxSum := max apply( toList L, sum );
+     first select( L, v -> sum( v ) == maxSum )
 )
 
 --Finds the "delta" in Daniel Hernandez's algorithm
