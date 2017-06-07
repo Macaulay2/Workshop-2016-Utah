@@ -326,13 +326,16 @@ baseP1 = ( p, n, e ) ->
 --===================================================================================
 
 
---Given a vector w={x,y}, x and y rational in [0,1], returns a number of digits 
---such that it suffices to check to see if x and y add without carrying in base p
+--Given a vector w of rational integers in [0,1], returns a number of digits such that
+--it suffices to check to see if the components of w add without carrying in base p
 carryTest = ( p, w ) ->
 (
-     if w#0 < 0 or w#0 > 1 or w#1 < 0 or w#1 > 1 then error "basePExp: Expected w in [0,1]^2";
-     c := 0; for i from 0 to #w-1 do c = max(c, (divideFraction(p, w#i))#1);
-     d := 1; for j from 0 to #w-1 do if ((divideFraction(p, w#j))#2)!=0 then d = lcm(d,(divideFraction(p,w#j))#2);
+    if any( w, x -> x < 0 or x > 1 ) then 
+        error "carryTest: Expected the second argument to be a list of rational numbers in [0,1]";
+     div := apply( w, x -> divideFraction(p, x) );
+     c := max (transpose div)#1; --max of second components of div
+     v := selectNonzero (transpose div)#2; -- nonzero third components of div
+     d := if v === {} then 1 else lcm v;
      c+d+1
 )
 
@@ -344,7 +347,7 @@ firstCarry = ( p, w ) ->
         error "firstCarry: Expected the second argument to be a list of rational numbers in [0,1]";
     if product( w ) == 0 then -1 else
     (
-	i := 0;
+	i := 0;	
 	d := 0;
 	while d < p and i < carryTest(p,w) do 
 	(
@@ -358,7 +361,6 @@ firstCarry = ( p, w ) ->
 --===================================================================================
 
 --Returns a vector of the reciprocals of the entries of a vector.
---Mutable list....
 reciprocal = w ->
 (
      if product(w) == 0 then error "reciprocal: entries of vector must be non-zero.";

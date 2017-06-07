@@ -113,15 +113,15 @@ export{
     "OutputRange",
 
 --F-thresholds of special families of polynomials (SpecialFThresholds.m2)
+    -- Eventually, only binomialFPT, diagonalFPT, and binaryFormFPT should  
+    -- be exported from this section **PT
     "binaryFormFPT",     
     "binaryFormFPTInternal",
     "binomialFPT",
     "diagonalFPT",
     "factorList",    
     "findCPBelow",
-    "isBinomial",
     "isCP",
-    "isDiagonal",
     "isInLowerRegion",
     "isInUpperRegion",
     "MaxExp",

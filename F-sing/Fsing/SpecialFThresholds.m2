@@ -6,13 +6,11 @@
 
 -- Main functions: diagonalFPT, binomialFPT, binaryFormFPT, 
 
--- Auxiliary Functions: isDiagonal, factorOutMonomial, monomialFactor
---    twoIntersection, allIntersections, isInPolytope, isInInteriorPolytope,
+-- Auxiliary Functions: factorOutMonomial, monomialFactor, twoIntersection, 
+--    allIntersections, isInPolytope, isInInteriorPolytope,
 --    polytopeDefiningPoints, maxCoordinateSum, dCalculation, calculateEpsilon
---    isBinomial, setFTData, isInUpperRegion, isInLowerRegion, 
---    neighborInUpperRegion, isCP, findCPBelow, binaryFormFPTInternal, 
---    factorList, splittingField, isBinaryForm, isNonConstantBinaryForm, 
---    isLinearBinaryForm, isPolynomialOverFiniteField
+--    setFTData, isInUpperRegion, isInLowerRegion, neighborInUpperRegion, isCP, 
+--    findCPBelow, binaryFormFPTInternal, factorList, splittingField
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
