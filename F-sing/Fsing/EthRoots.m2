@@ -115,31 +115,31 @@ ethRoot(ZZ, List, List) := opts -> (e, exponentList, idealList) -> (
     ));
     I = R;
     for j from 0 to length(idealList) - 1 do I = I*(idealList#j)^(exponentList#j - nsList#j * p);
-    I = ethRoot(1, I);
-    ethRoot(e - 1, append(nsList, 1), append(idealList, I))
+    I = ethRoot(1, I, EthRootStrategy => opts.EthRootStrategy);
+    ethRoot(e - 1, append(nsList, 1), append(idealList, I), EthRootStrategy => opts.EthRootStrategy)
 );
 
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootRingElements ( e, a, f, I ) ---MK
+ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootRingElements ( e, a, f, I, EthRootStrategy => opts.EthRootStrategy ) ---MK
  -- in the future, ethRootRingElements should be subsumed by ethRoot(ZZ, List, List). When this happens,
  -- the above line should end with ethRoot( e, {a, 1}, {f, I} ) 
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootRingElements ( e, a, f ) ---MK
+ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootRingElements ( e, a, f, EthRootStrategy => opts.EthRootStrategy) ---MK
  -- in the future, ethRootRingElements should be subsumed by ethRoot(ZZ, List, List). When this happens,
  -- the above line should end with ethRoot( e, {a}, {f} ) 
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> ethRoot( e, {m}, {I} )
+ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> ethRoot( e, {m}, {I}, EthRootStrategy => opts.EthRootStrategy )
 
 -----------------------------------------------------------------------------
 
 ethRoot( ZZ, List, List, Ideal) := opts -> (e, exponentList, idealList, J) ->
-   ethRoot(e, append(exponentList, 1), append(idealList, J));
+   ethRoot(e, append(exponentList, 1), append(idealList, J), EthRootStrategy => opts.EthRootStrategy);
 
 -----------------------------------------------------------------------------
 

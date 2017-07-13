@@ -115,7 +115,7 @@ isLocallyPrincipalIdeal := (I2) -> (
     );
     inverseIdeal := (ideal(localGen) : I2);
     idealProduct := inverseIdeal*I2;
-    isLocPrinc := (reflexifyIdeal(idealProduct, KnownNormal=>true) == idealProduct);
+    isLocPrinc := (reflexify(idealProduct) == idealProduct);
     if (isLocPrinc == true) then (
         return {true, inverseIdeal};
     )
@@ -175,7 +175,7 @@ testIdeal(Ring) := o->(R1) -> (
         );
 --    1/0;
     
-        newDenom := reflexifyIdeal(canIdeal*dualCanIdeal);
+        newDenom := reflexify(canIdeal*dualCanIdeal);
         computedTau = (runningIdeal*R1) : newDenom;
     );
     computedTau
@@ -249,10 +249,37 @@ testIdeal(List, List, Ring) := o->(tList, fList, R1) ->(
             runningIdeal = runningIdeal + (testModule(t2, f2, canIdeal, u1))#0;        
         );
     
-        newDenom := reflexifyIdeal(canIdeal*dualCanIdeal);
+        newDenom := reflexify(canIdeal*dualCanIdeal);
         computedTau = (runningIdeal*R1) : newDenom;
     );
     computedTau        
+);
+
+--We can now check F-regularity
+
+isFregular = method(Options => {MaxCartierIndex => 100});
+
+isFregular(Ring) := R1 -> (
+    tau := testIdeal(R1);
+    if (isSubset(ideal(sub(1, R1)), tau)) then true else false
+);
+
+isFregular(QQ, RingElement) := (tt, ff) -> (
+    R1 := ring ff;
+    tau := testIdeal(tt, ff);
+    if (isSubset(ideal(sub(1, R1)), tau)) then true else false
+);
+
+isFregular(ZZ, RingElement) := (tt, ff) -> (
+    R1 := ring ff;
+    tau := testIdeal(tt, ff);
+    if (isSubset(ideal(sub(1, R1)), tau)) then true else false
+);
+
+isFregular(List, List) := (ttList, ffList) -> (
+    R1 := ring (ffList#0);
+    tau := testIdeal(ttList, ffList);
+    if (isSubset(ideal(sub(1, R1)), tau)) then true else false
 );
 
 --*************
@@ -456,7 +483,7 @@ tauNonPrincipalAOverPEPoly = {Verbose=> false}>> o -> (I1, a1, e1) -> ( -- compu
 			
 			myDirectImage := HH_0(directImageComplex(IRees^(a1*p1^(i1-e1))*newKer, Regularity=>(10+a1))); 	
  	
-		 	directIdeal := moduleToIdeal(myDirectImage**R1); --probably the tensor product is unnecessary
+		 	directIdeal := embedAsIdeal(myDirectImage**R1); --probably the tensor product is unnecessary
  			if ( codim(directIdeal)==1) then error "This function produced a codimension 1 ideal.";
  	
  			descend = ethRoot(i1,directIdeal);

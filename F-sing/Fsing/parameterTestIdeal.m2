@@ -24,7 +24,7 @@ canonicalIdeal(Ring) := (R1) -> (
 	else (
 		degList = apply(varList, q -> (degree(q))); );
 	M1 := (Ext^(dS - dR)(S1^1/I1, S1^{-(sum degList)}))**R1;
-	moduleToIdeal(M1)
+	embedAsIdeal(M1)
 )
 
 
@@ -180,6 +180,8 @@ testModule(QQ, RingElement, Ideal, List) := o -> (tt, ff, canIdeal, u1) -> (
 
 --Write a testModule function that computes \tau(omega, f^s g^t h^u) for example
 --this works similarly to testModule(QQ, RingElement, Ideal, List), but it takes lists of elements.
+--Note if you specify u1 and something a bit different that canIdeal (but that is u compatible), this can be used to still compute
+--a test module of a certain Cartier module.
 testModule(List, List, Ideal, List) := o -> (ttList, ffList, canIdeal, u1) -> (
     ff := ffList#0;
     R1 := ring ff;
