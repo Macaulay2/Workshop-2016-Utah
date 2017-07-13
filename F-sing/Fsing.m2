@@ -29,9 +29,15 @@ Authors => {
      {Name => "Sara Malec",
      Email=> "smalec@gsu.edu"
      },
+     {Name => "Marcus Robinson",
+     Email=> "robinson@math.utah.edu"
+     },
      {Name => "Karl Schwede",
      Email => "schwede@math.psu.edu",
      HomePage => "http://math.utah.edu/~schwede/"
+     },
+     {Name => "Dan Smolkin",
+     Email=> "smolkin@math.utah.edu"
      },
      {Name => "Pedro Teixeira",
      Email => "pteixeir@knox.edu",
@@ -152,14 +158,14 @@ export{
     "Katzman", --an option for CanonicalStrategy
 
 -- testIdeals.m2
-    "findQGorGen", --Karl (this finds y such that I^{[p^e]} : I = (y) + I^{[p^e]}, if it exists)
-    "findTestElementAmbient", --Karl (my students Marcus and Dan did some improvements on this recently, it doesn't compute the whole Jacobian, it just looks at random minors until it finds a good one, it can be much much faster)
+    "findQGorGen", --Karl (this finds y such that I^{[p^e]} : I = (y) + I^{[p^e]}, if it exists) **Documented**
+    "testElement", --Karl (my students Marcus and Dan did some improvements on this recently, it doesn't compute the whole Jacobian, it just looks at random minors until it finds a good one, it can be much much faster) **Documented**
     "MaxCartierIndex", --the cartier index limit in the test ideal method
-    "tauAOverPEMinus1Poly", --Karl (this should be removed)
-    "tauGor", --Karl (this should be removed)
-    "tauGorAmb",--Karl (this should be removed)
-    "tauNonPrincipalAOverPEPoly", --Karl (this should be removed)
-    "tauPoly", --Karl (this should be removed)
+--    "tauAOverPEMinus1Poly", --Karl (this should be removed)
+--    "tauGor", --Karl (this should be removed)
+--    "tauGorAmb",--Karl (this should be removed)
+--    "tauNonPrincipalAOverPEPoly", --Karl (this should be removed)
+--    "tauPoly", --Karl (this should be removed)
 --    "tauQGor",    --Karl removed  since it is subsumed by the new testIdeal
 --    "tauQGorAmb", --Karl removed  since it is subsumed by the new testIdeal
     "testIdeal", --Karl (the new version)
@@ -247,6 +253,8 @@ load "./Fsing/compatiblySplitDoc.m2"
 load "./Fsing/FFiniteSupportDoc.m2"
 
 load "./Fsing/generatingMorphismDoc.m2"
+
+load "./Fsing/testIdealsDoc.m2"
 
 load "./Fsing/parameterTestIdealDoc.m2"
 

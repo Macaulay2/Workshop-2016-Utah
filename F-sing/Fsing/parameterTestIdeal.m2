@@ -75,7 +75,7 @@ testModule(Ring, Ideal) := o->(R1, canIdeal) -> (
     S1 := ambient R1;
 	I1 := ideal R1;
     J1 := sub(canIdeal, S1);
-    C1 := findTestElementAmbient(R1);
+    C1 := testElement(R1);
     
     u1 := findusOfIdeal(I1, J1+I1);
     tau := I1;
@@ -118,7 +118,7 @@ testModule(QQ, RingElement, Ideal, List) := o -> (tt, ff, canIdeal, u1) -> (
     J1 := sub(canIdeal, S1);
     
     
-    C1 := findTestElementAmbient(R1);
+    C1 := testElement(R1);
     fractionDivided := divideFraction(pp, tt);
     -- fraction divided writes tt = (a/(p^b(p^c-1))
     -- the point is that
@@ -192,7 +192,7 @@ testModule(List, List, Ideal, List) := o -> (ttList, ffList, canIdeal, u1) -> (
     J1 := sub(canIdeal, S1);    
     
     ffList = apply(ffList, zz->sub(zz, S1));
-    C1 := findTestElementAmbient(R1);
+    C1 := testElement(R1);
     fractionDividedList := apply(ttList, tt -> divideFraction(pp, tt));
     -- fraction divided writes tt = (a/(p^b(p^c-1))
     -- the point is that

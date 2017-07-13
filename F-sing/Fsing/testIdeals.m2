@@ -38,7 +38,7 @@ findQGorGen ( ZZ, Ring ) := ( e, R ) ->
      J = trim sub( J, S/Ie ); -- extend colon ideal to S/Ie
      L := J_*; -- grab generators
      if ( #L != 1 ) then 
-	  error "findQGorGen: this ring does not appear to be (Q-)Gorenstein, or you might need to work on a smaller chart. Or the index may not divide p^e-1 for the e you have selected.";
+	  error "findQGorGen: this ring does not appear to be (Q-)Gorenstein, or you might need to work on a smaller chart. Or the index may not divide p^e-1 for the e you have selected.  Alternately it is possible that Macaulay2 failed to trim a principal ideal.";
      lift( L#0, S )
 )
 
@@ -51,10 +51,10 @@ findQGorGen ( Ring ) := R -> findQGorGen( 1, R )
 --instead, if we just find one element of the Jacobian not in I, then that would also work
 --and perhaps be substantially faster
 --it assumes that R is a reduced ring.
-findTestElementAmbient = method()
+testElement = method()
 randomSubset = method()
 
-findTestElementAmbient(Ring) := (R1) ->
+testElement(Ring) := (R1) ->
 (
 	I1 := ideal R1;
 	n1 := #gens R1 - dim R1;
@@ -148,7 +148,7 @@ testIdeal(Ring) := o->(R1) -> (
     );
     if (fflag == false) then error "testIdeal: Ring does not appear to be Q-Gorenstein, perhaps increase the option MaxCartierIndex";
     if ((pp-1)%cartIndex == 0) then ( 
-        J1 := findTestElementAmbient( R1 );
+        J1 := testElement( R1 );
         h1 := sub(0, ambient R1);
         try (h1 = findQGorGen( 1, R1)) then (
             computedTau = ascendIdeal(1, h1, sub(ideal(J1), R1) );
@@ -222,7 +222,7 @@ testIdeal(List, List, Ring) := o->(tList, fList, R1) ->(
     );
     if (fflag == false) then error "testIdeal: Ring does not appear to be Q-Gorenstein, perhaps increase the option MaxCartierIndex";
     if ((pp-1)%cartIndex == 0) then ( 
-        J1 := findTestElementAmbient( R1 );
+        J1 := testElement( R1 );
         h1 := sub(0, ambient R1);
         try (h1 = findQGorGen( 1, R1)) then (
             --do stuff
@@ -361,7 +361,7 @@ tauQGor = (Rk, ek, fk, t1) ->
      pp := char Sk;
      L1 := divideFraction(pp,t1); --this breaks up t1 into the pieces we need
      hk := findQGorGen(ek, Rk); --the term in the test ideal
-     Jk := findTestElementAmbient(Rk); --this finds some test elements (lifted on the ambient
+     Jk := testElement(Rk); --this finds some test elements (lifted on the ambient
                                        --ring).  Right now it is slow because of a call to 
 				       --singularLocus (ie, computing a Jacobian).
      I1 := ideal(0_Sk); I2 := ideal(0_Sk);
