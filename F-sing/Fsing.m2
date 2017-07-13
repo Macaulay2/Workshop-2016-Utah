@@ -12,6 +12,9 @@ Authors => {
      Email => "djbruce@math.wisc.edu",
      HomePage => "http://www.math.wisc.edu/~djbruce/"
      },
+     {Name => "Drew Ellingson",
+     Email => "drewtell@umich.edu"
+     },
      {Name => "Daniel Hernandez",
      Email => "dhernan@math.utah.edu",
      HomePage => "http://math.utah.edu/~dhernan/"
@@ -131,7 +134,9 @@ export{
     "splittingField",
 
 -- parameterTestIdeal.m2
-    "AssumeCM", --an option for isFrational, if true then the function won't check if the ring is CM.
+    "AssumeCM", --an option for function, if true, then the function will do less work.
+    "AssumeReduced", --an option telling functions to assume a ring is reduced.
+    "AssumeNormal", --an option telling functions to assume a ring is normal.
     "canonicalIdeal", --Karl (still needs more tests / documentation), this is based on Moty's old code.
     "findusOfIdeal", --Karl (this is Moty's find u function, but it returns a list if Macaulay2 doesn't identify 1 element).
     "isCohenMacaulay", --Karl (added recently, if anyone has ideas to improve this...)
@@ -139,6 +144,12 @@ export{
     "IsLocal", --an option for isCohenMacaulay, isFrational, etc.
     "randomSubset",
     "testModule", --Karl (this subsumes a bunch of older functions)
+    
+-- Finjective.m2
+    "HSLGModule", --produces the non-F-injective module, ie the submodule of the canonical module
+    "isFinjective",
+    "CanonicalStrategy", --how to check F-injectivity on the canonical module (Ext or Katzman)
+    "Katzman", --an option for CanonicalStrategy
 
 -- testIdeals.m2
     "findQGorGen", --Karl (this finds y such that I^{[p^e]} : I = (y) + I^{[p^e]}, if it exists)
@@ -210,6 +221,7 @@ load "./Fsing/FFiniteSupport.m2"
 
 load "./Fsing/parameterTestIdeal.m2"
 
+load "./Fsing/Finjective.m2"
 
 load "./Fsing/FThresholds.m2"
 
