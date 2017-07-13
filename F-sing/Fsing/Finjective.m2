@@ -186,7 +186,7 @@ isFinjective(Ring) := o-> (R1) ->
     --if we assume Cohen-Macaulay, then we are already done
     if (o.AssumeCM == true) then return true;
     --otherwise we next construct G : R -> F_* R                
-    G = frobPFMap(1,R1);
+    G := frobPFMap(1,R1);
     
     if (o.AssumeNormal == true) then (d1 = d1 - 2) else if (o.AssumeReduced == true) then (d1 = d1-1);
     
