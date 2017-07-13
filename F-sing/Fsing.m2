@@ -90,17 +90,28 @@ export{
     "Safe", 
     
 --F-thresholds computations (FThresholds.m2)
+    "BinaryFormCheck",
+    "binarySearch1",
+    "binarySearchRecursive",
     "BinomialCheck",
+    "ComputePreviousNus",
     "DiagonalCheck", 
     "estFPT", --Karl (and others, Pedro?, maybe should just be called fpt?)
-    "FinalCheck",    
+    "FinalCheck", 
+    "fpt",   
+    "fpt1",   
     "FPTApproxList",     
     "FTApproxList",
     "FTHatApproxList", 
     "guessFPT", --Karl (probably should be incorporated into estFPT
     "isFJumpingNumberPoly", --Karl (should be redone, so as not to assume a polynomial ring)
     "isFPTPoly", --Karl (should be redone, so as not to assume a polynomial ring)
-    "MultiThread",    
+    "linearSearch",
+    "MultiThread",
+    "newNu",
+    "newNuHat", 
+    "newNuHatList",
+    "newNuList",   
     "nu",
     "nuAlt",
     "NuCheck",
@@ -111,6 +122,12 @@ export{
     "nuListAlt1",
     "Origin",
     "OutputRange",
+    "SearchFunction",
+    "TestFunction",
+    "testGenFrobeniusPower",
+    "testPower",
+    "testRoot",
+    "UseColonIdeals",
 
 --F-thresholds of special families of polynomials (SpecialFThresholds.m2)
     -- Eventually, only binomialFPT, diagonalFPT, and binaryFormFPT should  

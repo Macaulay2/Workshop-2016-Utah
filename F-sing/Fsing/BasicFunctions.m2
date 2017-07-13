@@ -136,6 +136,7 @@ divideFraction( ZZ, QQ ) := o -> ( p, t ) ->
     {a,b,c}
 )
 divideFraction( ZZ, ZZ ) := (p, t) -> divideFraction(p, t/1)
+
 --===================================================================================
      
 --Finds the a/p^e nearest t from above.
@@ -163,7 +164,7 @@ nontrivialPowerSet = L -> delete( {}, subsets L )
 numberToPrimeFactorList = n ->
 (
      prod := factor n;
-     flatten (apply(#prod, i -> toList(((prod#(i))#1):((prod#(i))#0)) ))
+     flatten apply( toList prod, x -> toList( x#1:x#0 ) )
 )
 
 --===================================================================================
@@ -173,17 +174,14 @@ numberToPrimeFactorList = n ->
 getFactorList = n ->
 (
      if (n < 1) then error "getFactorList: expected an integer greater than 1.";
-     powSet := nontrivialPowerSet(numberToPrimeFactorList(n)); 
-     toList ( set apply(#powSet, i->product(powSet#i)) )
+     powSet := nontrivialPowerSet( numberToPrimeFactorList( n ) ); 
+     toList set apply( powSet, x -> product( x ) )
 )
-
 
 --===================================================================================
 
 --*************************************************
---*************************************************
 --Finding Numbers in Given Range
---*************************************************
 --*************************************************
 
 --===================================================================================
@@ -287,7 +285,7 @@ truncatedBasePExp = method()
 --Gives the e-th truncation of the non-terminating base p expansion of a rational number.
 truncatedBasePExp ( ZZ, ZZ, QQ ) := ( p, e, x ) -> 
 (
-    if x<0 then error "truncatedBasePExp: Expected x>0";
+    if x < 0 then error "truncatedBasePExp: Expected x>0";
     ( ceiling( p^e*x ) - 1 )/p^e    	
 )
 
@@ -325,7 +323,6 @@ baseP1 = ( p, n, e ) ->
 
 --===================================================================================
 
-
 --Given a vector w of rational integers in [0,1], returns a number of digits such that
 --it suffices to check to see if the components of w add without carrying in base p
 carryTest = ( p, w ) ->
@@ -338,6 +335,8 @@ carryTest = ( p, w ) ->
      d := if v === {} then 1 else lcm v;
      c+d+1
 )
+
+--===================================================================================
 
 --Given a vector w of rational integers in [0,1], returns the first spot 
 --e where the the sum of the entries in w carry in base p
@@ -361,11 +360,13 @@ firstCarry = ( p, w ) ->
 --===================================================================================
 
 --Returns a vector of the reciprocals of the entries of a vector.
+-- Probably not needed anymore.
 reciprocal = w ->
 (
-     if product(w) == 0 then error "reciprocal: entries of vector must be non-zero.";
-     apply(w, i -> 1/i)
+    if product(w) == 0 then error "reciprocal: entries of vector must be non-zero.";
+    apply(w, i -> 1/i)
 )
+
 --===================================================================================
 
 getCanVector = method()
@@ -376,7 +377,7 @@ getCanVector = method()
 getCanVector ( ZZ, ZZ ) := ( i, n ) -> 
 (
     if ( (i<0) or (i>=n) ) then error "canVector(i,n) expects integers i and n with 0<=i<n.";   
-    apply( n, j-> if i==j then 1 else 0 )
+    apply( n, j -> if i==j then 1 else 0 )
 )
  
 --===================================================================================
@@ -388,7 +389,7 @@ getNumAndDenom = method()
 getNumAndDenom ( List ) := u -> 
 (
     den := lcm apply( u, denom );
-    a := apply( u, n-> lift( n*den, ZZ ) );
+    a := apply( u, n -> lift( n*den, ZZ ) );
     ( a, den )        
 )
 
@@ -398,16 +399,6 @@ taxicabNorm = method()
 
 --Computes the taxicab norm of a vector.
 taxicabNorm ( List ) := u -> sum( u, abs )
-
---===================================================================================
-
---Finds the x-intercept of a line passing through two points
-xInt = ( x1, y1, x2, y2 ) ->
-(
-    if x1 == x2 then error "xInt: x1==x2 no intersection";
-    x1-(y1/((y1-y2)/(x1-x2)))
-)
---===================================================================================
 
 --===================================================================================
 
@@ -430,6 +421,8 @@ isPolynomial = method( TypicalValue => Boolean )
 
 isPolynomial (RingElement) := Boolean => F -> isPolynomialRing( ring F ) 
 
+--===================================================================================
+
 --isPolynomialOverPosCharField(F) checks if F is a polynomial over a field
 --of positive characteristic
 isPolynomialOverPosCharField = method( TypicalValue => Boolean )
@@ -437,12 +430,15 @@ isPolynomialOverPosCharField = method( TypicalValue => Boolean )
 isPolynomialOverPosCharField (RingElement) := Boolean => F ->
     isPolynomial F and isField( kk := coefficientRing ring F ) and ( char kk ) > 0
 
+--===================================================================================
+
 --isPolynomialOverFiniteField(F) checks if F is a polynomial over a finite field.
 isPolynomialOverFiniteField = method( TypicalValue => Boolean )
 
 isPolynomialOverFiniteField (RingElement) := Boolean => F ->
-    isPolynomialOverPosCharField( F ) and     
-        ( try (coefficientRing ring F)#order then true else false )
+    isPolynomialOverPosCharField( F ) and isFinitePrimeField(coefficientRing ring F)
+
+--===================================================================================
 
 --Determines whether a polynomial f is a diagonal polynomial (i.e., of the form 
 --x_1^(a_1)+...+x_n^(a_n)) over a field of positive characteristic 
@@ -452,17 +448,23 @@ isDiagonal (RingElement) := Boolean => f ->
     isPolynomialOverPosCharField( f ) and 
     ( product( exponents( f ), v -> #(positions( v, x -> x != 0 )) ) == 1 )
 
+--===================================================================================
+
 --Returns true if the polynomial is a monomial
 isMonomial = method( TypicalValue => Boolean )
 
 isMonomial (RingElement) := Boolean => f -> 
     isPolynomial f and #( terms f ) == 1
 
+--===================================================================================
+
 --Returns true if the polynomial is a binomial over a field of positive characteristic
 isBinomial = method( TypicalValue => Boolean )
 
 isBinomial (RingElement) := Boolean => f -> 
     isPolynomialOverPosCharField f and #( terms f ) == 2
+
+--===================================================================================
   
 --isBinaryForm(F) checks if F is a homogeneous polynomial in two variables.
 --WARNING: what we are really testing is if the *ring* of F is a polynomial ring in two 
@@ -474,12 +476,16 @@ isBinaryForm = method( TypicalValue => Boolean )
 isBinaryForm (RingElement) := Boolean => F ->
     isPolynomial F and numgens ring F == 2 and isHomogeneous F 
 
+--===================================================================================
+
 --isNonconstantBinaryForm(F) checks if F is a nonconstant homogeneous polynomial in two 
 --variables. See warning under "isBinaryForm".
 isNonConstantBinaryForm = method( TypicalValue => Boolean )
 
 isNonConstantBinaryForm (RingElement) := Boolean => F -> 
     isBinaryForm F  and ( degree F )#0 > 0
+
+--===================================================================================
 
 --isLinearBinaryForm(F) checks if F is a linearform in two variables. See warning 
 --under "isBinaryForm".
@@ -488,6 +494,7 @@ isLinearBinaryForm = method( TypicalValue => Boolean )
 isLinearBinaryForm (RingElement) := Boolean => F -> 
     isBinaryForm F and ( degree F )#0 == 1
 
+--===================================================================================
 
 --*************************************************
 --Partitions
@@ -526,9 +533,29 @@ allPartitionsInnards = ( n, k, PP, answer)->
 
 --===================================================================================
 
+--*************************************************
+--Miscelaneous
+--*************************************************
+
+--===================================================================================
+
 -- maxIdeal returns the ideal generated by the variables of a polynomial ring
-maxIdeal = method()
+maxIdeal = method( TypicalValue => Ideal )
 
-maxIdeal ( PolynomialRing ) := R -> monomialIdeal R_*
+maxIdeal ( PolynomialRing ) := Ideal => R -> monomialIdeal R_*
 
+maxIdeal ( RingElement ) := Ideal => f -> maxIdeal ring f
+
+maxIdeal ( Ideal ) := Ideal => I -> maxIdeal ring I
+
+--===================================================================================
+
+--Finds the x-intercept of a line passing through two points
+xInt = ( x1, y1, x2, y2 ) ->
+(
+    if x1 == x2 then error "xInt: x1==x2 no intersection";
+    x1-(y1/((y1-y2)/(x1-x2)))
+)
+
+--===================================================================================
 

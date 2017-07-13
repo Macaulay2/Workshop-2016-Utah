@@ -168,17 +168,16 @@ isFRegularQGor (Ring,ZZ,Ideal) := (R,e1,Q1) ->(
  
 --- Computes the F-signature for a specific value a1/p^e1
 --- Input:
----	e1 - some positive integer
----	a1 - some positive integer between 0 and p^e
----	f1 - some polynomial in two or three variables in a ring R of PRIME characteristic
+---	e - some positive integer
+---	a - some positive integer between 0 and p^e
+---	f - some polynomial in two or three variables in a ring R of PRIME characteristic
 --- Output:
----	returns value of the F-signature of the pair (R, f1^{a1/p^e1})
+---	returns value of the F-signature of the pair (R, f^{a/p^e})
 --- Code is based on work of Eric Canton
-fSig = (f1, a1, e1) -> (
-     R1:=ring f1;
-     pp:= char ring f1;     
-     1-(1/pp^(dim(R1)*e1))*
-          degree( (ideal(apply(first entries vars R1, i->i^(pp^e1)))+ideal(fastExp(a1,f1) ))) 
+fSig = (f, a, e) -> (
+     R := ring f;
+     p := char ring f;     
+     1 - p^(-e*dim(R))*degree( frobeniusPower( e, maxIdeal R) + ideal( fastExp( a, f ) )) 
 )  
 
 --Calculates the x-int of the secant line between two guesses for the fpt
