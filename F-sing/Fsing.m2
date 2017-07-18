@@ -84,7 +84,9 @@ export{
     "boundLargestCompatible", ---MK
     "ethRoot",
     "ethRootRingElements",   
-    "EthRootStrategy",    
+    "EthRootStrategy",  
+    "frobeniusRoot",  
+    "FrobeniusRootStrategy",  
     "getFieldGenRoot",
     "minimalCompatible",
     "MonomialBasis",	
@@ -92,24 +94,35 @@ export{
     
 --Frobenius Powers (frobeniusPowers.m2)
     "fastExp",
+    "frobenius",
     "frobeniusPower",
-    "genFrobeniusPower",    
     "gfpStrategy",
     "Naive", 
     "Safe", 
     
 --F-thresholds computations (FThresholds.m2)
+    "BinaryFormCheck",
+    "binarySearch1",
+    "binarySearchRecursive",
     "BinomialCheck",
+    "ComputePreviousNus",
     "DiagonalCheck", 
     "estFPT", --Karl (and others, Pedro?, maybe should just be called fpt?)
-    "FinalCheck",    
+    "FinalCheck", 
+    "fpt",   
+    "fpt1",   
     "FPTApproxList",     
     "FTApproxList",
     "FTHatApproxList", 
     "guessFPT", --Karl (probably should be incorporated into estFPT
     "isFJumpingNumberPoly", --Karl (should be redone, so as not to assume a polynomial ring)
     "isFPTPoly", --Karl (should be redone, so as not to assume a polynomial ring)
-    "MultiThread",    
+    "linearSearch",
+    "MultiThread",
+    "newNu",
+    "newNuHat", 
+    "newNuHatList",
+    "newNuList",   
     "nu",
     "nuAlt",
     "NuCheck",
@@ -120,6 +133,12 @@ export{
     "nuListAlt1",
     "Origin",
     "OutputRange",
+    "SearchFunction",
+    "TestFunction",
+    "testGenFrobeniusPower",
+    "testPower",
+    "testRoot",
+    "UseColonIdeals",
 
 --F-thresholds of special families of polynomials (SpecialFThresholds.m2)
     -- Eventually, only binomialFPT, diagonalFPT, and binaryFormFPT should  
@@ -171,7 +190,6 @@ export{
     "testIdeal", --Karl (the new version)
 
 -- Other.m2
-    "frobenius", 
     "fSig",
     "HSL", 
     "imageOfRelativeCanonical",
@@ -218,12 +236,9 @@ load "./Fsing/frobeniusPowers.m2"
 
 load "./Fsing/compatiblySplit.m2"
 
-
 load "./Fsing/FPure.m2"
 
 load "./Fsing/FFiniteSupport.m2"
-
-
 
 load "./Fsing/parameterTestIdeal.m2"
 
@@ -233,14 +248,17 @@ load "./Fsing/FThresholds.m2"
 
 load "./Fsing/SpecialFThresholds.m2"
 
-
 load "./Fsing/testIdeals.m2"
 
 load "./Fsing/Other.m2"
 
-load "./Fsing/FsingDocs.m2"
-
 beginDocumentation()
+
+load "./Fsing/BasicFunctionsDoc.m2"
+
+load "./Fsing/frobeniusPowersDocs.m2"
+
+load "./Fsing/FsingDocs.m2"
 
 load "./Fsing/EthRootsDoc.m2"
 
@@ -260,8 +278,12 @@ load "./Fsing/parameterTestIdealDoc.m2"
 
 load "./Fsing/FPureDoc.m2"
 
+-- TESTS
+
 load "./Fsing/BasicFunctionsTests.m2"
 
 load "./Fsing/EthRootsTest.m2"
 
 load "./Fsing/SpecialFThresholdsTest.m2"
+
+load "./Fsing/frobeniusPowersTest.m2"

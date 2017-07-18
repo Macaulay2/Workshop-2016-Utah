@@ -43,7 +43,7 @@ findAllCompatibleIdealsInnards = (u,L,P) ->(
 	p:=char R;
 	local tau;
 	local Plist;
-	P1:=frobeniusPower(1,P);
+	P1:=frobenius(P);
 	C1:=ideal((singularLocus(P)).relations);
 	---tau=ideal mingens star(C1,u,1) ; ---OLD VERSION
 	tau=ideal mingens minimalCompatible (1,u,C1);

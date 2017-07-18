@@ -33,8 +33,8 @@ canonicalIdeal(Ring) := (R1) -> (
 finduOfIdeal = method();
 
 finduOfIdeal(Ideal, Ideal) := (defIdeal, canIdeal) -> (
-	Ip := frobeniusPower(1, defIdeal);
-	tempIdeal := intersect( (frobeniusPower(1,canIdeal)) : canIdeal, Ip : defIdeal );
+	Ip := frobenius( defIdeal );
+	tempIdeal := intersect( (frobenius( canIdeal )) : canIdeal, Ip : defIdeal );
 	
 	M1 := compress ((gens tempIdeal)%(gens Ip));
 	first first entries M1
@@ -48,8 +48,8 @@ finduOfIdeal(Ideal, Ideal) := (defIdeal, canIdeal) -> (
 --J^{[p]} : J and I^{[p]} : I where I is the defining ideal and J is the canonical
 --ideal lifted to the ambient ring (in a maximal way).
 findusOfIdeal = (defIdeal, canIdeal) -> (
-	Ip := frobeniusPower(1, defIdeal);
-	tempIdeal := intersect( (frobeniusPower(1,canIdeal)) : canIdeal, Ip : defIdeal );
+	Ip := frobenius( defIdeal );
+	tempIdeal := intersect( (frobenius( canIdeal )) : canIdeal, Ip : defIdeal );
 	
 	M1 := compress ((gens tempIdeal)%(gens Ip));
 	first entries M1

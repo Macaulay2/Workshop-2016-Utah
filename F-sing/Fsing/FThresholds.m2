@@ -1,20 +1,3 @@
--- CHANGES IN ORDERS OF ARGUMENTS
-
--- internal functions acted on:     nu*, FTApproxList, FPTApproxList, FTHatApproxList, 
---     	       	       	       	    isFPTPoly, isFJumpingNumberPoly
-
--- internal functions To DO: guessFPT, estFPT
-
--- external functions acted on: divideFraction, findNumberBetween, fastExp,
---    	      	      	      	  frobeniusPower, genFrobeniusPower, ethRoot  
-
--- external functions TO DO: tau*, sigma*
-
--- TO DO:
-
--- There is a lot of repeated code here, in the computations of nus
--- (the code of certain binary search is repeated at least 4 times). Clean up!
-
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
 -- CONTENTS
@@ -93,7 +76,7 @@ nuList( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this is a faster nuList computa
 	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(I^middle, frobeniusPower( d, J));
+			answer = isSubset(I^middle, frobenius( d, J));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
@@ -131,7 +114,7 @@ nuList( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this is a faster nuList c
 	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( d, J ));
+			answer = isSubset(ideal(fastExp( middle, f )), frobenius( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
@@ -166,10 +149,9 @@ nu( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this does a fast nu computation
 	N = numgens(trim(J));
 	top = nuPrev*N*p^e-1;
 	bottom = 0;
-			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(I^middle, frobeniusPower( e, J ));
+		answer = isSubset(I^middle, frobenius( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -189,7 +171,7 @@ nu( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this does a fast nu computati
 	local bottom;--for the binary search
 	local middle;--for the binary search
 	local answer; --a boolean for determining if we go up, or down 
-	if isSubset(ideal(f), radical(J))==false then (print "Error: Nu Undefined")
+ 	if isSubset(ideal(f), radical(J))==false then (print "Error: Nu Undefined")
 	else(
 	N := 0;
 	myList := new MutableList;
@@ -200,7 +182,7 @@ nu( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this does a fast nu computati
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( e, J ));
+		answer = isSubset(ideal(fastExp( middle, f )), frobenius( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -283,7 +265,7 @@ nuListAlt1( ZZ, RingElement, Ideal ) := ( n, f, J ) ->
 	    I = I: ideal( f^nu );
 	    nu = binarySearch( f, I, 1, { 0, p } );
 	    theList = append( theList, p*(last theList) + nu );
-	    I = frobeniusPower( 1, I ); 
+	    I = frobenius( I ); 
 	)
     );
     theList
@@ -312,7 +294,7 @@ nuHatList( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this is a faster nuList comp
 	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(genFrobeniusPower( middle, I ), frobeniusPower( d, J ));
+			answer = isSubset(frobeniusPower( middle, I ), frobenius( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
@@ -358,7 +340,7 @@ nuHat ( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this does a fast nu computation
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(genFrobeniusPower( middle, I ), frobeniusPower( e, J ));
+		answer = isSubset(frobeniusPower( middle, I ), frobenius( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -380,6 +362,179 @@ nuHat( ZZ, RingElement, Ideal ) := ( e, f, J ) -> nu( e, f, J )
 -- and J=maximal ideal 
 
 nuHat( ZZ, RingElement ) := ( e, f ) -> nu( e, f )
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+----------------------------------------------------------------------------------
+-- newNu: an attempt to combine all of the nu functions, make them more flexible,
+-- and eliminate some redundancies
+----------------------------------------------------------------------------------
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+----------------------------------------------------------------------------------
+-- nu1(I,J) finds the maximal N such that I^N is not contained in J, i.e., nu_I^J(1)
+nu1 = method()
+
+nu1 ( Ideal, Ideal ) :=  ( I, J ) -> 
+(
+    if not isSubset( I, radical J ) then 
+        error "nu1: The first ideal is not contained in the radical of the second.";
+    d := 1;
+    while not isSubset( I^d, J ) do d = d + 1;
+    d - 1
+)
+
+-- for polynomials, we use fastExp
+nu1 ( RingElement, Ideal ) := ( f, J ) -> 
+(
+    if not isSubset( ideal f, radical J ) then 
+        error "nu1: The polynomial is not contained in the radical of the ideal.";
+    d := 1;
+    while not isSubset( ideal fastExp( d, f ), J ) do d = d + 1;
+    d - 1
+)
+
+----------------------------------------------------------------------------------
+-- TESTS
+
+-- testRoot(J,a,I,e) checks whether J^a is a subset of I^[p^e], using ethRoot
+testRoot = ( J, a, I, e ) -> isSubset( ethRoot( e, a, J ), I )
+
+-- testPower(J,a,I,e) checks whether J^a is  a subset of I^[p^e], directly
+testPower = method()
+
+testPower ( Ideal, ZZ, Ideal, ZZ ) := ( J, a, I, e ) -> 
+    isSubset( J^a, frobenius( e, I ) )
+
+-- for polynomials, use fastExp
+testPower ( RingElement, ZZ, Ideal, ZZ ) := ( f, a, I, e ) -> 
+    isSubset( ideal fastExp( a, f ), frobenius( e, I ) )
+
+-- testGenFrobeniusPower(J,a,I,e) checks whether J^[a] is a subset of I^[p^e]
+testGenFrobeniusPower = ( J, a, I, e ) -> 
+    isSubset( frobeniusPower( a, J ), frobenius( e, I ) )
+
+----------------------------------------------------------------------------------
+-- SEARCH FUNCTIONS
+
+-- Each *Search(I,J,e,a,b,test) searches for the last n in [a,b) such that test(I,n,J,e) 
+-- is false, assuming that test(I,a,J,e) is false and test(I,b,J,e) is true.
+
+-- Non-recursive binary search, based on our previous code
+binarySearch1 = ( I, J, e, startPt, endPt, testFunction ) -> 
+(
+    a := startPt;
+    b := endPt; 
+    local c;   
+    while b > a+1 do 
+    (
+	c = floor( (a+b)/2 );
+	if testFunction( I, c, J, e ) then b = c else a = c
+    );
+    a
+)
+
+-- Recursive binary search
+binarySearchRecursive = ( I, J, e, a, b, testFunction ) -> 
+(
+    if b <= a+1 then return a;
+    c := floor( (a+b)/2 );
+    if testFunction( I, c, J, e ) 
+        then binarySearchRecursive( I, J, e, a, c, testFunction ) 
+	else binarySearchRecursive( I, J, e, c, b, testFunction )
+)
+
+-- Linear search
+linearSearch = ( I, J, e, a, b, testFunction ) -> 
+(
+    c := a + 1;
+    while not testFunction( I, c, J, e ) do c = c+1;
+    c-1
+)
+
+----------------------------------------------------------------------------------
+-- OPTION PACKAGES
+
+optIL = { TestFunction => testPower, UseColonIdeals => false, SearchFunction => binarySearch1 }
+
+optPL = { TestFunction => testRoot, UseColonIdeals => false, SearchFunction => binarySearch1 }
+
+optI = append( optIL, ComputePreviousNus => true )
+
+optP = append( optPL, ComputePreviousNus => true )
+
+----------------------------------------------------------------------------------
+-- INTERNAL FUNCTION
+
+nuInternal = optI >> o -> ( n, f, J ) -> 
+( 
+    p := char ring f;
+    nu := nu1( f, J );
+    theList := { nu };
+    principal := if isIdeal f then (numgens trim f) == 1 else true;
+    local N;
+    if not o.ComputePreviousNus then
+    (
+	if n == 0 then return theList;
+ 	N = if principal or o.TestFunction === testGenFrobeniusPower
+	     then p^n else (numgens trim J)*(p^n-1)+1;
+     	return { o.SearchFunction( f, J, n, nu*p^n, (nu+1)*N, o.TestFunction ) }
+    );
+    if o.UseColonIdeals and principal then -- colon ideals only work for polynomials
+    (
+	I := J;
+	g := if isIdeal f then (trim f)_*_0 else f; 
+	scan( 1..n, e ->
+	    (
+		I = I : ideal( fastExp( nu, g ) );
+		nu =  last nuInternal( 1, g, I, TestFunction => o.TestFunction );
+	      	theList = append( theList, p*(last theList) + nu );
+	      	I = frobenius( I )
+	    )
+	)
+    )
+    else
+    (
+	N = if principal or o.TestFunction === testGenFrobeniusPower
+	     then p else (numgens trim J)*(p-1)+1;
+	scan( 1..n, e -> 
+	    (
+		nu = o.SearchFunction( f, J, e, p*nu, (nu+1)*N, o.TestFunction );
+    	       	theList = append( theList, nu )
+    	    )
+    	)
+     );
+     theList
+)
+
+----------------------------------------------------------------------------------
+-- EXPORTED METHODS
+
+newNuList = method( Options => true )
+
+newNuList( ZZ, Ideal, Ideal ) := optIL >> o -> ( e, I, J ) -> nuInternal( e, I, J, o )
+
+newNuList( ZZ, RingElement, Ideal ) := optPL >> o -> ( e, I, J ) -> nuInternal( e, I, J, o )
+
+newNuList( ZZ, Ideal ) := optIL >> o -> ( e, I ) -> newNuList( e, I, maxIdeal I, o )
+
+newNuList( ZZ, RingElement ) := optPL >> o -> ( e, f ) -> newNuList( e, f, maxIdeal f, o )
+
+newNu = method( Options => true )
+
+newNu( ZZ, Ideal, Ideal ) := optI >> o -> ( e, I, J ) -> last nuInternal( e, I, J, o )
+
+newNu( ZZ, RingElement, Ideal ) := optP >> o -> ( e, f, J ) -> last nuInternal( e, f, J, o )
+
+newNu( ZZ, Ideal ) := optI >> o -> ( e, I ) -> newNu( e, I, maxIdeal I, o )
+
+newNu( ZZ, RingElement ) := optP >> o -> ( e, f ) -> newNu( e, f, maxIdeal f, o )
+
+-- The hat versions, that use generalized Frobenius powers, can be computed using 
+-- TestFunction=>testGenFrobeniusPower. For convenience, here are some shortcuts: 
+
+newNuHatList = optIL >> o -> x -> newNuList( x, o, TestFunction => testGenFrobeniusPower ) 
+
+newNuHat = optI >> o -> x -> newNu( x, o, TestFunction => testGenFrobeniusPower ) 
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
@@ -561,6 +716,280 @@ estFPT={FinalCheck=> true, Verbose=> false, MultiThread=>false, DiagonalCheck=>t
      --return the answer
      answer
 )
+
+-- essentially same as estFPT, with small additions and changes to make the code clearer
+fpt = method( 
+    TypicalValue => QQ, 
+    Options => 
+        {
+	    FinalCheck => true, 
+	    Verbose => false, 
+	    MultiThread => false, 
+	    DiagonalCheck => true, 
+	    BinomialCheck => true, 
+	    BinaryFormCheck => true, 
+	    NuCheck => true 
+    	}
+);
+
+fpt ( RingElement, ZZ ) := QQ => o -> ( f, e ) -> 
+(
+    -- To do: check if f is a polynomial over a field of positive char
+
+    -- Check if polynomial is in the homogeneous maximal ideal
+    M := maxIdeal f;   -- The maximal ideal we are computing the fpt at  
+    p := char ring f;
+    if not isSubset( ideal f, M ) then error "Polynomial is not in the homogeneous maximal ideal";   
+
+    if o.Verbose then print "Starting fpt";
+    
+    -- Check if fpt equals 1
+    if not isSubset( ideal( f^(p-1) ), frobenius( M ) ) then 
+    (
+        if o.Verbose then print "nu(1,f) = p-1, so fpt(f) = 1"; 
+        return 1 
+    );	
+    
+    if o.Verbose then print "fpt(f) is not 1";
+    
+    -- Check if one of the special FPT functions can be used...
+    
+    -- Check if it is diagonal:
+    if o.DiagonalCheck and isDiagonal f then 
+    ( 
+        if o.Verbose then print "Polynomial is diagonal"; 
+        return diagonalFPT f 
+    );
+
+    -- Now check if it is binomial:
+    if o.DiagonalCheck and isBinomial f then 
+    ( 
+        if o.Verbose then print "Polynomial is a binomial";
+        return binomialFPT f 
+    );
+
+    -- Now check if it is a binary form:
+    if o.BinaryFormCheck and isBinaryForm f then 
+    ( 
+        if o.Verbose then print "Polynomial is a binary form";
+        return binaryFormFPT f 
+    );
+    
+    if o.Verbose then print "Special fpt algorithms are not available for this polynomial";
+     
+    -- Compute nu(e,f)
+    n := newNu( e, f ); -- Change this after "nu" computations are consolidated;
+                        -- specify nu computation using roots or use option to specify method     
+    if o.Verbose then print( "nu has been computed: nu(e,f) = " | toString n );
+    
+    -- If our nu isn't fine enough, we just spit back some information
+    if n == 0 then 
+    (
+	if o.Verbose then 
+	    print "The nu computed isn't fine enough. Try increasing the max exponent e.";
+	return { 0, 1/p }
+    );
+
+    -- Check to see if either nu/(p^e-1) or (nu+1)/p^e is the fpt
+    if o.NuCheck then 
+    (
+        --check to see if nu/(p^e-1) is the fpt
+	if not isFRegularPoly( f, n/( p^e - 1 ), M ) then 
+	(
+	    if o.Verbose then print "Found answer via nu/(p^e-1)"; 
+	    return n/( p^e - 1 )
+	) 
+      	else if o.Verbose then print "nu/(p^e-1) is not the fpt";
+	
+        --check to see if (nu+1)/p^e is the FPT
+	if isFPTPoly( ( n + 1 )/p^e, f ) then 
+	(
+	    if o.Verbose then print "Found answer via (nu+1)/(p^e)"; 
+	    return ( n + 1 )/p^e
+	) 
+      	else if o.Verbose then print "(nu+1)/p^e is not the fpt"
+    );
+
+    -- Do the F-signature computation
+    a := 0;
+    if  not o.MultiThread then a = threshInt( f, e, (n-1)/p^e, fSig( f, n-1 , e ), n ) 
+    else
+    (
+	if o.Verbose then print "Beginning multithreaded F-signature";
+	allowableThreads = 4;
+	numVars := #(ring f)_*;
+	Y := local Y;
+	myMon := monoid[ toList(Y_1..Y_numVars), MonomialOrder => RevLex, Global => false ];
+	R := (coefficientRing ring f) myMon;
+	rMap := map( R, ring f, vars myMon);
+	g := rMap f;
+	t := schedule( fSig, ( g, n-1, e ) );
+	s2 := fSig( f, n, e );	
+	if o.Verbose then print("First F-signature: s(f,nu/p^e) = " | toString s2);
+	while not isReady t do sleep 1;
+	s1 := taskResult t;
+	if o.Verbose then print("Second F-signature: s(f,(nu-1)/p^e) = " | toString s1);
+	a = { s2, xInt( (n-1)/p^e, s1, n/p^e, s2 )}
+    );
+    if o.Verbose then print( "Computed F-signature intercept: " | toString a#1);
+
+    -- Now check to see if we cross at (nu+1)/p^e. If so, then that's the fpt.
+    if (n+1)/p^e == a#1 then 
+    (
+	if  o.Verbose then print "F-signature line crosses at (nu+1)/p^e"; 
+	return a#1
+    );
+	       	
+    if o.FinalCheck then 
+    (
+	if o.Verbose then print "Starting FinalCheck"; 
+ --       if not isFRegularPoly( f, a#1, M ) then 
+ -- trying isFPT here
+        if isFPTPoly( a#1, f ) then 
+        (	
+	   if o.Verbose then print "FinalCheck successful"; 
+	   return a#1
+      	)
+	else if o.Verbose then print "FinalCheck didn't find the fpt"
+    )
+    else if o.Verbose then print "FinalCheck not run";    
+    { a#1, (n+1)/p^e }
+)
+
+-- a different version, where multithread is done without cloning the ring and poly
+-- essentially same as estFPT, with small additions and changes to make the code clearer
+fpt1 = method( 
+    TypicalValue => QQ, 
+    Options => 
+        {
+	    FinalCheck => true, 
+	    Verbose => false, 
+	    MultiThread => false, 
+	    DiagonalCheck => true, 
+	    BinomialCheck => true, 
+	    BinaryFormCheck => true, 
+	    NuCheck => true 
+    	}
+);
+
+fpt1 ( RingElement, ZZ ) := QQ => o -> ( f, e ) -> 
+(
+    -- To do: check if f is a polynomial over a field of positive char
+
+    -- Check if polynomial is in the homogeneous maximal ideal
+    M := maxIdeal f;   -- The maximal ideal we are computing the fpt at  
+    p := char ring f;
+    if not isSubset( ideal f, M ) then error "Polynomial is not in the homogeneous maximal ideal";   
+
+    if o.Verbose then print "Starting fpt";
+    
+    -- Check if fpt equals 1
+    if not isSubset( ideal( f^(p-1) ), frobenius( M ) ) then 
+    (
+        if o.Verbose then print "nu(1,f) = p-1, so fpt(f) = 1"; 
+        return 1 
+    );	
+    
+    if o.Verbose then print "fpt(f) is not 1";
+    
+    -- Check if one of the special FPT functions can be used...
+    
+    -- Check if it is diagonal:
+    if o.DiagonalCheck and isDiagonal f then 
+    ( 
+        if o.Verbose then print "Polynomial is diagonal"; 
+        return diagonalFPT f 
+    );
+
+    -- Now check if it is binomial:
+    if o.DiagonalCheck and isBinomial f then 
+    ( 
+        if o.Verbose then print "Polynomial is a binomial";
+        return binomialFPT f 
+    );
+
+    -- Now check if it is a binary form:
+    if o.BinaryFormCheck and isBinaryForm f then 
+    ( 
+        if o.Verbose then print "Polynomial is a binary form";
+        return binaryFormFPT f 
+    );
+    
+    if o.Verbose then print "Special fpt algorithms are not available for this polynomial";
+     
+    -- Compute nu(e,f)
+    n := newNu( e, f ); -- Change this after "nu" computations are consolidated;
+                        -- specify nu computation using roots or use option to specify method     
+    if o.Verbose then print( "nu has been computed: nu(e,f) = " | toString n );
+    
+    -- If our nu isn't fine enough, we just spit back some information
+    if n == 0 then 
+    (
+	if o.Verbose then 
+	    print "The nu computed isn't fine enough. Try increasing the max exponent e.";
+	return { 0, 1/p }
+    );
+
+    -- Check to see if either nu/(p^e-1) or (nu+1)/p^e is the fpt
+    if o.NuCheck then 
+    (
+        --check to see if nu/(p^e-1) is the fpt
+	if not isFRegularPoly( f, n/( p^e - 1 ), M ) then 
+	(
+	    if o.Verbose then print "Found answer via nu/(p^e-1)"; 
+	    return n/( p^e - 1 )
+	) 
+      	else if o.Verbose then print "nu/(p^e-1) is not the fpt";
+	
+        --check to see if (nu+1)/p^e is the FPT
+	if isFPTPoly( ( n + 1 )/p^e, f ) then 
+	(
+	    if o.Verbose then print "Found answer via (nu+1)/(p^e)"; 
+	    return ( n + 1 )/p^e
+	) 
+      	else if o.Verbose then print "(nu+1)/p^e is not the fpt"
+    );
+
+    -- Do the F-signature computation
+    a := 0;
+    if  not o.MultiThread then a = threshInt( f, e, (n-1)/p^e, fSig( f, n-1 , e ), n ) 
+    else
+    (
+	if o.Verbose then print "Beginning multithreaded F-signature";
+	t := schedule( fSig, ( f, n-1, e ) );
+	s2 := fSig( f, n, e );	
+	if o.Verbose then print("First F-signature: s(f,nu/p^e) = " | toString s2);
+	while not isReady t do sleep 1;
+	s1 := taskResult t;
+	if o.Verbose then print("Second F-signature: s(f,(nu-1)/p^e) = " | toString s1);
+	a = { s2, xInt( (n-1)/p^e, s1, n/p^e, s2 )}
+    );
+    if o.Verbose then print( "Computed F-signature intercept: " | toString a#1);
+
+    -- Now check to see if we cross at (nu+1)/p^e. If so, then that's the fpt.
+    if (n+1)/p^e == a#1 then 
+    (
+	if  o.Verbose then print "F-signature line crosses at (nu+1)/p^e"; 
+	return a#1
+    );
+	       	
+    if o.FinalCheck then 
+    (
+	if o.Verbose then print "Starting FinalCheck"; 
+ --       if not isFRegularPoly( f, a#1, M ) then 
+ -- trying isFPT here
+        if isFPTPoly( a#1, f ) then 
+        (	
+	   if o.Verbose then print "FinalCheck successful"; 
+	   return a#1
+      	)
+	else if o.Verbose then print "FinalCheck didn't find the fpt"
+    )
+    else if o.Verbose then print "FinalCheck not run";    
+    { a#1, (n+1)/p^e }
+)
+
+
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------

@@ -22,59 +22,38 @@
 
 doc ///
      Key
-     	fastExp
+     	floorLog
      Headline
-        Computes
+        Computes the floor of the log base b of x
      Usage
-     	  fastExp(N,f) 
-     Inputs
-         N:ZZ
-     	 f:RingElement
+     	 floorLog(b,x)
+     Inputs 
+     		b:ZZ
+		x:ZZ		
      Outputs
-        :RingElement
+         :ZZ
      Description
 	Text
-	     In prime characteristic p > 0, raising a sum (a+b) to a power is more quickly done by simply computing a^p 
-	     and b^p and adding them.  The basic strategy is to break up the exponent into its base p expansion, and then 
-	     use the exponent rules.  For example, (x+y)^(3*p^2 + 5*p+2) = ((x+y)^3)^(p^2)*((x+y)^5)^p*(x+y)^2.
-///
+	    This differs from floor(log_b(x)) in that it corrects problems due to rounding.
+/// 
 
 doc ///
      Key
-     	 frobeniusPower
+     	multOrder
+     	(multOrder, ZZ, ZZ)
      Headline
-        The following raises an ideal or matrix (entry-wise) to the p^e-th power.
+        Computes the multiplicative order of a modulo b
      Usage
-     	  frobeniusPower(e,I) 
-	  frobeniusPower(e,M)
-     Inputs
-         e:ZZ
-     	 I:Ideal
-	 M:Matrix
+     	 multOrder(a,b)
+     Inputs 
+     		a:ZZ
+		b:ZZ		
      Outputs
-        :Ideal
-	:Matrix
+         :ZZ
      Description
 	Text
-	     frobeniusPower(e,I) outputs I^[p^e] and frobeniusPower(e,M) outputs a matrix whose entries are p^e-th powers of
-	     the entries of M.
+	    This computes the multiplicative order of a modulo b.  If a and b are not relatively prime, it returns an error.
 ///
 
-doc ///
-     Key
-     	genFrobeniusPower 
-     Headline
-        Computes the generalized Frobenius power of an ideal
-     Usage
-     	  genFrobeniusPower(t,I)
-     Inputs
-     	     	t:QQ
-         	I:Ideal
-     Outputs
-        :Ideal
-     Description
-     	Text
-	   genFrobeniusPower(t,I) outputs the generalized Frobenius power I^[t].
- ///
  
  

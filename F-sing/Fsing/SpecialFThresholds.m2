@@ -318,7 +318,7 @@ binaryFormFPTInternal (List,FTData) := QQ => opt -> (a,S) ->
     (
 	e=e+1;
 	dgt=digit(p,e,u);
-	I=frobeniusPower(1,I):product(polys,dgt,(f,k)->f^k);
+	I=frobenius( I ):product(polys,dgt,(f,k)->f^k);
 	ideals=append(ideals,I)
     );
     if I!=ideal(1_rng) then 

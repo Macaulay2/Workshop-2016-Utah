@@ -1,20 +1,3 @@
--- changes in argument order:
-
--- INTERNAL: 
-
--- ethRoot: (I,e) -> (e,I), (f, I, a, e) -> (e,a,f,I), (f, I, a, e) -> (e,a,f,I), (Matrix, ZZ) -> (ZZ, Matrix), 
---    	    (Ideal, ZZ, ZZ),  (I,m,e) -> ( e, m, I ) 
-
--- eR: gone
-
--- ethRootRingElements: (f,I,a,e) -> (e,a,f,I), (f,a,e) -> (e,a,f)
-		
--- ethRootRingElements: (fList,I,aList,e) -> (e,aList,fList,I), (fList,aList,e) -> (e,aList,fList)
-
--- mEthRoot, mEthRootOneElement: (A,e) -> (e,A)
-
--- EXTERNAL: basePExp
-
 --*************************************************
 --*************************************************
 --This file is used for doing the [1/p^e] operation
@@ -122,28 +105,49 @@ ethRoot(ZZ, List, List) := opts -> (e, exponentList, idealList) -> (
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootRingElements ( e, a, f, I, EthRootStrategy => opts.EthRootStrategy ) ---MK
+ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootRingElements ( e, a, f, I, opts ) ---MK
  -- in the future, ethRootRingElements should be subsumed by ethRoot(ZZ, List, List). When this happens,
  -- the above line should end with ethRoot( e, {a, 1}, {f, I} ) 
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootRingElements ( e, a, f, EthRootStrategy => opts.EthRootStrategy) ---MK
+ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootRingElements ( e, a, f,  opts ) ---MK
  -- in the future, ethRootRingElements should be subsumed by ethRoot(ZZ, List, List). When this happens,
  -- the above line should end with ethRoot( e, {a}, {f} ) 
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> ethRoot( e, {m}, {I}, EthRootStrategy => opts.EthRootStrategy )
+ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> ethRoot( e, {m}, {I}, opts )
 
 -----------------------------------------------------------------------------
 
 ethRoot( ZZ, List, List, Ideal) := opts -> (e, exponentList, idealList, J) ->
-   ethRoot(e, append(exponentList, 1), append(idealList, J), EthRootStrategy => opts.EthRootStrategy);
-
+   ethRoot(e, append(exponentList, 1), append(idealList, J), opts );
 -----------------------------------------------------------------------------
 
 ethRoot ( ZZ, Matrix ) := opts -> (e, A) -> mEthRoot (e,A)  --- MK
+
+-----------------------------------------------------------------------------
+
+
+frobeniusRoot = method( Options => { FrobeniusRootStrategy => Substitution } )
+
+frobeniusRoot ( ZZ, Ideal ) := o -> ( n, I ) -> 
+(
+    p := char ring I;  
+    e := floorLog( p, n );
+    if n != p^e then error "frobeniusPower: first argument must be a number of the form 1/p^e, where p is the characteristic of the ring.";   
+    ethRoot( e, I, EthRootStrategy => o.FrobeniusRootStrategy )
+)
+
+frobeniusRoot ( ZZ, MonomialIdeal ) := o -> ( n, I ) -> 
+(
+    p := char ring I;  
+    e := floorLog( p, n );
+    if n != p^e then error "frobeniusPower: first argument must be a number of the form 1/p^e, where p is the characteristic of the ring.";   
+    ethRoot( e, I, EthRootStrategy => o.FrobeniusRootStrategy )
+)
+
 
 -----------------------------------------------------------------------------
 -- MACHINERY

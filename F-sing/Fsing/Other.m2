@@ -1,9 +1,3 @@
--- Changes in orders of arguments
-
--- INTERNAL: NONE
-
--- EXTERNAL: eR (replaced with ethRoot), ethRoot*, frobeniusPower
-
 ----------------------------------------------------------------
 --************************************************************--
 --Functions for computing sigma                               --
@@ -106,11 +100,11 @@ isFPure = I1->(
     p1:=char ring I1;
     if codim(I1)==numgens(I1) then(
 	L:=flatten entries gens I1;
-	cond = isSubset(ideal(product(#L, l-> fastExp(p1-1,L#l))),frobeniusPower(1,maxIdeal));
+	cond = isSubset(ideal(product(#L, l-> fastExp(p1-1,L#l))),frobenius( maxIdeal ));
 	if(cond==false) then answer=true else answer=false;
 	)
     else(
-	cond = isSubset((frobeniusPower(1,I1)):I1,frobeniusPower(1,maxIdeal));
+	cond = isSubset((frobenius( I1 )):I1,frobenius( maxIdeal ));
 	if(cond==false) then answer=true else answer=false;
 	);
     answer
@@ -132,7 +126,7 @@ isFRegularPoly (RingElement, QQ) := (f1, t1) -> (
 --Checks whether (R, f1^(a1/(p^e1-1)) is sharply F-pure at the prime ideal m1
 isSharplyFPurePoly = (f1, a1, e1,m1) -> (
      if (isPrime m1 == false) then error "isSharplyFPurePoly: expected a prime ideal.";
-     not (isSubset(ideal(f1^a1), frobeniusPower(e1,m1)))
+     not (isSubset(ideal(f1^a1), frobenius(e1,m1)))
 )
 
 --Checks whether a Q-Gorenstein pair is strongly F-regular 
@@ -168,17 +162,16 @@ isFRegularQGor (Ring,ZZ,Ideal) := (R,e1,Q1) ->(
  
 --- Computes the F-signature for a specific value a1/p^e1
 --- Input:
----	e1 - some positive integer
----	a1 - some positive integer between 0 and p^e
----	f1 - some polynomial in two or three variables in a ring R of PRIME characteristic
+---	e - some positive integer
+---	a - some positive integer between 0 and p^e
+---	f - some polynomial in two or three variables in a ring R of PRIME characteristic
 --- Output:
----	returns value of the F-signature of the pair (R, f1^{a1/p^e1})
+---	returns value of the F-signature of the pair (R, f^{a/p^e})
 --- Code is based on work of Eric Canton
-fSig = (f1, a1, e1) -> (
-     R1:=ring f1;
-     pp:= char ring f1;     
-     1-(1/pp^(dim(R1)*e1))*
-          degree( (ideal(apply(first entries vars R1, i->i^(pp^e1)))+ideal(fastExp(a1,f1) ))) 
+fSig = (f, a, e) -> (
+     R := ring f;
+     p := char ring f;     
+     1 - p^(-e*dim(R))*degree( frobenius( e, maxIdeal R) + ideal( fastExp( a, f ) )) 
 )  
 
 --Calculates the x-int of the secant line between two guesses for the fpt
@@ -247,11 +240,4 @@ imageOfTrace = (f1) -> (
 	trim ideal traceList
 )
 
---computes the relative e-iterated Frobenius over the base ring (the absolute Frobenius in the case 
-frobenius = (R1, e1) -> (
-	p1 := char R1;
-	genList := first entries gens R1;
-	fPowerList := apply(genList, z->z^p1 );
-	map(R1, R1, fPowerList);
-)
 
