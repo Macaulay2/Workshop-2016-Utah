@@ -1,10 +1,3 @@
--- Changes in orders of arguments
-
--- INTERNAL: NONE
-
--- EXTERNAL: ethRoot*, frobeniusPower, divideFraction, ascendIdeal*
-
-
 --****************************************************
 --****************************************************
 --This file contains functions related to test ideals.
@@ -33,7 +26,7 @@ findQGorGen ( ZZ, Ring ) := ( e, R ) ->
 (
      S := ambient R; -- the ambient ring
      I := ideal R; -- the defining ideal
-     Ie := frobeniusPower( e, I );     
+     Ie := frobenius( e, I );     
      J := trim ( Ie : I ); --compute the colon
      J = trim sub( J, S/Ie ); -- extend colon ideal to S/Ie
      L := J_*; -- grab generators

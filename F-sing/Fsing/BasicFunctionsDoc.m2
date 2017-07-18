@@ -41,40 +41,38 @@ doc ///
 
 doc ///
      Key
-     	 frobeniusPower
+     	floorLog
      Headline
-        The following raises an ideal or matrix (entry-wise) to the p^e-th power.
+        Computes the floor of the log base b of x
      Usage
-     	  frobeniusPower(e,I) 
-	  frobeniusPower(e,M)
-     Inputs
-         e:ZZ
-     	 I:Ideal
-	 M:Matrix
+     	 floorLog(b,x)
+     Inputs 
+     		b:ZZ
+		x:ZZ		
      Outputs
-        :Ideal
-	:Matrix
+         :ZZ
      Description
 	Text
-	     frobeniusPower(e,I) outputs I^[p^e] and frobeniusPower(e,M) outputs a matrix whose entries are p^e-th powers of
-	     the entries of M.
-///
+	    This differs from floor(log_b(x)) in that it corrects problems due to rounding.
+/// 
 
 doc ///
      Key
-     	genFrobeniusPower 
+     	multOrder
+     	(multOrder, ZZ, ZZ)
      Headline
-        Computes the generalized Frobenius power of an ideal
+        Computes the multiplicative order of a modulo b
      Usage
-     	  genFrobeniusPower(t,I)
-     Inputs
-     	     	t:QQ
-         	I:Ideal
+     	 multOrder(a,b)
+     Inputs 
+     		a:ZZ
+		b:ZZ		
      Outputs
-        :Ideal
+         :ZZ
      Description
-     	Text
-	   genFrobeniusPower(t,I) outputs the generalized Frobenius power I^[t].
- ///
+	Text
+	    This computes the multiplicative order of a modulo b.  If a and b are not relatively prime, it returns an error.
+///
+
  
  

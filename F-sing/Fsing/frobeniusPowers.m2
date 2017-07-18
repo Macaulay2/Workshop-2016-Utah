@@ -1,11 +1,3 @@
--- CHANGES IN ORDERS OF ARGUMENTS
-
---fastExp(N,f)  from (f,N)
---frobeniusPower(e,I) from (I,e)
---generalizedFrobeniusPower(e,I) from (I,e)
-
-
-
 --*************************************************
 --*************************************************
 --This file is used for taking various types of 
@@ -30,21 +22,31 @@ fastExp = (N,f) ->
 
 --Outputs the p^e-th Frobenius power of an ideal, or the p^e-th (entry-wise) Frobenius power of a matrix.
 
-frobeniusPower = method();
+frobenius = method();
 
-frobeniusPower(ZZ,Ideal) := (e,I) ->
+frobenius ( ZZ, Ideal ) := ( e, I ) ->
 (
      R := ring I;
      p := char R;
      G := I_*;
-     if #G==0 then ideal(0_R) else ideal(apply(G, j -> fastExp(p^e,j)))
+     if #G == 0 then ideal( 0_R ) else ideal( apply( G, j -> fastExp( p^e, j ) ) )
 )
 
-frobeniusPower(ZZ,Matrix) := (e,M) ->
+frobenius ( ZZ, Matrix ) := ( e, M ) ->
 (
-    p:=char ring M;
-    matrix apply(entries M,u -> apply(u, j -> fastExp(p^e,j)))
+    p := char ring M;
+    matrix apply( entries M, u -> apply( u, j -> fastExp( p^e, j ) ) )
 )
+
+frobenius ( Ideal ) := I -> frobenius( 1, I )
+
+frobenius ( Matrix ) := M -> frobenius( 1, M )
+
+ComposableFunction = new Type of MethodFunction
+
+frobenius = new ComposableFunction from frobenius
+
+ComposableFunction ^ ZZ := ( f, n ) -> ( x -> f( n, x ) )
 
 --------------------------------------------------------------------------------------------------------
 
@@ -69,10 +71,10 @@ while (isSubset(L,K)==false) do
 
 --Outputs the generalized Frobenius power of an ideal; either the N-th Frobenius power of N/p^e-th one.
 
-genFrobeniusPower = method(Options => {gfpStrategy => Naive});
+frobeniusPower = method(Options => {gfpStrategy => Naive});
 
 --Computes the integral generalized Frobenius power I^[N]
-genFrobeniusPower(ZZ,Ideal) := opts -> (N,I) -> 
+frobeniusPower(ZZ,Ideal) := opts -> (N,I) -> 
 (
      R := ring I;
      p := char R;
@@ -80,11 +82,11 @@ genFrobeniusPower(ZZ,Ideal) := opts -> (N,I) ->
      if #G==0 then return ideal(0_R);
      if #G==1 then return ideal(fastExp(N,G#0));
      E := basePExp(p,N);
-     product(#E, m->frobeniusPower(m,I^(E#m)))
+     product(#E, m->frobenius(m,I^(E#m)))
 )
 
 --Computes the generalized Frobenius power I^[N/p^e]
-genFrobeniusPower(ZZ,ZZ,Ideal) := opts -> (e,N,I) ->
+frobeniusPower(ZZ,ZZ,Ideal) := opts -> (e,N,I) ->
 (
      R := ring I;
      p := char R;
@@ -92,7 +94,7 @@ genFrobeniusPower(ZZ,ZZ,Ideal) := opts -> (e,N,I) ->
      if #G==0 then return ideal(0_R);
      rem := N % p^e;
      M := N // p^e;
-     J := genFrobeniusPower(M,I);  --component when applying Skoda's theorem
+     J := grobeniusPower(M,I);  --component when applying Skoda's theorem
      
     if opts.gfpStrategy==Safe then 
     (
@@ -100,21 +102,21 @@ genFrobeniusPower(ZZ,ZZ,Ideal) := opts -> (e,N,I) ->
 	J*product(#E, m->ethRoot(e-m,I^(E#m)));  --step-by-step computation of generalized Frobenius power of I^[rem/p^e]
                                                                             --using the base p expansion of rem/p^e < 1
     )
-    else J*ethRoot(e,genFrobeniusPower(rem,I))  --Skoda to compute I^[N/p^e] from I^[rem/p^e] 
+    else J*ethRoot(e,frobeniusPower(rem,I))  --Skoda to compute I^[N/p^e] from I^[rem/p^e] 
  )
 
 --Computes the generalized Frobenius power I^[t] for a rational number t 
-genFrobeniusPower(QQ,Ideal) := (t,I) ->
+frobeniusPower(QQ,Ideal) := (t,I) ->
 (
     p := char ring I;
     L := divideFraction(p,t); 
     a := L#0; b := L#1; c := L#2;     --write t = a/(p^b*(p^c-1))
-    if c==0 then return genFrobeniusPower(b,a,I)  --if c = 0, call simpler function
+    if c==0 then return frobeniusPower(b,a,I)  --if c = 0, call simpler function
     	else 
 	(
 	    rem := a % (p^c-1);      
 	    quot := a // (p^c-1);     
-	    J := stableIdeal(c, genFrobeniusPower(rem,I), I);
-	    ethRoot(b,genFrobeniusPower(quot,I)*J)
+	    J := stableIdeal(c, frobeniusPower(rem,I), I);
+	    ethRoot(b,frobeniusPower(quot,I)*J)
         );
 )

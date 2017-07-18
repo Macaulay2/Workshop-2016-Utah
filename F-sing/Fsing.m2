@@ -86,8 +86,8 @@ export{
     
 --Frobenius Powers (frobeniusPowers.m2)
     "fastExp",
+    "frobenius",
     "frobeniusPower",
-    "genFrobeniusPower",    
     "gfpStrategy",
     "Naive", 
     "Safe", 
@@ -182,7 +182,6 @@ export{
     "testIdeal", --Karl (the new version)
 
 -- Other.m2
-    "frobenius", 
     "fSig",
     "HSL", 
     "imageOfRelativeCanonical",
@@ -229,12 +228,9 @@ load "./Fsing/frobeniusPowers.m2"
 
 load "./Fsing/compatiblySplit.m2"
 
-
 load "./Fsing/FPure.m2"
 
 load "./Fsing/FFiniteSupport.m2"
-
-
 
 load "./Fsing/parameterTestIdeal.m2"
 
@@ -244,14 +240,17 @@ load "./Fsing/FThresholds.m2"
 
 load "./Fsing/SpecialFThresholds.m2"
 
-
 load "./Fsing/testIdeals.m2"
 
 load "./Fsing/Other.m2"
 
-load "./Fsing/FsingDocs.m2"
-
 beginDocumentation()
+
+load "./Fsing/BasicFunctionsDoc.m2"
+
+load "./Fsing/frobeniusPowersDocs.m2"
+
+load "./Fsing/FsingDocs.m2"
 
 load "./Fsing/EthRootsDoc.m2"
 
@@ -268,6 +267,8 @@ load "./Fsing/generatingMorphismDoc.m2"
 load "./Fsing/parameterTestIdealDoc.m2"
 
 load "./Fsing/FPureDoc.m2"
+
+-- TESTS
 
 load "./Fsing/BasicFunctionsTests.m2"
 

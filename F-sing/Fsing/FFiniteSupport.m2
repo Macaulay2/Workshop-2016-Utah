@@ -19,7 +19,7 @@ generatingRoot= (A,U) ->(
 	while ((( L)%( LL))!=0) do
 	{
 		LL=L;
-		L=L | matrixColon(frobeniusPower(L,1),U);
+		L=L | matrixColon(frobenius(1,L),U);
 		L=mingens image L;
 ---		print("=================================================================");
 ---		print(L);

@@ -25,12 +25,12 @@ doc ///
 
 doc ///
      Key
-     	 frobeniusPower
+     	 frobenius
      Headline
         The following raises an ideal or matrix (entry-wise) to the p^e-th power.
      Usage
-     	  frobeniusPower(e,I) 
-	  frobeniusPower(e,M)
+     	  frobenius(e,I) 
+	  frobenius(e,M)
      Inputs
          e:ZZ
      	 I:Ideal
@@ -40,17 +40,17 @@ doc ///
 	:Matrix
      Description
 	Text
-	     frobeniusPower(e,I) outputs I^[p^e] and frobeniusPower(e,M) outputs a matrix whose entries are p^e-th powers of
+	     frobenius(e,I) outputs I^[p^e] and frobenius(e,M) outputs a matrix whose entries are p^e-th powers of
 	     the entries of M.
 ///
 
 doc ///
      Key
-     	genFrobeniusPower 
+     	frobeniusPower 
      Headline
         Computes the generalized Frobenius power of an ideal
      Usage
-     	  genFrobeniusPower(t,I)
+     	  frobeniusPower(t,I)
      Inputs
      	     	t:QQ
          	I:Ideal
@@ -58,7 +58,7 @@ doc ///
         :Ideal
      Description
      	Text
-	   genFrobeniusPower(t,I) outputs the generalized Frobenius power I^[t].
+	   frobeniusPower(t,I) outputs the generalized Frobenius power I^[t].
  ///
  
  

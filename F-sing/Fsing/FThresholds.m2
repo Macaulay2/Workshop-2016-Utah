@@ -1,20 +1,3 @@
--- CHANGES IN ORDERS OF ARGUMENTS
-
--- internal functions acted on:     nu*, FTApproxList, FPTApproxList, FTHatApproxList, 
---     	       	       	       	    isFPTPoly, isFJumpingNumberPoly
-
--- internal functions To DO: guessFPT, estFPT
-
--- external functions acted on: divideFraction, findNumberBetween, fastExp,
---    	      	      	      	  frobeniusPower, genFrobeniusPower, ethRoot  
-
--- external functions TO DO: tau*, sigma*
-
--- TO DO:
-
--- There is a lot of repeated code here, in the computations of nus
--- (the code of certain binary search is repeated at least 4 times). Clean up!
-
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ----------------------------------------------------------------------------------
 -- CONTENTS
@@ -93,7 +76,7 @@ nuList( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this is a faster nuList computa
 	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(I^middle, frobeniusPower( d, J));
+			answer = isSubset(I^middle, frobenius( d, J));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
@@ -131,7 +114,7 @@ nuList( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this is a faster nuList c
 	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( d, J ));
+			answer = isSubset(ideal(fastExp( middle, f )), frobenius( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
@@ -168,7 +151,7 @@ nu( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this does a fast nu computation
 	bottom = 0;
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(I^middle, frobeniusPower( e, J ));
+		answer = isSubset(I^middle, frobenius( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -199,7 +182,7 @@ nu( ZZ, RingElement, Ideal ) := ( e, f, J ) -> ( --this does a fast nu computati
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(ideal(fastExp( middle, f )), frobeniusPower( e, J ));
+		answer = isSubset(ideal(fastExp( middle, f )), frobenius( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -282,7 +265,7 @@ nuListAlt1( ZZ, RingElement, Ideal ) := ( n, f, J ) ->
 	    I = I: ideal( f^nu );
 	    nu = binarySearch( f, I, 1, { 0, p } );
 	    theList = append( theList, p*(last theList) + nu );
-	    I = frobeniusPower( 1, I ); 
+	    I = frobenius( 1, I ); 
 	)
     );
     theList
@@ -311,7 +294,7 @@ nuHatList( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this is a faster nuList comp
 	for d from 1 to e do (
 		while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 			middle := floor((top + bottom)/2);
-			answer = isSubset(genFrobeniusPower( middle, I ), frobeniusPower( d, J ));
+			answer = isSubset(frobeniusPower( middle, I ), frobenius( d, J ));
 			if (answer == false) then bottom = middle else top = middle;
 		);
 		nuPrev = bottom;
@@ -357,7 +340,7 @@ nuHat ( ZZ, Ideal, Ideal ) := ( e, I, J ) -> ( --this does a fast nu computation
 			
 	while (top - 1 > bottom) do (--the bottom value is always not in m, the top is always in m
 		middle = floor((top + bottom)/2);
-		answer = isSubset(genFrobeniusPower( middle, I ), frobeniusPower( e, J ));
+		answer = isSubset(frobeniusPower( middle, I ), frobenius( e, J ));
 		if (answer == false) then bottom = middle else top = middle;
 	);
 	bottom)
@@ -420,15 +403,15 @@ testRoot = ( J, a, I, e ) -> isSubset( ethRoot( e, a, J ), I )
 testPower = method()
 
 testPower ( Ideal, ZZ, Ideal, ZZ ) := ( J, a, I, e ) -> 
-    isSubset( J^a, frobeniusPower( e, I ) )
+    isSubset( J^a, frobenius( e, I ) )
 
 -- for polynomials, use fastExp
 testPower ( RingElement, ZZ, Ideal, ZZ ) := ( f, a, I, e ) -> 
-    isSubset( ideal fastExp( a, f ), frobeniusPower( e, I ) )
+    isSubset( ideal fastExp( a, f ), frobenius( e, I ) )
 
 -- testGenFrobeniusPower(J,a,I,e) checks whether J^[a] is a subset of I^[p^e]
 testGenFrobeniusPower = ( J, a, I, e ) -> 
-    isSubset( genFrobeniusPower( a, J ), frobeniusPower( e, I ) )
+    isSubset( frobeniusPower( a, J ), frobenius( e, I ) )
 
 ----------------------------------------------------------------------------------
 -- SEARCH FUNCTIONS
@@ -488,10 +471,11 @@ nuInternal = optI >> o -> ( n, f, J ) ->
     nu := nu1( f, J );
     theList := { nu };
     principal := if isIdeal f then (numgens trim f) == 1 else true;
+    local N;
     if not o.ComputePreviousNus then
     (
 	if n == 0 then return theList;
- 	N := if principal or o.TestFunction === testGenFrobeniusPower
+ 	N = if principal or o.TestFunction === testGenFrobeniusPower
 	     then p^n else (numgens trim J)*(p^n-1)+1;
      	return { o.SearchFunction( f, J, n, nu*p^n, (nu+1)*N, o.TestFunction ) }
     );
@@ -504,13 +488,13 @@ nuInternal = optI >> o -> ( n, f, J ) ->
 		I = I : ideal( fastExp( nu, g ) );
 		nu =  last nuInternal( 1, g, I, TestFunction => o.TestFunction );
 	      	theList = append( theList, p*(last theList) + nu );
-	      	I = frobeniusPower( 1, I )
+	      	I = frobenius( 1, I )
 	    )
 	)
     )
     else
     (
-	N := if principal or o.TestFunction === testGenFrobeniusPower
+	N = if principal or o.TestFunction === testGenFrobeniusPower
 	     then p else (numgens trim J)*(p-1)+1;
 	scan( 1..n, e -> 
 	    (
@@ -760,7 +744,7 @@ fpt ( RingElement, ZZ ) := QQ => o -> ( f, e ) ->
     if o.Verbose then print "Starting fpt";
     
     -- Check if fpt equals 1
-    if not isSubset( ideal( f^(p-1) ), frobeniusPower( 1, M ) ) then 
+    if not isSubset( ideal( f^(p-1) ), frobenius( 1, M ) ) then 
     (
         if o.Verbose then print "nu(1,f) = p-1, so fpt(f) = 1"; 
         return 1 
@@ -900,7 +884,7 @@ fpt1 ( RingElement, ZZ ) := QQ => o -> ( f, e ) ->
     if o.Verbose then print "Starting fpt";
     
     -- Check if fpt equals 1
-    if not isSubset( ideal( f^(p-1) ), frobeniusPower( 1, M ) ) then 
+    if not isSubset( ideal( f^(p-1) ), frobenius( 1, M ) ) then 
     (
         if o.Verbose then print "nu(1,f) = p-1, so fpt(f) = 1"; 
         return 1 
