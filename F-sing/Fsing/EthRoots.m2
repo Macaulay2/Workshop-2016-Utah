@@ -129,21 +129,22 @@ ethRoot ( ZZ, Matrix ) := opts -> (e, A) -> mEthRoot (e,A)  --- MK
 
 -----------------------------------------------------------------------------
 
+
 frobeniusRoot = method( Options => { FrobeniusRootStrategy => Substitution } )
 
-frobeniusRoot ( QQ, Ideal ) := o -> ( t, I ) -> 
+frobeniusRoot ( ZZ, Ideal ) := o -> ( n, I ) -> 
 (
     p := char ring I;  
-    ( a, b, c ) := toSequence divideFraction( p, t );
-    if a != 1 or c != 0 then error "frobeniusPower: first argument must be a number of the form 1/p^e, where p is the characteristic of the ring.";   
-    ethRoot( b, I, EthRootStrategy => o.FrobeniusRootStrategy )
+    e := floorLog( p, n );
+    if n != p^e then error "frobeniusPower: first argument must be a number of the form 1/p^e, where p is the characteristic of the ring.";   
+    ethRoot( e, I, EthRootStrategy => o.FrobeniusRootStrategy )
 )
 
-frobeniusRoot ( QQ, MonomialIdeal ) := o -> ( t, I ) -> 
+frobeniusRoot ( ZZ, MonomialIdeal ) := o -> ( t, I ) -> 
 (
     p := char ring I;  
-    ( a, b, c ) := toSequence divideFraction( p, t );
-    if a != 1 or c != 0 then error "frobeniusPower: first argument must be a number of the form 1/p^e, where p is the characteristic of the ring.";   
+    e := floorLog( p, n );
+    if n != p^e then error "frobeniusPower: first argument must be a number of the form 1/p^e, where p is the characteristic of the ring.";   
     ethRoot( b, I, EthRootStrategy => opts.FrobeniusRootStrategy )
 )
 

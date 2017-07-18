@@ -8,12 +8,12 @@ assert(ethRoot(2,I,EthRootStrategy => MonomialBasis) == ideal(x,z,w))
 assert(ethRoot(3,I) == ideal(1_R))
 assert(ethRoot(3,I,EthRootStrategy => MonomialBasis) == ideal(1_R))
 -- using frobeniusRoot
-assert(frobeniusRoot(1/5,I) == ideal(x^5*y^2+4*y^3*z^7,z^5,x^3*w^6,x^2*y^2*z^7,z^10))
-assert(frobeniusRoot(1/5,I,FrobeniusRootStrategy => MonomialBasis) == ideal(x^5*y^2+4*y^3*z^7,z^5,x^3*w^6,x^2*y^2*z^7,z^10))
-assert(frobeniusRoot(1/25,I) == ideal(x,z,w))
-assert(frobeniusRoot(1/25,I,FrobeniusRootStrategy => MonomialBasis) == ideal(x,z,w))
-assert(frobeniusRoot(1/125,I) == ideal(1_R))
-assert(frobeniusRoot(1/125,I,FrobeniusRootStrategy => MonomialBasis) == ideal(1_R))
+assert(frobeniusRoot(5,I) == ideal(x^5*y^2+4*y^3*z^7,z^5,x^3*w^6,x^2*y^2*z^7,z^10))
+assert(frobeniusRoot(5,I,FrobeniusRootStrategy => MonomialBasis) == ideal(x^5*y^2+4*y^3*z^7,z^5,x^3*w^6,x^2*y^2*z^7,z^10))
+assert(frobeniusRoot(25,I) == ideal(x,z,w))
+assert(frobeniusRoot(25,I,FrobeniusRootStrategy => MonomialBasis) == ideal(x,z,w))
+assert(frobeniusRoot(125,I) == ideal(1_R))
+assert(frobeniusRoot(125,I,FrobeniusRootStrategy => MonomialBasis) == ideal(1_R))
 ///
 
 TEST /// -- test 1
@@ -29,12 +29,12 @@ assert(ethRoot(2,I,EthRootStrategy => MonomialBasis) == ideal(x,y))
 assert(ethRoot(3,I) == ideal(1_R))
 assert(ethRoot(3,I,EthRootStrategy => MonomialBasis) == ideal(1_R))    
 -- using frobeniusRoot
-assert(frobeniusRoot(1/3,I) == ideal(x^6,a*x^4*y^2*z+y^3*z^3,x*y^3*z^2,y^7))
-assert(frobeniusRoot(1/3,I,FrobeniusRootStrategy => MonomialBasis) == ideal(x^6,a*x^4*y^2*z+y^3*z^3,x*y^3*z^2,y^7))
-assert(frobeniusRoot(1/9,I) == ideal(x,y))    
-assert(frobeniusRoot(1/9,I,FrobeniusRootStrategy => MonomialBasis) == ideal(x,y))
-assert(frobeniusRoot(1/27,I) == ideal(1_R))
-assert(frobeniusRoot(1/27,I,FrobeniusRootStrategy => MonomialBasis) == ideal(1_R))    
+assert(frobeniusRoot(3,I) == ideal(x^6,a*x^4*y^2*z+y^3*z^3,x*y^3*z^2,y^7))
+assert(frobeniusRoot(3,I,FrobeniusRootStrategy => MonomialBasis) == ideal(x^6,a*x^4*y^2*z+y^3*z^3,x*y^3*z^2,y^7))
+assert(frobeniusRoot(9,I) == ideal(x,y))    
+assert(frobeniusRoot(9,I,FrobeniusRootStrategy => MonomialBasis) == ideal(x,y))
+assert(frobeniusRoot(27,I) == ideal(1_R))
+assert(frobeniusRoot(27,I,FrobeniusRootStrategy => MonomialBasis) == ideal(1_R))    
 ///
 
 TEST ///  -- test 2
