@@ -94,7 +94,7 @@ frobeniusPower(ZZ,ZZ,Ideal) := opts -> (e,N,I) ->
      if #G==0 then return ideal(0_R);
      rem := N % p^e;
      M := N // p^e;
-     J := grobeniusPower(M,I);  --component when applying Skoda's theorem
+     J := frobeniusPower(M,I);  --component when applying Skoda's theorem
      
     if opts.gfpStrategy==Safe then 
     (
