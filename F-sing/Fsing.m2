@@ -78,7 +78,9 @@ export{
     "boundLargestCompatible", ---MK
     "ethRoot",
     "ethRootRingElements",   
-    "EthRootStrategy",    
+    "EthRootStrategy",  
+    "frobeniusRoot",  
+    "FrobeniusRootStrategy",  
     "getFieldGenRoot",
     "minimalCompatible",
     "MonomialBasis",	
@@ -275,3 +277,5 @@ load "./Fsing/BasicFunctionsTests.m2"
 load "./Fsing/EthRootsTest.m2"
 
 load "./Fsing/SpecialFThresholdsTest.m2"
+
+load "./Fsing/frobeniusPowersTest.m2"

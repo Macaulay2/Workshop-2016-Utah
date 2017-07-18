@@ -105,28 +105,48 @@ ethRoot(ZZ, List, List) := opts -> (e, exponentList, idealList) -> (
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootRingElements ( e, a, f, I, EthRootStrategy => opts.EthRootStrategy ) ---MK
+ethRoot ( ZZ, ZZ, RingElement, Ideal ) := opts -> ( e, a, f, I ) -> ethRootRingElements ( e, a, f, I, opts ) ---MK
  -- in the future, ethRootRingElements should be subsumed by ethRoot(ZZ, List, List). When this happens,
  -- the above line should end with ethRoot( e, {a, 1}, {f, I} ) 
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootRingElements ( e, a, f, EthRootStrategy => opts.EthRootStrategy) ---MK
+ethRoot ( ZZ, ZZ, RingElement ) := opts -> ( e, a, f ) -> ethRootRingElements ( e, a, f,  opts ) ---MK
  -- in the future, ethRootRingElements should be subsumed by ethRoot(ZZ, List, List). When this happens,
  -- the above line should end with ethRoot( e, {a}, {f} ) 
 
 -----------------------------------------------------------------------------
 
-ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> ethRoot( e, {m}, {I}, EthRootStrategy => opts.EthRootStrategy )
+ethRoot ( ZZ, ZZ, Ideal ) := opts -> ( e, m, I ) -> ethRoot( e, {m}, {I}, opts )
 
 -----------------------------------------------------------------------------
 
 ethRoot( ZZ, List, List, Ideal) := opts -> (e, exponentList, idealList, J) ->
-   ethRoot(e, append(exponentList, 1), append(idealList, J), EthRootStrategy => opts.EthRootStrategy);
-
+   ethRoot(e, append(exponentList, 1), append(idealList, J), opts );
 -----------------------------------------------------------------------------
 
 ethRoot ( ZZ, Matrix ) := opts -> (e, A) -> mEthRoot (e,A)  --- MK
+
+-----------------------------------------------------------------------------
+
+frobeniusRoot = method( Options => { FrobeniusRootStrategy => Substitution } )
+
+frobeniusRoot ( QQ, Ideal ) := o -> ( t, I ) -> 
+(
+    p := char ring I;  
+    ( a, b, c ) := toSequence divideFraction( p, t );
+    if a != 1 or c != 0 then error "frobeniusPower: first argument must be a number of the form 1/p^e, where p is the characteristic of the ring.";   
+    ethRoot( b, I, EthRootStrategy => o.FrobeniusRootStrategy )
+)
+
+frobeniusRoot ( QQ, MonomialIdeal ) := o -> ( t, I ) -> 
+(
+    p := char ring I;  
+    ( a, b, c ) := toSequence divideFraction( p, t );
+    if a != 1 or c != 0 then error "frobeniusPower: first argument must be a number of the form 1/p^e, where p is the characteristic of the ring.";   
+    ethRoot( b, I, EthRootStrategy => opts.FrobeniusRootStrategy )
+)
+
 
 -----------------------------------------------------------------------------
 -- MACHINERY

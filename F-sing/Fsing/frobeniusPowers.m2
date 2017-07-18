@@ -22,31 +22,35 @@ fastExp = (N,f) ->
 
 --Outputs the p^e-th Frobenius power of an ideal, or the p^e-th (entry-wise) Frobenius power of a matrix.
 
-frobenius = method();
+frobenius =  method( Options => { EthRootStrategy => Substitution } );
 
-frobenius ( ZZ, Ideal ) := ( e, I ) ->
+frobenius ( ZZ, Ideal ) := o -> ( e, I ) ->
 (
-     R := ring I;
-     p := char R;
-     G := I_*;
-     if #G == 0 then ideal( 0_R ) else ideal( apply( G, j -> fastExp( p^e, j ) ) )
+    if e == 0 then return I;
+    if e < 0 then return ethRoot( -e, I, o );
+    R := ring I;
+    p := char R;
+    G := I_*;
+    if #G == 0 then ideal( 0_R ) else ideal( apply( G, j -> fastExp( p^e, j ) ) )
 )
 
 frobenius ( ZZ, Matrix ) := ( e, M ) ->
 (
+    if e == 0 then return M;
+    if e < 0 then error "frobenius: first argment must be nonnegative.";
     p := char ring M;
     matrix apply( entries M, u -> apply( u, j -> fastExp( p^e, j ) ) )
 )
 
-frobenius ( Ideal ) := I -> frobenius( 1, I )
+frobenius ( Ideal ) := o -> I -> frobenius( 1, I, o )
 
 frobenius ( Matrix ) := M -> frobenius( 1, M )
 
-ComposableFunction = new Type of MethodFunction
+FrobeniusOperator = new Type of MethodFunctionWithOptions
 
-frobenius = new ComposableFunction from frobenius
+frobenius = new FrobeniusOperator from frobenius
 
-ComposableFunction ^ ZZ := ( f, n ) -> ( x -> f( n, x ) )
+FrobeniusOperator ^ ZZ := ( f, n ) -> ( x -> f( n, x ) )
 
 --------------------------------------------------------------------------------------------------------
 
@@ -56,14 +60,14 @@ ComposableFunction ^ ZZ := ( f, n ) -> ( x -> f( n, x ) )
 --This chain is ascending, and has the property that once two consecutive terms
 --agree, the chain stabilizes.  This function outputs the stable ideal of this chain.
 
-stableIdeal = ( e, I, J ) -> 
+stableIdeal = { EthRootStrategy => Substitution } >> o -> ( e, I, J ) -> 
 (
     K := ideal( 0_( ring I ) );
-    L := ethRoot( e, I*J );
+    L := ethRoot( e, I*J, o );
     while not isSubset( L, K ) do
     (
     	K = L;              
-    	L = ethRoot( e, I*K );
+    	L = ethRoot( e, I*K, o );
     );
     trim K 
 )
@@ -72,7 +76,7 @@ stableIdeal = ( e, I, J ) ->
 
 --Outputs the generalized Frobenius power of an ideal; either the N-th Frobenius power of N/p^e-th one.
 
-frobeniusPower = method( Options => { gfpStrategy => Naive } );
+frobeniusPower = method( Options => { gfpStrategy => Naive, EthRootStrategy => Substitution } );
 
 --Computes the integral generalized Frobenius power I^[N]
 frobeniusPower ( ZZ, Ideal ) := opts -> ( N, I ) -> 
@@ -100,23 +104,23 @@ frobeniusPower( ZZ, ZZ, Ideal ) := opts -> ( e, N, I ) ->
     if opts.gfpStrategy == Safe then 
     (
 	E := basePExp( p, rem );
-	J * product( #E, m -> ethRoot( e-m, I^( E#m ) ) );  --step-by-step computation of generalized Frobenius power of I^[rem/p^e]
+	J * product( #E, m -> ethRoot( e-m, I^( E#m ),  EthRootStrategy => opts.EthRootStrategy ) );  --step-by-step computation of generalized Frobenius power of I^[rem/p^e]
                                                                             --using the base p expansion of rem/p^e < 1
     )
-    else J * ethRoot( e, frobeniusPower( rem, I ) )  --Skoda to compute I^[N/p^e] from I^[rem/p^e] 
+    else J * ethRoot( e, frobeniusPower( rem, I ), EthRootStrategy => opts.EthRootStrategy )  --Skoda to compute I^[N/p^e] from I^[rem/p^e] 
 )
 
 --Computes the generalized Frobenius power I^[t] for a rational number t 
-frobeniusPower( QQ, Ideal ) := ( t, I ) ->
+frobeniusPower( QQ, Ideal ) := opts -> ( t, I ) ->
 (
     p := char ring I;
     ( a, b, c ) := toSequence divideFraction( p, t ); --write t = a/(p^b*(p^c-1))
-     if c == 0 then frobeniusPower( b, a, I )  --if c = 0, call simpler function
+     if c == 0 then frobeniusPower( b, a, I, opts )  --if c = 0, call simpler function
     	else 
 	(
 	    rem := a % ( p^c - 1 );      
 	    quot := a // ( p^c - 1 );     
-	    J := stableIdeal( c, frobeniusPower( rem, I ), I );
-	    ethRoot( b, frobeniusPower( quot, I ) * J )
+	    J := stableIdeal( c, frobeniusPower( rem, I ), I, EthRootStrategy => opts.EthRootStrategy );
+	    ethRoot( b, frobeniusPower( quot, I ) * J, EthRootStrategy => opts.EthRootStrategy )
         )
 )
