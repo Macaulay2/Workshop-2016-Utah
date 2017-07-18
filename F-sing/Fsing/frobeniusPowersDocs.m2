@@ -29,8 +29,10 @@ doc ///
      Headline
         The following raises an ideal or matrix (entry-wise) to the p^e-th power.
      Usage
-     	  frobenius(e,I) 
+     	  frobenius(e,I)
+	  frobenius^e(I) 
 	  frobenius(e,M)
+	  frobenius^e(M)
      Inputs
          e:ZZ
      	 I:Ideal
@@ -40,7 +42,7 @@ doc ///
 	:Matrix
      Description
 	Text
-	     frobenius(e,I) outputs I^[p^e] and frobenius(e,M) outputs a matrix whose entries are p^e-th powers of
+	     frobenius(e,I) or frobenius^e(I) outputs I^[p^e] and frobenius(e,M) or frobenius^e(M) outputs a matrix whose entries are p^e-th powers of
 	     the entries of M.
 ///
 

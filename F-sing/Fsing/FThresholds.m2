@@ -265,7 +265,7 @@ nuListAlt1( ZZ, RingElement, Ideal ) := ( n, f, J ) ->
 	    I = I: ideal( f^nu );
 	    nu = binarySearch( f, I, 1, { 0, p } );
 	    theList = append( theList, p*(last theList) + nu );
-	    I = frobenius( 1, I ); 
+	    I = frobenius( I ); 
 	)
     );
     theList
@@ -488,7 +488,7 @@ nuInternal = optI >> o -> ( n, f, J ) ->
 		I = I : ideal( fastExp( nu, g ) );
 		nu =  last nuInternal( 1, g, I, TestFunction => o.TestFunction );
 	      	theList = append( theList, p*(last theList) + nu );
-	      	I = frobenius( 1, I )
+	      	I = frobenius( I )
 	    )
 	)
     )
@@ -744,7 +744,7 @@ fpt ( RingElement, ZZ ) := QQ => o -> ( f, e ) ->
     if o.Verbose then print "Starting fpt";
     
     -- Check if fpt equals 1
-    if not isSubset( ideal( f^(p-1) ), frobenius( 1, M ) ) then 
+    if not isSubset( ideal( f^(p-1) ), frobenius( M ) ) then 
     (
         if o.Verbose then print "nu(1,f) = p-1, so fpt(f) = 1"; 
         return 1 
@@ -884,7 +884,7 @@ fpt1 ( RingElement, ZZ ) := QQ => o -> ( f, e ) ->
     if o.Verbose then print "Starting fpt";
     
     -- Check if fpt equals 1
-    if not isSubset( ideal( f^(p-1) ), frobenius( 1, M ) ) then 
+    if not isSubset( ideal( f^(p-1) ), frobenius( M ) ) then 
     (
         if o.Verbose then print "nu(1,f) = p-1, so fpt(f) = 1"; 
         return 1 

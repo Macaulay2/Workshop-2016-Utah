@@ -4,7 +4,7 @@ generatingMorphism= (i,I) ->(
 	local F1; local K; local C;
 	local F1p; local Kp; local Cp;
 	R:=ring(I);
-	Ip:=frobenius(1,I);
+	Ip:=frobenius( I );
 	M:=coker I;
 	Mp:=coker Ip;
 	resM:=res M;
@@ -60,7 +60,7 @@ generatingMorphism= (i,I) ->(
 findGeneratingMorphisms = (I) ->
 (
 	local i;
-	Ip:=frobenius(1,I);
+	Ip:=frobenius( I );
 	M:=coker I;
 	Mp:=coker Ip;
 	resM:=res M;
