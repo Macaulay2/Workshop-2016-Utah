@@ -140,12 +140,12 @@ frobeniusRoot ( ZZ, Ideal ) := o -> ( n, I ) ->
     ethRoot( e, I, EthRootStrategy => o.FrobeniusRootStrategy )
 )
 
-frobeniusRoot ( ZZ, MonomialIdeal ) := o -> ( t, I ) -> 
+frobeniusRoot ( ZZ, MonomialIdeal ) := o -> ( n, I ) -> 
 (
     p := char ring I;  
     e := floorLog( p, n );
     if n != p^e then error "frobeniusPower: first argument must be a number of the form 1/p^e, where p is the characteristic of the ring.";   
-    ethRoot( b, I, EthRootStrategy => opts.FrobeniusRootStrategy )
+    ethRoot( e, I, EthRootStrategy => o.FrobeniusRootStrategy )
 )
 
 
