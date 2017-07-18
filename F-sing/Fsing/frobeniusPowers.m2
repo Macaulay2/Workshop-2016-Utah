@@ -56,13 +56,14 @@ ComposableFunction ^ ZZ := ( f, n ) -> ( x -> f( n, x ) )
 --This chain is ascending, and has the property that once two consecutive terms
 --agree, the chain stabilizes.  This function outputs the stable ideal of this chain.
 
-stableIdeal = (e,I,J) -> (
-K := ideal(0_{ring I});
-L := ethRoot(e,I*J);
-while (isSubset(L,K)==false) do
+stableIdeal = ( e, I, J ) -> 
+(
+    K := ideal( 0_( ring I ) );
+    L := ethRoot( e, I*J );
+    while not isSubset( L, K ) do
     (
-    K = L;              
-    L = ethRoot(e,I*K);
+    	K = L;              
+    	L = ethRoot( e, I*K );
     );
     trim K 
 )
@@ -71,52 +72,51 @@ while (isSubset(L,K)==false) do
 
 --Outputs the generalized Frobenius power of an ideal; either the N-th Frobenius power of N/p^e-th one.
 
-frobeniusPower = method(Options => {gfpStrategy => Naive});
+frobeniusPower = method( Options => { gfpStrategy => Naive } );
 
 --Computes the integral generalized Frobenius power I^[N]
-frobeniusPower(ZZ,Ideal) := opts -> (N,I) -> 
+frobeniusPower ( ZZ, Ideal ) := opts -> ( N, I ) -> 
 (
      R := ring I;
      p := char R;
      G := first entries mingens I;
-     if #G==0 then return ideal(0_R);
-     if #G==1 then return ideal(fastExp(N,G#0));
-     E := basePExp(p,N);
-     product(#E, m->frobenius(m,I^(E#m)))
+     if #G == 0 then return ideal( 0_R );
+     if #G == 1 then return ideal( fastExp( N, G#0 ) );
+     E := basePExp( p, N );
+     product( #E, m -> frobenius( m, I^( E#m ) ) )
 )
 
 --Computes the generalized Frobenius power I^[N/p^e]
-frobeniusPower(ZZ,ZZ,Ideal) := opts -> (e,N,I) ->
+frobeniusPower( ZZ, ZZ, Ideal ) := opts -> ( e, N, I ) ->
 (
      R := ring I;
      p := char R;
      G := first entries mingens I;
-     if #G==0 then return ideal(0_R);
+     if #G == 0 then return ideal( 0_R );
      rem := N % p^e;
      M := N // p^e;
-     J := frobeniusPower(M,I);  --component when applying Skoda's theorem
+     J := frobeniusPower( M, I );  --component when applying Skoda's theorem
      
-    if opts.gfpStrategy==Safe then 
+    if opts.gfpStrategy == Safe then 
     (
-	E := basePExp(p,rem);
-	J*product(#E, m->ethRoot(e-m,I^(E#m)));  --step-by-step computation of generalized Frobenius power of I^[rem/p^e]
+	E := basePExp( p, rem );
+	J * product( #E, m -> ethRoot( e-m, I^( E#m ) ) );  --step-by-step computation of generalized Frobenius power of I^[rem/p^e]
                                                                             --using the base p expansion of rem/p^e < 1
     )
-    else J*ethRoot(e,frobeniusPower(rem,I))  --Skoda to compute I^[N/p^e] from I^[rem/p^e] 
- )
+    else J * ethRoot( e, frobeniusPower( rem, I ) )  --Skoda to compute I^[N/p^e] from I^[rem/p^e] 
+)
 
 --Computes the generalized Frobenius power I^[t] for a rational number t 
-frobeniusPower(QQ,Ideal) := (t,I) ->
+frobeniusPower( QQ, Ideal ) := ( t, I ) ->
 (
     p := char ring I;
-    L := divideFraction(p,t); 
-    a := L#0; b := L#1; c := L#2;     --write t = a/(p^b*(p^c-1))
-    if c==0 then return frobeniusPower(b,a,I)  --if c = 0, call simpler function
+    ( a, b, c ) := toSequence divideFraction( p, t ); --write t = a/(p^b*(p^c-1))
+     if c == 0 then frobeniusPower( b, a, I )  --if c = 0, call simpler function
     	else 
 	(
-	    rem := a % (p^c-1);      
-	    quot := a // (p^c-1);     
-	    J := stableIdeal(c, frobeniusPower(rem,I), I);
-	    ethRoot(b,frobeniusPower(quot,I)*J)
-        );
+	    rem := a % ( p^c - 1 );      
+	    quot := a // ( p^c - 1 );     
+	    J := stableIdeal( c, frobeniusPower( rem, I ), I );
+	    ethRoot( b, frobeniusPower( quot, I ) * J )
+        )
 )
