@@ -166,7 +166,8 @@ polarDualFace = method();
 polarDualFace(Polyhedron,List) := (P,f) -> (
     vp := vertices P;
     vpolar := vertices polar P;
-    positions(entries (transpose (vpolar) * (vp)_f), x -> all(x, x1 -> x1 == -1))
+    positions(entries (transpose (vpolar) * (vp)_f), 
+              x -> all(x, x1 -> x1 == -1))
     );
 
 hodgeOfCYToricDivisor = method();
@@ -302,6 +303,57 @@ Caveat
 SeeAlso
 ///
 
+doc ///
+   Key
+     interiorLattice
+     (interiorLattice,Polyhedron)
+   Headline
+     collect interior lattice points of each face and its dual
+   Usage
+     interiorLattice P
+   Inputs
+     P:Polyhedron
+       Any polytope will do, although so far it has only been tested on 
+       reflexive polytopes.
+   Outputs
+     :HashTable
+       Each key is an integer denoting a possible dimension of faces of $P, and its value is
+       another hash table whose keys are the faces $F$ of $P$ of that dimension, and whose corresponding value
+       is a pair of lists: the first is a list of interior lattice points of the face $F$, and the second is the 
+       interior lattice points to the face $F^*$ of $P$.  Note: if the face is a point,
+       then its lattice point is the contents of this list.
+   Description
+    Text
+    Example
+       --  4 12  M:24 12 N:16 11 H:11,19 [-16]
+       polystr = " 1   0   0   0   0   1   2   1   0  -2   0  -2
+               0   1   0   0   0   0  -2  -1   1   2  -1   0
+               0   0   1   0   0  -1   0  -1  -1   1  -1   1
+               0   0   0   1  -1   0   1   1  -1   0   1  -2
+               "
+      A = matrixFromString polystr
+      P = convexHull A
+    Text
+      This polytope has 12 vertices, 33 edges, 32 2-faces, and 11 facets.
+    Example
+      intP = interiorLattice P
+      intP#1
+    Text
+      Note that only the faces which contain interior lattice points, or whose dual does, is included.
+      So 6 of the 33 edges of the polytope have an interior vertex along that edge.
+    Text
+      Often, we want the same information for the polar dual.  For example.
+    Example
+      P2 = polar P
+      interiorLattice P2
+      hodgeOfCYToricDivisors P
+    Text
+    Example
+      
+   Caveat
+   SeeAlso
+///
+
 TEST ///
   -- We work on one example in 4 dimensions, where we know the answers (or have computed them elsewhere).
   -- Second polytope (index 1) on h11=3 Kreuzer-Skarke list of 4d reflexive polytopes for h11=3.
@@ -342,6 +394,46 @@ TEST ///
   assert(cohoms == cohoms1)
   assert not isFavorable polar P
 ///
+
+TEST ///
+  -- id=0 h11=11
+  -- 4 13  M:23 13 N:16 13 H:11,18 [-14]
+  str = "    1    0    0    0   -1    1    0    0    0    1   -1    1   -2
+    0    1    0    0    1   -1    0    1    1   -1    1   -2    0
+    0    0    1    0    1   -1    0    1    0    0   -1   -2    2
+    0    0    0    1   -1    1   -1   -1   -1    1    1    0   -1
+    "
+
+  P = convexHull matrixFromString last first eg11
+  P2 = polar P
+  elapsedTime interiorLattice P
+  elapsedTime interiorLattice P2
+  assert(h11OfCY P == 11)
+  assert(h21OfCY P == 18)
+  assert(h11OfCY polar P == 18)
+  assert(h21OfCY polar P == 11)
+
+  -- Now compute all of the cohomologies of the (irreducible) toric divisors 
+  LP = select(latticePoints polar P, p -> p != 0)
+  LP = for lp in LP list flatten entries lift(lp,ZZ)
+  assert(#LP == 15)
+  --elapsedTime cohoms = for v in LP list hodgeOfCYToricDivisor(P, v)
+  cohomH = hashTable hodgeOfCYToricDivisors P
+  cohoms1 = for v in LP list cohomH#(transpose matrix {v})
+  assert(cohoms == cohoms1)
+  assert isFavorable P
+
+  -- Now compute all of the cohomologies of the (irreducible) toric divisors for the polar dual
+  LP = select(latticePoints P, p -> p != 0)
+  LP = for lp in LP list flatten entries lift(lp,ZZ)
+  assert(#LP == 22)
+  --elapsedTime cohoms = for v in LP list hodgeOfCYToricDivisor(polar P, v)
+  cohomH = hashTable hodgeOfCYToricDivisors polar P
+  cohoms1 = for v in LP list cohomH#(transpose matrix {v})
+  assert(cohoms == cohoms1)
+  assert isFavorable polar P
+///
+
 
 end--
 

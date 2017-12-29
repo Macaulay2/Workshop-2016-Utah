@@ -62,27 +62,41 @@ batyrev Polyhedron := (P) -> (
 end
 
 restart    
+uninstallPackage "PolyhedralObjects"
+uninstallPackage "PolymakeInterface"
+
 installPackage "PolyhedralObjects"
 installPackage "PolymakeInterface"
 viewHelp PolymakeInterface
 
 restart
-load "mes-polymake.m2"
+--load "mes-polymake.m2"
+
+loadPackage "ToricVolumeProject"
+loadPackage "PolymakeInterface"
 str = ///    1    0    0    0   -1    1    0    0    0    1   -1    1   -2
     0    1    0    0    1   -1    0    1    1   -1    1   -2    0
     0    0    1    0    1   -1    0    1    0    0   -1   -2    2
     0    0    0    1   -1    1   -1   -1   -1    1    1    0   -1///
 M = matrixFromString str
+
 M1 = matrix{for i from 0 to numColumns M - 1 list 1} || M
 P = new Polyhedron from {"Points" => transpose M1}
-runPolymake(P, "AmbientDim")
-runPolymake(P, "Vertices")
-runPolymake(P, "InteriorLatticePoints") -- bug if none
-runPolymake(P, "BoundaryLatticePoints")
+--runPolymake(P, "AmbientDim") -- doesn't work
+elapsedTime runPolymake(P, "Vertices")
+getPropertyNames P
+get P.cache#"PolymakeFile"
+elapsedTime runPolymake(P, "InteriorLatticePoints") -- bug if none
+elapsedTime runPolymake(P, "BoundaryLatticePoints")
+runPolymake(P, "Points")
+runPolymake(P, "Inequalities") -- only an input property
+fac = runPolymake(P, "Facets")
+pts = runPolymake(P, "Vertices")
+fac * (transpose pts)
+
 
 P1 = convexHull M
 vertices P1
-faces(4,P1)
 latticePoints P1
 interiorLatticePoints P1
 P2 = polar P1
@@ -94,3 +108,15 @@ findInteriors(0,P2)
 h11 P2
 batyrev P2
 h11 P1
+
+needsPackage "NormalToricVarieties"
+V = normalToricVariety P1
+dim V
+isSmooth V
+isSimplicial V
+rays V
+matrix oo
+orbits(V,2)
+orbits(V,1)
+viewHelp orbits
+V2 = normalToricVariety P2
