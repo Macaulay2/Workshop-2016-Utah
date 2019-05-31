@@ -1,0 +1,501 @@
+\documentclass[11pt]{amsart}
+%   \overfullrule=5pt
+\usepackage[active]{srcltx}
+\usepackage{calc,amssymb,amsthm,amsmath,amscd, eucal,ulem}
+\usepackage{alltt}
+%\usepackage[left=1.25in,top=1in,right=1.25in,bottom=1in]{geometry}
+\usepackage{fullpage}
+%\usepackage{color}
+\synctex=1
+%\usepackage{mathtools}
+\RequirePackage[dvipsnames,usenames]{color}
+\let\mffont=\sf
+\normalem
+\input{kmacros3.sty}
+\input{mabliautoref.sty}
+\input{xy}
+\xyoption{all}
+\usepackage{tikz}
+%\usepackage{pdfsync}
+%
+%
+
+\numberwithin{equation}{theorem}
+\def\ff{{\bf f}}
+\def\XX{{\bf X}}
+\def\YY{{\bf Y}}
+
+%\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\D}{\displaystyle}
+\newcommand{\til}{\widetilde}
+\newcommand{\ol}{\overline}
+\newcommand{\F}{\mathbb{F}}
+\DeclareMathOperator{\E}{E}
+\renewcommand{\:}{\colon}
+\newcommand{\eg}{{\itshape e.g.} }
+\renewcommand{\m}{\mathfrak{m}}
+\renewcommand{\n}{\mathfrak{n}}
+\newcommand{\Tt}{{\mathfrak{T}}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\RamiT}{\mathcal{R_{T}}}
+\DeclareMathOperator{\edim}{edim}
+\DeclareMathOperator{\length}{length}
+\DeclareMathOperator{\monomials}{monomials}
+\DeclareMathOperator{\Fitt}{Fitt}
+\DeclareMathOperator{\depth}{depth}
+\newcommand{\Frob}[2]{{#1}^{1/p^{#2}}}
+\newcommand{\Frobp}[2]{{(#1)}^{1/p^{#2}}}
+\newcommand{\FrobP}[2]{{\left(#1\right)}^{1/p^{#2}}}
+\newcommand{\extends}{extends over $\Tt${}}
+\newcommand{\extension}{extension over $\Tt${}}
+\DeclareMathOperator{\DIV}{Div}
+%\DeclareMathOperator{\Tor}{Tor}
+%\DeclareMa
+%\DeclareMathOperator{\Ann}{Ann}
+%\DeclareMathOperator{\height}{ht}
+%\DeclareMathOperator{\rank}{rank}
+%\DeclareMathOperator{\ord}{ord}
+%\DeclareMathOperator{\ker}{ker}
+%\DeclareMathOperator{\im}{im}
+\DeclareMathOperator{\sspan}{span}
+%\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\homgp}{Hom}
+%\DeclareMathOperator{\Ext}{Ext}
+\DeclareMathOperator{\socle}{socle}
+%\DeclareMathOperator{\id}{id}
+%\DeclareMathOperator{\coker}{coker}
+\DeclareMathOperator{\Ass}{Ass}
+\DeclareMathOperator{\Exc}{exc}
+\DeclareMathOperator{\Newt}{Newt}
+\DeclareMathOperator{\sheafhom}{\scr{H}{\kern -2pt om}}
+\DeclareMathOperator{\soc}{socle}
+\DeclareMathOperator{\pd}{pd}
+\DeclareMathOperator{\ffield}{frac} %fraction field
+\DeclareMathOperator{\Projfnc}{Proj} %proj functor
+%\DeclareMathOperator{\sn}{sn}
+%\usepackage{showkeys}
+
+%\usepackage[left=1.25in,top=1.25in,right=1.25in,bottom=1.25in]{geometry}
+\usepackage{fullpage}
+
+\usepackage{setspace}
+% \singlespacing, \doublespacing, \onehalfspacing,
+%\spacing{1.3}
+\usepackage{hyperref}
+% \url{http://www.umich.edu/~kevtuck}, \href{mailto:kevtuck@umich.edu}{kevtuck@umich.edu}
+
+\usepackage{enumerate}
+%\begin{enumerate}[(1.)]
+
+\usepackage{graphicx}
+% \includegraphics[width=2in]{Pics/picture.pdf}
+
+\usepackage[all,cmtip]{xy}
+%\ar[r] to
+%\ar@{|->}[r] mapsto
+%\ar@{-}[r]} line
+%\ar@{^{(}->}[r] injective arrow
+%\ar@{->>}[r] surjective arrow
+%\ar@{.>}[r] just the head of an arrow
+%\ar@{-->}[r] dashed arrow
+%\ar@{=>}[r] double lined arrow
+%\ar@{~>}[r] squigly arrow
+%\ar@{=}[r] equals
+%
+% superscripts and subscripts add labels to the arrows
+%
+%Commutative Diagram
+%
+%\[  \xymatrix{
+%%
+%A    \ar[d]    \ar[r]    &     B   \ar[d]   \\
+%C    \ar[r]                 &     D
+%%
+%} \]
+%
+%
+%Short Exact Sequence
+%
+%\[  \xymatrix{
+%%
+%0 \ar[r] &   A   \ar[r] &   B   \ar[r] &   C   \ar[r] & 0
+%%
+%} \]
+%
+
+\usepackage{verbatim}
+
+\theoremstyle{theorem}
+\newtheorem*{mainthm}{Main Theorem}
+\newtheorem*{mainthma}{Main Theorem A}
+\newtheorem*{mainthmb}{Main Theorem B}
+\newtheorem*{mainthmc}{Main Theorem C}
+\newtheorem*{atheorem}{Theorem}
+
+%The todo box!
+\def\todo#1{\textcolor{Mahogany}%
+{\footnotesize\newline{\color{Mahogany}\fbox{\parbox{\textwidth-15pt}{\textbf{todo:
+} #1}}}\newline}}
+
+%What is going on?  Why isn't \O a script O?!?
+\renewcommand{\O}{\mathcal O}
+
+\begin{document}
+\title{RationalMaps, a package for Macaulay2}
+\author{C.J. Bott}
+\author{S. Hamid Hassanzadeh}
+\author{Karl Schwede}
+\author{Daniel Smolkin}
+\address{Department of Mathematics\\Department of Mathematics\\275 TMCB Brigham Young University\\Provo, UT 84602}
+\email{cjamesbott@gmail.com}
+\address{Department of Mathematics\\Federal University of Rio de Janeiro\\Brazil}
+\email{hamid@im.ufrj.br}
+\address{Department of Mathematics\\ University of Utah\\ Salt Lake City\\ UT 84112}
+\email{schwede@math.utah.edu}
+\address{Department of Mathematics\\ University of Utah\\ Salt Lake City\\ UT 84112}
+\email{smolkin@math.utah.edu}
+
+\thanks{The second named author was supported by CNPq-bolsa de Produtividade}
+\thanks{The third named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
+\thanks{The fourth named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
+
+\maketitle
+\begin{abstract}
+This paper describes the {\tt RationalMaps} package for Macaulay2.  This package provides functionality for computing several aspects of rational maps.
+\end{abstract}
+
+
+
+\section{Introduction}
+
+
+This package aims to compute a number of things about rational maps between varieties.  In particular, this package will compute
+\begin{itemize}
+\item{} The base locus of a rational map.
+\item{} Whether a rational map is birational.
+\item{} The inverse of a birational map.
+\item{} Whether a map is a closed embedding.
+\item{} And more!
+\end{itemize}
+Our functions have numerous options which allow them to run much more quickly in certain examples if configured correctly.  The {\tt Verbose} option gives hints as to the best way to apply these.
+
+A rational map $\mathfrak{F}:X\subseteq \P^n\dasharrow Y \subseteq \P^m$ between projective varieties is presented by $m+1$ forms $\ff=\{f_0,\ldots f_m\}$ of the same degree in the coordinate ring of $X$, denoted by  $R$.
+The idea of looking at the syzygies of the forms $\ff$ to detect the geometric properties of  $\mathfrak{F}$ goes
+back at least to \cite{HulekKatzSchreyer} in the case
+where $X=\P^n$, $Y = \P^m$ and $m=n$ (see also \cite{SempleTyrrell}). In \cite{RussoSimisCompositio}  this method was developed by Russo and Simis
+to handle the case $X=\P^n$ and $m\geq n$. Simis pushed the method further to the study
+of general rational maps between two integral projective schemes in
+arbitrary characteristic by an extended ideal-theoretic method
+emphasizing the role of the Rees algebra associated to the ideal
+generated by $\ff$ \cite{SimisCremona}.  Recently,  Doria, Hassanzadeh, and Simis applied these
+ Rees algebra techniques to study the birationality of  $\mathfrak{F}$ \cite{DoriaHassanzadehSimisBirationality}.  Our core functions, in particular the functions related to computing inverse maps, rely heavily on this work.
+\vskip 12pt
+\noindent
+\emph{Acknowledgements:}  Much of the work  on this package was completed during the Macaulay2 workshop held at the University of Utah in May 2016.  We especially thank David Eisenbud, Aron Simis, Greg Smith, Giovanni Staglian\`o and Mike Stillman for valuable conversations.
+
+
+
+\section{Base Loci}
+
+We begin with the problem of computing the base locus of a map to projective space. Let $X$ be a projective variety over any field $k$ and let $\mathfrak{F}: X \to \P_k^m$ be a rational map from $X$ to projective space. Then we can choose some representative $(f_0, \cdots, f_m)$ of $\mathfrak{F}$, where each $f_i$ is the $i^{\textrm{th}}$ coordinate of $\mathfrak{F}$. A priori, each $f_i$ is in $K = \ffield R$, where $R$ is the coordinate ring of $X$. However, we can get another representative of $\mathfrak{F}$ by clearing denominators. (Note this does not enlarge the base locus of $\mathfrak{F}$ since $\mathfrak{F}$ is undefined whenever the denominator of any of the $f_i$ vanishes.) Thus we can assume that $f_i\in R$ for all $i$, and that all the $f_i$ are homogeneous of the same degree.
+
+In this setting, one might naively think that the map $\mathfrak{F}$ is undefined exactly when all of the $f_i$ vanish, and thus the base locus is the vanishing set of the ideal $(f_0, \cdots, f_m)$. However, this can yield a base locus that's too big.  Indeed, to find the base locus of a rational map, we must consider all possible representatives of the map and find where none of them are defined. To do this, we use the following result.
+
+%For example, suppose $X = \Projfnc k[x, y, z]$ and $F$ is the rational map represented by $(x^2y, x^2z, xyz)$. Then the vanishing locus of the ideal $(x^2y, x^2z, xyz)$ is the union of the line $\left\{ x = 0 \right\}$ with the point $(1:0:0)$. However, the same rational map is given by $(xy, xz, yz)$ since these two representations agree where $\left\{ x\neq 0 \right\}$ (see \cite[I.4]{Hartshorne}), and the vanishing locus of $(xy, xz, yz)$ is just the three points $\left\{ (1:0:0), (0:1:0), (0:0:1) \right\}$.
+
+
+% take a presentation of I
+% ker $\vp^t$ is Hom(I,R)
+% vectors of this correpond to reps of $I$
+% so take the ideal generated by these vectors
+%
+
+\begin{proposition}\textnormal{\cite[Proposition 1.1]{SimisCremona}}
+  Let $\mathfrak{F}: X \dashrightarrow \P^m$ be a rational map and let $\textbf{f} = \left\{ f_0, \dots, f_m \right\}$ be a representative of $\mathfrak{F}$ with $f_i\in R$ homogeneous of degree $d$ for all $i$. Set $I  = (f_0, \cdots, f_m)$. Then the set of such representatives of $\mathfrak{F}$ corresponds bijectively to the homogeneous vectors in the rank 1 graded $R$-module $\homgp_R(I, R) \cong (R :_K I)$.
+  \label{lemma:repsOfRatMap}
+\end{proposition}
+
+The bijection comes from multiplying our fixed representative $\textbf{f}$ of $\mathfrak{F}$ by $h \in (R :_K I)$.
+%I can probably omit this...
+%\begin{proof}
+  %Suppose that $(f'_0, \cdots, f'_m)$ is another such representative of $F$. Then there is some $h\in K$ such that $hf_i = f'_i$ for all $i$. In particular, we have that each $hf_i \in R$ for each $i$, and so $h\in \left( R :_K I \right)$. Further, it's clear that each homogeneous element of $\left( R :_K I \right)$ gives another representative of $F$. Thus the set of representatives of $F$ is $\left\{ (h f_0, \cdots, hf_m)\mid h\in \left( R :_K I \right) \right\}$. It's a standard fact that $\homgp_R(I, R) = \left\{ x\mapsto hx \mid h\in (R :_K I) \right\}$, giving us the desired result.
+%\end{proof}
+%and I can probably just refer to simis for this...
+Now, in the setting of \autoref{lemma:repsOfRatMap}, let
+  \[
+    \bigoplus_s R(-d_s) \xrightarrow{\varphi} R(-d)^{m+1} \xrightarrow{[f_0, \cdots, f_m]} I \to 0
+  \]
+be a free resolution of $I$. Then we get
+\[
+  0 \to \homgp_R(I, R) \to \left( R(-d)^{m+1} \right)^\vee \xrightarrow{\varphi^t} \left( \bigoplus_s R(d_s) \right)^\vee
+\]
+where $\varphi^t$ is the transpose of $\varphi$ and $R^\vee$ is the dual module of $R$. Thus, we get that $\homgp_R(I,R) \cong \ker \varphi^t$, and so each representative of $\mathfrak{F}$ corresponds to a vector in $\ker \varphi^t$. The correspondence takes a representative $(hf_0, \cdots, hf_m)$ to the map that multiplies vectors in $R^{m+1}$ by $[hf_0, \cdots, hf_m]$ on the left.
+
+The base locus of $\mathfrak{F}$ is the intersection of the sets $V(f^i_0, \cdots, f^i_m)$ as $\mathbf{f}^i = (f^i_0, \cdots, f^i_m)$ ranges over all the representatives of $\mathfrak{F}$. The above implies that this is the same as the intersection of the sets $V(w^i_0,\cdots, w^i_m)$ as $\mathbf{w}^i = (w^i_0, \cdots, w^i_m)$ ranges over the vectors in $\ker \varphi^t$. Now, given any $a, f, g\in R$, we have $V(af) \supseteq V(f)$ and $V(f + g) \supseteq V(f)\cap V(g)$. Thus, it's enough to take a generating set $\mathbf w^1, \cdots, \mathbf w^n$ of $\ker \varphi^t$  and take the intersection over this generating set.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%In summary, if we're given a representation $(f_0, \cdots, f_m)$ of a rational map to projective space, we compute its base locus by:
+%\begin{enumerate}
+%  \item finding $M = \ker \varphi^t$, where $\varphi$ is a presentation matrix for $I$,
+%  \item fixing a generating set $\mathbf w^1, \cdots, \mathbf w^n$ for $M$ as an $R$-module, and
+ % \item taking the ideal generated by all the entries of all of the $\mathbf w^i$.
+%\end{enumerate}
+The base locus of $\mathfrak{F}$ is then the variety cut out by the ideal generated by all the entries of all of the $\mathbf w^i$. Our function {\tt baseLocusOfMap}  returns this ideal.
+{\scriptsize\color{blue}
+\begin{verbatim}
+i1 : loadPackage "RationalMaps";
+i2 : R = QQ[x,y,z];
+i3 : f = {x^2*y, x^2*z, x*y*z};
+i4 : baseLocusOfMap(f);
+o4 = ideal (y*z, x*z, x*y)
+o4 : Ideal of R
+\end{verbatim}
+}
+{\normalsize}
+ If the \verb=SaturateOutput= option is set {\tt true}, our function will return the saturation of this ideal.
+
+
+\section{Birationality and Inverse Maps}
+
+Again, a rational map $\mathfrak{F}:X\subseteq \P^n\dasharrow Y \subseteq \P^m$ between projective spaces is defined by $m+1$ forms $\ff=\{f_0,\ldots f_m\}$ of the same degree in the coordinate ring of $X$, denoted by  $R$. $R$ is a standard graded ring in $n+1$ variables. Here we assumed the varieties over a field $k$ and  $\dim R\geq 1$.
+The idea to find a ring theoretic criterion for birationality and on top of that to find the inverse of a rational map, is to study the Rees algebra of the ideal $I=(\ff)$ in $R$. 
+So that let  $R\simeq k[x_0,\ldots, x_n]=k[\XX]/\mathfrak{a}$ with $k[\XX]=k[X_0,\ldots, X_n]$ and $\mathfrak{a}$ a homogeneous ideal. The Rees algebra is defined by the polynomial relations among $\{f_0,\ldots f_m\}$ in $R$. To this end, we consider the polynomial extension $R[\YY]=R[Y_0,\ldots,Y_m]$. To keep track of the variables by degrees, we set the standard  bigrading $\deg(X_i)=(1,0)$ and $\deg(Y_j)=(0,1)$. Mapping $Y_j\mapsto f_jt$ yields
+a presentation $R[\YY]/\mathcal{J}\simeq {\mathcal R}_R((\ff))$, with $\mathcal{J}$ a bihomogeneous {\em presentation
+ideal}.
+$\mathcal{J}$ is a bigraded ideal depends only on the rational map defined by $\ff$
+and not on this particular representative.
+
+
+%Since $I = (f_0, \dots, f_m)$ is generated in a fixed degree, the Rees algebra
+%$${\mathcal R}_R((\ff)):=R\oplus I\oplus I^2\oplus \cdots \simeq R[It]\subset R[t]$$
+
+$${\mathcal J}=\bigoplus_{(p,q)\in \mathbb{N}^2} {\mathcal J}_{(p,q)},$$
+where ${\mathcal J}_{(p,q)}$ denotes the $k$-vector space of forms of bidegree $(p,q)$.
+Every pieces of this ideal contains information about the rational map. For example ${\mathcal J}_{0,*}$ determines the dimension of the image of the map.  
+For birationality, the following bihomogeneous piece is  important:
+$${\mathcal J}_{1,*}:=\bigoplus_{r\in\mathbb{N}} {\mathcal J}_{1,q}$$
+with ${\mathcal J}_{1,q}$ denoting the bigraded piece of ${\mathcal J}$ spanned by the forms of bidegree
+ $(1,q)$ for all $q\geq 0$. Now, a form of bidegree $(1,*)$ can be written as $\sum_{i=0}^n Q_i(\YY)\,x_i$, for suitable homogeneous $Q_i(\YY)\in  R[\YY]$
+of the same degree. 
+
+One then goes to construct a matrix which can measure the birationality of the map. The first step is to lift the polynomials $Q_i(\YY)\in  R[\YY]$ into $k[\XX,\YY]$. 
+Since the $\{y_0,\cdots,y_m\}$ are indeterminates over $R$, each pair of such representations of the same form gives a syzygy of $\{x_0,\ldots,x_n\}$
+with coefficients in $k$.  This is where one must take into attention whether $X\subseteq \P^n$ in minimally embedded  or not. To measure this one can easily check the vector space dimension of ${\mathfrak a}_1$, the degree-1 part of $\mathfrak a$; if it is zero  then $X\subseteq \P^n$ is non-degenerated. 
+
+%Thus every such representation is unique  up to $k$-linear relations
+%of $\{x_0,\ldots,x_n\}$,  i.e., up to elements of ${\mathfrak a}_1$, the degree-1 part of $\mathfrak a$.
+
+%In particular, if the {\sc embedding dimension} of $R$ -- i.e., the $k$-vector space dimension
+%$\edim (R):=\dim_k(R_1)=n+1-\dim_k {\mathfrak a}_1$ -- is $n+1$ then every such form has a unique expression.
+
+Next, one can pick a minimal set of generators of the ideal $({\mathcal J}_{1,*})$ consisting of a finite number
+of forms of bidegree $(1,q)$, for various $q$'s.
+Let's assume  $X\subseteq \P^n$ is non-degenerated. Let $\{P_1,\ldots,P_s\}\subset k[\XX,\YY]$ denote liftings of these biforms,  
+ consider the Jacobian matrix of the polynomials $\{P_1,\ldots,P_s\}$ with respect to $\{x_0,\cdots,x_n\}$. This is a matrix with entries in $k[\YY]$. 
+Write $\psi$ for the corresponding matrix over $S=k[\YY]/{\mathfrak b}$, the coordinate ring of $Y$. This matrix is called   the \emph{weak Jacobian dual matrix}  associated to
+the given set of generators of $({\mathcal J}_{1,*})$.
+Note that a weak Jacobian matrix $\psi$ is not uniquely defined due to the lack of uniqueness in the expression of
+an individual form and to the choice of bihomogeneous generators. However, it is shown in \cite[Lemma 2.13]{DoriaHassanzadehSimisBirationality} that if the weak Jacobian matrix associated  to one set of bihomogeneous minimal generators of
+$({\mathcal J}_{1,*})$ has  rank over $S$ then the weak Jacobian matrix associated to any other
+set of bihomogeneous minimal generators of
+$({\mathcal J}_{1,*})$ has  rank over $S$ and the two ranks coincide.
+
+%========================================================================
+\vspace{0.2in}
+The  following  criterion is   \cite[Theorem 2.18 ]{DoriaHassanzadehSimisBirationality}. In the package we consider only the cases where $\XX$ is irreducible i.e. $R$ is a domain.
+\begin{theorem} \label{T birationality}Let $X\subseteq \P^n$ be non-degenerate. Then $\mathfrak{F}$ is birational onto $\YY$  if and only if ${\rm rank}(\psi)=\edim(R)-1(=n).$
+Moreover
+\begin{enumerate}
+  \item[{\rm (i)}] We get a representative for the inverse of $\mathfrak{F}$ by taking the coordinates of any homogeneous vector of positive degree
+in the {\rm (}rank one{\rm )} null space of $\psi$ over $S$ for which these coordinates generate an ideal containing
+a regular element.
+
+\item[{\rm (ii)}] If, further, $R$ is a domain, the representative of $\mathfrak{F}$ in {\rm (i)}
+can be taken to be the set of the {\rm (}ordered, signed{\rm )} $(\edim(R)-1)$-minors
+of an arbitrary $(\edim(R)-1)\times \edim(R)$ submatrix of $\psi$ of rank $\edim(R)-1$.
+\end{enumerate}
+
+\end{theorem}
+
+As expected, the most expensive part of applying this theorem is computing the Rees ideal ${\mathcal J}$. In the package {\tt RationalMaps} we use {\tt ReesStrategy} to compute the Rees equations. The algorithm is the standard elimination technique. However we do not use the {\tt ReesAlgebra} package, since verifying birationality according to \autoref{T birationality} only requires  computing a small part of the Rees ideal, namely elements of first-degree $1$. This idea is applied in the {\tt SimisStrategy}. More precisely, if the given map $\mathfrak{F}$ is birational, then the Jacobian dual rank will attain its maximum value of $\edim(R)-1$ after computing the Rees equations up to  degree $(1,N)$ for $N$ sufficiently large. This allows us to compute the inverse map.  The downside of {\tt SimisStrategy} is that if $\mathfrak{F}$ is not birational,  the desired number $N$ cannot be found and the process never terminates. To provide a definitive answer for birationality,  we use {\tt HybridStrategy}, which is a hybrid of {\tt ReesStrategy} and {\tt SimisStrategy}.  The default strategy is {\tt HybridStrategy}.
+
+{\tt HybridLimit} is an option to switch   {\tt SimisStrategy} to  {\tt{ReesStrategy}}, if the computations up to degree $(1, \tt{HybridLimit})$ do not lead to   ${\rm rank}(\psi)=\edim(R)-1$.
+The default value for {\tt HybridLimit} is $15$. The change from  {\tt SimisStrategy} to  {\tt ReesStrategy} is done in such a way that the generators of the Rees ideal computed in the { \tt SimisStrategy} phase are not lost; the program computes other generators of the Rees ideal while keeping the generators it found before attaining {\tt HybridLimit}.
+
+There is yet another method for computing the Rees ideal called {\tt SaturationStrategy}. In this option the whole Rees ideal is computed by saturating the defining ideal of the symmetric algebra with respect to a non-zero element in $R$ (we assume $R$ to be a domain). This strategy appears to be slower in some examples, though one might be able improve this option in the future by stopping the computation of the saturation at a certain step.
+
+Computing inverse maps is the most important functionality of this package, and is done by the function {\tt inverseOfMap}. According to \autoref{T birationality}, there are two ways to compute the inverse of a map: $(1)$ by finding any syzygy of the Jacobian dual matrix, and $(2)$ by finding a sub-matrix of $\psi$ of rank $\edim(R)-1$. Each way has its own benefits. Method $(1)$ is quite fast in many cases, however method $(2)$ is very useful if the rank of the Jacobian dual matrix  $\psi$ is relatively small compared to the degrees of the entries of $\psi$. Our function {\tt inverseOfMap} starts by using the second method and later switches to the first method if the second method didn't work.  The timing of this transition from the first method to the second method is controlled by the option {\tt MinorsCount}. Setting {\tt MinorsCount} to zero will mean that no minors are checked and the inverse map is computed just by looking at the syzygies of $\psi$.  If {\tt MinorsCount} is left as null (the default value), the program will try to make an educated guess as to how big to set this option, depending on varieties the user is working with.
+
+ In addition, to improve the speed of the function {\tt inverseOfMap}, we have two other options, {\tt AssumeDominant} and {\tt CheckBirational}. If {\tt AssumeDominant} is set  to be {\tt true},  then  {\tt inverseOfMap} assumes that the map from $X$ to $Y$ is dominant and does not compute the image of the map; this is time consuming in certain cases.
+ Similarly, if {\tt CheckBirational} set {\tt false}, {\tt inverseOfMap} will  not check birationality although it still computes the Jacobian dual matrix.
+
+ In general, as long as {\tt Verbose} is {\tt true}, the function will make suggestions as to how to run it more quickly.  For example.
+{
+{\scriptsize\color{blue}
+\begin{verbatim}
+i1 : loadPackage "RationalMaps";
+i2 : Q=QQ[x,y,z,t,u];
+i3 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
+o3 : RingMap Q <--- Q
+i4 : time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, MinorsCount=>50000)
+Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 1}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 2}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 4}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 7}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 11}.
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 16}.
+inverseOfMapSimis:  We give up. Using all of the previous computations,
+                                  we  compute the whole Groebner basis of the rees ideal.
+                                  Increase HybridLimit and rerun to avoid this.
+inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  5 columns
+                                  and about  20 rows.
+inverseOfMapSimis: Looking for a nonzero minor
+Starting nonZeroMinor, looking for rank: 4, we will run it 50000 times.
+                                         If this is slow, rerun with MinorsCount=>0.
+nonZeroMinor: Found a nonzero minor
+inverseOfMapSimis: We found a nonzero minor.
+     -- used 3.51586 seconds
+\end{verbatim}}}}
+
+{\color{black}\normalsize
+\section{Embeddings}
+
+Our package also checks whether a rational map $\mathfrak{F} : X \to Y$ is a closed embedding.  The strategy is quite simple.
+\begin{enumerate}
+\item  We first check whether $\mathfrak{F}$ is regular (by checking if its base locus is empty).
+\item  We next invert the map (if possible).
+\item  Finally, we check if the inverse map is also regular.
+\end{enumerate}
+If all three conditions are met, then the map is a closed embedding and the function returns {\tt true}.  Otherwise {\tt isEmbedding} returns false.
+}
+{\scriptsize
+\color{blue}\begin{verbatim}
+i1 : needspackage "divisor"; --used to quickly define a map
+i2 : c = QQ[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
+i3 : q = ideal(y,x+z); --a point on our curve
+i6 : loadpackage "rationalmaps";
+i8 : f2 = maptoprojectivespace(12*divisor(q));
+o8 : RingMap C <--- QQ[YY , YY , YY , YY , YY , YY , YY , YY , YY , YY  ]
+                         1    2    3    4    5    6    7    8    9    10
+i9 : time isEmbedding(f2)
+isEmbedding: About to find the image of the map.
+If you know the image, you may want to specify that and set AssumeDominant=>true option if
+        this is slow.
+isEmbedding: Checking to see if the map is a regular map
+isEmbedding: computing the inverse  map
+Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
+inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 1}.
+inverseOfMapSimis: We computed enough of the Groebner basis.
+inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  3 columns  and
+        about  17 rows.
+inverseOfMapSimis: Failed to find a nonzero minor.  We now compute syzygies instead.
+        If this doesn't terminate quickly, you may want to try increasing the option MinorsCount.
+isEmbedding: checking if the inverse map is a regular map
+     -- used 3.01948 seconds
+
+o9 = true
+\end{verbatim}
+}
+{\color{black}\normalsize
+\section{Functionality overlap with other packages}
+
+We note that our package has some overlaps in functionality with other packages.
+
+While the {\tt Parametrization} package \cite{ParametrizationPackage} focuses mostly on curves, it also includes a function called {\tt invertBirationalMap} which has the same functionality as {\tt inverseOfMap}. On the other hand, these two functions were implemented somewhat differently and so sometimes one function can be substantially faster than the other.
+
+The package {\tt Cremona} \cite{CremonaPackage} focuses on very fast probabilistic computation in general cases and very fast deterministic computation for special kinds of maps from projective space. In particular, in {\tt Cremona},
+
+\begin{itemize}
+\item{}     {\tt isBirational} gives a probabilisitc answer to the question of whether a map between varieties is birational. Furthermore, if the source is projective space, then {\tt degreeOfRationalMap} with {\tt MathMode=>true} can give a deterministic answer that is frequently faster than what our package can provide with {\tt isBirationalMap}.
+\item{}  {\tt invertBirMap} gives a very fast computation of the inverse of a birational map if the source is projective space and the map has maximal linear rank. If you pass this function a map not from projective space, then it calls a modified, faster version of {\tt invertBirationalMap} originally from {\tt Parametrization}. Even in some cases with maximal linear rank, our {\tt inverseOfMap} function appears to be quite competitive however.
+\end{itemize}
+
+\subsection{Speed comparisons}
+\noindent
+First we do comparisons using examples with maximal linear rank where {\tt Cremona} excels.  These examples were run using version 2.0 of {\tt Cremona} and version 0.21 of {\tt RationalMaps}.
+
+Indeed, in some of those examples with maximal linear rank, {\tt Cremona} is substantially faster.
+{\scriptsize
+\color{blue}\begin{verbatim}
+i1 : loadPackage "Cremona"; loadPackage "RationalMaps";
+i3 : ringP20=QQ[t_0..t_20];
+i4 : phi=map(ringP20,ringP20,{t_10*t_15-t_9*t_16+t_6*t_20,t_10*t_14-t_8*t_16+t_5*t_20,t_9*t_14-t_8*t_15+t_4*t_20,
+t_6*t_14-t_5*t_15+t_4*t_16,t_11*t_13-t_16*t_17+t_15*t_18-t_14*t_19+t_12*t_20,t_3*t_13-t_10*t_17+t_9*t_18-t_8*t_19
++t_7*t_20,t_10*t_12-t_2*t_13-t_7*t_16-t_6*t_18+t_5*t_19,t_9*t_12-t_1*t_13-t_7*t_15-t_6*t_17+t_4*t_19,t_8*t_12
+-t_0*t_13-t_7*t_14-t_5*t_17+t_4*t_18,t_10*t_11-t_3*t_16+t_2*t_20,t_9*t_11-t_3*t_15+t_1*t_20,t_8*t_11-t_3*t_14
++t_0*t_20,t_7*t_11-t_3*t_12+t_2*t_17-t_1*t_18+t_0*t_19,t_6*t_11-t_2*t_15+t_1*t_16,t_5*t_11-t_2*t_14+t_0*t_16,
+t_4*t_11-t_1*t_14+t_0*t_15,t_6*t_8-t_5*t_9+t_4*t_10,t_3*t_6-t_2*t_9+t_1*t_10,t_3*t_5-t_2*t_8+t_0*t_10,t_3*t_4
+-t_1*t_8+t_0*t_9,t_2*t_4-t_1*t_5+t_0*t_6});
+i5 : time inverseOfMap(phi, AssumeDominant=>true, Verbose=>false)-- Function from "RationalMaps"
+     -- used 1.12522 seconds
+i6 : time invertBirMap phi -- Function from "Cremona"
+     -- used 0.0789913 seconds
+i7 : isSameMap(o5, o6) -- Function from "RationalMaps"
+o7 = true
+\end{verbatim}
+}
+{\color{black}\normalsize}
+However, sometimes our function is substantially faster even in examples with maximal linear rank.
+{\scriptsize
+\color{blue}\begin{verbatim}
+i1 : ZZ/33331[t_0..t_6];
+i2 : loadPackage "Cremona"; loadPackage "RationalMaps";
+i4 : phi=toMap minors(3,matrix{{t_0..t_4},{t_1..t_5},{t_2..t_6}});
+i5 : J=kernelComponent(phi,2);
+i6 : phi=toMap(phi,Dominant=>J);
+i7 : time inverseOfMap(phi, AssumeDominant=>true, Verbose=>false) -- Function from "RationalMaps"
+     -- used 0.126314 seconds
+i8 : time invertBirMap phi;  -- Function from "Cremona"
+     -- used 0.375856 seconds
+i9 : isSameMap(o7, o8)
+o9 = true
+\end{verbatim}}
+
+{\color{black}\normalsize
+Note both these examples were taken directly from the documentation of {\tt Cremona}.
+On the other hand, when the source and target are  not projective space, or the map does not have maximal linear rank, in our experience, our functions appear to be faster.  Here is an example where the source and target are not projective space.
+}
+
+{\scriptsize
+\color{blue}\begin{verbatim}
+i1 : needsPackage "Divisor"; loadPackage "RationalMaps"; loadPackage("Cremona", Reload=>true);
+i5 : C = QQ[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
+i6 : Q = ideal(y,x+z); --a point on our curve
+i7 : (f3 = mapOntoImage(mapToProjectiveSpace(12*divisor(Q))););
+i8 : (time g1 = inverseOfMap(f3, Verbose=>false);); -- Function from "RationalMaps"
+     -- used 1.1996 seconds
+i9 : (time g2 = invertBirMap(f3);); -- Function from "Cremona"
+     -- used 13.7981 seconds
+i10 : (g3 = map(target g1, source g2, sub(matrix g2, target g1)););
+i11 : isSameMap(g3, g1)
+o11 = true
+\end{verbatim}
+}
+
+{\color{black}\normalsize
+We also include an example where the map does not have maximal linear rank.
+}
+{\scriptsize
+\color{blue}\begin{verbatim}
+i1 : loadPackage "RationalMaps"; loadPackage "Cremona";
+i3 : Q=QQ[x,y,z,t,u];
+i4 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
+o4 : RingMap Q <--- Q
+i5 : (time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, MinorsCount=>50000));
+     -- Function from "RationalMaps"
+     -- used 5.80638 seconds
+i9 : (time h = invertBirMap(phi)); -- Function from "Cremona"
+     -- used 71.8998 seconds
+i10 : isSameMap(o5, h)
+o10 = true
+\end{verbatim}
+}
+{\color{black}\normalsize
+\bibliographystyle{skalpha}
+\bibliography{MainBib.bib}
+}
+\color{black}
+\end{document}
+
+
