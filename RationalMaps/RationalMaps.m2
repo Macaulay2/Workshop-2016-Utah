@@ -20,7 +20,7 @@ export{
 	"isBirationalMap",
 	"idealOfImageOfMap",
 	"baseLocusOfMap",
-	"dimImage", --probably this shouldn't be exported
+	--"dimImage", --probably this shouldn't be exported
 	"isRegularMap",
 	"isEmbedding",
 	"relationType",
@@ -1581,52 +1581,6 @@ doc ///
 		       jacobianDualMatrix(Pi, Strategy=>SaturationStrategy)
 ///
 --***************************************************************
-
-doc ///
-        Key
-                dimImage
-		(dimImage,Ideal,Ideal,Matrix)
-		(dimImage,Ideal,Ideal,BasicList)
-		(dimImage,Ring,Ring,Matrix)
-		(dimImage,Ring,Ring,BasicList)
-		(dimImage,RingMap)
-        Headline
-                Computes dimension of image of rational map of projective varieties
-        Usage
-                d = dimImage(a,b,f)
-		d = dimImage(a,b,g)
-		d = dimImage(R,S,f)
-		d = dimImage(R,S,g)
-		d = dimImage(p)
-        Inputs
-                a: Ideal
-                        defining equations for X
-                b: Ideal
-                        defining equations for Y
-                f:Matrix
-                        projective rational map given by polynomial represenative
-        	g:BasicList
-                        projective rational map given by polynomial representatives
-                R:Ring
-                        coordinate ring of X
-                S:Ring
-                        coordinate ring of Y
-                p:RingMap
-                        projective rational map given by polynomial representatives
-	Outputs
-                d:ZZ
-			dimension of image
-	Description
-                Text
-                        Gives the dimension of the image of a rational map. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these
-                Example
-                        S = QQ[x,y,z,w];
-			b = ideal(x*y-z*w);
-			R = QQ[u,v];
-			a = ideal(sub(0,R));
-			f = matrix {{u,0,v,0}};
-			dimImage(a,b,f)
-///
 --***************************************************************
 
 
@@ -2067,56 +2021,25 @@ TEST /// --test #2
 	assert(idealOfImageOfMap(f1)==idealOfImageOfMap(f2))
 ///
 
-TEST /// --test #3
-	-------------------------------------
-	------ Tests for dimImage -----------
-	-------------------------------------
-
-	S = QQ[x,y,z,w];
-	b = ideal(x*y-z*w);
-	R = QQ[u,v];
-	a = ideal(sub(0,R));
-	f = matrix {{u,0,v,0}};
-	d = dimImage(a,b,f);
-	assert (d == 1)
-///
-
-TEST /// --test #4
-        S = QQ[x0,x1];
-        T = QQ[y0,y1,y2];
-        f = map(S,T,{x0^4,x0^2*x1^2,x1^4});
-        d = dimImage(f);
-        assert(d == 1)
-///
-
-TEST /// --test #5
-    -- Since in Projective Space, check to make sure different representations give the same result
-    S = QQ[x,y];
-    T = QQ[u,v];
-    f1 = map(S,T,{x,y});
-    f2 = map(S,T,{x^3*y^2,x^2*y^3});
-    assert(dimImage(f1)==dimImage(f2))
-///
-
 
 	-------------------------------------
 	-- Tests for baseLocusOfMap ---------
 	-------------------------------------
-TEST ///	--test #6
+TEST ///	--test #3
     R = QQ[x,y,z]
 	M = matrix{{x^2*y, x^2*z, x*y*z}}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(M))
 ///
 
-TEST ///	--test #7
+TEST ///	--test #4
     R = QQ[x,y,z]
 	L = {x^2*y, x^2*z, x*y*z}
 	I = ideal(x*y, y*z, x*z)
 	assert(I == baseLocusOfMap(L))
 ///
 
-TEST /// --test #8
+TEST /// --test #5
 	-- reducible source
 
 	R = QQ[x,y,z]/(x*y)
@@ -2131,39 +2054,39 @@ TEST /// --test #8
 	-------------------------------------
 	----- isRegularMap -----------------
 	-------------------------------------
-TEST /// --test #9
+TEST /// --test #6
 	R = QQ[x,y,z,w]/(x*y - z*w)
 	M = matrix{{sub(1,R), 0, 0}}
 	assert(isRegularMap(M))
 ///
 
-TEST /// --test #10
+TEST /// --test #7
     R = QQ[x,y]/(x*y)
     M = matrix{{x,y}}
     assert(isRegularMap(M))
 ///
 
-TEST /// --test #11
+TEST /// --test #8
     R = QQ[x,y,z]/(x^3 + y^3 - z^3)
     M = matrix{{(y-z)*x, x^2}}
     assert(isRegularMap(M) == true)
 ///
 
-TEST /// --test #12
+TEST /// --test #9
         R=QQ[x,y,z];
         S=QQ[a,b];
         h = map(R, S, {x,y});
         assert(isRegularMap(h) == false)
 ///
 
-TEST /// --test #13
+TEST /// --test #10
         R=QQ[x,y,z];
         S=QQ[a,b,c];
         h = map(R,S,{y*z,x*z,x*y});
         assert(isRegularMap(h) == false)
 ///
 
-TEST /// -- test #14
+TEST /// -- test #11
     -- projection from the blow up of P2 to P2
 
     P5 = QQ[a..f];
@@ -2178,7 +2101,7 @@ TEST /// -- test #14
 	----- isBirationalOntoImage  --------
 	-------------------------------------
 
-TEST /// --test #15 (a map from the blowup of P^2 at a point back down to P^2)
+TEST /// --test #12 (a map from the blowup of P^2 at a point back down to P^2)
     P5 = QQ[a..f];
     M = matrix{{a,b,c},{d,e,f}};
     blowUpSubvar = P5/(minors(2, M) + ideal(b-d));
@@ -2186,35 +2109,35 @@ TEST /// --test #15 (a map from the blowup of P^2 at a point back down to P^2)
     assert(isBirationalOntoImage(blowUpSubvar, QQ[x,y,z], f, Verbose=>false) == true)
 ///
 
-TEST /// --test #16 (quadratic cremona transformation)
+TEST /// --test #13 (quadratic cremona transformation)
     R = QQ[x,y,z];
     S = QQ[a,b,c];
     f = map(R, S, {y*z, x*z, x*y});
     assert(isBirationalOntoImage(f) == true)
 ///
 
-TEST /// --test #17 (map P^1 to P^2)
+TEST /// --test #14 (map P^1 to P^2)
     R = QQ[x,y];
     S = QQ[a,b,c];
     f = map(R, S, {x,y,0});
     assert(isBirationalOntoImage(f) == true)
 ///
 
-TEST /// --test #18 (let's map an elliptic curve onto P^1)
+TEST /// --test #15 (let's map an elliptic curve onto P^1)
     R = QQ[x,y,z]/(x^3+y^3-z^3);
     S = QQ[a,b];
     f = map(R, S, {x, y-z});
     assert(isBirationalOntoImage(f) == false)
 ///
 
-TEST /// --test #19 (map P^2\pt -> P^1)
+TEST /// --test #16 (map P^2\pt -> P^1)
     R = QQ[x,y,z];
     S = QQ[a,b];
     f = map(R, S, {x,y});
     assert(isBirationalOntoImage(f) == false)
 ///
 
-TEST /// --test #20 (3rd veronese embedding of P^1)
+TEST /// --test #17 (3rd veronese embedding of P^1)
     R = QQ[x,y];
     S = QQ[a,b,c,d];
     f = map(R, S, {x^3,x^2*y,x*y^2,x^3});
@@ -2225,35 +2148,35 @@ TEST /// --test #20 (3rd veronese embedding of P^1)
 	----- isBirationalMap  --------------
 	-------------------------------------
 
-TEST /// --test #21 (quadratic cremona)
+TEST /// --test #18 (quadratic cremona)
     R = QQ[x,y,z];
     S = QQ[a,b,c];
     f = map(R, S, {y*z, x*z, x*y});
     assert(isBirationalMap(f) == true)
 ///
 
-TEST /// --test #22 (map P^1 to P^2)
+TEST /// --test #19 (map P^1 to P^2)
     R = QQ[x,y];
     S = QQ[a,b,c];
     f = map(R, S, {x,y,0});
     assert(isBirationalMap(f) == false)
 ///
 
-TEST /// --test #23 (let's map an elliptic curve onto P^1)
+TEST /// --test #20 (let's map an elliptic curve onto P^1)
     R = QQ[x,y,z]/(x^3+y^3-z^3);
     S = QQ[a,b];
     f = map(R, S, {x, y-z});
     assert(isBirationalOntoImage(f, Strategy=>SaturationStrategy) == false)
 ///
 
-TEST /// --test #24 (3rd veronese embedding of P^1)
+TEST /// --test #21 (3rd veronese embedding of P^1)
     R = QQ[x,y];
     S = QQ[a,b,c,d];
     f = map(R, S, {x^3,x^2*y,x*y^2,x^3});
     assert(isBirationalOntoImage(f, HybridLimit=>20) == true)
 ///
 
-TEST /// --test #25 (Frobenius on an elliptic curve)
+TEST /// --test #22 (Frobenius on an elliptic curve)
     R = ZZ/5[x,y,z]/(x^3+y^3-z^3);
     S = ZZ/5[a,b,c]/(a^3+b^3-b^3);
     h = map(R, S, {x^5, y^5, z^5});
@@ -2263,7 +2186,7 @@ TEST /// --test #25 (Frobenius on an elliptic curve)
 	----- Tests for inverseOfMap  -------
 	-------------------------------------
 
-TEST /// --test #26
+TEST /// --test #23
     -- Let's find the inverse of the projection map from
     -- the blow up of P^2 to P^2
 
@@ -2276,7 +2199,7 @@ TEST /// --test #26
     assert( (baseLocusOfMap(inverseOfMap(h)) == sub(ideal(x,y), T)) and (baseLocusOfMap(inverseOfMap(h, Strategy=>ReesStrategy)) == sub(ideal(x,y), T)) )
 ///
 
-TEST /// --test #27
+TEST /// --test #24
     R =  QQ[a..d]/(a*d - b*c);
     S = QQ[x,y,z];
     f = inverseOfMap(R, S, {a,b,c});
@@ -2284,7 +2207,7 @@ TEST /// --test #27
     assert( (isSameMap(first entries matrix f, {x^2, x*y, x*z, y*z})) and (isSameMap(first entries matrix g, {x^2, x*y, x*z, y*z})) )
 ///
 
-TEST /// --test #28 (quadratic cremona)
+TEST /// --test #25 (quadratic cremona)
     R = ZZ/11[x,y,z];
     S = ZZ/11[a,b,c];
     h = map(R, S, {y*z, x*z, x*y});
@@ -2297,7 +2220,7 @@ TEST /// --test #28 (quadratic cremona)
 ------- isEmbedding ---------------
 -----------------------------------
 
-TEST /// --test #29
+TEST /// --test #26
     -- Consider the projection map from
     -- the blow up of P^2 to P^2
 
@@ -2309,7 +2232,7 @@ TEST /// --test #29
     assert(isEmbedding(h)==false)
 ///
 
-TEST /// --test #30
+TEST /// --test #27
     --Let's do the twisted cubic curve
     P3 = ZZ/101[x,y,z,w];
     C = ZZ/101[a,b];
@@ -2317,7 +2240,7 @@ TEST /// --test #30
     assert(isEmbedding(h) == true)
 ///
 
-TEST /// --test #31
+TEST /// --test #28
      --let's parameterize the nodal plane cubic
      P2 = QQ[x,y,z]
      C = QQ[a,b]
@@ -2325,7 +2248,7 @@ TEST /// --test #31
      assert((isBirationalMap h == false) and (isBirationalOntoImage h == true) and (isEmbedding(h) == false) and (isRegularMap inverseOfMap h == false))
 ///
 
-TEST /// --test #32, map from genus 3 curve to projective space
+TEST /// --test #29, map from genus 3 curve to projective space
     needsPackage "Divisor";
     C = QQ[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
     Q = ideal(y,x+z); --a point on our curve
@@ -2339,7 +2262,7 @@ TEST /// --test #32, map from genus 3 curve to projective space
 -----------------------------------
 
 --finally we test a map between non-rational varieties
-TEST /// --test #33, maps between cones over elliptic curves and their blowups
+TEST /// --test #30, maps between cones over elliptic curves and their blowups
     --the cone over an elliptic curve lies in P3, the blowup lives in P11
     P3 = QQ[x,y,z,w];
     P11 = QQ[a_{0,0}..a_{2,3}];

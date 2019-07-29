@@ -11,6 +11,10 @@
 \providecommand{\href}[2]{#2}
 \begin{thebibliography}{HKS92}
 
+\bibitem[Boe10]{ParametrizationPackage}
+{\sc J.~Boehm}: \emph{Parametrization}, Package for Macaulay2, see
+  \url{http://www.math.uiuc.edu/Macaulay2/doc/Macaulay2-1.9.2/share/doc/Macaulay2/Parametrization/html/}.
+
 \bibitem[DHS12]{DoriaHassanzadehSimisBirationality}
 {\sc A.~V. Doria, S.~H. Hassanzadeh, and A.~Simis}: \emph{A characteristic-free
   criterion of birationality}, Adv. Math. \textbf{230} (2012), no.~1, 390--413.
@@ -26,8 +30,18 @@
   Compositio Math. \textbf{126} (2001), no.~3, 335--358. {\sf\scriptsize
   1834742}
 
+\bibitem[ST69]{SempleTyrrell}
+{\sc J.~G. Semple and J.~A. Tyrrell}: \emph{The {C}remona transformation of
+  {$S_{6}$} by quadrics through a normal elliptic septimic scroll
+  {$^{1}R^{7}$}}, Mathematika \textbf{16} (1969), 89--97. {\sf\scriptsize
+  0249431}
+
 \bibitem[Sim04]{SimisCremona}
 {\sc A.~Simis}: \emph{Cremona transformations and some related algebras}, J.
   Algebra \textbf{280} (2004), no.~1, 162--179. {\sf\scriptsize 2081926}
+
+\bibitem[Sta16]{CremonaPackage}
+{\sc G.~Staglian\`o}: \emph{Cremona}, Package for Macaulay2, see
+  \url{http://www.math.uiuc.edu/Macaulay2/doc/Macaulay2-1.9.2/share/doc/Macaulay2/Cremona/html/}.
 
 \end{thebibliography}
