@@ -159,11 +159,11 @@
 \thanks{The third named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
 \thanks{The fourth named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
 
-\maketitle
+
 \begin{abstract}
 This paper describes the {\tt RationalMaps} package for Macaulay2.  This package provides functionality for computing several aspects of rational maps.
 \end{abstract}
-
+\maketitle
 
 
 \section{Introduction}
@@ -252,7 +252,7 @@ o4 : Ideal of R
 \end{verbatim}
 }
 {\normalsize}
- If the \verb=SaturateOutput= option is set {\tt true}, our function will return the saturation of this ideal.
+If the \verb=SaturateOutput= option is set {\tt true}, our function will return the saturation of this ideal.
 
 
 \section{Birationality and Inverse Maps}
@@ -337,26 +337,30 @@ i1 : loadPackage "RationalMaps";
 i2 : Q=QQ[x,y,z,t,u];
 i3 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
 o3 : RingMap Q <--- Q
-i4 : time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, MinorsCount=>50000)
+i4 : time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false);
 Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 1}.
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 2}.
+getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 4
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 4}.
+getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 4
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 7}.
+getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 4
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 11}.
+getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 4
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 16}.
-inverseOfMapSimis:  We give up. Using all of the previous computations,
-                                  we  compute the whole Groebner basis of the rees ideal.
-                                  Increase HybridLimit and rerun to avoid this.
-inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  5 columns
-                                  and about  20 rows.
-inverseOfMapSimis: Looking for a nonzero minor
-Starting nonZeroMinor, looking for rank: 4, we will run it 50000 times.
-                                         If this is slow, rerun with MinorsCount=>0.
-nonZeroMinor: Found a nonzero minor
+inverseOfMapSimis:  We give up.  Using the previous computations, we compute the whole 
+        Groebner basis of the rees ideal.  Increase HybridLimit and rerun to avoid this.
+inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  5 columns  and about  20 rows.
+inverseOfMapSimis: Looking for a nonzero minor.
+        If this fails, you may increase the attempts with MinorsCount => #
+getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 20
+getSubmatrixOfRank: found one, in 3 attempts
 inverseOfMapSimis: We found a nonzero minor.
-     -- used 3.51586 seconds
-\end{verbatim}}}}
+     -- used 0.703125 seconds
+
+    o4 : RingMap Q <--- Q\end{verbatim}
+}}
 
 {\color{black}\normalsize
 \section{Embeddings}
@@ -368,36 +372,43 @@ Our package also checks whether a rational map $\mathfrak{F} : X \to Y$ is a clo
 \item  Finally, we check if the inverse map is also regular.
 \end{enumerate}
 If all three conditions are met, then the map is a closed embedding and the function returns {\tt true}.  Otherwise {\tt isEmbedding} returns false.
+The following exam illustrates this.  We begin with an example where we take a plane quartic, choose a point $Q$ on it and take map associated to 
+the divisor $12 Q$.  This map must be an embedding, which we now verify.
 }
 {\scriptsize
 \color{blue}\begin{verbatim}
-i1 : needspackage "divisor"; --used to quickly define a map
-i2 : c = QQ[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
-i3 : q = ideal(y,x+z); --a point on our curve
-i6 : loadpackage "rationalmaps";
-i8 : f2 = maptoprojectivespace(12*divisor(q));
-o8 : RingMap C <--- QQ[YY , YY , YY , YY , YY , YY , YY , YY , YY , YY  ]
-                         1    2    3    4    5    6    7    8    9    10
-i9 : time isEmbedding(f2)
+i1 : needsPackage "Divisor"; --used to quickly define a map
+i2 : C = ZZ/101[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
+i3 : Q = ideal(y,x+z);
+o3 : Ideal of C
+i4 : f2 = mapToProjectiveSpace(12*divisor(Q));
+                     ZZ
+o4 : RingMap C <--- ---[YY , YY , YY , YY , YY , YY , YY , YY , YY , YY  ]
+                    101   1    2    3    4    5    6    7    8    9    10
+i5 : loadPackage "RationalMaps";
+i6 : time isEmbedding(f2)
 isEmbedding: About to find the image of the map.
-If you know the image, you may want to specify that and set AssumeDominant=>true option if
-        this is slow.
+If you know the image, you may want to specify that and set AssumeDominant=>true option if this is slow.
 isEmbedding: Checking to see if the map is a regular map
 isEmbedding: computing the inverse  map
 Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 1}.
+getSubmatrixOfRank: Trying to find a submatrix of rank at least: 2 with attempts = 4
+getSubmatrixOfRank: found one, in 1 attempts
 inverseOfMapSimis: We computed enough of the Groebner basis.
-inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  3 columns  and
-        about  17 rows.
-inverseOfMapSimis: Failed to find a nonzero minor.  We now compute syzygies instead.
-        If this doesn't terminate quickly, you may want to try increasing the option MinorsCount.
+inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  3 columns  and about  17 rows.
+inverseOfMapSimis: MinorsCount => 0, so we now compute syzygies instead.
+                   If this doesn't terminate quickly, you may want to try increasing the option MinorsCount.
 isEmbedding: checking if the inverse map is a regular map
-     -- used 3.01948 seconds
-
-o9 = true
+     -- used 0.53125 seconds
+o6 = true
 \end{verbatim}
 }
-{\color{black}\normalsize
+{\color{black}\normalsize%
+\noindent
+Notice that {\tt MinorsCount => 0} by default for {\tt isEmbedding}.  This is because the expressions defining the inverse map obtained from 
+an appropriate minor frequently are more complicated than the expressions for the inverse map obtained via the syzygies.  Complicated expressions can sometimes slow down the checking of whether the inverse map is regular.  
+
 \section{Functionality overlap with other packages}
 
 We note that our package has some overlaps in functionality with other packages.
@@ -408,14 +419,14 @@ The package {\tt Cremona} \cite{CremonaPackage} focuses on very fast probabilist
 
 \begin{itemize}
 \item{}     {\tt isBirational} gives a probabilisitc answer to the question of whether a map between varieties is birational. Furthermore, if the source is projective space, then {\tt degreeOfRationalMap} with {\tt MathMode=>true} can give a deterministic answer that is frequently faster than what our package can provide with {\tt isBirationalMap}.
-\item{}  {\tt invertBirMap} gives a very fast computation of the inverse of a birational map if the source is projective space and the map has maximal linear rank. If you pass this function a map not from projective space, then it calls a modified, faster version of {\tt invertBirationalMap} originally from {\tt Parametrization}. Even in some cases with maximal linear rank, our {\tt inverseOfMap} function appears to be quite competitive however.
+\item{}  {\tt inverseMap} gives a very fast computation of the inverse of a birational map if the source is projective space and the map has maximal linear rank. If you pass this function a map not from projective space, then it calls a modified, faster version of {\tt invertBirationalMap} originally from {\tt Parametrization}. Even in some cases with maximal linear rank, our {\tt inverseOfMap} function appears to be quite competitive however.
 \end{itemize}
 
-\subsection{Speed comparisons}
+\section{Comments on speed of functions}
 \noindent
-First we do comparisons using examples with maximal linear rank where {\tt Cremona} excels.  These examples were run using version 2.0 of {\tt Cremona} and version 0.21 of {\tt RationalMaps}.
+We begin with a comparison using examples with maximal linear rank where {\tt Cremona} excels.  These examples were run using version 4.3 of {\tt Cremona} and version 0.3 of {\tt RationalMaps}.
 
-Indeed, in some of those examples with maximal linear rank, {\tt Cremona} is substantially faster.
+Indeed, in this example, {\tt Cremona} is substantially faster.
 {\scriptsize
 \color{blue}\begin{verbatim}
 i1 : loadPackage "Cremona"; loadPackage "RationalMaps";
@@ -428,70 +439,40 @@ t_6*t_14-t_5*t_15+t_4*t_16,t_11*t_13-t_16*t_17+t_15*t_18-t_14*t_19+t_12*t_20,t_3
 t_4*t_11-t_1*t_14+t_0*t_15,t_6*t_8-t_5*t_9+t_4*t_10,t_3*t_6-t_2*t_9+t_1*t_10,t_3*t_5-t_2*t_8+t_0*t_10,t_3*t_4
 -t_1*t_8+t_0*t_9,t_2*t_4-t_1*t_5+t_0*t_6});
 i5 : time inverseOfMap(phi, AssumeDominant=>true, Verbose=>false)-- Function from "RationalMaps"
-     -- used 1.12522 seconds
-i6 : time invertBirMap phi -- Function from "Cremona"
-     -- used 0.0789913 seconds
+      -- used 0.671875 seconds
+i6 : time inverseMap phi -- Function from "Cremona"
+     --  used 0.140625 seconds
 i7 : isSameMap(o5, o6) -- Function from "RationalMaps"
 o7 = true
 \end{verbatim}
 }
 {\color{black}\normalsize}
-However, sometimes our function is substantially faster even in examples with maximal linear rank.
-{\scriptsize
-\color{blue}\begin{verbatim}
-i1 : ZZ/33331[t_0..t_6];
-i2 : loadPackage "Cremona"; loadPackage "RationalMaps";
-i4 : phi=toMap minors(3,matrix{{t_0..t_4},{t_1..t_5},{t_2..t_6}});
-i5 : J=kernelComponent(phi,2);
-i6 : phi=toMap(phi,Dominant=>J);
-i7 : time inverseOfMap(phi, AssumeDominant=>true, Verbose=>false) -- Function from "RationalMaps"
-     -- used 0.126314 seconds
-i8 : time invertBirMap phi;  -- Function from "Cremona"
-     -- used 0.375856 seconds
-i9 : isSameMap(o7, o8)
-o9 = true
-\end{verbatim}}
-
+Note in the above example, increasing the option {\tt MinorSize} makes {\tt inverseOfMap} much slower. 
+However, sometimes our function is faster even in examples with maximal linear rank (even in the first example from {\tt Cremona}'s documentation).
+}
 {\color{black}\normalsize
-Note both these examples were taken directly from the documentation of {\tt Cremona}.
-On the other hand, when the source and target are  not projective space, or the map does not have maximal linear rank, in our experience, our functions appear to be faster.  Here is an example where the source and target are not projective space.
-}
-
-{\scriptsize
-\color{blue}\begin{verbatim}
-i1 : needsPackage "Divisor"; loadPackage "RationalMaps"; loadPackage("Cremona", Reload=>true);
-i5 : C = QQ[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
-i6 : Q = ideal(y,x+z); --a point on our curve
-i7 : (f3 = mapOntoImage(mapToProjectiveSpace(12*divisor(Q))););
-i8 : (time g1 = inverseOfMap(f3, Verbose=>false);); -- Function from "RationalMaps"
-     -- used 1.1996 seconds
-i9 : (time g2 = invertBirMap(f3);); -- Function from "Cremona"
-     -- used 13.7981 seconds
-i10 : (g3 = map(target g1, source g2, sub(matrix g2, target g1)););
-i11 : isSameMap(g3, g1)
-o11 = true
-\end{verbatim}
-}
-
-{\color{black}\normalsize
-We also include an example where the map does not have maximal linear rank.
+On the other hand, when the source and target are  not projective space, or the map does not have maximal linear rank, in our experience, our functions appear to be faster (although sometimes changing the options {\tt Strategy}, {\tt HybridLimit}, {\tt MinorSize} and {\tt QuickRank}, can make a large difference).  
+We include an example where the map does not have maximal linear rank.  
 }
 {\scriptsize
 \color{blue}\begin{verbatim}
-i1 : loadPackage "RationalMaps"; loadPackage "Cremona";
+i1 : loadPackage "Cremona"; loadPackage "RationalMaps"; 
 i3 : Q=QQ[x,y,z,t,u];
 i4 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
 o4 : RingMap Q <--- Q
-i5 : (time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, MinorsCount=>50000));
+i5 : (time g = inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, Verbose=>false));
      -- Function from "RationalMaps"
-     -- used 5.80638 seconds
-i9 : (time h = invertBirMap(phi)); -- Function from "Cremona"
+     -- used 0.640625 seconds
+i6 : (time h = inverseMap(phi)); -- Function from "Cremona"
      -- used 71.8998 seconds
-i10 : isSameMap(o5, h)
-o10 = true
+i7 : isSameMap(o5, h)
+o7 = true
 \end{verbatim}
 }
 {\color{black}\normalsize
+In this final example, for instance, setting {\tt MinorsCount=>0} makes {\tt inverseOfMap} very slow.
+\section{A large example}
+We conclude the paper with a large example that was communicated to us 
 \bibliographystyle{skalpha}
 \bibliography{MainBib.bib}
 }

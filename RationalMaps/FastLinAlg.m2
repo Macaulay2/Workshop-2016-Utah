@@ -51,14 +51,14 @@ export{
   "GRevLexSmallest",
   "GRevLexSmallestTerm",
   "MaxMinors",
-  "UseGRevLex",
   "Rank", --a value for Strategy in isRankAtLeast
-  "MutableSmallest", --these should be protected but not exported
-  "MutableLargest", --these should be protected but not exported
+  "MutableSmallest", --these should be protected but maybe not exported
+  "MutableLargest", --these should be protected but maybe not exported
   "Threads",
   "MinorsCache",
   --"RecursiveMinors",
   --premade stratgies
+  "Recursive",
   "StrategyDefault",
   "StrategyGRevLexSmallest",
   "StrategyLexSmallest",
@@ -107,7 +107,8 @@ optProjDim := {
     MinDimension => 0,
     Verbose => false,
     Strategy => StrategyDefault,
-    DetStrategy => Cofactor
+    DetStrategy => Cofactor,
+    MaxMinors => null
 };
 
 optIsRankAtLeast :=  {
@@ -553,6 +554,11 @@ getDetOfSubmatrix(Matrix, List) := opts -> (M2, submat) -> (
     mColListS := submat#1;
     smallestSubmatrix :=(M2^mRowListS)_mColListS;
 
+    if (opts.DetStrategy === Recursive) then (
+        J := recursiveMinors(#(submat#0), smallestSubmatrix);
+        return first first entries gens J;
+    );
+
     return determinant(smallestSubmatrix, Strategy=>opts.DetStrategy);-- take determinant
 );
 
@@ -782,6 +788,7 @@ chooseGoodMinors(ZZ, ZZ, Matrix) := opts -> (howMany, minorSize, M1) -> (
 projDim = method(Options=>optProjDim);
 
 projDim(Module) := opts -> (N1) -> (
+    if (isHomogeneous N1) then return pdim N1;
     ambRing := ring (N1);
     if (not instance(ambRing, PolynomialRing)) then error "projDim: currently this only works for modules over polynomial rings";
     myRes := resolution minimalPresentation N1;
@@ -791,7 +798,15 @@ projDim(Module) := opts -> (N1) -> (
     goodMinorsOptions := new OptionTable from {Strategy=>opts.Strategy, Verbose=>opts.Verbose, DetStrategy=>opts.DetStrategy}; --just grab the options relevant to chooseGoodMinors
     if (debugLevel > 0) or opts.Verbose then print concatenate("projDim: resolution computed!  length =", toString myLength, " rank =", toString firstRank);
     firstDiff := myDiffs_myLength;
-    theseMinors := chooseGoodMinors(firstRank*4 + 5, firstRank, firstDiff, goodMinorsOptions);
+
+    local minorsCount; --how many minors?
+    if instance(opts.MaxMinors, BasicList) then (
+        minorsCount = (opts.MaxMinors)#0;)
+    else if instance(opts.MaxMinors, ZZ) then (
+        minorsCount = opts.MaxMinors;)
+    else ( minorsCount = firstRank*4+5; );
+
+    theseMinors := chooseGoodMinors(minorsCount, firstRank, firstDiff, goodMinorsOptions);
     if (debugLevel > 0) or opts.Verbose then print concatenate("projDim: first minors computed!  minors found =", toString(#first entries gens theseMinors));
     curDim := dim theseMinors;
     if (curDim >= 0) then (return myLength);
@@ -801,7 +816,12 @@ projDim(Module) := opts -> (N1) -> (
     while (i>opts.MinDimension) and (curDim <= -1) do (
         --print concatenate("in loop: ", toString(i));
         firstRank = (rank myRes_i)-firstRank;
-        theseMinors = chooseGoodMinors(firstRank*4+5, firstRank, myDiffs_i, goodMinorsOptions);
+        if instance(opts.MaxMinors, BasicList) then (
+            minorsCount = (opts.MaxMinors)#(myLength - i); )
+        else if instance(opts.MaxMinors, ZZ) then (
+            minorsCount = opts.MaxMinors; )
+        else ( minorsCount = firstRank*4+5; );
+        theseMinors = chooseGoodMinors(minorsCount, firstRank, myDiffs_i, goodMinorsOptions);
         if (debugLevel > 0) or opts.Verbose then print concatenate("projDim: in loop, about to compute dim.  current length =", toString myLength, " rank =", toString firstRank);
         curDim = dim theseMinors;
         if (curDim >= 0) then (return i);
@@ -815,6 +835,7 @@ isRankAtLeast = method(Options => optIsRankAtLeast);
 
 isRankAtLeast(ZZ, Matrix) := opts -> (n1, M0) -> (
     if (n1 > numRows M0) or (n1 > numColumns M0) then return false;
+    if (n1 == numRows M0) and (n1 == numColumns M0) then return (rank M0 == n1);
     val := getSubmatrixOfRank(n1, M0, opts);
     if (val === null) then ( return (rank M0 >= n1); ) else return true;
 );
@@ -837,30 +858,35 @@ getSubmatrixOfRank(ZZ, Matrix) := opts -> (n1, M0) -> (
 
     internalMinorsOptions := new OptionTable from {Strategy=>opts.Strategy}; --just grab the options relevant to chooseGoodMinors
 
+    searchedSet := new MutableHashTable from {}; --used to store which ranks have already been computed
+
     if not (opts.MaxMinors === null) then (
         attempts = opts.MaxMinors;
     );
     subMatrix := null;
     val := null;
-    if (debugLevel > 0) or opts.Verbose then print ("getSubmatrixOfRank: Trying to find a submatrix of rank at least: " | toString(n1) | " with attempts = " | toString(attempts));
+    if (debugLevel > 0) or opts.Verbose then print ("getSubmatrixOfRank: Trying to find a submatrix of rank at least: " | toString(n1) | " with attempts = " | toString(attempts) | ".  DetStrategy=>" | toString(opts.DetStrategy));
     while (i < attempts)  do (
         subMatrix = internalChooseMinor(n1, ambRing, nonzeroM, M1, internalMinorsOptions++{MutableSmallest=>mutM2, MutableLargest=>mutM1});
         --if (debugLevel > 0) or opts.Verbose then print ("getSubmatrixOfRank: found subMatrix " | toString(subMatrix));
-        if (opts.DetStrategy === Rank) then (
-            mRowListS := subMatrix#0;
-            mColListS := subMatrix#1;
-            if (rank sub((M1^mRowListS)_mColListS, R1) >= n1) then (
-                if (debugLevel > 0) or opts.Verbose then print ("getSubmatrixOfRank: found one, in " | toString(i+1) | " attempts");
-                return {mRowListS, mColListS};
+        if (not (subMatrix === null)) and (not (searchedSet#?(locationToSubmatrix(subMatrix)))) then (
+            searchedSet#(locationToSubmatrix(subMatrix)) = true;
+            if (opts.DetStrategy === Rank) then (
+                mRowListS := subMatrix#0;
+                mColListS := subMatrix#1;
+                if (rank sub((M1^mRowListS)_mColListS, R1) >= n1) then (
+                    if (debugLevel > 0) or opts.Verbose then print ("getSubmatrixOfRank: found one, in " | toString(i+1) | " attempts");
+                    return {mRowListS, mColListS};
+                );
+            )
+            else if (opts.DetStrategy === null) then ( --we use a default strategy
+                val = sub(getDetOfSubmatrix(M1, subMatrix, DetStrategy=>opts.DetStrategy), R1);
+                if (not (val == 0)) then (if (debugLevel > 0) or opts.Verbose then print ("getSubmatrixOfRank: found one, in " | toString(i+1) | " attempts"); return {subMatrix#0, subMatrix#1};);
+            )
+            else ( --we use the given strategy
+                val = sub(getDetOfSubmatrix(M1, subMatrix, DetStrategy=>opts.DetStrategy), R1);
+                if (not (val == 0)) then (if (debugLevel > 0) or opts.Verbose then print ("getSubmatrixOfRank: found one, in " | toString(i+1) | " attempts"); return {subMatrix#0, subMatrix#1};);
             );
-        )
-        else if (opts.DetStrategy === null) then ( --we use a default strategy
-            val = sub(getDetOfSubmatrix(M1, subMatrix, DetStrategy=>opts.DetStrategy), R1);
-            if (not (val == 0)) then (if (debugLevel > 0) or opts.Verbose then print ("getSubmatrixOfRank: found one, in " | toString(i+1) | " attempts"); return {subMatrix#0, subMatrix#1};);
-        )
-        else ( --we use the given strategy
-            val = sub(getDetOfSubmatrix(M1, subMatrix, DetStrategy=>opts.DetStrategy), R1);
-            if (not (val == 0)) then (if (debugLevel > 0) or opts.Verbose then print ("getSubmatrixOfRank: found one, in " | toString(i+1) | " attempts"); return {subMatrix#0, subMatrix#1};);
         );
         i = i+1;
     );
@@ -1003,6 +1029,7 @@ doc ///
     Key
         chooseGoodMinors
         (chooseGoodMinors, ZZ, ZZ, Matrix)
+        [chooseGoodMinors, Verbose]
     Headline
         returns an ideal generated by interesting minors in a matrix
     Usage
@@ -1091,6 +1118,7 @@ doc ///
     Key
         isRankAtLeast
         (isRankAtLeast, ZZ, Matrix)
+        [isRankAtLeast, Verbose]
     Headline
         determines if the matrix has rank at least a number
     Usage
@@ -1119,6 +1147,7 @@ doc ///
     Key
         getSubmatrixOfRank
         (getSubmatrixOfRank, ZZ, Matrix)
+        [getSubmatrixOfRank, Verbose]
     Headline
         tries to find a submatrix of the given rank
     Usage
@@ -1149,6 +1178,7 @@ doc ///
     Key
         Rn
         (Rn, ZZ, Ring)
+        [Rn, Verbose]
     Headline
         attempts to show that the ring is regular in codimension n
     Usage
@@ -1164,7 +1194,7 @@ doc ///
     Description
         Text
             This function looks at interesting minors of the jacobian matrix to try to verify that the ring is Rn.
-            It is frequently much faster at giving an affirmative answer than computing the dimension of ideal of all minors of the jacobian.
+            It is frequently much faster at giving an affirmative answer than computing the dimension of the ideal of all minors of the Jacobian.
             We begin with a simple example which is R1, but not R2.
         Example
             R = QQ[x, y, z]/ideal(x*y-z^2);
@@ -1192,13 +1222,15 @@ doc ///
             time Rn(2, R)
             time Rn(2, R)
         Text
-            The function does works by choosing interesting looking submatrices, computing their determinants, and periodically (based on a logarithmic growth setting), computing the dimension of a subideal of the jacobian.
-            We do not recompute determinants .
+            The function works by choosing interesting looking submatrices, computing their determinants, and periodically (based on a logarithmic growth setting), computing the dimension of a subideal of the Jacobian.
             The option {\tt Verbose} can be used to see this in action.
         Example
             time Rn(2, S, Verbose=>true)
         Text
-            The maximum number of minors considered can be controlled by the option {\tt MaxMinors}.  If the user does not specify this, then the default value is given by the formula {\tt TODO}.
+            The maximum number of minors considered can be controlled by the option {\tt MaxMinors}.
+            If the user does not specify this, then the default value is given by the formula {\tt TODO}.
+            The function does not recompute determinants, so {\tt MaxMinors} is only an upper bound on the number of
+            minors computed.
         Example
             time Rn(2, S, Verbose=>true, MaxMinors=>30)
         Text
@@ -1206,7 +1238,8 @@ doc ///
             You can pass it a {\tt HashTable} specifying the strategy via the option {\tt Strategy}.  See @TO LexSmallest@ for how to construct this {\tt HashTable}.
             The default strategy is {\tt StrategyDefault}, which seems to work well on the examples we have explored.  However, caution must be taken, even in the above examples,
             certain strategies work well while others do not.  In the Abelian surface example, {\tt LexSmallest} works very well,
-            while {\tt LexSmallestTerm} does not even typically correctly identify the ring as nonsingular.
+            while {\tt LexSmallestTerm} does not even typically correctly identify the ring as nonsingular
+            (this is because of the fact that there are a small number of entries with nonzero constant terms, which are selected repeatedly).
             However, in our first example, the {\tt LexSmallestTerm} is much faster, and {\tt Random} does not perform well at all.
         Example
             StrategyCurrent#Random = 0;
@@ -1229,7 +1262,7 @@ doc ///
 
 
 document {
-    Key => {GRevLexLargest, GRevLexSmallest, GRevLexSmallestTerm, LexLargest, LexSmallest, LexSmallestTerm, Random, RandomNonzero, [chooseGoodMinors, Strategy], [getSubmatrixOfRank, Strategy], [Rn, Strategy], [isRankAtLeast, Strategy]},
+    Key => {GRevLexLargest, GRevLexSmallest, GRevLexSmallestTerm, LexLargest, LexSmallest, LexSmallestTerm, Random, RandomNonzero, [chooseGoodMinors, Strategy], [getSubmatrixOfRank, Strategy], [Rn, Strategy], [isRankAtLeast, Strategy], "StrategyCurrent", "StrategyDefault", "StrategyLexSmallest", "StrategyGRevLexSmallest", "StrategyRandom"},
     Headline => "strategies for choosing submatrices",
     "Many of the core functions of this package allow the user to fine tune the strategy of how submatrices are selected.  Different strategies yield markedly different performance or results on these examples.
     These are controlled by specifying a {\tt Strategy => } option, pointing to a {\tt HashTable}.  This HashTable should have the following keys.",
@@ -1258,8 +1291,8 @@ document {
     "This package comes with several default strategies exported to the user.",
     UL {
         {TT "StrategyDefault", ": 40% of the matrices are ", TT "LexSmallest", " and ", TT "LexSmallestTerm", " each, the remaining 20% are ", TT "Random" },
-        {TT "StrategyLex", ": 50% of the matrices are ", TT "LexSmallest", " and 50% are ", TT "LexSmallestTerm"},
-        {TT "StrategyGRevLex", ": 50% of the matrices are ", TT "GRevLexSmallest", " and 50% are ", TT "GRevLexLargest"},
+        {TT "StrategyLexSmallest", ": 50% of the matrices are ", TT "LexSmallest", " and 50% are ", TT "LexSmallestTerm"},
+        {TT "StrategyGRevLexSmallest", ": 50% of the matrices are ", TT "GRevLexSmallest", " and 50% are ", TT "GRevLexLargest"},
         {TT "StrategyRandom", ": chooses 100% random submatrices."},
     },
     "Additionally, a ", TT "MutableHashTable", " named ", TT "StrategyCurrent", " is also exported.  It begins as the default strategy, but the user can modify it."
@@ -1306,6 +1339,8 @@ doc ///
     Key
         projDim
         (projDim, Module)
+        [projDim, Verbose]
+        [projDim, MaxMinors]
     Headline
         finds an upper bound for the projective dimension of a module
     Usage
@@ -1323,7 +1358,8 @@ doc ///
             The function {\tt pdim} returns the length of a projective resolution.
             If the module passed is not Homogeneous, then the projective resolution may not be minimal and so {\tt pdim} can
             give the wrong answer.  This function {\tt projDim} tries to improve this bound
-            by considering ideals of appropriately sized minors of the resolution.  Using the option {\tt MinDimension} (default value 0)
+            by considering ideals of appropriately sized minors of the resolution (starting from the end of the resolution and working backwards).
+            Using the option {\tt MinDimension} (default value 0)
             gives a lower bound on the projective dimension, increasing it can thus improve the speed of computation.
         Example
             R = QQ[x,y];
@@ -1331,6 +1367,13 @@ doc ///
             pdim(module I)
             time projDim(module I)
             time projDim(module I, MinDimension => 1)
+        Text
+            The option MaxMinors can be used to control how many minors are computed at each step.
+            If this is not specified, the number of minors is a function of the rank of the matrix at the
+            current step of the resolution.
+            Otherwise the user can set the option {\tt MaxMinors => ZZ} to specify that a fixed integer is used for
+            each step.  Alternately, the user can set {\tt MaxMinors => List} passing a list of how many minors
+            should be computed at each step (working backwards).  TODO, give an example. 
     SeeAlso
         pdim
 ///
@@ -1374,6 +1417,36 @@ doc ///
             x > y
             y > z
             z > w
+///
+
+doc ///
+    Key
+        DetStrategy
+        Recursive
+        Rank
+        [chooseGoodMinors, DetStrategy]
+        [getSubmatrixOfRank, DetStrategy]
+        [isRankAtLeast, DetStrategy]
+        [projDim, DetStrategy]
+        [Rn, DetStrategy]
+        [RnReductionP, DetStrategy]
+    Headline
+        DetStrateg is a strategy for allowing the user to choose how determinants (or rank), is computed
+    Description
+        Text
+            Passing the option {\tt DetStrategy => Symbol} controls how certain functions compute determinants (or in some cases, rank).
+            For all methods, {\tt Bareiss}, {\tt Cofactor} and {\tt Recursive} are valid options.  The first two come included with Macaulay2,
+            the third is just a call to @TO recursiveMinors@.
+        Text
+            Additionally, for the methods {\tt getSubmatrixOfRank} and {\tt isRankAtLeast},
+            one can also pass {\tt DetStrategy} the option {\tt Rank} (the default).  Not using {\tt Rank} tells
+            the functions to check rank by computing the determinant, instead of using the internal
+            {\tt rank} function.  This is not usually recommended, but soemtimes it can be effective.
+    SeeAlso
+        recursiveMinors
+        Bareiss
+        Cofactor
+        rank
 ///
 
 TEST /// --check #0 (Rn)
