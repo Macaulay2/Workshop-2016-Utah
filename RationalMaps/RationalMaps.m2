@@ -20,10 +20,9 @@ export{
 	"isBirationalMap",
 	"idealOfImageOfMap",
 	"baseLocusOfMap",
-	--"dimImage", --probably this shouldn't be exported
 	"isRegularMap",
 	"isEmbedding",
-	"relationType",
+--	"relationType",
 	"jacobianDualMatrix",
 	"isBirationalOntoImage",
 	"inverseOfMap",
@@ -115,20 +114,26 @@ dimImage(RingMap) := (p) -> (
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 isSameDegree:=method();
 isSameDegree(BasicList):=(L)->(
-    n:=#L;
-    flag := true;
-    if n!=0 then (
-        d:=max(apply(L,zz->degree zz));
-        i := 0;
-        while ((i < n) and (flag == true)) do(
-	    if (isHomogeneous(L#i) == false) then flag = false;
-        if ((L#i) != sub(0, ring(L#i))) then (
-	        if (degree(L#i) != d) then flag = false;
-	    );
-       	i = i+1;
-        );
-    );
-    flag
+--    n:=#L;
+--    flag := true;
+--    if n!=0 then (
+--        d:=max(apply(L,zz->degree zz));
+--        i := 0;
+--        while ((i < n) and (flag == true)) do(
+--	        if (isHomogeneous(L#i) == false) then flag = false;
+--            if ((L#i) != sub(0, ring(L#i))) then (
+--	            if (degree(L#i) != d) then flag = false;
+--	        );
+--       	    i = i+1;
+--        );
+--    );
+--    flag
+--);
+--***the following code is modified from what was provided by the referee.  
+    if #L == 0 then return true; --it is true vacuously
+    R:=ring(first L);
+    d:=degree(first L);
+    all(drop(1, L), z -> ((z == 0_R) or (degree z == d) ))
 );
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -136,8 +141,8 @@ isSameDegree(BasicList):=(L)->(
 baseLocusOfMap = method(Options=>{SaturateOutput=>true});
 
 baseLocusOfMap(Matrix) := o->(L1) -> ( --L1 is a row matrix
-    if numRows L1 > 1 then error "Expected a row matrix";
-    if isSameDegree( first entries L1  )==false then error "Expected a matrix of homogenous elements of the same degree";
+    if numRows L1 > 1 then error "baseLocsOfMap: Expected a row matrix";
+    if isSameDegree( first entries L1  )==false then error "baseLocsOfMap: Expected a matrix of homogenous elements of the same degree";
 
     M:= gens ker transpose presentation image L1;
     -- this matrix gives all the "equivalent"
@@ -152,10 +157,10 @@ baseLocusOfMap(Matrix) := o->(L1) -> ( --L1 is a row matrix
 
     L:= apply(entries M, ll->ideal(ll));
     if (o.SaturateOutput == true) then (
-        saturate fold(L, plus)
+        saturate sum L
     )
     else (
-        fold(L, plus)
+        sum L
     )
 
     -- the "apply" statement makes a list of ideals; each element of the
@@ -232,7 +237,7 @@ isRegularMap(RingMap) := (ff) ->(
     elt := 0;
     i := 0;
     while ( (i < r) and (sub(L#i,RRR) == sub(0, RRR))) do (i = i+1;);
-    if (i == r) then error "Map is zero map";
+    if (i == r) then error "blowUpIdealsSaturation: Map is zero map";
     nzd1 := sub(L#i, RRR);
     Rs:=RRR[ toList(yyy_0..yyy_(r-1))];
     M1:=syz(matrix{L},Algorithm =>Homogeneous);
@@ -355,23 +360,23 @@ simisAlgebra(Ideal, Matrix,ZZ):=(a,M,m)->(
 
 
  --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- dgi:=method();
+-- dgi:=method();
  --this function computes the degeneration index of an ideal a which is the
  --number of t linear generators among the generators of a.
  --dgi measures the number of hyperPlanes which cut the variety
  -- defined by a.
 
 
- dgi(Ideal):=(a)->(
-     S := ring a;
-     n:=numgens a;
-     d:=0;
-     for i from 0 to n-1 do (
-         if (a_i != sub(0, S)) then (
-             if (degree a_i)=={1} then d=d+1
-         );
-     );
- d);
+ --dgi(Ideal):=(a)->(
+ --    S := ring a;
+ --    n:=numgens a;
+ --    d:=0;
+ --    for i from 0 to n-1 do (
+ --        if (a_i != sub(0, S)) then (
+ --            if (degree a_i)=={1} then d=d+1
+ --        );
+ --    );
+ --);
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStrategy,Verbose=>true, HybridLimit=>15, Verbose=>true});
@@ -477,7 +482,7 @@ isBirationalOntoImageSimis(RingMap) :=o->(f)->(
 
 
 isBirationalOntoImageRees(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
-    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    if isSameDegree(bm)==false then error "isBirationalOntoImageRees: Expected a list of homogenous elements of the same degree";
     R:=ring di;
     S:=ring im;
     im1 := im;
@@ -543,7 +548,7 @@ if (o.Verbose == true) then print "Starting inverseOfMapOntoImageSimis(SimisStra
        if (o.Verbose === true) then print "isBirationalOntoImageSimis: Found the image of the map.";
 
     );
-if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+if isSameDegree(bm)==false then error "isBirationalOntoImageSimis: Expected a list of homogenous elements of the same degree";
     R:=ring di;
     K:=coefficientRing R;
     S:=ring im;
@@ -766,7 +771,7 @@ inverseOfMapRees(RingMap) := o->(f)->(
     di := ideal target f;
     im := ideal source f;
     bm := first entries matrix f;
-    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    if isSameDegree(bm)==false then error "inverseOfMapRees: Expected a list of homogenous elements of the same degree";
     R:=ring di;
     K:=coefficientRing R;
     S:=ring im;
@@ -789,7 +794,7 @@ inverseOfMapRees(RingMap) := o->(f)->(
     --print "JD computed";
     jdd:=(numgens ambient Rlin1)-1;
    if (o.CheckBirational== true) then (
-    if not (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>4)) then error "The map is not birational onto its image";
+    if not (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>4)) then error "inverseOfMapRees: The map is not birational onto its image";
    );
   Inv:={};
      psi:=null;
@@ -845,7 +850,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     di := ideal target f; -- the defining ideal of the source variety
     im := ideal source f; -- the defining ideal of the target variety
     bm := first entries matrix f;     --the list defining the map from the source to target variety
-    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    if isSameDegree(bm)==false then error "inverseOfMapSimis: Expected a list of homogenous elements of the same degree";
     R:=ring di;
     K:=coefficientRing R;
     S:=ring im;
@@ -920,7 +925,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
         else (
             flag = true;
             if (o.CheckBirational == true) then (
-                if (not isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>4)) then error "The map is not birational onto its image";
+                if (not isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>4)) then error "inverseOfMapSimis: The map is not birational onto its image";
             );
         );
         secdeg=secdeg + jj;
@@ -1056,10 +1061,10 @@ isEmbedding(RingMap):= o-> (f1)->(
 
  isSameMap(RingMap, RingMap) := (f1, f2) -> (
     if (not (target f1 === target f2)) then (
-        error "The ring maps should have the same target.";
+        error "isSameMap: The ring maps should have the same target.";
     );
     if (not (source f1 === source f2)) then (
-        error "The ring maps should have the same source.";
+        error "isSameMap: The ring maps should have the same source.";
     );
     theRing := target f1;
 --    rank matrix(frac(theRing), entries ((matrix f1) || (matrix f2))) == 1
@@ -1082,7 +1087,7 @@ isEmbedding(RingMap):= o-> (f1)->(
 --list of elements = bm
 
 jacobianDualMatrix(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
-    if isSameDegree(bm)==false then error "Expected a list of homogenous elements of the same degree";
+    if isSameDegree(bm)==false then error "jacobianDualMatrix: Expected a list of homogenous elements of the same degree";
     R:=ring di;
     K:=coefficientRing R;
     S:=ring im;
@@ -1200,7 +1205,7 @@ document {
   Key => {[isBirationalMap,Verbose],
 	  [isBirationalOntoImage,Verbose],
 	   [isEmbedding, Verbose],
-	  [relationType,Verbose],
+--	  [relationType,Verbose],
 	  [inverseOfMap, Verbose],
 	  [sourceInversionFactor, Verbose]},
     Headline => "generate informative output",
@@ -1272,14 +1277,14 @@ document{
 	[isBirationalOntoImage,Strategy],
 	[jacobianDualMatrix,Strategy],
 	[isEmbedding, Strategy],
-	[relationType,Strategy],
+--	[relationType,Strategy],
 	[inverseOfMap, Strategy]
 	 },
     Headline=>" Determines the desired Strategy in each function.",
        "In sourceInversionFactor, isBirationalMap, isBirationalOntoImage,
 	    isEmbeddinga and inverseOfMap, Strategy may assumed any of three options
-	    ReesStrategy, SimisStrategy or  HybridStrategy (default). These functions as well as relationType
-	     and jacobianDualMatrix may also attain the Strategy=>SaturationStrategy or ReesStrategy (default).  ",
+	    ReesStrategy, SimisStrategy or  HybridStrategy (default). These functions as well as 
+	    jacobianDualMatrix may also attain the Strategy=>SaturationStrategy or ReesStrategy (default).  ",
 
 }
 --***************************************************************
@@ -1312,12 +1317,12 @@ doc ///
 
 --***************************************************************
 
-
+--relationType used to be valid
 doc ///
     Key
         ReesStrategy
     Headline
-        A strategy for inverseOfMap, isBirationalMap, relationType and is Embedding.
+        A strategy for inverseOfMap, isBirationalMap, and is Embedding.
     Description
     	Text
             It is a valid value for the Strategy Option for inverseOfMap (and other functions). By choosing Strategy=>ReesStrategy, the equation of the
@@ -1330,12 +1335,12 @@ doc ///
 
 ///
 --***************************************************************
-
+--relationType used to be documented here
 doc ///
     Key
         SaturationStrategy
     Headline
-        A strategy for inverseOfMap, isBirationalMap, relationType and is Embedding.
+        A strategy for inverseOfMap, isBirationalMap, isEmbedding.
     Description
     	Text
             It is a valid value for the Strategy Option for inverseOfMap (and other functions). By choosing Strategy=>SaturationStrategy,
@@ -1745,41 +1750,41 @@ doc ///
 ///
 --***************************************************************
 
-doc ///
-    Key
-        relationType
-        (relationType, Ideal,BasicList)
-        (relationType, Ideal,Ideal)
-        (relationType, Ring,Ideal)
+--doc ///
+--    Key
+--        relationType
+--        (relationType, Ideal,BasicList)
+--        (relationType, Ideal,Ideal)
+--        (relationType, Ring,Ideal)
 --	[relationType,Strategy]
 --	[relationType,Verbose]
-    Headline
-        Given an ideal in a ring this computes the maximum degree, of the new variables, of the minimal generators of the defining ideal of the associated Rees algebra.
-    Usage
-        n = relationType(I, L)
-        n = relationType(I, J)
-        n = relationType(R,J)
-    Inputs
-        I: Ideal
-            The ideal defining the base ring $R$.
-        L: List
-            The list of generators of the ideal $J$ we are forming the Rees algebra of.
-        R: Ring
-            The base ring.
-        J: Ideal
-            The ideal we are forming the Rees algebra of.
-    Outputs
-        n: ZZ
-            The maximum degree of the generators of the defining ideal of the Rees algebra.
-    Description
-        Text
-            Suppose $( g_1, \ldots, g_m ) = J \subseteq R$ is an ideal in a ring $R$.  We form the Rees algebra $R[Jt] = R[Y_1, \ldots, Y_m]/K$ where the $Y_i$ map to the $g_i$.  This function returns the maximum $Y$-degree of the generators of $K$.  For more information, see page 22 of Vasconcelos, Rees algebras, multiplicities, algorithms. Springer Monographs in Mathematics. Springer-Verlag, Berlin, 2005.
-        Example
-            R = QQ[x_0..x_8];
-            M = genericMatrix(R,x_0,3,3)
-            J = minors (2,M)
-            relationType(R,J)
-///
+--    Headline
+--        Given an ideal in a ring this computes the maximum degree, of the new variables, of the minimal generators of the defining ideal of the associated Rees algebra.
+--    Usage
+--        n = relationType(I, L)
+--        n = relationType(I, J)
+--        n = relationType(R,J)
+--    Inputs
+--        I: Ideal
+--            The ideal defining the base ring $R$.
+--        L: List
+--            The list of generators of the ideal $J$ we are forming the Rees algebra of.
+--        R: Ring
+--            The base ring.
+--        J: Ideal
+--            The ideal we are forming the Rees algebra of.
+--    Outputs
+--        n: ZZ
+--            The maximum degree of the generators of the defining ideal of the Rees algebra.
+--    Description
+--        Text
+--            Suppose $( g_1, \ldots, g_m ) = J \subseteq R$ is an ideal in a ring $R$.  We form the Rees algebra $R[Jt] = R[Y_1, \ldots, Y_m]/K$ where the $Y_i$ map to the $g_i$.  This function returns the maximum $Y$-degree of the generators of $K$.  For more information, see page 22 of Vasconcelos, Rees algebras, multiplicities, algorithms. Springer Monographs in Mathematics. Springer-Verlag, Berlin, 2005.
+--        Example
+--            R = QQ[x_0..x_8];
+--            M = genericMatrix(R,x_0,3,3)
+--            J = minors (2,M)
+--            relationType(R,J)
+--///
 --***************************************************************
 
 doc ///
