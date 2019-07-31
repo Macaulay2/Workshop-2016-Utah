@@ -879,18 +879,10 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
         barJD:=g(JD);
         --if (o.Verbose === true) then print("inverseOfMapSimis: computed barJD.");
 
-        if (giveUp == false) then(
-            if (o.QuickRank) then (
-                if (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, Verbose=>o.Verbose, MaxMinors=>2)) then (
-                    if (o.Verbose === true) then print("inverseOfMapSimis: We computed enough of the Groebner basis (QuickRank)." );
-                    flag = true;
-                );
-            )
-            else (
-                if (rank barJD >= jdd) then (
-                    if (o.Verbose === true) then print("inverseOfMapSimis: We computed enough of the Groebner basis." );
-                    flag = true;
-                );
+        if (giveUp == false) then(            
+            if (rank barJD >= jdd) then (
+                if (o.Verbose === true) then print("inverseOfMapSimis: We computed enough of the Groebner basis." );
+                flag = true;
             );
         )
         else (

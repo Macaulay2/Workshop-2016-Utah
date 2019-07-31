@@ -318,7 +318,7 @@ replaceZeros(Matrix):= Matrix => o->(M2) -> (
     n := numColumns M2;
     M2ent := flatten entries M2;
     largeDeg := 1;
-    if (#M2ent > 0) then largeDeg = max(largeDeg, sum(apply(flatten entries M2, z->degree z)));
+    if (#M2ent > 0) then largeDeg = 2*max(largeDeg, max(flatten apply(flatten entries M2, z->degree z)));
 
     largeGen := (last gens ambient ring M2)^(2*largeDeg+2);
 
