@@ -476,14 +476,52 @@ o9 = true
 In this final example, for instance, setting {\tt MinorsCount=>0} makes {\tt inverseOfMap} much slower -- approximately the same speed as corresponding command from {\tt Cremona}.
 The takeaway for the user should be that changing the options {\tt Strategy}, {\tt HybridLimit}, {\tt MinorSize} and {\tt QuickRank}, can make a large difference in performance.
 
-\section{How big can we make our examples?}
+%\section{How big can we make our examples?}
 
 We conclude with discussions of the limits of this pacakge.
 
-\begin{itemize}
-  \item{} H. Hassanzadeh {\color{red} and co-authors?} used this package to compute ...?  \cite{}
-  \item{} Ana-Maria Castravet and Zhuang He communicated to us that they used this package to compute the inverse of a rational map from $\bP^3$ to $\bP^3$.  This map was given by 4 degree 13 forms, with 485, 467, 467, and 467 terms respectively.  Computing the inverse of this map took several hours to compute, but it was successful.  As is frequently the case in Macaulay2, working over a finite field can make computations substantially faster than working over $\bQ$ (in this case, it seemed to approximately halve the computation time).  \cite{} 
-\end{itemize}
+ Work of O.~Gabber shows that if $f : \bP^n \to \bP^n$ is defined by forms of degree $d$, then its inverse can be defined by forms of degree $d^{n-1}$, \cite{}.  This bound is sharp, as the map
+    \[
+        (x_0^d : x_1 x_0^{d-1} : x_2 x_0^{d-1} - x_1^d : \dots : x_n x_0^{d-1} - x_{n-1})
+    \]
+    has inverse given by forms of degree $d^{n-1}$, see \cite{}.  Thus we might expect that this family of maps would be good to explore to see the limits of {\tt RationalMaps}.  We ran these examples with the following code.
+
+    {\scriptsize
+    \color{blue}
+    \begin{verbatim}
+    R = ZZ/101[x_0..x_n]; 
+    L = {x_0^d, x_1*x_0^(d-1)} | toList(apply(2..n, i -> (x_i*x_0^(d-1) + x_(i-1)^d))); 
+    psi = map(R, R, L);
+    time inv = inverseOfMap(psi, AssumeDominant=>true, CheckBirational=>false, Verbose=>false);
+    \end{verbatim}
+    }
+    When $n = 3$ (we are working on $\bP^3$) here is a table showing the computation time for the inverse for various $d$ at least one one system.  The degrees are those we would expect in this example (when $d = 100$, the degree of the forms in the inverse is $10000$).  Note {\tt Cremona} has nearly identical performance for these examples in $\bP^3$ ($n = 3$), but has slower as we increase the dimension.  
+    \begin{center}
+    \begin{tabular}{c|c|c|c|c|c|c|c}
+      $d$ & 5 & 10 & 20 & 40 & 60 & 80 & 100 \\ \hline
+      seconds  &  0.0625 &  0.09375 & 0.203125 &  2.10937 & 14.1406 &  43.1875 & 138.641 \\  
+    \end{tabular}
+  \end{center}
+    However, as the size o projective space increases, this becomes much slower.  Here is a table when $n = 4$.
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|c|c|c|c}
+        $d$ & 5 & 8 & 10 & 11 & 12 & 13 & 14 & 15 \\ \hline
+        seconds  &  0.125 & 1.92187 &  11.8281 &  26.9375 &   53.5156 & 106.313 &   211.484 &  396.703 \\  
+      \end{tabular}
+    \end{center}
+
+    We conclude with a table when $n = 5$.
+    \begin{center}
+      \begin{tabular}{c|c|c|c|c|c|c|c|c}
+        $d$ & 3 & 4 & 5 & 6  \\ \hline
+        seconds  &  0.3125 & 9.45312 &  335.172 &   \\  
+      \end{tabular}
+    \end{center}
+    Note the case when 
+  
+
+  Ana-Maria Castravet and Zhuang He communicated to us that they used {\tt RationalMaps} to compute the inverse of a rational map from $\bP^3$ to $\bP^3$.  This map was given by 4 degree 13 forms, with 485, 467, 467, and 467 terms respectively.  Computing the inverse of this map took several hours to compute, but it was successful.  As is frequently the case in Macaulay2, working over a finite field can make computations substantially faster than working over $\bQ$ (in this case, it seemed to approximately halve the computation time).  \cite{} 
+
 
 \bibliographystyle{skalpha}
 \bibliography{MainBib.bib}
