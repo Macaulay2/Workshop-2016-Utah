@@ -54,35 +54,47 @@ needsPackage("FastLinAlg");
 --************************************************************--
 ----------------------------------------------------------------
 
-idealOfImageOfMap = method();
+idealOfImageOfMap = method(Options=>{Verbose=>false, QuickRank=>true});
 
-idealOfImageOfMap(Ideal,Ideal,Matrix) := (a,b,f) -> (
+idealOfImageOfMap(Ideal,Ideal,Matrix) := o -> (a,b,f) -> (
 	h := map((ring a)/a, ring b ,f);
 	-- the image of f is the same as the kernel of its pullback on the
 	-- coordinate rings. h is this pullback
-        idealOfImageOfMap(h)
+        idealOfImageOfMap(h, o)
 	);
 
-idealOfImageOfMap(Ideal,Ideal,BasicList) := (a,b,g) -> (
+idealOfImageOfMap(Ideal,Ideal,BasicList) := o -> (a,b,g) -> (
 	h:=map((ring a)/a, ring b ,g);
-	idealOfImageOfMap(h)
+	idealOfImageOfMap(h, o)
 	);
 
-idealOfImageOfMap(Ring,Ring,Matrix) := (R,S,f) -> (
+idealOfImageOfMap(Ring,Ring,Matrix) := o -> (R,S,f) -> (
 	h := map(R,S,f);
-	idealOfImageOfMap(h)
+	idealOfImageOfMap(h, o)
 	);
 
-idealOfImageOfMap(Ring,Ring,BasicList) := (R,S,g) -> (
+idealOfImageOfMap(Ring,Ring,BasicList) := o -> (R,S,g) -> (
         h := map(R,S,g);
-        idealOfImageOfMap(h)
-	);
+        idealOfImageOfMap(h, o)
+);
 
-idealOfImageOfMap(RingMap) := (p) -> (
+idealOfImageOfMap(RingMap) := o -> (p) -> (
         h := map(target p, ambient source p,p);
+        --do a quick check to see if the map is injective
+        if (instance(target p, PolynomialRing)) then(
+            if (o.Verbose == true) then print "idealOfImageOfMap: checking if map is zero using rank of the jacobian";
+            jac := jacobian matrix h;
+            if (o.QuickRank >= true) then (
+               if (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>2)) then return ideal(sub(0, source p));
+            )
+            else (
+                if (rank jac >= dim source p) then return ideal(sub(0, source p));
+            );            
+            if (o.Verbose == true) then print "idealOfImageOfMap: map not injective, computing the kernel.";
+        );
         im := ker h;
-	im
-	);
+        im
+);
 
 dimImage = method();
 
@@ -951,9 +963,11 @@ inverseOfMapSimis(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
 mapOntoImage = method(); --given a map f : X -> Y, this creates the map f : X -> f(X).
 
 mapOntoImage(RingMap) := (f)->(
-        newMap := map(target f, ambient source f, matrix f);
-        kk := ker(newMap);
-        map(target newMap, (source newMap)/kk, matrix newMap)
+        S1 := ambient source f;
+        I1 := ideal source f;
+        kk := sub(idealOfImageOfMap(f), S1) + I1;
+--        newMap := map(target f, ambient source f, matrix f);        
+        map(target f, (S1)/kk, matrix f)
 
 );
 
@@ -1487,6 +1501,7 @@ doc ///
 		(idealOfImageOfMap,Ring,Ring,Matrix)
 		(idealOfImageOfMap,Ring,Ring,BasicList)
 		(idealOfImageOfMap,RingMap)
+		[idealOfImageOfMap, Verbose]
 	Headline
 		Finds defining equations for the image of a rational map between varieties or schemes
 	Usage
@@ -1987,7 +2002,10 @@ TEST /// --test #0
 	a = ideal(sub(0,R));
 	f = matrix {{u,0,v,0}};
 	im = idealOfImageOfMap(a,b,f);
-	assert (im == ideal(y,w))
+	assert (im == ideal(y,w));
+    T = QQ[x,y,z];
+    phi = map(T, T, {y*z, x*z, x*y});
+    assert(ideal(0_T) == idealOfImageOfMap(phi));
 ///
 
 TEST /// --test #1

@@ -324,7 +324,7 @@ There is yet another method for computing the Rees ideal called {\tt SaturationS
 
 Computing inverse maps is the most important functionality of this package, and is done by the function {\tt inverseOfMap}. According to \autoref{T birationality}, there are two ways to compute the inverse of a map: $(1)$ by finding any syzygy of the Jacobian dual matrix, and $(2)$ by finding a sub-matrix of $\psi$ of rank $\edim(R)-1$. Each way has its own benefits. Method $(1)$ is quite fast in many cases, however method $(2)$ is very useful if the rank of the Jacobian dual matrix  $\psi$ is relatively small compared to the degrees of the entries of $\psi$. Our function {\tt inverseOfMap} starts by using the second method and later switches to the first method if the second method didn't work.  The timing of this transition from the first method to the second method is controlled by the option {\tt MinorsCount}. Setting {\tt MinorsCount} to zero will mean that no minors are checked and the inverse map is computed just by looking at the syzygies of $\psi$.  If {\tt MinorsCount} is left as null (the default value), the program will try to make an educated guess as to how big to set this option, depending on varieties the user is working with.
 
- In addition, to improve the speed of the function {\tt inverseOfMap}, we have two other options, {\tt AssumeDominant} and {\tt CheckBirational}. If {\tt AssumeDominant} is set  to be {\tt true},  then  {\tt inverseOfMap} assumes that the map from $X$ to $Y$ is dominant and does not compute the image of the map; this is time consuming in certain cases.
+ In addition, to improve the speed of the function {\tt inverseOfMap}, we have two other options, {\tt AssumeDominant} and {\tt CheckBirational}. If {\tt AssumeDominant} is set  to be {\tt true},  then  {\tt inverseOfMap} assumes that the map from $X$ to $Y$ is dominant and does not compute the image of the map; this is time consuming in certain cases as it computes the kernel of a ring map.  However, this function goes through a call to {\tt idealOfImageOfMap} which first checks whether the ring map is injective (at least if the target is a polynomial ring) using the method described in \cite{}.
  Similarly, if {\tt CheckBirational} set {\tt false}, {\tt inverseOfMap} will  not check birationality although it still computes the Jacobian dual matrix.  The option {\tt QuickRank} is available to many functions.  At various points, the rank of a matrix is computed, and sometimes it is faster to compute the rank of an interesting looking submatrix (using the tools of the package {\tt FastLinAlg}).  Turning {\tt QuickRank} off will make showing that certain maps are birational slower, but will make showing that certain maps are \emph{not} birational faster.
 
  In general, as long as {\tt Verbose} is {\tt true}, the function will make suggestions as to how to run it more quickly.  For example.
@@ -439,7 +439,7 @@ t_4*t_11-t_1*t_14+t_0*t_15,t_6*t_8-t_5*t_9+t_4*t_10,t_3*t_6-t_2*t_9+t_1*t_10,t_3
 i5 : time inverseOfMap(phi, AssumeDominant=>true, Verbose=>false)-- Function from "RationalMaps"
       -- used 0.671875 seconds
 i6 : time inverseMap phi -- Function from "Cremona"
-     --  used 0.140625 seconds
+     --  used 0.109375 seconds
 i7 : isSameMap(o5, o6) -- Function from "RationalMaps"
 o7 = true
 \end{verbatim}
@@ -514,13 +514,13 @@ We conclude with discussions of the limits of this pacakge.
     \begin{center}
       \begin{tabular}{c|c|c|c|c|c|c|c|c}
         $d$ & 3 & 4 & 5 & 6  \\ \hline
-        seconds  &  0.3125 & 9.45312 &  335.172 &   \\  
+        seconds  &  0.3125 & 9.45312 &  335.172 &  15257.9  \\  
       \end{tabular}
     \end{center}
-    Note the case when 
+    Note the last case took more than 4 hours.
   
 
-  Ana-Maria Castravet and Zhuang He communicated to us that they used {\tt RationalMaps} to compute the inverse of a rational map from $\bP^3$ to $\bP^3$.  This map was given by 4 degree 13 forms, with 485, 467, 467, and 467 terms respectively.  Computing the inverse of this map took several hours to compute, but it was successful.  As is frequently the case in Macaulay2, working over a finite field can make computations substantially faster than working over $\bQ$ (in this case, it seemed to approximately halve the computation time).  \cite{} 
+  Finally, we mention that Ana-Maria Castravet and Zhuang He communicated to us that they used {\tt RationalMaps} to compute the inverse of a rational map from $\bP^3$ to $\bP^3$.  This map was given by 4 degree 13 forms, with 485, 467, 467, and 467 terms respectively.  Computing the inverse of this map took several hours to compute, but it was successful. % As is frequently the case in Macaulay2, working over a finite field can make computations substantially faster than working over $\bQ$ (in this case, it seemed to approximately halve the computation time).  \cite{} 
 
 
 \bibliographystyle{skalpha}
