@@ -56,8 +56,13 @@
 {\sc A.~Simis}: \emph{Cremona transformations and some related algebras}, J.
   Algebra \textbf{280} (2004), no.~1, 162--179. {\sf\scriptsize 2081926}
 
-\bibitem[Sta16]{CremonaPackage}
-{\sc G.~Staglian\`o}: \emph{Cremona}, Package for Macaulay2, see
-  \url{http://www.math.uiuc.edu/Macaulay2/doc/Macaulay2-1.9.2/share/doc/Macaulay2/Cremona/html/}.
+\bibitem[Sta]{CremonaSource}
+{\sc G.~Staglian{\`o}}: \emph{{Cremona: Some computations for rational maps
+  between projective varieties. Version~4.3}}.
+
+\bibitem[Sta18]{CremonaArticle}
+{\sc G.~Staglian{\`o}}: \emph{{A \emph{Macaulay2} package for computations with
+  rational maps}}, The Journal of Software for Algebra and Geometry \textbf{8}
+  (2018).
 
 \end{thebibliography}

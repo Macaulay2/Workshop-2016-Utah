@@ -6,48 +6,47 @@ Database file #1: MainBib.bib.bib
 Warning--missing journal name in ParametrizationPackage
 Warning--missing journal, volume, and year in ParametrizationPackage
 Warning--missing pages in ParametrizationPackage
-Warning--missing journal name in CremonaPackage
-Warning--missing journal, volume, and year in CremonaPackage
-Warning--missing pages in CremonaPackage
-You've used 10 entries,
+Warning--missing note in CremonaSource
+Warning--missing pages in CremonaArticle
+You've used 11 entries,
             2709 wiz_defined-function locations,
-            658 strings with 6621 characters,
-and the built_in function-call counts, 4028 in all, are:
-= -- 368
-> -- 164
-< -- 5
-+ -- 56
-- -- 53
-* -- 390
-:= -- 636
-add.period$ -- 10
-call.type$ -- 10
-change.case$ -- 59
-chr.to.int$ -- 10
+            663 strings with 6833 characters,
+and the built_in function-call counts, 4265 in all, are:
+= -- 387
+> -- 172
+< -- 6
++ -- 58
+- -- 55
+* -- 408
+:= -- 676
+add.period$ -- 11
+call.type$ -- 11
+change.case$ -- 64
+chr.to.int$ -- 11
 cite$ -- 16
-duplicate$ -- 167
-empty$ -- 312
-format.name$ -- 67
-if$ -- 786
+duplicate$ -- 181
+empty$ -- 332
+format.name$ -- 71
+if$ -- 831
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 20
-newline$ -- 41
-num.names$ -- 30
-pop$ -- 45
+missing$ -- 21
+newline$ -- 44
+num.names$ -- 33
+pop$ -- 54
 preamble$ -- 2
-purify$ -- 69
+purify$ -- 75
 quote$ -- 0
-skip$ -- 117
+skip$ -- 123
 stack$ -- 0
-substring$ -- 274
-swap$ -- 44
-text.length$ -- 5
-text.prefix$ -- 4
+substring$ -- 281
+swap$ -- 45
+text.length$ -- 6
+text.prefix$ -- 5
 top$ -- 0
-type$ -- 80
-warning$ -- 6
-while$ -- 43
-width$ -- 14
-write$ -- 124
-(There were 6 warnings)
+type$ -- 88
+warning$ -- 5
+while$ -- 45
+width$ -- 15
+write$ -- 132
+(There were 5 warnings)
