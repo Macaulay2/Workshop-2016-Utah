@@ -84,7 +84,7 @@ idealOfImageOfMap(RingMap) := o -> (p) -> (
         if (instance(target p, PolynomialRing)) then(
             if (o.Verbose == true) then print "idealOfImageOfMap: checking if map is zero using rank of the jacobian";
             jac := jacobian matrix h;
-            if (o.QuickRank >= true) then (
+            if (o.QuickRank == true) then (
                if (isRankAtLeast(dim source p, jac, Strategy => StrategyGRevLexSmallest, MaxMinors=>2)) then return ideal(sub(0, source p));
             )
             else (
@@ -517,7 +517,7 @@ isBirationalOntoImageRees(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
     r:=numgens ambient Rlin1;
      if (o.Verbose) then print "isBirationalOntoImageRees:  About to compute the Jacobian Dual Matrix,";
       if (o.Verbose) then print "if it is slow, run again and  set Strategy=>HybridStrategy or SimisStrategy.";
-    1/0;
+    --1/0;
     barJD:=jacobianDualMatrix(di1,im1,bm1,AssumeDominant=>true);--JacobianDual Matrix is another function in thi package
       nc:=numColumns(transpose barJD);
      nr:=numRows(transpose barJD);
@@ -1258,7 +1258,8 @@ document{
     [isBirationalOntoImage, QuickRank],
     [sourceInversionFactor, QuickRank],
     [idealOfImageOfMap, QuickRank],
-    [jacobianDualMatrix, QuickRank]
+    [jacobianDualMatrix, QuickRank],
+    [mapOntoImage, QuickRank]
     },
     Headline=>" An option for computing how rank is computed",
             "If set to true, then checking if rank is at least a certain number will be computed via the package", TT "FastLinAlg",
