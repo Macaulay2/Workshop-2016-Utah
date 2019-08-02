@@ -1305,7 +1305,7 @@ document{
     Key=>{ SaturateOutput, [baseLocusOfMap, SaturateOutput]},
     Headline =>"If false, certain functions will not saturate their output.",
     Usage =>"SaturateOutput=>b",
-    "  If SaturateOutput is true (the default), then functions will saturate their output.
+    "  If ", TT "SaturateOutput"," is ", TT "true"," (the default), then functions will saturate their output.
     Otherwise they will not.  It may be beneficial not to saturate in certain circumstances.",
 }
 --***************************************************************
@@ -1425,7 +1425,7 @@ doc ///
             true if the map is birational, false if otherwise
     Description
         Text
-            This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The target and source must be varieties, in particular their defining ideals must be prime.  Let's check that the plane quadratic cremona transformation is birational.
+            This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The target and source must be varieties, in particular their defining ideals must be prime.  Let's check that the plane quadratic cremona transformation is birational.
         Example
             R=QQ[x,y,z];
             S=QQ[a,b,c];
@@ -1486,7 +1486,7 @@ doc ///
                         true if the map is birational onto its image, false if otherwise
         Description
                 Text
-                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling isBirationalOntoImage.  The option AssumeDominant being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its defining ideals must be prime.  In the following example, the map is not birational, but it is birational onto its image.
+                        This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling {\tt isBirationalOntoImage}.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its defining ideals must be prime.  In the following example, the map is not birational, but it is birational onto its image.
                 Example
                         R=QQ[x,y];
                         S=QQ[a,b,c,d];
@@ -1558,6 +1558,8 @@ doc ///
 			a = ideal(sub(0,R));
 			f = matrix {{u,0,v,0}};
 			idealOfImageOfMap(a,b,f)
+		Text
+			This function frequently just calls {\tt ker} from Macaulay2.  However, if the target of the ring map is a polynomial ring, then it first tries to verify if the ring map is injective.  This is done by computing the rank of an appropriate jacobian matrix.
 ///
 --***************************************************************
 
@@ -1594,7 +1596,7 @@ doc ///
 			 describing the syzygies of the inverse map, if it exists.
 	Description
 		Text
-			This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the AssumeDominant option is set to true, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the Strategy option are ReesStrategy and SaturationStrategy.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390–413.
+			This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the {\tt AssumeDominant} option is set to {\tt true}, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the {\tt Strategy} option are {\tt ReesStrategy} and {\tt SaturationStrategy}.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390–413.
 		Example
                        R=QQ[x,y];
                        S=QQ[a,b,c,d];
@@ -1705,11 +1707,11 @@ doc ///
 	                isRegularMap(f)
 	                isEmbedding(f)
 	        Text
-	                If the option Verbose is set to true, the function will describe what it is doing at each step.
+	                If the option {\tt Verbose} is set to {\tt true}, the function will describe what it is doing at each step.
 	        Text
-	                If the option AssumeDominant is set to true, the function won't compute the kernel of the ring map.  Otherwise it will.
+	                If the option {\tt AssumeDominant} is set to {\tt true}, the function won't compute the kernel of the ring map.  Otherwise it will.
 	        Text
-	                The remaining options, Strategy, HybridLimit, MinorsCount, and CheckBirational are simply passed when this function calls inverseOfMap.  Note, this function, isEmbedding, will only behave properly if CheckBirational is set to true.
+	                The remaining options, {\tt Strategy}, {\tt HybridLimit}, {\tt MinorsCount}, and {\tt CheckBirational} are simply passed when this function calls {\tt inverseOfMap}.  Note, this function, {\tt isEmbedding}, will only behave properly if {\tt CheckBirational} is set to {\tt true}.
 ///
 
 --***************************************************************
@@ -1740,7 +1742,7 @@ doc ///
             The saturated defining ideal of the baselocus of the corresponding maps.
     Description
         Text
-            This defines the locus where a given map of projective varieties is not defined.  If the option SaturateOutput is set to false, the output will not be saturated.  The default value is true.  Consider the following rational map from $P^2$ to $P^1$
+            This defines the locus where a given map of projective varieties is not defined.  If the option {\tt SaturateOutput} is set to {\tt false}, the output will not be saturated.  The default value is true.  Consider the following rational map from $P^2$ to $P^1$
         Example
             R = QQ[x,y,z];
             S = QQ[a,b];
@@ -1918,9 +1920,9 @@ doc ///
         Text
             Given a map $f : X \to Y$, this finds the inverse of your birational map $f(X) \to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.
         Text
-            If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of f.
+            If {\tt AssumeDominant} is set to {\tt true} (default is {\tt false}) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of $f$.
         Text
-            The Strategy option can be set to HybridStrategy (default), SimisStrategy, ReesStrategy, or SaturationStrategy.  Note SimisStrategy will never terminate for non-birational maps. If CheckBirational is set to false (default is true), then no check for birationality will be done.  If it is set to true and the map is not birational, an error will be thrown if you are not using SimisStrategy. The option HybridLimit can weight the HybridStrategy between ReesStrategy and SimisStrategy, the default value is 15 and increasing it will weight towards SimisStrategy.
+            The {\tt Strategy} option can be set to {\tt HybridStrategy} (default), {\tt SimisStrategy}, {\tt ReesStrategy}, or {\tt SaturationStrategy}.  Note {\tt SimisStrategy} will never terminate for non-birational maps. If {\tt CheckBirational} is set to {\tt false} (default is {\tt true}), then no check for birationality will be done.  If it is set to {\tt true} and the map is not birational, an error will be thrown if you are not using {\tt SimisStrategy}. The option {\tt HybridLimit} can weight the {\tt HybridStrategy} between {\tt ReesStrategy} and {\tt SimisStrategy}, the default value is {\tt 15} and increasing it will weight towards {\tt SimisStrategy}.
         Example
             R = ZZ/7[x,y,z];
             S = ZZ/7[a,b,c];
@@ -1937,11 +1939,11 @@ doc ///
             baseLocusOfMap(g)
             baseLocusOfMap(h)
         Text
-            The next example, is a Birational map on $\mathbb{P}^4$. The default option is slower than the follwoing setting
+            The next example, is a Birational map on $\mathbb{P}^4$. 
         Example
             Q=QQ[x,y,z,t,u];
             phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
-            time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false)
+            time inverseOfMap(phi,CheckBirational=>false)
         Text
             Finally, we do an example of plane Cremona maps whose source is not minimally embedded.
         Example
@@ -1985,9 +1987,9 @@ doc ///
         Text
             Given a map $f : X \to Y$, this finds common factor among the the components of, $f^{(-1)}$ composed with $f$, which is an element of the coordinate ring of $X$ .
         Text
-            If AssumeDominant is set to true (default is false) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of f.
+            If {\tt AssumeDominant} is set to {\tt true} (default is {\tt false}) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of $f$.
         Text
-            The Strategy option can be set to HybridStrategy (default), SimisStrategy, ReesStrategy, or SaturationStrategy.  Note SimisStrategy will never terminate for non-birational maps. If CheckBirational is set to false (default is true), then no check for birationality will be done.  If it is set to true and the map is not birational, an error will be thrown if you are not using SimisStrategy. The option HybridLimit can weight the HybridStrategy between ReesStrategy and SimisStrategy, the default value is 15 and increasing it will weight towards SimisStrategy.
+            The {\tt Strategy} option can be set to {\tt HybridStrategy} (default), {\tt SimisStrategy}, {\tt ReesStrategy}, or {\tt SaturationStrategy}.  Note {\tt SimisStrategy} will never terminate for non-birational maps. If {\tt CheckBirational} is set to {\tt false} (default is {\tt true}), then no check for birationality will be done.  If it is set to {\tt true} and the map is not birational, an error will be thrown if you are not using {\tt SimisStrategy}. The option {\tt HybridLimit} can weight the {\tt HybridStrategy} between {\tt ReesStrategy} and {\tt SimisStrategy}, the default value is {\tt 15} and increasing it will weight towards {\tt SimisStrategy}.
         Example
             R = ZZ/7[x,y,z];
             S = ZZ/7[a,b,c];
