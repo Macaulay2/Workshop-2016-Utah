@@ -408,8 +408,10 @@ isBirationalMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     S:=ring im;
     im1 := im;
     if (o.AssumeDominant==false) then (
-        if (o.Verbose) then print "isBirationalMap: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant option if this is slow.";
-
+        if (o.Verbose) then (
+            print "isBirationalMap: About to find the image of the map.  If you know the image, ";
+            print "        you may want to use the AssumeDominant option if this is slow.";
+        );
         im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
         if (o.Verbose === true) then print "isBirationalMap: Found the image of the map.";
 
@@ -497,8 +499,10 @@ isBirationalOntoImageRees(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
         im1 =  im;
     )
     else (
-	 if (o.Verbose) then (print "isBirationalOntoImageRees: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant=>true  if this is slow."
-	     );
+        if (o.Verbose) then (
+            print "isBirationalOntoImageRees: About to find the image of the map.  If you know the image, ";
+            print "        you may want to use the AssumeDominant option if this is slow.";
+        );
 
         im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
     );
@@ -554,7 +558,11 @@ if (o.AssumeDominant == true) then (
     im1 =  im;
 )
 else (
-    if (o.Verbose === true) then print "isBirationalOntoImageSimis: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant=>true  if this is slow.";
+    if (o.Verbose) then (
+        print "isBirationalOntoImageSimis: About to find the image of the map.  If you know the image, ";
+        print "        you may want to use the AssumeDominant option if this is slow.";
+    );
+
     im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
     if (o.Verbose === true) then print "isBirationalOntoImageSimis: Found the image of the map.";
 );
@@ -732,9 +740,11 @@ inverseOfMapRees(RingMap) := o->(f)->(
 ---*******************
     if (o.Verbose == true) then print "Starting inverseOfMapRees(ReesStrategy or SaturationStrategy)";
     if (o.AssumeDominant == false) then (
-        if (o.Verbose === true) then print "inverseOfMapRees: About to find the image of the map.";
-	  if (o.Verbose === true) then print "If you know the image, you may want to set AssumeDominant=>true option if this is slow.";
-        f = mapOntoImage(f);
+    if (o.Verbose) then (
+        print "inverseOfMapRees: About to find the image of the map.  If you know the image, ";
+        print "        you may want to use the AssumeDominant option if this is slow.";
+    );
+              f = mapOntoImage(f);
         if (o.Verbose === true) then print "inverseOfMapRees: Found the image of the map.";
     );
     di := ideal target f;
@@ -818,7 +828,10 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     if ((o.CheckBirational == true) and (o.HybridLimit == infinity)) then print "Warning:  when using the current default SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
 
     if (o.AssumeDominant == false) then (
-        if (o.Verbose === true) then print "inverseOfMapSimis: About to find the image of the map.  If you know the image, you may want to use it and set AssumeDominant=>true if this is slow.";
+    if (o.Verbose) then (
+        print "inverseOfMapSimis: About to find the image of the map.  If you know the image, ";
+        print "        you may want to use the AssumeDominant option if this is slow.";
+    );
         f = mapOntoImage(f);
         if (o.Verbose === true) then print "inverseOfMapSimis: Found the image of the map.";
     );
@@ -1000,14 +1013,16 @@ isEmbedding(Ring, Ring, BasicList) := o-> (R1, S1, f1)->(
 isEmbedding(RingMap):= o-> (f1)->(
     f2:=null;
     if (o.AssumeDominant==false) then(
-        if (o.Verbose === true) then print "isEmbedding: About to find the image of the map.";
-	    if (o.Verbose === true) then print "If you know the image, you may want to specify that and set AssumeDominant=>true option if this is slow.";
+        if (o.Verbose) then (
+            print "isEmbedding: About to find the image of the map.  If you know the image, ";
+            print "        you may want to use the AssumeDominant option if this is slow.";
+        );        
         f2 = mapOntoImage(f1);
 	)
     else (
 	    f2=f1;
 	);
-     	if (o.Verbose === true) then print "isEmbedding: Checking to see if the map is a regular map";
+    if (o.Verbose === true) then print "isEmbedding: Checking to see if the map is a regular map";
         flag := isRegularMap(f2);
         if (flag == true) then (
 	        if (o.Verbose === true) then (print "isEmbedding: computing the inverse  map");
@@ -1123,8 +1138,10 @@ sourceInversionFactor(RingMap):=o->(f)->(
     x:=R_0;
     f2:=f;
     if (o.AssumeDominant==false) then(
-        if (o.Verbose === true) then print "sourceInversionFactor: About to find the image of the map.";
-        if (o.Verbose === true) then print "If you know the image, you may want to set AssumeDominant=>true option if this is slow.";
+    if (o.Verbose) then (
+        print "sourceInversionFactor: About to find the image of the map.  If you know the image, ";
+        print "        you may want to use the AssumeDominant option if this is slow.";
+    );
         f2 = mapOntoImage(f);
     );
 

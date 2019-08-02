@@ -335,27 +335,26 @@ i1 : loadPackage "RationalMaps";
 i2 : Q=QQ[x,y,z,t,u];
 i3 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
 o3 : RingMap Q <--- Q
-i4 : time inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false);
+i4 : time inverseOfMap(phi, CheckBirational=>false);
 Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
+inverseOfMapSimis: About to find the image of the map.  If you know the image, 
+        you may want to use the AssumeDominant option if this is slow.
+inverseOfMapSimis: Found the image of the map.
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 1}.
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 2}.
-getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 4
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 4}.
-getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 4
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 7}.
-getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 4
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 11}.
-getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 4
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 16}.
 inverseOfMapSimis:  We give up.  Using the previous computations, we compute the whole 
         Groebner basis of the rees ideal.  Increase HybridLimit and rerun to avoid this.
 inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  5 columns  and about  20 rows.
 inverseOfMapSimis: Looking for a nonzero minor.
         If this fails, you may increase the attempts with MinorsCount => #
-getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 20
-getSubmatrixOfRank: found one, in 3 attempts
+getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 10.  DetStrategy=>Rank
+getSubmatrixOfRank: found one, in 2 attempts
 inverseOfMapSimis: We found a nonzero minor.
-     -- used 0.703125 seconds
+     -- used 0.53125 seconds
 
     o4 : RingMap Q <--- Q\end{verbatim}
 }}
@@ -436,7 +435,7 @@ t_6*t_14-t_5*t_15+t_4*t_16,t_11*t_13-t_16*t_17+t_15*t_18-t_14*t_19+t_12*t_20,t_3
 +t_0*t_20,t_7*t_11-t_3*t_12+t_2*t_17-t_1*t_18+t_0*t_19,t_6*t_11-t_2*t_15+t_1*t_16,t_5*t_11-t_2*t_14+t_0*t_16,
 t_4*t_11-t_1*t_14+t_0*t_15,t_6*t_8-t_5*t_9+t_4*t_10,t_3*t_6-t_2*t_9+t_1*t_10,t_3*t_5-t_2*t_8+t_0*t_10,t_3*t_4
 -t_1*t_8+t_0*t_9,t_2*t_4-t_1*t_5+t_0*t_6});
-i5 : time inverseOfMap(phi, AssumeDominant=>true, Verbose=>false)-- Function from "RationalMaps"
+i5 : time inverseOfMap(phi, Verbose=>false)-- Function from "RationalMaps"
       -- used 1.04688 seconds
 i6 : time inverseMap phi -- Function from "Cremona"
      --  used 0.046875 seconds
@@ -459,10 +458,10 @@ i1 : loadPackage "Cremona"; loadPackage "RationalMaps";
 i3 : Q=QQ[x,y,z,t,u];
 i4 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
 o4 : RingMap Q <--- Q
-i5 : (time g = inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, Verbose=>false));
+i5 : (time g = inverseOfMap(phi, CheckBirational=>false, Verbose=>false));
      -- Function from "RationalMaps"
      -- used 0.265625 seconds
-i6 : (time f = inverseOfMap(phi, AssumeDominant=>true,CheckBirational=>false, Verbose=>false, MinorsCount=>0));
+i6 : (time f = inverseOfMap(phi, CheckBirational=>false, Verbose=>false, MinorsCount=>0));
      -- used 125.141 seconds     
 i7 : (time h = inverseMap(phi)); -- Function from "Cremona"
     -- used 141.25 seconds
@@ -480,11 +479,11 @@ The takeaway for the user should be that changing the options {\tt Strategy}, {\
 
 We conclude with discussions of the limits of this pacakge.
 
- Work of O.~Gabber shows that if $f : \bP^n \to \bP^n$ is defined by forms of degree $d$, then its inverse can be defined by forms of degree $d^{n-1}$, \cite{}.  This bound is sharp, as the map
+ Work of O.~Gabber shows that if $f : \bP^n \to \bP^n$ is defined by forms of degree $d$, then its inverse can be defined by forms of degree $d^{n-1}$, \cite{BassConnellWrightJacobianConjecture}.  This bound is sharp, as the map
     \[
         (x_0^d : x_1 x_0^{d-1} : x_2 x_0^{d-1} - x_1^d : \dots : x_n x_0^{d-1} - x_{n-1}^d)
     \]
-    has inverse given by forms of degree $d^{n-1}$, see \cite{}.  Thus we might expect that this family of maps would be good to explore to see the limits of {\tt RationalMaps}.  We ran these examples with the following code.
+    has inverse given by forms of degree $d^{n-1}$, see \cite{HassanzadehSimisBoundsOnDegreesOfBirat}.  Thus we might expect that this family of maps would be good to explore to see the limits of {\tt RationalMaps}.  We ran these examples with the following code.
 }
 {\scriptsize
 \color{blue}

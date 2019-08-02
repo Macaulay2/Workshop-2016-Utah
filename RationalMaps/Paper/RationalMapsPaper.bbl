@@ -9,7 +9,12 @@
   \href{http://www.ams.org/mathscinet-getitem?mr=#1}{#2}
 }
 \providecommand{\href}[2]{#2}
-\begin{thebibliography}{HKS92}
+\begin{thebibliography}{BCW82}
+
+\bibitem[BCW82]{BassConnellWrightJacobianConjecture}
+{\sc H.~Bass, E.~H. Connell, and D.~Wright}: \emph{The {J}acobian conjecture:
+  reduction of degree and formal expansion of the inverse}, Bull. Amer. Math.
+  Soc. (N.S.) \textbf{7} (1982), no.~2, 287--330. {\sf\scriptsize 663785}
 
 \bibitem[Boe10]{ParametrizationPackage}
 {\sc J.~Boehm}: \emph{Parametrization}, Package for Macaulay2, see
@@ -19,6 +24,11 @@
 {\sc A.~V. Doria, S.~H. Hassanzadeh, and A.~Simis}: \emph{A characteristic-free
   criterion of birationality}, Adv. Math. \textbf{230} (2012), no.~1, 390--413.
   {\sf\scriptsize 2900548}
+
+\bibitem[HS17]{HassanzadehSimisBoundsOnDegreesOfBirat}
+{\sc S.~H. Hassanzadeh and A.~Simis}: \emph{Bounds on degrees of birational
+  maps with arithmetically {C}ohen-{M}acaulay graphs}, J. Algebra \textbf{478}
+  (2017), 220--236. {\sf\scriptsize 3621670}
 
 \bibitem[HKS92]{HulekKatzSchreyer}
 {\sc K.~Hulek, S.~Katz, and F.-O. Schreyer}: \emph{Cremona transformations and
