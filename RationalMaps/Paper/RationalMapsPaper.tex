@@ -324,7 +324,7 @@ There is yet another method for computing the Rees ideal called {\tt SaturationS
 
 Computing inverse maps is the most important functionality of this package, and is done by the function {\tt inverseOfMap}. According to \autoref{T birationality}, there are two ways to compute the inverse of a map: $(1)$ by finding any syzygy of the Jacobian dual matrix, and $(2)$ by finding a sub-matrix of $\psi$ of rank $\edim(R)-1$. Each way has its own benefits. Method $(1)$ is quite fast in many cases, however method $(2)$ is very useful if the rank of the Jacobian dual matrix  $\psi$ is relatively small compared to the degrees of the entries of $\psi$. Our function {\tt inverseOfMap} starts by using the second method and later switches to the first method if the second method didn't work.  The timing of this transition from the first method to the second method is controlled by the option {\tt MinorsCount}. Setting {\tt MinorsCount} to zero will mean that no minors are checked and the inverse map is computed just by looking at the syzygies of $\psi$.  If {\tt MinorsCount} is left as null (the default value), the program will try to make an educated guess as to how big to set this option, depending on varieties the user is working with.
 
- In addition, to improve the speed of the function {\tt inverseOfMap}, we have two other options, {\tt AssumeDominant} and {\tt CheckBirational}. If {\tt AssumeDominant} is set  to be {\tt true},  then  {\tt inverseOfMap} assumes that the map from $X$ to $Y$ is dominant and does not compute the image of the map; this is time consuming in certain cases as it computes the kernel of a ring map.  However, this function goes through a call to {\tt idealOfImageOfMap} which first checks whether the ring map is injective (at least if the target is a polynomial ring) using the method described in \cite{}.
+ In addition, to improve the speed of the function {\tt inverseOfMap}, we have two other options, {\tt AssumeDominant} and {\tt CheckBirational}. If {\tt AssumeDominant} is set  to be {\tt true},  then  {\tt inverseOfMap} assumes that the map from $X$ to $Y$ is dominant and does not compute the image of the map; this is time consuming in certain cases as it computes the kernel of a ring map.  However, this function goes through a call to {\tt idealOfImageOfMap} which first checks whether the ring map is injective (at least if the target is a polynomial ring) using the method described in \cite[Proposition 1.1]{SimisTwoDifferentialThemes}. 
  Similarly, if {\tt CheckBirational} set {\tt false}, {\tt inverseOfMap} will  not check birationality although it still computes the Jacobian dual matrix.  The option {\tt QuickRank} is available to many functions.  At various points, the rank of a matrix is computed, and sometimes it is faster to compute the rank of an interesting looking submatrix (using the tools of the package {\tt FastLinAlg}).  Turning {\tt QuickRank} off will make showing that certain maps are birational slower, but will make showing that certain maps are \emph{not} birational faster.
 
  In general, as long as {\tt Verbose} is {\tt true}, the function will make suggestions as to how to run it more quickly.  For example.
@@ -437,9 +437,9 @@ t_6*t_14-t_5*t_15+t_4*t_16,t_11*t_13-t_16*t_17+t_15*t_18-t_14*t_19+t_12*t_20,t_3
 t_4*t_11-t_1*t_14+t_0*t_15,t_6*t_8-t_5*t_9+t_4*t_10,t_3*t_6-t_2*t_9+t_1*t_10,t_3*t_5-t_2*t_8+t_0*t_10,t_3*t_4
 -t_1*t_8+t_0*t_9,t_2*t_4-t_1*t_5+t_0*t_6});
 i5 : time inverseOfMap(phi, AssumeDominant=>true, Verbose=>false)-- Function from "RationalMaps"
-      -- used 0.671875 seconds
+      -- used 1.04688 seconds
 i6 : time inverseMap phi -- Function from "Cremona"
-     --  used 0.109375 seconds
+     --  used 0.046875 seconds
 i7 : isSameMap(o5, o6) -- Function from "RationalMaps"
 o7 = true
 \end{verbatim}
@@ -447,7 +447,7 @@ o7 = true
 {\color{black}\normalsize}
 Increasing the option {\tt MinorSize} makes {\tt inverseOfMap} much slower. 
 
-However, sometimes our function is faster even in examples with maximal linear rank (even in the first example from {\tt Cremona}'s documentation).
+However, sometimes the {\tt RationalMaps} function is faster, even in examples with maximal linear rank (see the first example from {\tt Cremona}'s documentation).
 }
 {\color{black}\normalsize
 %On the other hand, when the source and target are  not projective space, or the map does not have maximal linear rank.  
@@ -485,42 +485,43 @@ We conclude with discussions of the limits of this pacakge.
         (x_0^d : x_1 x_0^{d-1} : x_2 x_0^{d-1} - x_1^d : \dots : x_n x_0^{d-1} - x_{n-1}^d)
     \]
     has inverse given by forms of degree $d^{n-1}$, see \cite{}.  Thus we might expect that this family of maps would be good to explore to see the limits of {\tt RationalMaps}.  We ran these examples with the following code.
+}
+{\scriptsize
+\color{blue}
+\begin{verbatim}
+R = ZZ/101[x_0..x_n]; 
+L = {x_0^d, x_1*x_0^(d-1)} | toList(apply(2..n, i -> (x_i*x_0^(d-1) + x_(i-1)^d))); 
+psi = map(R, R, L);
+time inv = inverseOfMap(psi, AssumeDominant=>true, CheckBirational=>false, Verbose=>false);
+\end{verbatim}%
+}%
+{\color{black}\normalsize    
+When $n = 3$ (we are working on $\bP^3$) here is a table showing the computation time for the inverse for various $d$ at least one one system.  The degrees are those we would expect in this example (when $d = 100$, the degree of the forms in the inverse is $10000$).  Note {\tt Cremona} has nearly identical performance for these examples in $\bP^3$ ($n = 3$), but has slower as we increase the dimension.  
+\begin{center}
+\begin{tabular}{c|c|c|c|c|c|c|c}
+  $d$ & 5 & 10 & 20 & 40 & 60 & 80 & 100 \\ \hline
+  seconds  &  0.0625 &  0.09375 & 0.203125 &  2.10937 & 14.1406 &  43.1875 & 138.641 \\  
+\end{tabular}
+\end{center}
+However, as the size o projective space increases, this becomes much slower.  Here is a table when $n = 4$.
+\begin{center}
+  \begin{tabular}{c|c|c|c|c|c|c|c|c}
+    $d$ & 5 & 8 & 10 & 11 & 12 & 13 & 14 & 15 \\ \hline
+    seconds  &  0.125 & 1.92187 &  11.8281 &  26.9375 &   53.5156 & 106.313 &   211.484 &  396.703 \\  
+  \end{tabular}
+\end{center}
 
-    {\scriptsize
-    \color{blue}
-    \begin{verbatim}
-    R = ZZ/101[x_0..x_n]; 
-    L = {x_0^d, x_1*x_0^(d-1)} | toList(apply(2..n, i -> (x_i*x_0^(d-1) + x_(i-1)^d))); 
-    psi = map(R, R, L);
-    time inv = inverseOfMap(psi, AssumeDominant=>true, CheckBirational=>false, Verbose=>false);
-    \end{verbatim}
-    }
-    When $n = 3$ (we are working on $\bP^3$) here is a table showing the computation time for the inverse for various $d$ at least one one system.  The degrees are those we would expect in this example (when $d = 100$, the degree of the forms in the inverse is $10000$).  Note {\tt Cremona} has nearly identical performance for these examples in $\bP^3$ ($n = 3$), but has slower as we increase the dimension.  
-    \begin{center}
-    \begin{tabular}{c|c|c|c|c|c|c|c}
-      $d$ & 5 & 10 & 20 & 40 & 60 & 80 & 100 \\ \hline
-      seconds  &  0.0625 &  0.09375 & 0.203125 &  2.10937 & 14.1406 &  43.1875 & 138.641 \\  
-    \end{tabular}
-  \end{center}
-    However, as the size o projective space increases, this becomes much slower.  Here is a table when $n = 4$.
-    \begin{center}
-      \begin{tabular}{c|c|c|c|c|c|c|c|c}
-        $d$ & 5 & 8 & 10 & 11 & 12 & 13 & 14 & 15 \\ \hline
-        seconds  &  0.125 & 1.92187 &  11.8281 &  26.9375 &   53.5156 & 106.313 &   211.484 &  396.703 \\  
-      \end{tabular}
-    \end{center}
+We conclude with a table when $n = 5$.
+\begin{center}
+  \begin{tabular}{c|c|c|c|c|c|c|c|c}
+    $d$ & 3 & 4 & 5 & 6  \\ \hline
+    seconds  &  0.3125 & 9.45312 &  335.172 &  15257.9  \\  
+  \end{tabular}
+\end{center}
+Note the last case took more than 4 hours.
 
-    We conclude with a table when $n = 5$.
-    \begin{center}
-      \begin{tabular}{c|c|c|c|c|c|c|c|c}
-        $d$ & 3 & 4 & 5 & 6  \\ \hline
-        seconds  &  0.3125 & 9.45312 &  335.172 &  15257.9  \\  
-      \end{tabular}
-    \end{center}
-    Note the last case took more than 4 hours.
-  
 
-  Finally, we mention that Ana-Maria Castravet and Zhuang He communicated to us that they used {\tt RationalMaps} to compute the inverse of a rational map from $\bP^3$ to $\bP^3$.  This map was given by 4 degree 13 forms, with 485, 467, 467, and 467 terms respectively.  Computing the inverse of this map took several hours to compute, but it was successful. % As is frequently the case in Macaulay2, working over a finite field can make computations substantially faster than working over $\bQ$ (in this case, it seemed to approximately halve the computation time).  \cite{} 
+Finally, we mention that Ana-Maria Castravet and Zhuang He communicated to us that they used {\tt RationalMaps} to compute the inverse of a rational map from $\bP^3$ to $\bP^3$.  This map was given by 4 degree 13 forms, with 485, 467, 467, and 467 terms respectively.  Computing the inverse of this map took several hours to compute, but it was successful.  \cite{} % As is frequently the case in Macaulay2, working over a finite field can make computations substantially faster than working over $\bQ$ (in this case, it seemed to approximately halve the computation time).  \cite{} 
 
 
 \bibliographystyle{skalpha}

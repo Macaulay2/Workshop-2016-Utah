@@ -85,7 +85,7 @@ idealOfImageOfMap(RingMap) := o -> (p) -> (
             if (o.Verbose == true) then print "idealOfImageOfMap: checking if map is zero using rank of the jacobian";
             jac := jacobian matrix h;
             if (o.QuickRank >= true) then (
-               if (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>2)) then return ideal(sub(0, source p));
+               if (isRankAtLeast(dim source p, jac, Strategy => StrategyGRevLexSmallest, MaxMinors=>2)) then return ideal(sub(0, source p));
             )
             else (
                 if (rank jac >= dim source p) then return ideal(sub(0, source p));
@@ -410,7 +410,7 @@ isBirationalMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
     if (o.AssumeDominant==false) then (
         if (o.Verbose) then print "isBirationalMap: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant option if this is slow.";
 
-        im1 = idealOfImageOfMap(di, im, bm);
+        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
         if (o.Verbose === true) then print "isBirationalMap: Found the image of the map.";
 
         if (dim ((im1*S^1)/(im*S^1)) <= 0) then( --first check if the image is the closure of the image is even the right thing
@@ -500,7 +500,7 @@ isBirationalOntoImageRees(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
 	 if (o.Verbose) then (print "isBirationalOntoImageRees: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant=>true  if this is slow."
 	     );
 
-        im1 = idealOfImageOfMap(di, im, bm);
+        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
     );
 
     K:=coefficientRing R;
@@ -517,7 +517,7 @@ isBirationalOntoImageRees(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
     r:=numgens ambient Rlin1;
      if (o.Verbose) then print "isBirationalOntoImageRees:  About to compute the Jacobian Dual Matrix,";
       if (o.Verbose) then print "if it is slow, run again and  set Strategy=>HybridStrategy or SimisStrategy.";
-
+    1/0;
     barJD:=jacobianDualMatrix(di1,im1,bm1,AssumeDominant=>true);--JacobianDual Matrix is another function in thi package
       nc:=numColumns(transpose barJD);
      nr:=numRows(transpose barJD);
@@ -555,7 +555,7 @@ if (o.AssumeDominant == true) then (
 )
 else (
     if (o.Verbose === true) then print "isBirationalOntoImageSimis: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant=>true  if this is slow.";
-    im1 = idealOfImageOfMap(di, im, bm);
+    im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
     if (o.Verbose === true) then print "isBirationalOntoImageSimis: Found the image of the map.";
 );
 if isSameDegree(bm)==false then error "isBirationalOntoImageSimis: Expected a list of homogenous elements of the same degree";
@@ -960,25 +960,25 @@ inverseOfMapSimis(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-mapOntoImage = method(); --given a map f : X -> Y, this creates the map f : X -> f(X).
+mapOntoImage = method(Options=>{QuickRank=>true}); --given a map f : X -> Y, this creates the map f : X -> f(X).
 
-mapOntoImage(RingMap) := (f)->(
+mapOntoImage(RingMap) := o -> (f)->(
         S1 := ambient source f;
         I1 := ideal source f;
-        kk := sub(idealOfImageOfMap(f), S1) + I1;
+        kk := sub(idealOfImageOfMap(f, QuickRank=>o.QuickRank), S1) + I1;
 --        newMap := map(target f, ambient source f, matrix f);        
         map(target f, (S1)/kk, matrix f)
 
 );
 
-mapOntoImage(Ring, Ring, BasicList) := (R,S,l)->(
+mapOntoImage(Ring, Ring, BasicList) := o -> (R,S,l)->(
         newMap := map(R, ambient S, l);
-        mapOntoImage(newMap)
+        mapOntoImage(newMap, o)
 );
 
-mapOntoImage(Ideal, Ideal, BasicList) := (a,b,l)->(
+mapOntoImage(Ideal, Ideal, BasicList) := o -> (a,b,l)->(
         newMap := map((ring a)/a, (ring b)/b, l);
-        mapOntoImage(newMap)
+        mapOntoImage(newMap, o)
 );
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1055,7 +1055,7 @@ isEmbedding(RingMap):= o-> (f1)->(
 
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- jacobianDualMatrix = method(Options => {AssumeDominant=>false, Strategy=>ReesStrategy});
+ jacobianDualMatrix = method(Options => {AssumeDominant=>false, Strategy=>ReesStrategy, QuickRank=>true});
 --this the jacobian dual matrix of  a  rational map X -> Y.
 
 --X = Proj R
@@ -1076,7 +1076,7 @@ jacobianDualMatrix(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
         im1 =  im;
     )
     else (
-        im1 = idealOfImageOfMap(di, im, bm);
+        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
     );
     --In the following lines we remove the linear parts of the ideal di and
 --modify our map bm
@@ -1145,8 +1145,8 @@ sourceInversionFactor(RingMap):=o->(f)->(
 --****************************************************--
 --*****************Documentation**********************--
 --****************************************************--
-needsPackage "Parametrization";
-needsPackage "Cremona";
+--needsPackage "Parametrization";
+--needsPackage "Cremona";
 
 beginDocumentation();
 
@@ -1164,19 +1164,19 @@ document {
 	},
     BOLD "Functionality overlap with other packages:\n\n",BR{},BR{},
     BOLD "Parametrization.m2",
-      ":  While the ", TO "Parametrization", " focuses on mostly on curves, it also includes a function ", TO "invertBirationalMap", "
+      ":  While the package", TT "Parametrization", " focuses on mostly on curves, it also includes a function ", TT "invertBirationalMap", "
       which has the same functionality as ", TO "inverseOfMap", ".  On the other hand, these two functions were implemented somewhat differently and so sometimes one function can be substantially faster than the other.\n", BR{}, BR{},
     BOLD "Cremona.m2",
-    ":  The package ", TO "Cremona", " focuses on  fast probabilistic computations in general cases and  deterministic computations for special
+    ":  The package ", TT "Cremona", " focuses on  fast probabilistic computations in general cases and  deterministic computations for special
      kinds of maps from projective space.  More precisely, ",BR{},
     UL {
-        {TO "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the
-	     source is projective space, then ", TO "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer.
+        {TT "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the
+	     source is projective space, then ", TT "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer.
 	      In some cases, the speed of the latter  is comparable with ", TO "isBirationalMap", " with ", TT   "AssumeDominant=>true." },
-        {TO "invertBirMap", " gives a  fast computation of the inverse of a birational map if the source is projective space ", EM " and ",
+        {TT "inverseMap", " gives a  fast computation of the inverse of a birational map if the source is projective space ", EM " and ",
 	     "the map has maximal linear rank.   In some cases, even if the map has maximal linear rank, our function ", TO "inverseOfMap",
 	       " appears to be competitive however.  If you pass invertBirMap a map not from projective space, then it calls a modified version ",
-	      TO "invertBirationalMap", " copied from ", TO "Parametrization", "."},
+	      TT "invertBirationalMap", " from ", TT "Parametrization", "."},
     },
 }
 
@@ -1256,7 +1256,9 @@ document{
 	[inverseOfMap, QuickRank],
 	[isBirationalMap,QuickRank],
     [isBirationalOntoImage, QuickRank],
-    [sourceInversionFactor, QuickRank]
+    [sourceInversionFactor, QuickRank],
+    [idealOfImageOfMap, QuickRank],
+    [jacobianDualMatrix, QuickRank]
     },
     Headline=>" An option for computing how rank is computed",
             "If set to true, then checking if rank is at least a certain number will be computed via the package", TT "FastLinAlg",

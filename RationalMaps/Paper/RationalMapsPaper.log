@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2017.12.22)  1 AUG 2019 22:32
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2017.12.22)  1 AUG 2019 23:17
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -756,32 +756,35 @@ Overfull \hbox (2.00175pt too wide) in paragraph at lines 465--465
  []
 
 [6]
+
+LaTeX Warning: Characters dropped after `\end{verbatim}' on input line 496.
+
 :<+ RationalMapsPaper.bbl
 (c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.bbl [7])
 :<-
 [8]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 530.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 530.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 531.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 531.
  (c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 530.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 530.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 531.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 531.
 Package rerunfilecheck Info: File `RationalMapsPaper.out' has not changed.
 (rerunfilecheck)             Checksum: C336267186119E86ADF35748FD0ED4E6;419.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 530.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 531.
  ) 
 Here is how much of TeX's memory you used:
- 20352 strings out of 492985
- 349406 string characters out of 6136298
- 462873 words of memory out of 5000000
- 23306 multiletter control sequences out of 15000+600000
+ 20354 strings out of 492985
+ 349465 string characters out of 6136298
+ 462925 words of memory out of 5000000
+ 23307 multiletter control sequences out of 15000+600000
  21102 words of font info for 87 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
- 56i,12n,56p,3281b,567s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 56i,12n,56p,3281b,569s stack positions out of 5000i,500n,10000p,200000b,80000s
 <c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/euler/eufm10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/euler/eusm10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.pdf (8 pages, 304285 bytes).
+Output written on c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.pdf (8 pages, 305381 bytes).
 PDF statistics:
- 210 PDF objects out of 1000 (max. 8388607)
- 173 compressed objects within 2 object streams
- 28 named destinations out of 1000 (max. 500000)
+ 212 PDF objects out of 1000 (max. 8388607)
+ 175 compressed objects within 2 object streams
+ 29 named destinations out of 1000 (max. 500000)
  69 words of extra memory for PDF output out of 10000 (max. 10000000)
 
