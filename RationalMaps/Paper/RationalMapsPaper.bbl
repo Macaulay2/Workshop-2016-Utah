@@ -9,7 +9,7 @@
   \href{http://www.ams.org/mathscinet-getitem?mr=#1}{#2}
 }
 \providecommand{\href}[2]{#2}
-\begin{thebibliography}{BCW82}
+\begin{thebibliography}{ETPS18}
 
 \bibitem[BCW82]{BassConnellWrightJacobianConjecture}
 {\sc H.~Bass, E.~H. Connell, and D.~Wright}: \emph{The {J}acobian conjecture:
@@ -25,10 +25,23 @@
   criterion of birationality}, Adv. Math. \textbf{230} (2012), no.~1, 390--413.
   {\sf\scriptsize 2900548}
 
+\bibitem[ETPS]{ReesAlgebraSource}
+{\sc D.~Eisenbud, A.~Taylor, S.~Popescu, and M.~E. Stillman}:
+  \emph{{ReesAlgebra: A \emph{Macaulay2} package. Version~2.2}}.
+
+\bibitem[ETPS18]{ReesAlgebraArticle}
+{\sc D.~Eisenbud, A.~Taylor, S.~Popescu, and M.~E. Stillman}: \emph{{The
+  ReesAlgebra package in \emph{Macaulay2}}}, The Journal of Software for
+  Algebra and Geometry \textbf{8} (2018).
+
 \bibitem[HS17]{HassanzadehSimisBoundsOnDegreesOfBirat}
 {\sc S.~H. Hassanzadeh and A.~Simis}: \emph{Bounds on degrees of birational
   maps with arithmetically {C}ohen-{M}acaulay graphs}, J. Algebra \textbf{478}
   (2017), 220--236. {\sf\scriptsize 3621670}
+
+\bibitem[HL19]{HeYangTheMoriDreamSpacePropertyOfBlowups}
+{\sc Z.~He and Y.~Lei}: \emph{The mori dream space property of blow-ups of
+  projective spaces at points and lines}, Work in preparation.
 
 \bibitem[HKS92]{HulekKatzSchreyer}
 {\sc K.~Hulek, S.~Katz, and F.-O. Schreyer}: \emph{Cremona transformations and
