@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2017.12.22)  3 AUG 2019 17:01
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017/W32TeX) (preloaded format=pdflatex 2017.12.22)  4 AUG 2019 01:22
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -770,13 +770,13 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 532.
 Here is how much of TeX's memory you used:
  20366 strings out of 492985
  349829 string characters out of 6136298
- 463238 words of memory out of 5000000
+ 463237 words of memory out of 5000000
  23313 multiletter control sequences out of 15000+600000
  21102 words of font info for 87 fonts, out of 8000000 for 9000
  1302 hyphenation exceptions out of 8191
  56i,12n,56p,3281b,569s stack positions out of 5000i,500n,10000p,200000b,80000s
 <c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxti10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmti9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/euler/eufm10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/euler/eusm10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb><c:/texlive/2017/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.pdf (8 pages, 312145 bytes).
+Output written on c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.pdf (8 pages, 312144 bytes).
 PDF statistics:
  223 PDF objects out of 1000 (max. 8388607)
  186 compressed objects within 2 object streams

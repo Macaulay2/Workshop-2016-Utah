@@ -403,30 +403,11 @@ isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStra
 --defining ideal of Y = im
 --list of elements = bm
 isBirationalMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
-    if (o.Verbose) then (print "Starting isBirationalMap" );
     R:=ring di;
+    R2 := R/di;
     S:=ring im;
-    im1 := im;
-    if (o.AssumeDominant==false) then (
-        if (o.Verbose) then (
-            print "isBirationalMap: About to find the image of the map.  If you know the image, ";
-            print "        you may want to use the AssumeDominant option if this is slow.";
-        );
-        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
-        if (o.Verbose === true) then print "isBirationalMap: Found the image of the map.";
-
-        if (dim ((im1*S^1)/(im*S^1)) <= 0) then( --first check if the image is the closure of the image is even the right thing
-            if (o.Strategy==ReesStrategy or o.Strategy==SaturationStrategy ) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>o.Strategy, Verbose=>o.Verbose, QuickRank=>o.QuickRank))
-            else if (o.Strategy==HybridStrategy) then ( isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>HybridStrategy, HybridLimit=>o.HybridLimit,Verbose=>o.Verbose, QuickRank=>o.QuickRank))
-            else if (o.Strategy==SimisStrategy) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>SimisStrategy, Verbose=>o.Verbose, QuickRank=>o.QuickRank))
-        )
-        else(
-            false
-        )
-    )
-    else(
-        isBirationalOntoImage(di,im1,bm,AssumeDominant=>true,Strategy=>o.Strategy,Verbose=>o.Verbose, HybridLimit=>o.HybridLimit, QuickRank=>o.QuickRank)
-    )
+    ff := map(R2, S/di, apply(bm, z -> sub(z, R2)));
+    isBirationalMap(ff)
 );
 
 isBirationalMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
@@ -435,8 +416,63 @@ isBirationalMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
 
 
 isBirationalMap(RingMap) :=o->(f)->(
-    isBirationalMap(target f, source f, first entries matrix f,AssumeDominant=>o.AssumeDominant,Strategy=>o.Strategy,Verbose=>o.Verbose, HybridLimit=>o.HybridLimit,QuickRank=>o.QuickRank)
-    );
+    di := ideal target f;
+    R := ring di;
+    im := ideal source f;
+    S := ring im;
+    bm := first entries matrix f; 
+    local im1;
+    --isBirationalMap(target f, source f, first entries matrix f,AssumeDominant=>o.AssumeDominant,Strategy=>o.Strategy,Verbose=>o.Verbose, HybridLimit=>o.HybridLimit,QuickRank=>o.QuickRank)
+    if (o.AssumeDominant==false) then (
+        if (o.Verbose) then (
+            print "isBirationalMap: About to find the image of the map.  If you know the image, ";
+            print "        you may want to use the AssumeDominant option if this is slow.";
+        );
+--        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
+        if (instance(target f, PolynomialRing)) then(
+            if (o.Verbose == true) then print "isBirationalMap: initial birationality via rank of the jacobian";
+            jac := jacobian matrix f;
+            local rk;
+            fSourceDim := dim source f;
+            if (o.QuickRank == true) then (
+                l1 := getSubmatrixOfRank(fSourceDim, jac, Strategy => StrategyGRevLexSmallest, MaxMinors=>2);
+                if (l1 === null) then (
+                    rk = rank jac;
+                )
+                else (
+                    rk = fSourceDim;
+                );
+            )
+            else (
+                rk = rank jac;
+            );
+            if (o.Verbose == true) then print("isBirationalMap: jac rank = " | toString(rk) | ".  sourceDim = " | fSourceDim);
+            if (rk == fSourceDim) then (im1 = im) else (
+                if (char S == 0) then print (
+                    if (o.Verbose === true) then print "isBirationalMap: the dimension is wrong, not birational.";
+                    return false;)
+                else (im1 = im + sub(ker f, S));
+            ); 
+        )
+        else (
+            im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
+        );
+        if (o.Verbose === true) then print "isBirationalMap: Found the image of the map.";
+
+        if (dim (S^1/im1) >= dim (source f)) then( --first check if the image is the closure of the image is even the right thing
+            if (o.Strategy==ReesStrategy or o.Strategy==SaturationStrategy ) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>o.Strategy, Verbose=>o.Verbose, QuickRank=>o.QuickRank))
+            else if (o.Strategy==HybridStrategy) then ( isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>HybridStrategy, HybridLimit=>o.HybridLimit,Verbose=>o.Verbose, QuickRank=>o.QuickRank))
+            else if (o.Strategy==SimisStrategy) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>SimisStrategy, Verbose=>o.Verbose, QuickRank=>o.QuickRank))
+        )
+        else(
+            if (o.Verbose === true) then print "isBirationalMap: the dimension is really wrong, not birational.";
+            false
+        )
+    )
+    else(
+        isBirationalOntoImage(di,im1,bm,AssumeDominant=>true,Strategy=>o.Strategy,Verbose=>o.Verbose, HybridLimit=>o.HybridLimit, QuickRank=>o.QuickRank)
+    )
+);
 
   --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
