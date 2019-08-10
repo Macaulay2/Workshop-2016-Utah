@@ -474,14 +474,13 @@ o9 = true
 \end{verbatim}
 }
 {\color{black}\normalsize
-In this final example, for instance, setting {\tt MinorsCount=>0} makes {\tt inverseOfMap} much slower -- approximately the same speed as corresponding command from {\tt Cremona}.
+In the previous example, setting {\tt MinorsCount=>0} makes {\tt inverseOfMap} much slower -- approximately the same speed as corresponding command from {\tt Cremona}.
 The takeaway for the user should be that changing the options {\tt Strategy}, {\tt HybridLimit}, {\tt MinorSize} and {\tt QuickRank}, can make a large difference in performance.
 
 %\section{How big can we make our examples?}
 
 We conclude with discussions of the limits of this pacakge.
-
- Work of O.~Gabber shows that if $f : \bP^n \to \bP^n$ is defined by forms of degree $d$, then its inverse can be defined by forms of degree $d^{n-1}$, \cite{BassConnellWrightJacobianConjecture}.  This bound is sharp, as the map
+Work of O.~Gabber shows that if $f : \bP^n \to \bP^n$ is defined by forms of degree $d$, then its inverse can be defined by forms of degree $d^{n-1}$, \cite{BassConnellWrightJacobianConjecture}.  This bound is sharp, as the map
     \[
         (x_0^d : x_1 x_0^{d-1} : x_2 x_0^{d-1} - x_1^d : \dots : x_n x_0^{d-1} - x_{n-1}^d)
     \]
