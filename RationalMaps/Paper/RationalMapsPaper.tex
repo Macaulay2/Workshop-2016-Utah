@@ -337,7 +337,7 @@ i3 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
 o3 : RingMap Q <--- Q
 i4 : time inverseOfMap(phi, CheckBirational=>false);
 Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
-inverseOfMapSimis: About to find the image of the map.  If you know the image,
+inverseOfMapSimis: About to find the image of the map.  If you know the image, 
         you may want to use the AssumeDominant option if this is slow.
 inverseOfMapSimis: Found the image of the map.
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 1}.
@@ -346,7 +346,7 @@ inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to 
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 7}.
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 11}.
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 16}.
-inverseOfMapSimis:  We give up.  Using the previous computations, we compute the whole
+inverseOfMapSimis:  We give up.  Using the previous computations, we compute the whole 
         Groebner basis of the rees ideal.  Increase HybridLimit and rerun to avoid this.
 inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  5 columns  and about  20 rows.
 inverseOfMapSimis: Looking for a nonzero minor.
@@ -354,7 +354,7 @@ inverseOfMapSimis: Looking for a nonzero minor.
 getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 10.  DetStrategy=>Rank
 getSubmatrixOfRank: found one, in 2 attempts
 inverseOfMapSimis: We found a nonzero minor.
-     -- used 0.53125 seconds
+     -- used 0.40625 seconds
 
     o4 : RingMap Q <--- Q\end{verbatim}
 }}
@@ -384,20 +384,19 @@ o4 : RingMap C <--- ---[YY , YY , YY , YY , YY , YY , YY , YY , YY , YY  ]
                     101   1    2    3    4    5    6    7    8    9    10
 i5 : loadPackage "RationalMaps";
 i6 : time isEmbedding(f2)
-isEmbedding: About to find the image of the map.
-If you know the image, you may want to specify that and set AssumeDominant=>true option if this is slow.
+isEmbedding: About to find the image of the map.  If you know the image, 
+        you may want to use the AssumeDominant option if this is slow.
 isEmbedding: Checking to see if the map is a regular map
 isEmbedding: computing the inverse  map
 Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
 inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 1}.
-getSubmatrixOfRank: Trying to find a submatrix of rank at least: 2 with attempts = 4
-getSubmatrixOfRank: found one, in 1 attempts
+inverseOfMapSimis: About to check rank, if this is very slow, you may try turning QuickRank=>false.
 inverseOfMapSimis: We computed enough of the Groebner basis.
 inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  3 columns  and about  17 rows.
 inverseOfMapSimis: MinorsCount => 0, so we now compute syzygies instead.
                    If this doesn't terminate quickly, you may want to try increasing the option MinorsCount.
 isEmbedding: checking if the inverse map is a regular map
-     -- used 0.53125 seconds
+     -- used 0.265625 seconds
 o6 = true
 \end{verbatim}
 }
@@ -438,9 +437,9 @@ t_6*t_14-t_5*t_15+t_4*t_16,t_11*t_13-t_16*t_17+t_15*t_18-t_14*t_19+t_12*t_20,t_3
 t_4*t_11-t_1*t_14+t_0*t_15,t_6*t_8-t_5*t_9+t_4*t_10,t_3*t_6-t_2*t_9+t_1*t_10,t_3*t_5-t_2*t_8+t_0*t_10,t_3*t_4
 -t_1*t_8+t_0*t_9,t_2*t_4-t_1*t_5+t_0*t_6});
 i5 : time inverseOfMap(phi, Verbose=>false)-- Function from "RationalMaps"
-      -- used  1.78125 seconds
+      -- used 0.234375 seconds
 i6 : time inverseMap phi -- Function from "Cremona"
-     --  used 0.140625 seconds
+     --  used 0.0625 seconds
 i7 : isSameMap(o5, o6) -- Function from "RationalMaps"
 o7 = true
 \end{verbatim}
@@ -460,13 +459,13 @@ i1 : loadPackage "Cremona"; loadPackage "RationalMaps";
 i3 : Q=QQ[x,y,z,t,u];
 i4 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
 o4 : RingMap Q <--- Q
-i5 : (time g = inverseOfMap(phi, CheckBirational=>false, Verbose=>false));
+i5 : (time g = inverseOfMap(phi, Verbose=>false));
      -- Function from "RationalMaps"
-     -- used 0.265625 seconds
-i6 : (time f = inverseOfMap(phi, CheckBirational=>false, Verbose=>false, MinorsCount=>0));
+     -- used 0.375 seconds
+i6 : (time f = inverseOfMap(phi, Verbose=>false, MinorsCount=>0));
      -- used 125.141 seconds
 i7 : (time h = inverseMap(phi)); -- Function from "Cremona"
-    -- used 141.25 seconds
+    -- used 122.516 seconds
 i8 : isSameMap(f, h)
 o8 = true
 i9 : isSameMap(g, h)

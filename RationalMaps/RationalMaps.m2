@@ -81,20 +81,20 @@ idealOfImageOfMap(Ring,Ring,BasicList) := o -> (R,S,g) -> (
 );
 
 idealOfImageOfMap(RingMap) := o -> (p) -> (
-        h := map(target p, ambient source p,p);
+        --h := map(target p, ambient source p,p);
         --do a quick check to see if the map is injective
         if (instance(target p, PolynomialRing)) then(
             if (o.Verbose == true) then print "idealOfImageOfMap: checking if map is zero using rank of the jacobian";
-            jac := jacobian matrix h;
+            jac := jacobian matrix p;
             if (o.QuickRank == true) then (
-               if (isRankAtLeast(dim source p, jac, Strategy => StrategyGRevLexSmallest, MaxMinors=>2)) then return ideal(sub(0, source p));
+               if (isRankAtLeast(dim source p, jac, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>2)) then return ideal(sub(0, source p));
             )
             else (
                 if (rank jac >= dim source p) then return ideal(sub(0, source p));
             );            
             if (o.Verbose == true) then print "idealOfImageOfMap: map not injective, computing the kernel.";
         );
-        im := ker h;
+        im := ker p;
         im
 );
 
@@ -393,7 +393,7 @@ simisAlgebra(Ideal, Matrix,ZZ):=(a,M,m)->(
  --);
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStrategy,Verbose=>true, HybridLimit=>15, Verbose=>true, QuickRank=>true});
+isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStrategy,MinorsCount=>null, Verbose=>true, HybridLimit=>15, Verbose=>true, QuickRank=>true});
 
 --this checks whether a map X -> Y is birational.
 
@@ -437,7 +437,7 @@ isBirationalMap(RingMap) :=o->(f)->(
             local rk;
             fSourceDim := dim source f;
             if (o.QuickRank == true) then (
-                l1 := getSubmatrixOfRank(fSourceDim, jac, Strategy => StrategyGRevLexSmallest, MaxMinors=>2);
+                l1 := getSubmatrixOfRank(fSourceDim, jac, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>2);
                 if (l1 === null) then (
                     rk = rank jac;
                 )
@@ -462,9 +462,9 @@ isBirationalMap(RingMap) :=o->(f)->(
         if (o.Verbose === true) then print "isBirationalMap: Found the image of the map.";
 
         if (dim (S^1/im1) >= dim (source f)) then( --first check if the image is the closure of the image is even the right thing
-            if (o.Strategy==ReesStrategy or o.Strategy==SaturationStrategy ) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>o.Strategy, Verbose=>o.Verbose, QuickRank=>o.QuickRank))
-            else if (o.Strategy==HybridStrategy) then ( isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>HybridStrategy, HybridLimit=>o.HybridLimit,Verbose=>o.Verbose, QuickRank=>o.QuickRank))
-            else if (o.Strategy==SimisStrategy) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, Strategy=>SimisStrategy, Verbose=>o.Verbose, QuickRank=>o.QuickRank))
+            if (o.Strategy==ReesStrategy or o.Strategy==SaturationStrategy ) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, MinorsCount=>o.MinorsCount, Strategy=>o.Strategy, Verbose=>o.Verbose, QuickRank=>o.QuickRank))
+            else if (o.Strategy==HybridStrategy) then ( isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, MinorsCount=>o.MinorsCount, Strategy=>HybridStrategy, HybridLimit=>o.HybridLimit,Verbose=>o.Verbose, QuickRank=>o.QuickRank))
+            else if (o.Strategy==SimisStrategy) then (isBirationalOntoImage(di,im1,bm,AssumeDominant=>true, MinorsCount=>o.MinorsCount, Strategy=>SimisStrategy, Verbose=>o.Verbose, QuickRank=>o.QuickRank))
         )
         else(
             if (o.Verbose === true) then print "isBirationalMap: the dimension is really wrong, not birational.";
@@ -472,16 +472,16 @@ isBirationalMap(RingMap) :=o->(f)->(
         )
     )
     else(
-        isBirationalOntoImage(di,im1,bm,AssumeDominant=>true,Strategy=>o.Strategy,Verbose=>o.Verbose, HybridLimit=>o.HybridLimit, QuickRank=>o.QuickRank)
+        isBirationalOntoImage(di,im1,bm,AssumeDominant=>true,Strategy=>o.Strategy,Verbose=>o.Verbose, MinorsCount=>o.MinorsCount, HybridLimit=>o.HybridLimit, QuickRank=>o.QuickRank)
     )
 );
 
   --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-isBirationalOntoImage = method(Options => {AssumeDominant=>false, Strategy=>HybridStrategy,Verbose=>true, HybridLimit=>15, QuickRank=>true});
+isBirationalOntoImage = method(Options => {AssumeDominant=>false, MinorsCount => null, Strategy=>HybridStrategy,Verbose=>true, HybridLimit=>15, QuickRank=>true});
 --if AssumeDominant is true, it doesn't form the kernel.
-isBirationalOntoImageRees := method(Options => {AssumeDominant=>false,  Strategy=>ReesStrategy,Verbose=>true, QuickRank=>true});
- isBirationalOntoImageSimis := method(Options => {AssumeDominant=>false,  HybridLimit=>15,Verbose=>true, QuickRank=>true});
+isBirationalOntoImageRees := method(Options => {AssumeDominant=>false, MinorsCount => null, Strategy=>ReesStrategy,Verbose=>true, QuickRank=>true});
+ isBirationalOntoImageSimis := method(Options => {AssumeDominant=>false, MinorsCount=> null, HybridLimit=>15,Verbose=>true, QuickRank=>true});
 
 
 --*****************************Strategies
@@ -572,7 +572,7 @@ isBirationalOntoImageRees(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
 
     --not(isSubset(minors(jdd,barJD),im1))
     if (o.QuickRank == true) then (
-        isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>2)
+        isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>2)
     )
     else (
         rank barJD >= jdd
@@ -589,22 +589,22 @@ isBirationalOntoImageSimis(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
 --    map(source f, target f, invList)
 --    inverseOfMap(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
 ---*******************
-if (o.Verbose == true) then print "Starting inverseOfMapOntoImageSimis(SimisStrategy or HybridStrategy)";
+    if (o.Verbose == true) then print "Starting inverseOfMapOntoImageSimis(SimisStrategy or HybridStrategy)";
 
-im1 := im;
-if (o.AssumeDominant == true) then (
-    im1 =  im;
-)
-else (
-    if (o.Verbose) then (
-        print "isBirationalOntoImageSimis: About to find the image of the map.  If you know the image, ";
-        print "        you may want to use the AssumeDominant option if this is slow.";
+    im1 := im;
+    if (o.AssumeDominant == true) then (
+        im1 =  im;
+    )
+    else (
+        if (o.Verbose) then (
+            print "isBirationalOntoImageSimis: About to find the image of the map.  If you know the image, ";
+            print "        you may want to use the AssumeDominant option if this is slow.";
+        );
+
+        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
+        if (o.Verbose === true) then print "isBirationalOntoImageSimis: Found the image of the map.";
     );
-
-    im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
-    if (o.Verbose === true) then print "isBirationalOntoImageSimis: Found the image of the map.";
-);
-if isSameDegree(bm)==false then error "isBirationalOntoImageSimis: Expected a list of homogenous elements of the same degree";
+    if isSameDegree(bm)==false then error "isBirationalOntoImageSimis: Expected a list of homogenous elements of the same degree";
     R:=ring di;
     K:=coefficientRing R;
     S:=ring im;
@@ -622,6 +622,21 @@ if isSameDegree(bm)==false then error "isBirationalOntoImageSimis: Expected a li
     r:=numgens ambient Rlin1;
     jdd:=(numgens ambient Rlin1)-1;
     --THe following is a part of simisAlgebra
+    minorsCt := o.MinorsCount;
+    if (o.MinorsCount === null) then ( --if the user didn't specify MinorsCount, we make some educated guesses
+        if (jdd < 6) then(
+            minorsCt = 3;
+        )
+        else if (jdd < 9) then (
+            minorsCt = 2;
+        )
+        else if (jdd < 12) then (
+            minorsCt = 1;
+        )
+        else (
+            minorsCt = 0;
+        );
+    );
     rs:=length  bm1;
     SS:=ring di1;
     LL:=apply(bm1,uu->sub(uu, SS));
@@ -674,7 +689,7 @@ if isSameDegree(bm)==false then error "isBirationalOntoImageSimis: Expected a li
         if (giveUp == false) then(
             if (o.Verbose === true) then print "isBirationalOntoImageSimis: is computing the rank of the  Jacobian Dual Matrix- barJD";
             if (o.QuickRank == true) then (
-                if (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>2, Verbose=>o.Verbose)) then (
+                if (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>minorsCt, Verbose=>o.Verbose)) then (
                     flag=true;
                     giveUp=true;
                 );
@@ -691,7 +706,7 @@ if isSameDegree(bm)==false then error "isBirationalOntoImageSimis: Expected a li
                             );
             if (o.Verbose === true) then print "isBirationalOntoImageSimis: is computing the rank of the  Jacobian Dual Matrix- barJD";
             if (o.QuickRank == true) then (
-                if (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>2, Verbose=>o.Verbose)) then (
+                if (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>minorsCt, Verbose=>o.Verbose)) then (
                     flag = true;
                     giveUp=true;
                 );
@@ -778,11 +793,11 @@ inverseOfMapRees(RingMap) := o->(f)->(
 ---*******************
     if (o.Verbose == true) then print "Starting inverseOfMapRees(ReesStrategy or SaturationStrategy)";
     if (o.AssumeDominant == false) then (
-    if (o.Verbose) then (
-        print "inverseOfMapRees: About to find the image of the map.  If you know the image, ";
-        print "        you may want to use the AssumeDominant option if this is slow.";
-    );
-              f = mapOntoImage(f);
+        if (o.Verbose) then (
+            print "inverseOfMapRees: About to find the image of the map.  If you know the image, ";
+            print "        you may want to use the AssumeDominant option if this is slow.";
+        );
+        f = mapOntoImage(f);
         if (o.Verbose === true) then print "inverseOfMapRees: Found the image of the map.";
     );
     di := ideal target f;
@@ -812,7 +827,7 @@ inverseOfMapRees(RingMap) := o->(f)->(
     jdd:=(numgens ambient Rlin1)-1;
     if (o.CheckBirational== true) then (
         if (o.QuickRank) then (
-            if not (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>2, Verbose=>o.Verbose)) then error "inverseOfMapRees: The map is not birational onto its image";
+            if not (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>2, Verbose=>o.Verbose)) then error "inverseOfMapRees: The map is not birational onto its image";
         )
         else (
             if not (rank barJD >= jdd) then error "inverseOfMapRees: The map is not birational onto its image";
@@ -866,10 +881,10 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     if ((o.CheckBirational == true) and (o.HybridLimit == infinity)) then print "Warning:  when using the current default SimisStrategy, the map must be birational.  If the map is not birational, this function will never terminate.";
 
     if (o.AssumeDominant == false) then (
-    if (o.Verbose) then (
-        print "inverseOfMapSimis: About to find the image of the map.  If you know the image, ";
-        print "        you may want to use the AssumeDominant option if this is slow.";
-    );
+        if (o.Verbose) then (
+            print "inverseOfMapSimis: About to find the image of the map.  If you know the image, ";
+            print "        you may want to use the AssumeDominant option if this is slow.";
+        );
         f = mapOntoImage(f);
         if (o.Verbose === true) then print "inverseOfMapSimis: Found the image of the map.";
     );
@@ -944,16 +959,24 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
 
         if (giveUp == false) then(            
             --if (rank barJD >= jdd) then (
-            if (isRankAtLeast(jdd, barJD, MaxMinors=>opts.MinorsCount, MStrategy=>StrategyGRevLexSmallestTerm) then (
-                if (o.Verbose === true) then print("inverseOfMapSimis: We computed enough of the Groebner basis." );
-                flag = true;
+            if (o.QuickRank == true) then (
+                if (o.Verbose === true) then print("inverseOfMapSimis: About to check rank, if this is very slow, you may try turning QuickRank=>false." );
+                if (isRankAtLeast(jdd, barJD, MaxMinors=>min(2, o.MinorsCount), Strategy=>StrategyGRevLexSmallestTerm)) then (
+                    if (o.Verbose === true) then print("inverseOfMapSimis: We computed enough of the Groebner basis." );
+                    flag = true;
+                );
+            )
+            else (
+                if (rank barJD >= jdd) then (
+                    flag = true;
+                );
             );
         )
         else (
             flag = true;
             if (o.CheckBirational == true) then (
                 if (o.QuickRank) then (
-                    if (not isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallest, MaxMinors=>2, Verbose=>o.Verbose)) then error "inverseOfMapSimis: The map is not birational onto its image";
+                    if (not isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>min(2, o.MinorsCount), Verbose=>o.Verbose)) then error "inverseOfMapSimis: The map is not birational onto its image";
                 )
                 else(
                     if (not (rank barJD >= jdd)) then error "inverseOfMapSimis: The map is not birational onto its image";
@@ -1015,12 +1038,19 @@ inverseOfMapSimis(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
 mapOntoImage = method(Options=>{QuickRank=>true}); --given a map f : X -> Y, this creates the map f : X -> f(X).
 
 mapOntoImage(RingMap) := o -> (f)->(
-        S1 := ambient source f;
-        I1 := ideal source f;
-        kk := sub(idealOfImageOfMap(f, QuickRank=>o.QuickRank), S1) + I1;
+    S1 := ambient source f;
+    R1 := source f;
+    I1 := ideal source f;
+    local kk;
+    JJ := idealOfImageOfMap(f, QuickRank=>o.QuickRank);
+    if ( JJ == ideal(sub(0, R1)) ) then (
+        return f;
+    )
+    else (
+        kk = JJ + I1;
+    );
 --        newMap := map(target f, ambient source f, matrix f);        
-        map(target f, (S1)/kk, matrix f)
-
+    map(target f, (S1)/kk, matrix f)
 );
 
 mapOntoImage(Ring, Ring, BasicList) := o -> (R,S,l)->(
@@ -1295,7 +1325,9 @@ document{
 document{
     Key=>{MinorsCount, [isEmbedding, MinorsCount],
 	[inverseOfMap, MinorsCount],
-	[sourceInversionFactor,MinorsCount] },
+	[sourceInversionFactor,MinorsCount], 
+    [isBirationalOntoImage, MinorsCount],
+    [isBirationalMap, MinorsCount] },
     Headline=>" An option controlling the behavior of isBirational and inverseOfMap
      (and other functions which call those).",
             "One of the ways to invert a map is to find a nonzero minor of a variant of the jacobialDualMatrix.

@@ -836,6 +836,7 @@ isRankAtLeast = method(Options => optIsRankAtLeast);
 isRankAtLeast(ZZ, Matrix) := opts -> (n1, M0) -> (
     if (n1 > numRows M0) or (n1 > numColumns M0) then return false;
     if (n1 == numRows M0) and (n1 == numColumns M0) then return (rank M0 == n1);
+    if (not (opts.MaxMinors === null)) then (if (opts.MaxMinors <= 0) then return (rank M0 == n1););
     val := getSubmatrixOfRank(n1, M0, opts);
     if (val === null) then ( return (rank M0 >= n1); ) else return true;
 );
