@@ -146,7 +146,7 @@
 \author{S. Hamid Hassanzadeh}
 \author{Karl Schwede}
 \author{Daniel Smolkin}
-\address{Department of Mathematics\\Department of Mathematics\\275 TMCB Brigham Young University\\Provo, UT 84602}
+\address{Department of Mathematics\\Mailstop 3368\\Texas A\&M University\\College Station, TX 77843-3368}
 \email{cjamesbott@gmail.com}
 \address{Department of Mathematics\\Federal University of Rio de Janeiro\\Brazil}
 \email{hamid@im.ufrj.br}
@@ -157,7 +157,7 @@
 
 \thanks{The second named author was supported by CNPq-bolsa de Produtividade}
 \thanks{The third named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
-\thanks{The fourth named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115 and NSF CAREER Grant DMS \#1252860/1501102}
+\thanks{The fourth named author was supported in part by the NSF FRG Grant DMS \#1265261/1501115, NSF CAREER Grant DMS \#1252860/1501102 and NSF Grant DMS \#1801849.}
 
 
 \begin{abstract}
@@ -414,7 +414,7 @@ While the {\tt Parametrization} package \cite{ParametrizationPackage} focuses mo
 The package {\tt Cremona} \cite{CremonaSource,CremonaArticle} focuses on very fast probabilistic computation in general cases and very fast deterministic computation for special kinds of maps from projective space. In particular, in {\tt Cremona},
 
 \begin{itemize}
-\item{}     {\tt isBirational} gives a probabilisitc answer to the question of whether a map between varieties is birational. Furthermore, if the source is projective space, then {\tt degreeOfRationalMap} with {\tt MathMode=>true} can give a deterministic answer that is frequently faster than what our package can provide with {\tt isBirationalMap}.
+\item{}     {\tt isBirational} gives a probabilisitc answer to the question of whether a map between varieties is birational. Furthermore, if the source is projective space, then {\tt degreeOfRationalMap} with {\tt MathMode=>true} can give a deterministic answer that can be faster than what our package can provide with {\tt isBirationalMap}.
 \item{}  {\tt inverseMap} gives a very fast computation of the inverse of a birational map if the source is projective space and the map has maximal linear rank. If you pass this function a map not from projective space, then it calls a modified, faster version of {\tt invertBirationalMap} originally from {\tt Parametrization}. Even in some cases with maximal linear rank, our {\tt inverseOfMap} function appears to be quite competitive however.
 \end{itemize}
 
@@ -512,7 +512,7 @@ However, as the size o projective space increases, this becomes much slower.  He
 
 We conclude with a table when $n = 5$.
 \begin{center}
-  \begin{tabular}{c|c|c|c|c|c|c|c|c}
+  \begin{tabular}{c|c|c|c|c}
     $d$ & 3 & 4 & 5 & 6  \\ \hline
     seconds  &  0.3125 & 9.45312 &  335.172 &  15257.9  \\
   \end{tabular}
