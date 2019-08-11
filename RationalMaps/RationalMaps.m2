@@ -1,5 +1,5 @@
 newPackage( "RationalMaps",
-Version => "0.3", Date => "July 27, 2019", Authors => {
+Version => "0.3", Date => "August 11th, 2019", Authors => {
      {Name => "Karl Schwede",
      Email=> "kschwede@gmail.com",
      HomePage=> "http://www.math.utah.edu/~schwede"
@@ -48,6 +48,8 @@ export{
 }
 
 needsPackage("FastLinAlg");
+
+StrategyGRevLexSmallestTerm = new HashTable from {LexLargest=>0, LexSmallestTerm => 0, LexSmallest=>0, GRevLexSmallestTerm => 100, GRevLexSmallest => 0, GRevLexLargest=>0,Random=>0,RandomNonzero=>0};
 ----------------------------------------------------------------
 --************************************************************--
 -------------------- Function Defitions ------------------------
@@ -941,7 +943,8 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
         --if (o.Verbose === true) then print("inverseOfMapSimis: computed barJD.");
 
         if (giveUp == false) then(            
-            if (rank barJD >= jdd) then (
+            --if (rank barJD >= jdd) then (
+            if (isRankAtLeast(jdd, barJD, MaxMinors=>opts.MinorsCount, MStrategy=>StrategyGRevLexSmallestTerm) then (
                 if (o.Verbose === true) then print("inverseOfMapSimis: We computed enough of the Groebner basis." );
                 flag = true;
             );

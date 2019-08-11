@@ -1,18 +1,18 @@
 # Fdb version 3
-["bibtex RationalMapsPaper"] 1564873283 "RationalMapsPaper.aux" "RationalMapsPaper.bbl" "RationalMapsPaper" 1565477522
+["bibtex RationalMapsPaper"] 1564873283 "RationalMapsPaper.aux" "RationalMapsPaper.bbl" "RationalMapsPaper" 1565547541
   "./skalpha.bst" 1564282499 32537 d032d9938924d1428b94731749d10637 ""
   "MainBib.bib" 1564873197 250917 4cbf10c684e595e34849bc3b907e2850 ""
   "RationalMapsPaper.aux" 1565477519 2828 b379e003bfee5b56b5c8230727ba4a6c ""
   (generated)
-  "RationalMapsPaper.blg"
   "RationalMapsPaper.bbl"
-["pdflatex"] 1565477516 "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.tex" "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.pdf" "RationalMapsPaper" 1565477522
+  "RationalMapsPaper.blg"
+["pdflatex"] 1565477516 "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.tex" "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.pdf" "RationalMapsPaper" 1565547541
   "RationalMapsPaper.aux" 1565477519 2828 b379e003bfee5b56b5c8230727ba4a6c ""
   "RationalMapsPaper.bbl" 1564873283 3667 c361eb0fa2aa6e01e81d22f52867b49f "bibtex RationalMapsPaper"
   "RationalMapsPaper.out" 1565477519 419 c336267186119e86adf35748fd0ed4e6 ""
-  "RationalMapsPaper.tex" 1565477513 35377 1e6906de07901246182950d20f00f990 ""
+  "RationalMapsPaper.tex" 1565547539 35377 1e6906de07901246182950d20f00f990 ""
   "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.aux" 1565477519 2828 b379e003bfee5b56b5c8230727ba4a6c ""
-  "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.tex" 1565477513 35377 1e6906de07901246182950d20f00f990 ""
+  "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.tex" 1565547539 35377 1e6906de07901246182950d20f00f990 ""
   "c:/texlive/2017/texmf-dist/fonts/map/fontname/texfonts.map" 1513984140 3332 103109f5612ad95229751940c61aada0 ""
   "c:/texlive/2017/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1513981866 1004 54797486969f23fa377b128694d548df ""
   "c:/texlive/2017/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1513981866 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -236,9 +236,9 @@
   "kmacros3.sty" 1564282499 12182 f73e10280ca546eeddc26508885322fc ""
   "mabliautoref.sty" 1564455221 4853 58def3d29bdbf8607f0807458eee05c5 ""
   (generated)
-  "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.pdf"
-  "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.log"
   "RationalMapsPaper.pdf"
-  "RationalMapsPaper.out"
   "RationalMapsPaper.log"
+  "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.log"
+  "RationalMapsPaper.out"
+  "c:/Users/kschw/Workshop-2016-Utah/RationalMaps/Paper/RationalMapsPaper.pdf"
   "RationalMapsPaper.aux"
