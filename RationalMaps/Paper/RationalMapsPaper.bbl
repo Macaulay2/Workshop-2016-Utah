@@ -9,25 +9,78 @@
   \href{http://www.ams.org/mathscinet-getitem?mr=#1}{#2}
 }
 \providecommand{\href}[2]{#2}
-\begin{thebibliography}{HKS92}
+\begin{thebibliography}{ETPS18}
+
+\bibitem[BCW82]{BassConnellWrightJacobianConjecture}
+{\sc H.~Bass, E.~H. Connell, and D.~Wright}: \emph{The {J}acobian conjecture:
+  reduction of degree and formal expansion of the inverse}, Bull. Amer. Math.
+  Soc. (N.S.) \textbf{7} (1982), no.~2, 287--330. {\sf\scriptsize 663785}
+
+\bibitem[Boe10]{ParametrizationPackage}
+{\sc J.~Boehm}: \emph{Parametrization}, Package for Macaulay2, see
+  \url{http://www.math.uiuc.edu/Macaulay2/doc/Macaulay2-1.9.2/share/doc/Macaulay2/Parametrization/html/}.
 
 \bibitem[DHS12]{DoriaHassanzadehSimisBirationality}
 {\sc A.~V. Doria, S.~H. Hassanzadeh, and A.~Simis}: \emph{A characteristic-free
   criterion of birationality}, Adv. Math. \textbf{230} (2012), no.~1, 390--413.
   {\sf\scriptsize 2900548}
 
+\bibitem[ETPS]{ReesAlgebraSource}
+{\sc D.~Eisenbud, A.~Taylor, S.~Popescu, and M.~E. Stillman}:
+  \emph{{ReesAlgebra: A \emph{Macaulay2} package. Version~2.2}}.
+
+\bibitem[ETPS18]{ReesAlgebraArticle}
+{\sc D.~Eisenbud, A.~Taylor, S.~Popescu, and M.~E. Stillman}: \emph{{The
+  ReesAlgebra package in \emph{Macaulay2}}}, The Journal of Software for
+  Algebra and Geometry \textbf{8} (2018).
+
+\bibitem[HS17]{HassanzadehSimisBoundsOnDegreesOfBirat}
+{\sc S.~H. Hassanzadeh and A.~Simis}: \emph{Bounds on degrees of birational
+  maps with arithmetically {C}ohen-{M}acaulay graphs}, J. Algebra \textbf{478}
+  (2017), 220--236. {\sf\scriptsize 3621670}
+
+\bibitem[HL19]{HeYangTheMoriDreamSpacePropertyOfBlowups}
+{\sc Z.~He and Y.~Lei}: \emph{The {M}ori dream space property of blow-ups of
+  projective spaces at points and lines}, Work in preparation.
+
 \bibitem[HKS92]{HulekKatzSchreyer}
 {\sc K.~Hulek, S.~Katz, and F.-O. Schreyer}: \emph{Cremona transformations and
   syzygies}, Math. Z. \textbf{209} (1992), no.~3, 419--443. {\sf\scriptsize
   1152265}
+
+\bibitem[MRSY]{FastLinAlgSource}
+{\sc B.~Martinova, M.~Robinson, K.~Schwede, and Y.~W. Yao}:
+  \emph{{FastLinAlg.m2, a Macaulay2 package for sometimes faster function field
+  arithmetic}}, A pre-release version of this package.
 
 \bibitem[RS01]{RussoSimisCompositio}
 {\sc F.~Russo and A.~Simis}: \emph{On birational maps and {J}acobian matrices},
   Compositio Math. \textbf{126} (2001), no.~3, 335--358. {\sf\scriptsize
   1834742}
 
+\bibitem[ST69]{SempleTyrrell}
+{\sc J.~G. Semple and J.~A. Tyrrell}: \emph{The {C}remona transformation of
+  {$S_{6}$} by quadrics through a normal elliptic septimic scroll
+  {$^{1}R^{7}$}}, Mathematika \textbf{16} (1969), 89--97. {\sf\scriptsize
+  0249431}
+
+\bibitem[Sim03]{SimisTwoDifferentialThemes}
+{\sc A.~Simis}: \emph{Two differential themes in characteristic zero}, Topics
+  in algebraic and noncommutative geometry ({L}uminy/{A}nnapolis, {MD}, 2001),
+  Contemp. Math., vol. 324, Amer. Math. Soc., Providence, RI, 2003,
+  pp.~195--204. {\sf\scriptsize 1986124}
+
 \bibitem[Sim04]{SimisCremona}
 {\sc A.~Simis}: \emph{Cremona transformations and some related algebras}, J.
   Algebra \textbf{280} (2004), no.~1, 162--179. {\sf\scriptsize 2081926}
+
+\bibitem[Sta]{CremonaSource}
+{\sc G.~Staglian{\`o}}: \emph{{Cremona: Some computations for rational maps
+  between projective varieties. Version~4.3}}.
+
+\bibitem[Sta18]{CremonaArticle}
+{\sc G.~Staglian{\`o}}: \emph{{A \emph{Macaulay2} package for computations with
+  rational maps}}, The Journal of Software for Algebra and Geometry \textbf{8}
+  (2018).
 
 \end{thebibliography}

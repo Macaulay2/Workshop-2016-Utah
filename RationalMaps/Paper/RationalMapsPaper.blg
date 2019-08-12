@@ -1,46 +1,57 @@
-This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
-Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
 The top-level auxiliary file: RationalMapsPaper.aux
 The style file: skalpha.bst
 Database file #1: MainBib.bib.bib
-You've used 4 entries,
+Warning--missing journal name in ParametrizationPackage
+Warning--missing journal, volume, and year in ParametrizationPackage
+Warning--missing pages in ParametrizationPackage
+Warning--missing note in ReesAlgebraSource
+Warning--missing pages in ReesAlgebraArticle
+Warning--missing journal name in HeYangTheMoriDreamSpacePropertyOfBlowups
+Warning--missing journal, volume, and year in HeYangTheMoriDreamSpacePropertyOfBlowups
+Warning--missing pages in HeYangTheMoriDreamSpacePropertyOfBlowups
+Warning--missing note in CremonaSource
+Warning--missing pages in CremonaArticle
+You've used 15 entries,
             2709 wiz_defined-function locations,
-            610 strings with 5329 characters,
-and the built_in function-call counts, 1732 in all, are:
-= -- 160
-> -- 77
-< -- 1
-+ -- 27
-- -- 26
-* -- 176
-:= -- 282
-add.period$ -- 4
-call.type$ -- 4
-change.case$ -- 25
-chr.to.int$ -- 4
-cite$ -- 4
-duplicate$ -- 61
-empty$ -- 129
-format.name$ -- 31
-if$ -- 331
+            681 strings with 7513 characters,
+and the built_in function-call counts, 5766 in all, are:
+= -- 511
+> -- 284
+< -- 6
++ -- 101
+- -- 97
+* -- 551
+:= -- 942
+add.period$ -- 15
+call.type$ -- 15
+change.case$ -- 94
+chr.to.int$ -- 15
+cite$ -- 25
+duplicate$ -- 237
+empty$ -- 414
+format.name$ -- 117
+if$ -- 1101
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 8
-newline$ -- 23
-num.names$ -- 12
-pop$ -- 14
+missing$ -- 27
+newline$ -- 56
+num.names$ -- 45
+pop$ -- 91
 preamble$ -- 2
-purify$ -- 29
+purify$ -- 109
 quote$ -- 0
-skip$ -- 43
+skip$ -- 157
 stack$ -- 0
-substring$ -- 129
-swap$ -- 12
-text.length$ -- 1
-text.prefix$ -- 1
+substring$ -- 310
+swap$ -- 58
+text.length$ -- 6
+text.prefix$ -- 5
 top$ -- 0
-type$ -- 32
-warning$ -- 0
-while$ -- 19
-width$ -- 6
-write$ -- 58
+type$ -- 120
+warning$ -- 10
+while$ -- 57
+width$ -- 20
+write$ -- 167
+(There were 10 warnings)
