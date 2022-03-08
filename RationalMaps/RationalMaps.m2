@@ -94,7 +94,17 @@ net RationalMapping := t -> (
     toString(source t) | " - - - > " | toString(target t)
 )
 
+RationalMapping * RationalMapping := RationalMapping => (phi, psi) -> (
+    rationalMapping( (psi#map)*(phi#map))
+);
 
+RationalMapping == RationalMapping := Boolean => (phi, psi) -> (
+    isSameMap(phi, psi)
+)
+
+map(RationalMapping) := o -> phi -> (
+    phi#map
+);
 -------------------------------------------------------
 
 
@@ -1189,7 +1199,7 @@ isEmbedding(RingMap):= o-> (f1)->(
         if (flag == true) then (
 	        if (o.Verbose === true) then (print "isEmbedding: computing the inverse  map");
 
-            try(h := inverseOfMap(f2, AssumeDominant=>true, QuickRank=>o.QuickRank, Strategy=>o.Strategy,HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount); ) then
+            try(h := (inverseOfMap(f2, AssumeDominant=>true, QuickRank=>o.QuickRank, Strategy=>o.Strategy,HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount))#map; ) then
             (
 	            if (o.Verbose === true) then print "isEmbedding: checking if the inverse map is a regular map";
         	    flag = isRegularMap(h);
@@ -1307,8 +1317,8 @@ sourceInversionFactor(RingMap):=o->(f)->(
         f2 = mapOntoImage(f);
     );
 
-    invf2:=inverseOfMap(f2, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,
-    HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount, QuickRank=>o.QuickRank);
+    invf2:=(inverseOfMap(f2, AssumeDominant=>o.AssumeDominant, CheckBirational=>o.CheckBirational, Strategy=>o.Strategy,
+    HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount, QuickRank=>o.QuickRank))#map;
     I:=ideal(matrix((f2)*invf2));
     s:=quotient(ideal(I_0),ideal(x));
     s_0
@@ -2109,7 +2119,7 @@ doc ///
             F = {y*z*(x-z)*(x-2*y), x*z*(y-z)*(x-2*y),y*x*(y-z)*(x-z)};
             S = QQ[u,v,w];
             h = map(R, S, F);
-            g = inverseOfMap h
+            g = map inverseOfMap h --this returns the associated ring map
             use S;
             (g*h)(u)*v==(g*h)(v)*u
             (g*h)(u)*w==(g*h)(w)*u
