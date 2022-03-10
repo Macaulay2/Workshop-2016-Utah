@@ -1384,16 +1384,6 @@ document {
     },
 }
 
---***************************************************************
-document {
-  Key => {[isBirationalMap,Verbose],
-	  [isBirationalOntoImage,Verbose],
-	   [isEmbedding, Verbose],
---	  [relationType,Verbose],
-	  [inverseOfMap, Verbose],
-	  [sourceInversionFactor, Verbose]},
-    Headline => "generate informative output",
-    "If this option is set, functions will generate additional output. Default is true. "}
 
 --***************************************************************
 
@@ -1423,21 +1413,7 @@ document{
         HybridStrategy
 }
 --***************************************************************
-document{
-    Key=>{AssumeDominant, [isBirationalMap, AssumeDominant],
-	[isBirationalOntoImage, AssumeDominant],
-	[isEmbedding, AssumeDominant],
-	[jacobianDualMatrix,AssumeDominant],
-	[inverseOfMap, AssumeDominant],
-	[sourceInversionFactor, AssumeDominant] },
-    Headline=>"
-        whether to assume that a rational map is dominant",
-    Usage=>"AssumeDominant=>b",
-       " If true, certain functions assume that $f : X \\to Y$ is dominant.
-         In other words that the closure of $f(X)$ is equal to $Y$.
-	  In practice, this means that a kernel of a ring map will
-	   not be computed.",
-}
+
 --***************************************************************
 
 document{
@@ -1586,16 +1562,16 @@ doc ///
         (isBirationalMap, Ideal, Ideal, BasicList)
         (isBirationalMap, Ring, Ring, BasicList)
         (isBirationalMap, RingMap)
-       -- [isBirationalMap, AssumeDominant]
-       --[isBirationalMap, Strategy]
-	--[isBirationalMap,Verbose]
-	--[isBirationalMap,HybridLimit]
+        [isBirationalMap, AssumeDominant]
+        --[isBirationalMap, Strategy]
+	    [isBirationalMap,Verbose]
+	    --[isBirationalMap,HybridLimit]
     Headline
         whether a map between projective varieties is birational
     Usage
         val = isBirationalMap(a,b,f)
         val = isBirationalMap(R,S,f)
-        val = isBirationalMap(Pi)
+        val = isBirationalMap(Pi)        
     Inputs
         a:Ideal
             defining equations for X
@@ -1608,7 +1584,11 @@ doc ///
         S:Ring
             the homogeneous coordinate ring of Y
         Pi:RingMap
-            A ring map S to R corresponding to X mapping to Y
+            a ring map S to R corresponding to X mapping to Y    
+        Verbose => Boolean
+            generate informative output which can be used to adjust strategies
+        AssumeDominant => Boolean
+            whether to assume a map of schemes is dominant, if set to true it can speed up computation
     Outputs
         val:Boolean
             true if the map is birational, false if otherwise
@@ -1643,10 +1623,12 @@ doc ///
 
 doc ///
         Key
-		isBirationalOntoImage
-		(isBirationalOntoImage, Ideal, Ideal, BasicList)
-		(isBirationalOntoImage, Ring, Ring, BasicList)
-		(isBirationalOntoImage, RingMap)
+            isBirationalOntoImage
+            (isBirationalOntoImage, Ideal, Ideal, BasicList)
+            (isBirationalOntoImage, Ring, Ring, BasicList)
+            (isBirationalOntoImage, RingMap)        
+            [isBirationalOntoImage,Verbose]
+            [isBirationalOntoImage, AssumeDominant]
         Headline
                 whether a map between projective varieties is birational onto its image
         Usage
@@ -1666,6 +1648,10 @@ doc ///
                         the homogeneous coordinate ring of Y
                 Pi:RingMap
                         A ring map S to R corresponding to X mapping to Y
+                Verbose => Boolean
+                    generate informative output which can be used to adjust strategies
+                AssumeDominant => Boolean
+                    whether to assume a map of schemes is dominant, if true it can speed up computation as a kernel will not be computed                    
         Outputs
                 val:Boolean
                         true if the map is birational onto its image, false if otherwise
@@ -1747,44 +1733,46 @@ doc ///
 --***************************************************************
 
 doc ///
-	Key
-		jacobianDualMatrix
-		(jacobianDualMatrix,Ideal,Ideal,BasicList)
-		(jacobianDualMatrix,Ring,Ring,BasicList)
-		(jacobianDualMatrix,RingMap)
-	--	[jacobianDualMatrix,AssumeDominant]
-	--	[jacobianDualMatrix,Strategy]
-	Headline
-		computes the Jacobian Dual Matrix, a matrix whose kernel describing the syzygies of the inverse map
-	Usage
-		M = jacobianDualMatrix(a,b,g)
-		M = jacobianDualMatrix(R,S,g)
-		M = jacobianDualMatrix(p)
+    Key
+        jacobianDualMatrix
+        (jacobianDualMatrix,Ideal,Ideal,BasicList)
+        (jacobianDualMatrix,Ring,Ring,BasicList)
+        (jacobianDualMatrix,RingMap)
+        [jacobianDualMatrix,AssumeDominant]
+    --	[jacobianDualMatrix,Strategy]
+    Headline
+        computes the Jacobian Dual Matrix, a matrix whose kernel describing the syzygies of the inverse map
+    Usage
+        M = jacobianDualMatrix(a,b,g)
+        M = jacobianDualMatrix(R,S,g)
+        M = jacobianDualMatrix(p)
 	Inputs
-		a:Ideal
-			defining equations for X
-		b:Ideal
-			defining equations for Y
-		g:BasicList
-			projective rational map given by polynomial representatives
-		R:Ring
-			coordinate ring of X
-		S:Ring
-			coordinate ring of Y
-		p:RingMap
-			projective rational map given by polynomial representatives
-	Outputs
-		M:Matrix
-			Returns a matrix over the coordinate ring of the image, the kernel of this matrix
-			 describing the syzygies of the inverse map, if it exists.
-	Description
-		Text
-			This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the {\tt AssumeDominant} option is set to {\tt true}, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the {\tt Strategy} option are {\tt ReesStrategy} and {\tt SaturationStrategy}.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390–413.
-		Example
+        a:Ideal
+            defining equations for X
+        b:Ideal
+            defining equations for Y
+        g:BasicList
+            projective rational map given by polynomial representatives
+        R:Ring
+            coordinate ring of X
+        S:Ring
+            coordinate ring of Y
+        p:RingMap
+            projective rational map given by polynomial representatives
+        AssumeDominant => Boolean
+            whether to assume a map of schemes is dominant, if set to true it can speed up computation
+    Outputs
+        M:Matrix
+            Returns a matrix over the coordinate ring of the image, the kernel of this matrix
+            describing the syzygies of the inverse map, if it exists.
+    Description
+        Text
+            This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the {\tt AssumeDominant} option is set to {\tt true}, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the {\tt Strategy} option are {\tt ReesStrategy} and {\tt SaturationStrategy}.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390–413.
+        Example
                        R=QQ[x,y];
                        S=QQ[a,b,c,d];
                        Pi = map(R, S, {x^3, x^2*y, x*y^2, y^3});
-		       jacobianDualMatrix(Pi, Strategy=>SaturationStrategy)
+                       jacobianDualMatrix(Pi, Strategy=>SaturationStrategy)
 ///
 --***************************************************************
 --***************************************************************
@@ -1837,12 +1825,12 @@ doc ///
                 (isEmbedding, RingMap)
                 (isEmbedding, Ideal, Ideal, BasicList)
                 (isEmbedding, Ring, Ring, BasicList)
-             --   [isEmbedding, AssumeDominant]
+                [isEmbedding, AssumeDominant]
                 --[isEmbedding, CheckBirational]
                 --[isEmbedding, HybridLimit]
                -- [isEmbedding, Strategy]
                -- [isEmbedding, MinorsCount]
-                --[isEmbedding, Verbose]
+                [isEmbedding, Verbose]
         Headline
                 whether a map of projective varieties is a closed embedding
         Usage
@@ -1854,7 +1842,7 @@ doc ///
                         defining equations for X
                 b:Ideal
                         defining equations for Y
-		l:BasicList
+                l:BasicList
                         projective rational map given by polynomial represenatives of the same degree
                 f:RingMap
                         the ring map corresponding to $f : X \\to Y$
@@ -1862,7 +1850,10 @@ doc ///
                         coordinate ring for X
                 S:Ring
                         coordinate ring for Y
-
+                Verbose => Boolean
+                        generate informative output which can be used to adjust strategies
+                AssumeDominant => Boolean
+                    whether to assume a map of schemes is dominant, if set to true it can speed up computation
         Outputs
                 val:Boolean
 			true if the map is an embedding, otherwise false.
@@ -1925,14 +1916,14 @@ doc ///
             The saturated defining ideal of the baselocus of the corresponding maps.
     Description
         Text
-            This defines the locus where a given map of projective varieties is not defined.  If the option {\tt SaturateOutput} is set to {\tt false}, the output will not be saturated.  The default value is true.  Consider the following rational map from $P^2$ to $P^1$
+            This defines the locus where a given map of projective varieties is not defined.  If the option {\tt SaturateOutput} is set to {\tt false}, the output will not be saturated.  The default value is true.  Consider the following rational map from $P^2$ to $P^1$.
         Example
             R = QQ[x,y,z];
             S = QQ[a,b];
             f = map(R, S, {x,y});
             baseLocusOfMap(f)
         Text
-            Observe it is not defined at the point [0:0:1], which is exactly what one expects.  However, we can restrict the map to a curve on $P^2$ and then it will be defined everywhere.
+            Observe it is not defined at the point [0:0:1], which is exactly what one expects.  However, we can restrict the map to a curve in $P^2$ and then it will be defined everywhere.
         Example
             R=QQ[x,y,z]/(y^2*z-x*(x-z)*(x+z));
             S=QQ[a,b];
@@ -2072,14 +2063,14 @@ doc ///
 doc ///
     Key
         inverseOfMap
-		(inverseOfMap, Ideal, Ideal, BasicList)
-		(inverseOfMap, Ring, Ring, BasicList)
-		(inverseOfMap, RingMap)
---		[inverseOfMap, AssumeDominant]
+        (inverseOfMap, Ideal, Ideal, BasicList)
+        (inverseOfMap, Ring, Ring, BasicList)
+        (inverseOfMap, RingMap)
+        [inverseOfMap, AssumeDominant]
 --		[inverseOfMap, Strategy]
 --               [inverseOfMap, CheckBirational]
 --               [inverseOfMap, HybridLimit, MinorsCount]
---		[inverseOfMap, Verbose]
+        [inverseOfMap, Verbose]
 --		[inverseOfMap, MinorsCount]
     Headline
         computes the inverse map of a given birational map between projective varieties
@@ -2096,6 +2087,10 @@ doc ///
             list of polynomials that define the coordinates of your birational map
         g: RingMap
             corresponding to a birational map $f : X \\to Y$.
+        Verbose => Boolean
+            generate informative output which can be used to adjust strategies
+        AssumeDominant => Boolean
+            whether to assume a map of schemes is dominant, if set to true it can speed up computation
     Outputs
         f: RingMap
             Inverse function of your birational map, $f(X) \\to X$.
@@ -2154,7 +2149,7 @@ doc ///
 --       [sourceInversionFactor, Strategy]
 --       [sourceInversionFactor, CheckBirational]
 --       [sourceInversionFactor, HybridLimit]
---       [sourceInversionFactor, Verbose]
+        [sourceInversionFactor, Verbose]
 --	 [sourceInversionFactor,MinorsCount]
     Headline
         computes the the common factor among the the components of the composition of the inverse map and the original map
@@ -2163,6 +2158,8 @@ doc ///
     Inputs
         g: RingMap
             Your birational map $f : X \\to Y$.
+        Verbose => Boolean
+            generate informative output which can be used to adjust strategies
     Outputs
         s: RingElement
              an element of the coordinate ring of $X$ .

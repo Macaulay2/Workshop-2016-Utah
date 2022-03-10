@@ -99,11 +99,13 @@ Done.  Headlines are generally not capitalized now.
 
         add a period to the end
 
+Fixed.
 
     "a curve on P^2"
 
         many people prefer to say "in" instead of "on"
 
+Changed.
 
     Key=>{AssumeDominant, [isBirationalMap, AssumeDominant],
         [isBirationalOntoImage, AssumeDominant],
@@ -120,6 +122,11 @@ Done.  Headlines are generally not capitalized now.
         https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.16/share/doc/Macaulay2/Macaulay2Doc/html/___Verbose.html
 
         There are probably a lot of other instances of this kind of thing.
+
+I have changed this behavior for:
+    Verbose
+    AssumeDominant
+    (I or someone else needs to finish this)
 
 
     "HybridStrategy -- A strategy for inverseOfMap, isBirationalMap and isEmbedding."
