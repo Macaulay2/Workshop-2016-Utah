@@ -23,15 +23,15 @@ newPackage( "RationalMaps",
 export{
     "RationalMapping", --a new type
     "rationalMapping", --constructor
-	"isBirationalMap",
-	"idealOfImageOfMap",
-	"baseLocusOfMap",
-	"isRegularMap",
-	"isEmbedding",
+    "isBirationalMap",
+    "idealOfImageOfMap",
+    "baseLocusOfMap",
+    "isRegularMap",
+    "isEmbedding",
 --	"relationType",
-	"jacobianDualMatrix",
-	"isBirationalOntoImage",
-	"inverseOfMap",
+    "jacobianDualMatrix",
+    "isBirationalOntoImage",
+    "inverseOfMap",
 	"mapOntoImage",
     "QuickRank",
 	--"blowUpIdeals", --at some point we should document this and expose it to the user
@@ -65,24 +65,20 @@ rationalMapping(RingMap) := o->(phi) -> (
     new RationalMapping from {map=>phi, cache => new CacheTable from {}}
 );
 
-rationalMapping(Ideal, Ideal, Matrix) := o-> (I1, J1, M1) -> (
-    ambR := ring I1;
-    ambS := ring J1; 
-    rationalMapping(map(ambR/I1, ambS/J1, M1))
+rationalMapping(Ring, Ring, BasicList) := o->(R1, R2, L1) -> (
+    rationalMapping(map(R1, R2, L1))
 );
 
-rationalMapping(Ideal, Ideal, BasicList) := o-> (I1, J1, L1) -> (
-    ambR := ring I1;
-    ambS := ring J1; 
-    rationalMapping(map(ambR/I1, ambS/I1, L1))
-);
-
-rationalMapping(Ring, Ring, Matrix) := o-> (R1,R2, M1) -> (
+rationalMapping(Ring, Ring, Matrix) := o->(R1, R2, M1) -> (
     rationalMapping(map(R1, R2, M1))
 );
 
-rationalMapping(Ring, Ring, BasicList) := o-> (R1, R2, L1) -> (
-    rationalMapping(map(R1, R2, L1))
+rationalMapping(ProjectiveVariety, ProjectiveVariety, BasicList) := o->(X1, X2, L1) -> (
+    rationalMapping(map(ring X2, ring X1, L1))
+);
+
+rationalMapping(ProjectiveVariety, ProjectiveVariety, Matrix) := o->(X1, X2, M1) -> (
+    rationalMapping(map(ring X2, ring X1, M1))
 );
 
 target(RationalMapping) := myMap ->(
@@ -90,7 +86,7 @@ target(RationalMapping) := myMap ->(
 )
 
 source(RationalMapping) := myMap ->(
-    Proj source (myMap#map)
+    Proj target (myMap#map)
 )
 
 net RationalMapping := t -> (
@@ -132,31 +128,7 @@ idealOfImageOfMap(RationalMapping) := o-> (phi) -> (
     J
 );
 
-idealOfImageOfMap(Ideal,Ideal,Matrix) := o -> (a,b,f) -> (
-	--h := map((ring a)/a, ring b ,f);
-	-- the image of f is the same as the kernel of its pullback on the
-	-- coordinate rings. h is this pullback
-    --  idealOfImageOfMap(h, o)
-    idealOfImageOfMap(rationalMapping((ring a)/a,ring b,f), o)
-);
 
-idealOfImageOfMap(Ideal,Ideal,BasicList) := o -> (a,b,g) -> (
-	--h:=map((ring a)/a, ring b ,g);
-	--idealOfImageOfMap(h, o)
-    idealOfImageOfMap(rationalMapping((ring a)/a, ring b, g), o)
-	);
-
-idealOfImageOfMap(Ring,Ring,Matrix) := o -> (R,S,f) -> (
-	--h := map(R,S,f);
-	--idealOfImageOfMap(h, o)
-    idealOfImageOfMap(rationalMapping(R,S,f), o)
-	);
-
-idealOfImageOfMap(Ring,Ring,BasicList) := o -> (R,S,g) -> (
-    --h := map(R,S,g);
-    --idealOfImageOfMap(h, o)
-    idealOfImageOfMap(rationalMapping(R,S,g), o)
-);
 
 idealOfImageOfMap(RingMap) := o -> (p) -> (
         --h := map(target p, ambient source p,p);
@@ -176,40 +148,6 @@ idealOfImageOfMap(RingMap) := o -> (p) -> (
         im
 );
 
-dimImage = method();
-
-dimImage(RationalMapping) := (phi) -> (
-    if phi#cache#?dimImage then return phi#cache#dimImage;
-    d := dimImage(phi#map);    
-    phi#cache#dimImage = d;
-    d
-)
-
-dimImage(Ideal,Ideal,Matrix) := (a,b,f) -> (
-    --h := map( (ring a)/a, (ring b)/b, f);
-    dimImage(rationalMapping(a,b,f))
-);
-
-dimImage(Ideal,Ideal,BasicList) := (a,b,g) -> (
-    --h := map( (ring a)/a, (ring b)/b, g);
-    dimImage(rationalMapping(a,b,g))
-);
-
-dimImage(Ring,Ring,Matrix) := (R,S,f) -> (
-    --h := map( R, S, f);
-    dimImage(rationalMapping(R,S,f))
-);
-
-dimImage(Ring,Ring,BasicList) := (R,S,g) -> (
-    --h := map( R, S, g);
-    dimImage(rationalMapping(R,S,g))
-);
-
-dimImage(RingMap) := (p) -> (
-    -- subtract 1 from the dimension of the image since in projective space
-	I := idealOfImageOfMap(p);
-	(dim I) - 1
-);
 
 -- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 isSameDegree:=method();
@@ -240,7 +178,8 @@ isSameDegree(BasicList):=(L)->(
 
 baseLocusOfMap = method(Options=>{SaturateOutput=>true});
 
-baseLocusOfMap(Matrix) := o->(L1) -> ( --L1 is a row matrix
+internalBaseLocusOfMap = method(Options=>{SaturateOutput=>true});
+internalBaseLocusOfMap(Matrix) := o->(L1) -> ( --L1 is a row matrix
     if numRows L1 > 1 then error "baseLocsOfMap: Expected a row matrix";
     if isSameDegree( first entries L1  )==false then error "baseLocsOfMap: Expected a matrix of homogeneous elements of the same degree";
 
@@ -272,13 +211,10 @@ baseLocusOfMap(Matrix) := o->(L1) -> ( --L1 is a row matrix
 
 );
 
-baseLocusOfMap(List) := o->(L) ->(
-    baseLocusOfMap(matrix{L}, o)
-);
 
 baseLocusOfMap(RingMap) := o->(ff) ->(
     mm := sub(matrix ff, target ff);
-    baseLocusOfMap(mm, o)
+    internalBaseLocusOfMap(mm, o)
 );
 
 baseLocusOfMap(RationalMapping) := o->(phi) -> (
@@ -294,15 +230,6 @@ baseLocusOfMap(RationalMapping) := o->(phi) -> (
 
 isRegularMap = method();
 
-isRegularMap(Matrix) := (L1) -> ( --L1 is a row matrix
-    I:= baseLocusOfMap(L1, SaturateOutput=>false);
-    (dim I <= 0)
-);
-
-isRegularMap(List) := (L1) -> (
-    I:= baseLocusOfMap(L1, SaturateOutput=>false);
-    (dim I <= 0)
-);
 
 isRegularMap(RingMap) := (ff) ->(
     I:=baseLocusOfMap(ff, SaturateOutput=>false);
@@ -533,7 +460,6 @@ isBirationalMap(RingMap) :=o->(f)->(
             print "isBirationalMap: About to find the image of the map.  If you know the image, ";
             print "        you may want to use the AssumeDominant option if this is slow.";
         );
---        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
         if (instance(target f, PolynomialRing)) then(
             if (o.Verbose == true) then print "isBirationalMap: initial birationality via rank of the jacobian";
             jac := jacobian matrix f;
@@ -560,7 +486,7 @@ isBirationalMap(RingMap) :=o->(f)->(
             ); 
         )
         else (
-            im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
+            im1 = idealOfImageOfMap( map((ring di)/di, ring im, bm), QuickRank=>o.QuickRank);
         );
         if (o.Verbose === true) then print "isBirationalMap: Found the image of the map.";
 
@@ -652,7 +578,7 @@ isBirationalOntoImageRees(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
             print "        you may want to use the AssumeDominant option if this is slow.";
         );
 
-        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
+        im1 = idealOfImageOfMap( map((ring di)/di, ring im, bm), QuickRank=>o.QuickRank);
     );
 
     K:=coefficientRing R;
@@ -711,7 +637,7 @@ isBirationalOntoImageSimis(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
             print "        you may want to use the AssumeDominant option if this is slow.";
         );
 
-        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
+        im1 = idealOfImageOfMap( map((ring di)/di, ring im, bm), QuickRank=>o.QuickRank);
         if (o.Verbose === true) then print "isBirationalOntoImageSimis: Found the image of the map.";
     );
     if isSameDegree(bm)==false then error "isBirationalOntoImageSimis: Expected a list of homogeneous elements of the same degree";
@@ -1278,7 +1204,7 @@ jacobianDualMatrix(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
         im1 =  im;
     )
     else (
-        im1 = idealOfImageOfMap(di, im, bm, QuickRank=>o.QuickRank);
+        im1 = idealOfImageOfMap( map( (ring di)/di, ring im, bm), QuickRank=>o.QuickRank);
     );
     --In the following lines we remove the linear parts of the ideal di and
 --modify our map bm
@@ -1305,13 +1231,13 @@ jacobianDualMatrix(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
    );
 
 jacobianDualMatrix(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
-   jacobianDualMatrix(ideal R1, ideal S1, bm, AssumeDominant=>o.AssumeDominant)
+   jacobianDualMatrix(ideal R1, ideal S1, bm, o)
     );
 
 jacobianDualMatrix(RingMap) := o->(f)->(
    -- invList := inverseOfMap(target f, source f, first entries matrix f);
 --    map(source f, target f, invList)
-    jacobianDualMatrix(target f, source f, first entries matrix f, AssumeDominant=>o.AssumeDominant)
+    jacobianDualMatrix(target f, source f, first entries matrix f, o)
     );
 
 
@@ -1554,6 +1480,27 @@ doc ///
 
 --***************************************************************
 
+doc ///
+    Key
+        RationalMapping
+        rationalMapping
+        (rationalMapping, RingMap)
+    Headline
+        a rational mapping between projective varieties
+    Description
+        Text
+            A {\tt RationalMapping} is a Type that is used to treat maps between projective varieties  geometrically.  It stores essentially equivalent data to the corresponding map between the homogeneous coordinate rings.  For example, the following is the Cremona transformation on P2
+        Example
+            R = QQ[x,y,z]
+            P2 = Proj(R)
+            phi = rationalMapping (P2, P2, {y*z,x*z,x*y})
+        Text
+            For more details on creating rational 
+
+///
+
+--***************************************************************
+
 
 
 doc ///
@@ -1683,52 +1630,52 @@ doc ///
 
 
 doc ///
-	Key
-		idealOfImageOfMap
-		(idealOfImageOfMap,Ideal,Ideal,Matrix)
-		(idealOfImageOfMap,Ideal,Ideal,BasicList)
-		(idealOfImageOfMap,Ring,Ring,Matrix)
-		(idealOfImageOfMap,Ring,Ring,BasicList)
-		(idealOfImageOfMap,RingMap)
-		[idealOfImageOfMap, Verbose]
-	Headline
-		finds defining equations for the image of a rational map between varieties or schemes
-	Usage
-		im = idealOfImageOfMap(a,b,f)
-		im = idealOfImageOfMap(a,b,g)
-		im = idealOfImageOfMap(R,S,f)
-		im = idealOfImageOfMap(R,S,g)
-		im = idealOfImageOfMap(p)
-	Inputs
-		a:Ideal
-			defining equations for X
-		b:Ideal
-			defining equations for Y
-		f:Matrix
+    Key
+        idealOfImageOfMap        
+        (idealOfImageOfMap, RingMap)
+        (idealOfImageOfMap, RationalMapping)
+        [idealOfImageOfMap, Verbose]
+    Headline
+        finds defining equations for the image of a rational map between varieties or schemes
+    Usage
+        im = idealOfImageOfMap(a,b,f)
+        im = idealOfImageOfMap(a,b,g)
+        im = idealOfImageOfMap(R,S,f)
+        im = idealOfImageOfMap(R,S,g)
+        im = idealOfImageOfMap(p)
+    Inputs
+        a:Ideal
+            defining equations for X
+        b:Ideal
+            defining equations for Y
+        f:Matrix
                         projective rational map given by polynomial representatives
-		g:BasicList
-			projective rational map given by polynomial representatives
-		R:Ring
-			coordinate ring of X
-		S:Ring
-			coordinate ring of Y
-		p:RingMap
-			projective rational map given by polynomial representatives
-	Outputs
-		im:Ideal
-			defining equations for the image of f
-	Description
-		Text
-			Given $f : X \\to Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these.  In particular, this function returns an ideal defining a subset of the  the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
-		Example
-			S = QQ[x,y,z,w];
-			b = ideal(x*y-z*w);
-			R = QQ[u,v];
-			a = ideal(sub(0,R));
-			f = matrix {{u,0,v,0}};
-			idealOfImageOfMap(a,b,f)
-		Text
-			This function frequently just calls {\tt ker} from Macaulay2.  However, if the target of the ring map is a polynomial ring, then it first tries to verify if the ring map is injective.  This is done by computing the rank of an appropriate jacobian matrix.
+        g:BasicList
+            projective rational map given by polynomial representatives
+        R:Ring
+            coordinate ring of X
+        S:Ring
+            coordinate ring of Y
+        p:RingMap
+            projective rational map given by polynomial representatives
+    Outputs
+        im:Ideal
+            defining equations for the image of f
+    Description
+        Text
+            Given $f : X \\to Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these.  In particular, this function returns an ideal defining a subset of the  the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
+        Example
+            S = QQ[x,y,z,w];
+            b = ideal(x*y-z*w);
+            R = QQ[u,v];
+            a = ideal(sub(0,R));
+            f = matrix {{u,0,v,0}};
+            phi = rationalMapping(R/a, S/b, f)
+            idealOfImageOfMap(phi)
+            psi = rationalMapping(Proj(S/b), Proj(R/a), f)
+            idealOfImageOfMap(psi)
+        Text
+            This function frequently just calls {\tt ker} from Macaulay2.  However, if the target of the ring map is a polynomial ring, then it first tries to verify if the ring map is injective.  This is done by computing the rank of an appropriate jacobian matrix.
 ///
 --***************************************************************
 
@@ -1763,8 +1710,8 @@ doc ///
             whether to assume a map of schemes is dominant, if set to true it can speed up computation
     Outputs
         M:Matrix
-            Returns a matrix over the coordinate ring of the image, the kernel of this matrix
-            describing the syzygies of the inverse map, if it exists.
+            a matrix over the coordinate ring of the image, the kernel of this matrix
+            describes the syzygies of the inverse map, if it exists.
     Description
         Text
             This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the {\tt AssumeDominant} option is set to {\tt true}, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the {\tt Strategy} option are {\tt ReesStrategy} and {\tt SaturationStrategy}.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390--413.
@@ -1893,22 +1840,14 @@ doc ///
 
 doc ///
     Key
-        baseLocusOfMap
-        (baseLocusOfMap, Matrix)
-        (baseLocusOfMap, List)
+        baseLocusOfMap        
         (baseLocusOfMap, RingMap)
 --        [baseLocusOfMap, SaturateOutput]
     Headline
         the base locus of a map from a projective variety to projective space
-    Usage
-        I = baseLocusOfMap(M)
-        I = baseLocusOfMap(L)
+    Usage        
         I = baseLocusOfMap(h)
     Inputs
-        M: Matrix
-            row matrix whose entries correspond to the coordinates of your map to projective space
-        L: List
-            a list whose entries correspond to the coordinates of your map to projective space
         h: RingMap
             A ring map corresponding to a map of projective varieties
     Outputs
@@ -2027,36 +1966,29 @@ doc ///
 
 doc ///
     Key
-        isRegularMap
-        (isRegularMap, Matrix)
-        (isRegularMap, List)
+        isRegularMap        
         (isRegularMap, RingMap)
-
+        (isRegularMap, RationalMapping)
     Headline
         whether a map to projective space is regular
-    Usage
-        b = isRegularMap(M)
-        b = isRegularMap(L)
+    Usage        
         b = isRegularMap(f)
     Inputs
-        M: Matrix
-            row matrix whose entries correspond to the coordinates of your map to projective space
-        L: List
-            a list whose entries correspond to the coordinates of your map to projective space
         f: RingMap
             a ring map corresponding to a map of projective varieties
     Outputs
         b: Boolean
     Description
         Text
-            This function just runs baseLocusOfMap(M) and checks if the ideal defining the base locus is the whole ring.
+            This function just runs baseLocusOfMap(f) and checks if the ideal defining the base locus is the whole ring.
         Example
             P5 = QQ[a..f];
+            P2 = QQ[x,y,z];
             M = matrix{{a,b,c},{d,e,f}};
             segreProduct = P5/minors(2, M);
             blowUpSubvar = segreProduct/ideal(b - d);
-            f = {a, b, c};
-            isRegularMap({a,b,c})
+            f = map(blowUpSubvar, P2, {a, b, c});
+            isRegularMap(f)
 ///
 --***************************************************************
 
@@ -2203,8 +2135,9 @@ TEST /// --test #0
 	R = QQ[u,v];
 	a = ideal(sub(0,R));
 	f = matrix {{u,0,v,0}};
-	im = idealOfImageOfMap(a,b,f);
-	assert (im == ideal(y,w));
+    psi = rationalMapping(R/a, S/b, f)
+	im = idealOfImageOfMap(psi);
+	assert (im == sub(ideal(y,w), S/b));
     T = QQ[x,y,z];
     phi = map(T, T, {y*z, x*z, x*y});
     assert(ideal(0_T) == idealOfImageOfMap(phi));
@@ -2233,25 +2166,25 @@ TEST /// --test #2
 	-------------------------------------
 TEST ///	--test #3
     R = QQ[x,y,z]
-	M = matrix{{x^2*y, x^2*z, x*y*z}}
+	f = map(R, R, matrix{{x^2*y, x^2*z, x*y*z}})
 	I = ideal(x*y, y*z, x*z)
-	assert(I == baseLocusOfMap(M))
+	assert(I == baseLocusOfMap(f))
 ///
 
 TEST ///	--test #4
     R = QQ[x,y,z]
-	L = {x^2*y, x^2*z, x*y*z}
+	f = map(R, R, {x^2*y, x^2*z, x*y*z})
 	I = ideal(x*y, y*z, x*z)
-	assert(I == baseLocusOfMap(L))
+	assert(I == baseLocusOfMap(f))
 ///
 
 TEST /// --test #5
 	-- reducible source
 
 	R = QQ[x,y,z]/(x*y)
-	M = matrix{{x^2, x*y, y^2}}
+	f = map(R, R, matrix{{x^2, x*y, y^2}})
 	I = ideal(x,y)
-	assert(I == baseLocusOfMap(M))
+	assert(I == baseLocusOfMap(f))
 
     -- we should have a test for when that kernel is not a cyclic module
 ///
@@ -2261,21 +2194,23 @@ TEST /// --test #5
 	----- isRegularMap -----------------
 	-------------------------------------
 TEST /// --test #6
-	R = QQ[x,y,z,w]/(x*y - z*w)
-	M = matrix{{sub(1,R), 0, 0}}
-	assert(isRegularMap(M))
+    R = QQ[x,y,z,w]/(x*y - z*w)
+    S = QQ[a,b,c]
+    f = map(R, S, matrix{{sub(1,R), 0, 0}})
+    assert(isRegularMap(f))
 ///
 
 TEST /// --test #7
     R = QQ[x,y]/(x*y)
-    M = matrix{{x,y}}
-    assert(isRegularMap(M))
+    f = map(R, R, matrix{{x,y}})
+    assert(isRegularMap(f))
 ///
 
 TEST /// --test #8
     R = QQ[x,y,z]/(x^3 + y^3 - z^3)
-    M = matrix{{(y-z)*x, x^2}}
-    assert(isRegularMap(M) == true)
+    S = QQ[a,b]
+    f = map(R,S,matrix{{(y-z)*x, x^2}})
+    assert(isRegularMap(f))
 ///
 
 TEST /// --test #9
@@ -2297,10 +2232,11 @@ TEST /// -- test #11
 
     P5 = QQ[a..f];
     M = matrix{{a,b,c},{d,e,f}};
+    P2 = QQ[x,y,z];
     segreProduct = P5/minors(2, M);
     blowUpSubvar = segreProduct/ideal(b - d);
-    f = {a, b, c};
-    assert(isRegularMap(matrix{{a,b,c}}) == true)
+    f = map(blowUpSubvar, P2, {a, b, c});
+    assert(isRegularMap(f))
 ///
 
 	-------------------------------------
