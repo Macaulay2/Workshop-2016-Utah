@@ -1,22 +1,25 @@
 newPackage( "RationalMaps",
-Version => "0.4", Date => "March 8th, 2022", Authors => {
-     {Name => "Karl Schwede",
-     Email=> "kschwede@gmail.com",
-     HomePage=> "http://www.math.utah.edu/~schwede"
-     }, --Karl Schwede was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102, and NSF grant #1801849
-     {Name => "Daniel Smolkin",
-     Email=> "smolkin@math.utah.edu",
-     HomePage=> "http://www.math.utah.edu/~smolkin"
-     },--Dan Smolkin was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102
-     {Name => "S. Hamid Hassanzadeh",
-     Email => "hassanzadeh.ufrj@gmail.com",
-     HomePage=>"https://www.researchgate.net/profile/Seyed_Hassanzadeh"
-     }, --S. Hamid Hassanzadeh was supported by CNPq-bolsa de Produtividade
-     {Name => "C.J. Bott",
-     Email => "cjamesbott@gmail.com"}
-}, --this file is in the public domain
-Keywords => {"Commutative Algebra"},
-Headline => "rational maps between varieties", PackageImports => {"FastMinors"})
+    Version => "0.4", Date => "March 9th, 2022", Authors => {
+        {Name => "Karl Schwede",
+        Email=> "kschwede@gmail.com",
+        HomePage=> "http://www.math.utah.edu/~schwede"
+        }, --Karl Schwede was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102, and NSF grant #1801849
+        {Name => "Daniel Smolkin",
+        Email=> "smolkin@math.utah.edu",
+        HomePage=> "http://www.math.utah.edu/~smolkin"
+        },--Dan Smolkin was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102
+        {Name => "S. Hamid Hassanzadeh",
+        Email => "hassanzadeh.ufrj@gmail.com",
+        HomePage=>"https://www.researchgate.net/profile/Seyed_Hassanzadeh"
+        }, --S. Hamid Hassanzadeh was supported by CNPq-bolsa de Produtividade
+        {Name => "C.J. Bott",
+        Email => "cjamesbott@gmail.com"}
+    }, --this file is in the public domain
+    Keywords => {"Commutative Algebra"},
+    Headline => "rational maps between varieties", 
+    PackageImports => {"FastMinors"},
+    DebuggingMode => true
+)
 export{
     "RationalMapping", --a new type
     "rationalMapping", --constructor
@@ -91,7 +94,7 @@ source(RationalMapping) := myMap ->(
 )
 
 net RationalMapping := t -> (
-    toString(source t) | " - - - > " | toString(target t)
+    toString(source t) | " - - - > " | toString(target t) | "   " | toString(first entries matrix map t)
 )
 
 RationalMapping * RationalMapping := RationalMapping => (phi, psi) -> (
@@ -100,10 +103,14 @@ RationalMapping * RationalMapping := RationalMapping => (phi, psi) -> (
 
 RationalMapping == RationalMapping := Boolean => (phi, psi) -> (
     isSameMap(phi, psi)
-)
+);
 
 map(RationalMapping) := o -> phi -> (
     phi#map
+);
+
+RationalMapping ^ ZZ := RationalMapping => (myphi, n1) -> (
+    fold((a,b)->a*b, apply(n1, i->myphi))
 );
 -------------------------------------------------------
 
@@ -1224,6 +1231,10 @@ isEmbedding(RingMap):= o-> (f1)->(
 
  isSameMap(List, List, Ring) := (L1, L2, R1) -> (
     rank matrix(frac(R1), {L1, L2}) == 1
+ );
+
+ isSameMap(RationalMapping, RationalMapping) := (phi, psi) -> (
+     isSameMap(map phi, map psi)
  );
 
  isSameMap(RingMap, RingMap) := (f1, f2) -> (
