@@ -1401,7 +1401,7 @@ document{
     Key=>{CheckBirational, [isEmbedding, CheckBirational],
 	[inverseOfMap, CheckBirational],
 	[sourceInversionFactor, CheckBirational]},
-    Headline=> "whether to check birationality.",
+    Headline=> "whether to check birationality",
     Usage =>"  CheckBirational=>b",
       "If true, inverseOfMap, isEmbedding and sourceInversionFactor  will check whether the passed map is birational.
       If it is not birational, it will throw an error."
@@ -1415,7 +1415,7 @@ document{
           [isBirationalOntoImage,HybridLimit],
 	  [isEmbedding, HybridLimit],
 	  [sourceInversionFactor, HybridLimit]},
-    Headline=>"An option to control HybridStrategy",
+    Headline=>"an option to control HybridStrategy",
        "By increasing the HybridLimit value (default 15), you can weight
        HybridStrategy it more towards SimisStrategy.
 	     Infinity will behave just like SimisStrategy.",
@@ -1431,7 +1431,7 @@ document{
 	[inverseOfMap, AssumeDominant],
 	[sourceInversionFactor, AssumeDominant] },
     Headline=>"
-        whether to assume that a raional map is dominant",
+        whether to assume that a rational map is dominant",
     Usage=>"AssumeDominant=>b",
        " If true, certain functions assume that $f : X \\to Y$ is dominant.
          In other words that the closure of $f(X)$ is equal to $Y$.
@@ -1446,8 +1446,8 @@ document{
 	[sourceInversionFactor,MinorsCount], 
     [isBirationalOntoImage, MinorsCount],
     [isBirationalMap, MinorsCount] },
-    Headline=>" An option controlling the behavior of isBirational and inverseOfMap
-     (and other functions which call those).",
+    Headline=>" an option controlling the behavior of isBirational and inverseOfMap
+     (and other functions which call those)",
             "One of the ways to invert a map is to find a nonzero minor of a variant of the jacobialDualMatrix.
 	     This function controls how many (randomly chosen) minors to check before switching to another strategy (invovling computing a syzygy).
 	     Setting it to zero will mean no minors are checked.
@@ -1467,7 +1467,7 @@ document{
     [jacobianDualMatrix, QuickRank],
     [mapOntoImage, QuickRank]
     },
-    Headline=>" An option for computing how rank is computed",
+    Headline=>" an option for controlling how rank is computed",
             "If set to true, then checking if rank is at least a certain number will be computed via the package", TT "FastMinors",
     SeeAlso=>
         inverseOfMap
@@ -1482,7 +1482,7 @@ document{
 --	[relationType,Strategy],
 	[inverseOfMap, Strategy]
 	 },
-    Headline=>" Determines the desired Strategy in each function.",
+    Headline=>" determines the desired Strategy in each function.",
        "In sourceInversionFactor, isBirationalMap, isBirationalOntoImage,
 	    isEmbeddinga and inverseOfMap, Strategy may assumed any of three options
 	    ReesStrategy, SimisStrategy or  HybridStrategy (default). These functions as well as 
@@ -1506,7 +1506,7 @@ doc ///
     Key
         HybridStrategy
     Headline
-        A strategy for inverseOfMap,  isBirationalMap and isEmbedding.
+        a strategy for inverseOfMap,  isBirationalMap and isEmbedding.
     Description
     	Text
             It is a valid value for the Strategy Option for inverseOfMap.
@@ -1526,7 +1526,7 @@ doc ///
     Key
         ReesStrategy
     Headline
-        A strategy for inverseOfMap, isBirationalMap, and is Embedding.
+        a strategy for inverseOfMap, isBirationalMap, and isEmbedding
     Description
     	Text
             It is a valid value for the Strategy Option for inverseOfMap (and other functions). By choosing Strategy=>ReesStrategy, the equation of the
@@ -1544,7 +1544,7 @@ doc ///
     Key
         SaturationStrategy
     Headline
-        A strategy for inverseOfMap, isBirationalMap, isEmbedding.
+        a strategy for inverseOfMap, isBirationalMap, isEmbedding
     Description
     	Text
             It is a valid value for the Strategy Option for inverseOfMap (and other functions). By choosing Strategy=>SaturationStrategy,
@@ -1562,7 +1562,7 @@ doc ///
     Key
         SimisStrategy
     Headline
-        A strategy for inverseOfMap, isBirationalMap and isEmbedding.
+        a strategy for inverseOfMap, isBirationalMap and isEmbedding
     Description
     	Text
             It is a valid value for the Strategy Option for inverseOfMap (and other functions). Considering the bigraded structure of the
@@ -1591,7 +1591,7 @@ doc ///
 	--[isBirationalMap,Verbose]
 	--[isBirationalMap,HybridLimit]
     Headline
-        Checks if a map between projective varieties is birational.
+        whether a map between projective varieties is birational
     Usage
         val = isBirationalMap(a,b,f)
         val = isBirationalMap(R,S,f)
@@ -1648,7 +1648,7 @@ doc ///
 		(isBirationalOntoImage, Ring, Ring, BasicList)
 		(isBirationalOntoImage, RingMap)
         Headline
-                Checks if a map between projective varieties is birational onto its image.
+                whether a map between projective varieties is birational onto its image
         Usage
                 val = isBirationalOntoImage(a,b,f)
                 val = isBirationalOntoImage(R,S,f)
@@ -1706,7 +1706,7 @@ doc ///
 		(idealOfImageOfMap,RingMap)
 		[idealOfImageOfMap, Verbose]
 	Headline
-		Finds defining equations for the image of a rational map between varieties or schemes
+		finds defining equations for the image of a rational map between varieties or schemes
 	Usage
 		im = idealOfImageOfMap(a,b,f)
 		im = idealOfImageOfMap(a,b,g)
@@ -1755,7 +1755,7 @@ doc ///
 	--	[jacobianDualMatrix,AssumeDominant]
 	--	[jacobianDualMatrix,Strategy]
 	Headline
-		Computes the Jacobian Dual Matrix, a matrix whose kernel describing the syzygies of the inverse map.
+		computes the Jacobian Dual Matrix, a matrix whose kernel describing the syzygies of the inverse map
 	Usage
 		M = jacobianDualMatrix(a,b,g)
 		M = jacobianDualMatrix(R,S,g)
@@ -1844,7 +1844,7 @@ doc ///
                -- [isEmbedding, MinorsCount]
                 --[isEmbedding, Verbose]
         Headline
-                Checks whether a map of projective varieties is a closed embedding.
+                whether a map of projective varieties is a closed embedding
         Usage
                 val = isEmbedding(f)
                 val = isEmbedding(a,b,l)
@@ -1908,18 +1908,18 @@ doc ///
         (baseLocusOfMap, RingMap)
 --        [baseLocusOfMap, SaturateOutput]
     Headline
-        Computes base locus of a map from a projective variety to projective space
+        the base locus of a map from a projective variety to projective space
     Usage
         I = baseLocusOfMap(M)
         I = baseLocusOfMap(L)
         I = baseLocusOfMap(h)
     Inputs
         M: Matrix
-            Row matrix whose entries correspond to the coordinates of your map to projective space.
+            row matrix whose entries correspond to the coordinates of your map to projective space
         L: List
-            A list whose entries correspond to the coordinates of your map to projective space.
+            a list whose entries correspond to the coordinates of your map to projective space
         h: RingMap
-            A ring map corresponding to a map of projective varieties.
+            A ring map corresponding to a map of projective varieties
     Outputs
         I: Ideal
             The saturated defining ideal of the baselocus of the corresponding maps.
@@ -1995,22 +1995,22 @@ doc ///
         (isSameMap, List,List,Ring)
         (isSameMap, RingMap,RingMap)
     Headline
-        Checks whether two maps to projective space are really the same
+        whether two maps to projective space are really the same
     Usage
         b = isSameMap(L1,L2)
         b = isSameMap(L1,L2, R1)
         b = isSameMap(f1, f2)
     Inputs
         L1: List
-            The homogeneous forms that define the first map.
+            the homogeneous forms that define the first map
         L2: List
-            The homogeneous forms that define the second map.
+            the homogeneous forms that define the second map
         R1: Ring
-            The ring in which the homogeneous forms should live.
+            the ring in which the homogeneous forms should live
         f1: RingMap
-            The first map.
+            the first map
         f2: RingMap
-            The second map.
+            the second map
     Outputs
         b: Boolean
             True if the maps are the same, false otherwise.
@@ -2042,18 +2042,18 @@ doc ///
         (isRegularMap, RingMap)
 
     Headline
-        Checks whether a map to projective space is regular
+        whether a map to projective space is regular
     Usage
         b = isRegularMap(M)
         b = isRegularMap(L)
         b = isRegularMap(f)
     Inputs
         M: Matrix
-            Row matrix whose entries correspond to the coordinates of your map to projective space
+            row matrix whose entries correspond to the coordinates of your map to projective space
         L: List
-            A list whose entries correspond to the coordinates of your map to projective space
+            a list whose entries correspond to the coordinates of your map to projective space
         f: RingMap
-            A ring map corresponding to a map of projective varieties.
+            a ring map corresponding to a map of projective varieties
     Outputs
         b: Boolean
     Description
@@ -2082,20 +2082,20 @@ doc ///
 --		[inverseOfMap, Verbose]
 --		[inverseOfMap, MinorsCount]
     Headline
-        Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational onto its image.
+        computes the inverse map of a given birational map between projective varieties
     Usage
         f = inverseOfMap(I, J, L)
         f = inverseOfMap(R, S, L)
         f = inverseOfMap(g)
     Inputs
         I: Ideal
-            Defining ideal of source
+            defining ideal of source
         J: Ideal
-            Defining ideal of target
+            defining ideal of target
         L: List
-            List of polynomials that define the coordinates of your birational map
+            list of polynomials that define the coordinates of your birational map
         g: RingMap
-            Your birational map $f : X \\to Y$.
+            corresponding to a birational map $f : X \\to Y$.
     Outputs
         f: RingMap
             Inverse function of your birational map, $f(X) \\to X$.
@@ -2157,7 +2157,7 @@ doc ///
 --       [sourceInversionFactor, Verbose]
 --	 [sourceInversionFactor,MinorsCount]
     Headline
-        Computes the the common factor among the the components of the composition of the inverse map and the original map.
+        computes the the common factor among the the components of the composition of the inverse map and the original map
     Usage
          s = sourceInversionFactor(g)
     Inputs

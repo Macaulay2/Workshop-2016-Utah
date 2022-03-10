@@ -83,6 +83,7 @@ We have changed these throughout.
             don't capitalize "Row", because it doesn't start a sentence
             fix everywhere else, too
 
+Done.  Headlines are generally not capitalized now.
 
     "This defines the locus where a given map of projective varieties is not defined."
 
