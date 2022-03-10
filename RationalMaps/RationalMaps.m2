@@ -1,5 +1,5 @@
 newPackage( "RationalMaps",
-    Version => "0.4", Date => "March 9th, 2022", Authors => {
+    Version => "1.0", Date => "March 9th, 2022", Authors => {
         {Name => "Karl Schwede",
         Email=> "kschwede@gmail.com",
         HomePage=> "http://www.math.utah.edu/~schwede"
@@ -307,6 +307,10 @@ isRegularMap(List) := (L1) -> (
 isRegularMap(RingMap) := (ff) ->(
     I:=baseLocusOfMap(ff, SaturateOutput=>false);
     (dim I <= 0)
+);
+
+isRegularMap(RationalMapping) := (phi) ->(
+    isRegularMap(map phi)
 );
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1363,15 +1367,15 @@ document {
 	  {"A. Simis, ",EM "  Cremona Transformations and some Related Algebras", ", Journal of Algebra, Volume 280, Issue 1, 1 October 2004, Pages 162–179"},
 	},
     BOLD "Functionality overlap with other packages:\n\n",BR{},BR{},
-    BOLD "Parametrization.m2",
-      ":  While the package", TT "Parametrization", " focuses on mostly on curves, it also includes a function ", TT "invertBirationalMap", "
-      which has the same functionality as ", TO "inverseOfMap", ".  On the other hand, these two functions were implemented somewhat differently and so sometimes one function can be substantially faster than the other.\n", BR{}, BR{},
-    BOLD "Cremona.m2",
+    EM "Parametrization",
+      ":  While the package ", TT "Parametrization", " focuses mostly on curves, it also includes a function ", TT "invertBirationalMap", "
+      that has the same functionality as ", TO "inverseOfMap", ".  On the other hand, these two functions were implemented differently and so sometimes one function can be substantially faster than the other.\n", BR{}, BR{},
+    EM "Cremona",
     ":  The package ", TT "Cremona", " focuses on  fast probabilistic computations in general cases and  deterministic computations for special
      kinds of maps from projective space.  More precisely, ",BR{},
     UL {
-        {TT "isBirational", " gives a probabilisitc answer to the question of whether a map between varieties is birational.  Furthermore, if the
-	     source is projective space, then ", TT "degreeOfRationalMap", " with ", TT   "MathMode=>true", " can give a deterministic answer.
+        {TT "isBirational", " gives a probabilistic answer to the question of whether a map between varieties is birational.  Furthermore, if the
+	     source is projective space, then ", TT "degreeOfRationalMap", " with ", TT   "MathMode=>true", " gives a deterministic correct answer.
 	      In some cases, the speed of the latter  is comparable with ", TO "isBirationalMap", " with ", TT   "AssumeDominant=>true." },
         {TT "inverseMap", " gives a  fast computation of the inverse of a birational map if the source is projective space ", EM " and ",
 	     "the map has maximal linear rank.   In some cases, even if the map has maximal linear rank, our function ", TO "inverseOfMap",
@@ -1397,7 +1401,7 @@ document{
     Key=>{CheckBirational, [isEmbedding, CheckBirational],
 	[inverseOfMap, CheckBirational],
 	[sourceInversionFactor, CheckBirational]},
-    Headline=> "If true, functions will check birationality.",
+    Headline=> "whether to check birationality.",
     Usage =>"  CheckBirational=>b",
       "If true, inverseOfMap, isEmbedding and sourceInversionFactor  will check whether the passed map is birational.
       If it is not birational, it will throw an error."
@@ -1427,9 +1431,9 @@ document{
 	[inverseOfMap, AssumeDominant],
 	[sourceInversionFactor, AssumeDominant] },
     Headline=>"
-        If true, certain functions assume that the map from X to Y is dominant.",
+        whether to assume that a raional map is dominant",
     Usage=>"AssumeDominant=>b",
-       " If true, certain functions assume that $f : X \to Y$ is dominant.
+       " If true, certain functions assume that $f : X \\to Y$ is dominant.
          In other words that the closure of $f(X)$ is equal to $Y$.
 	  In practice, this means that a kernel of a ring map will
 	   not be computed.",
@@ -1667,7 +1671,7 @@ doc ///
                         true if the map is birational onto its image, false if otherwise
         Description
             Text
-                This checks whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling {\tt isBirationalOntoImage}.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its defining ideals must be prime.  In the following example, the map is not birational, but it is birational onto its image.
+                This checks whether $f : X \\to Y$ is birational onto its image.  We do this by computing the image and then calling {\tt isBirationalOntoImage}.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its defining ideals must be prime.  In the following example, the map is not birational, but it is birational onto its image.
             Example
                 R=QQ[x,y];
                 S=QQ[a,b,c,d];
@@ -1729,7 +1733,7 @@ doc ///
 			defining equations for the image of f
 	Description
 		Text
-			Given $f : X \to Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these.  In particular, this function returns an ideal defining a subset of the  the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
+			Given $f : X \\to Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these.  In particular, this function returns an ideal defining a subset of the  the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
 		Example
 			S = QQ[x,y,z,w];
 			b = ideal(x*y-z*w);
@@ -1806,7 +1810,7 @@ doc ///
 		l:BasicList
                         projective rational map given by polynomial represenatives of the same degree
                 f:RingMap
-                        the ring map corresponding to $f : X \to Y$
+                        the ring map corresponding to $f : X \\to Y$
                 R:Ring
                         coordinate ring for X
                 S:Ring
@@ -1814,10 +1818,10 @@ doc ///
 
         Outputs
                 h:RingMap
-			the map of rings corresponding to $f : X \to f(X)$.
+			the map of rings corresponding to $f : X \\to f(X)$.
 	Description
 	        Text
-	                This function is really simple, given $S \to R$, this just returns $S/kernel \to R$.
+	                This function is really simple, given $S \\to R$, this just returns $S/kernel \\to R$.
 	        Example
 	                R = QQ[x,y];
 	                S = QQ[a,b,c];
@@ -1853,7 +1857,7 @@ doc ///
 		l:BasicList
                         projective rational map given by polynomial represenatives of the same degree
                 f:RingMap
-                        the ring map corresponding to $f : X \to Y$
+                        the ring map corresponding to $f : X \\to Y$
                 R:Ring
                         coordinate ring for X
                 S:Ring
@@ -1864,7 +1868,7 @@ doc ///
 			true if the map is an embedding, otherwise false.
 	Description
 	        Text
-	                Given a map of rings, correspoing to $f : X \to Y$, this determines if this map embeds $X$ as a closed subscheme into $Y$.  The target and source must be varieties, in particular their defining ideals must be prime.  Consider the Veronese embedding.
+	                Given a map of rings, correspoing to $f : X \\to Y$, this determines if this map embeds $X$ as a closed subscheme into $Y$.  The target and source must be varieties, in particular their defining ideals must be prime.  Consider the Veronese embedding.
 	        Example
 	                R = ZZ/7[x,y];
 	                S = ZZ/7[a,b,c];
@@ -2091,13 +2095,13 @@ doc ///
         L: List
             List of polynomials that define the coordinates of your birational map
         g: RingMap
-            Your birational map $f : X \to Y$.
+            Your birational map $f : X \\to Y$.
     Outputs
         f: RingMap
-            Inverse function of your birational map, $f(X) \to X$.
+            Inverse function of your birational map, $f(X) \\to X$.
     Description
         Text
-            Given a map $f : X \to Y$, this finds the inverse of your birational map $f(X) \to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.
+            Given a map $f : X \\to Y$, this finds the inverse of your birational map $f(X) \\to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.
         Text
             If {\tt AssumeDominant} is set to {\tt true} (default is {\tt false}) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of $f$.
         Text
@@ -2158,13 +2162,13 @@ doc ///
          s = sourceInversionFactor(g)
     Inputs
         g: RingMap
-            Your birational map $f : X \to Y$.
+            Your birational map $f : X \\to Y$.
     Outputs
         s: RingElement
              an element of the coordinate ring of $X$ .
     Description
         Text
-            Given a map $f : X \to Y$, this finds common factor among the the components of, $f^{(-1)}$ composed with $f$, which is an element of the coordinate ring of $X$ .
+            Given a map $f : X \\to Y$, this finds common factor among the the components of, $f^{(-1)}$ composed with $f$, which is an element of the coordinate ring of $X$ .
         Text
             If {\tt AssumeDominant} is set to {\tt true} (default is {\tt false}) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of $f$.
         Text
@@ -2413,7 +2417,7 @@ TEST /// --test #24
     S = QQ[x,y,z];
     f = inverseOfMap(R, S, {a,b,c});
     g = inverseOfMap(R, S, {a,b,c},Strategy=>ReesStrategy);
-    assert( (isSameMap(first entries matrix f, {x^2, x*y, x*z, y*z})) and (isSameMap(first entries matrix g, {x^2, x*y, x*z, y*z})) )
+    assert( (isSameMap(first entries matrix map f, {x^2, x*y, x*z, y*z})) and (isSameMap(first entries matrix map g, {x^2, x*y, x*z, y*z})) )
 ///
 
 TEST /// --test #25 (quadratic cremona)
@@ -2422,7 +2426,7 @@ TEST /// --test #25 (quadratic cremona)
     h = map(R, S, {y*z, x*z, x*y});
     g = inverseOfMap(h,AssumeDominant=>true);
     f = inverseOfMap(h,AssumeDominant=>true, Strategy=>ReesStrategy);
-    assert( (isSameMap(first entries matrix g, {b*c, a*c, a*b})) and (isSameMap(first entries matrix f, {b*c, a*c, a*b})) )
+    assert( (isSameMap(first entries matrix map g, {b*c, a*c, a*b})) and (isSameMap(first entries matrix map f, {b*c, a*c, a*b})) )
 ///
 
 -----------------------------------

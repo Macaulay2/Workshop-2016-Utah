@@ -1,0 +1,520 @@
+    160829-Schwede-v3
+
+    RationalMaps package
+
+    The package can be installed and checked with M2 1.16.  It has 1200 lines of code and about the same
+    number of lines of documentation.
+
+    The documentation is in rough shape, so instead of finishing the review, I broke off early to give
+    the authors a chance to fix it, using my remarks as a guide for the part I didn't look at.  I also
+    recommend introducing a new type, "RationalMap", and using it to organize the code more cleanly.
+
+We have created a new type, RationalMapping.  We called it this to avoid conflict with the RationalMap type in the Cremona package.
+        
+
+    =============================================================================
+
+    comments on the documentation:
+
+
+    "While the packageParametrization focuses on mostly on curves"
+
+        insert a space after "package"
+        remove the first "on"
+
+Fixed.
+
+
+    "a function invertBirationalMap which has the same functionality as"
+
+    change "which" to "that"
+
+Fixed.
+
+    "Parametrization.m2" -- change to "Parametrization", for that is the name of the package.
+    Also set in italic, as you do your own package's name.  Similarly for Cremona.m2.
+
+Done.
+
+
+    "were implemented somewhat differently"
+
+        remove "somewhat"
+
+Done.
+
+    "probabilisitc"
+
+        fix
+
+Fixed.
+
+
+    "degreeOfRationalMap with MathMode=>true can give a deterministic answer."
+
+        change "can give" to "gives"
+        consider adding text explaining that the answer is not only deterministic, but correct.
+
+Changed, added correct.
+
+    "If true, certain functions assume that the map from X to Y is dominant."
+
+        change to "whether to assume that a raional map is dominant"
+
+Changed.  Made the analogous change to CheckBiraitonal.
+
+    "X \to Y"
+
+        change to \\to, because \t is the escape character combination for TAB
+
+        i4 : "\to"
+
+        o4 =         o
+
+        i5 : "\\to"
+
+        o5 = \to
+
+We have changed these throughout.
+
+    "Inputs:
+        M, a matrix, Row matrix whose entries correspond to the coordinates of your map to projective space."
+        
+            don't capitalize "Row", because it doesn't start a sentence
+            fix everywhere else, too
+
+
+    "This defines the locus where a given map of projective varieties is not defined."
+
+        Here "This" refers to what was mentioned in the title (headline), but that's a bit clumsy.
+        So phrase it this way:
+
+        "The function baseLocusOfMap defines the locus where a given map of projective varieties is not defined."
+
+        Check other nodes for similar uses
+
+
+    "Consider the following rational map from P2 to P1"
+
+        add a period to the end
+
+
+    "a curve on P^2"
+
+        many people prefer to say "in" instead of "on"
+
+
+    Key=>{AssumeDominant, [isBirationalMap, AssumeDominant],
+        [isBirationalOntoImage, AssumeDominant],
+        [isEmbedding, AssumeDominant],
+        [jacobianDualMatrix,AssumeDominant],
+        [inverseOfMap, AssumeDominant],
+        [sourceInversionFactor, AssumeDominant] },
+
+        One disadvantage of putting tags such as [sourceInversionFactor, AssumeDominant] on
+        the same node as the tag for AssumeDominant is that then there is no link
+        from that node to the node for sourceInversionFactor.  Wouldn't it look better
+        the other way?  Compare with
+
+        https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2-1.16/share/doc/Macaulay2/Macaulay2Doc/html/___Verbose.html
+
+        There are probably a lot of other instances of this kind of thing.
+
+
+    "HybridStrategy -- A strategy for inverseOfMap, isBirationalMap and isEmbedding."
+
+            It's too verbose to list the functions affected in the headline.  What about this?:
+            "an option specifying an intermediate strategy"
+
+
+    "Given $f : X \to Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$."
+
+        There should be some indication that f is a rational map here.  Check for similar instances elsewhere.
+        Also write f(X).
+        Or maybe f(X-baselocus f).
+        Also, if f is a rational map, then f(X) isn't closed, so it doesn't have a defining ideal.
+
+    "It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these. "
+
+        Poorly phrased, since "are" is not the same as "should be".  Try something
+        like: "The rings provided implicitly in the inputs should be polynomial
+        rings or quotients of polynomial rings."
+
+
+    "subset of the the ambient projective space"
+
+        remove a word
+
+
+    "This function frequently just calls ker from Macaulay2. "
+
+        make "ker" a link to the documentation of the function
+
+
+    " it first tries to verify if the ring map is injective."
+
+        change "if" to "whether"
+
+        check the rest of the documentation, and whereever you see something like "check if", change it
+        to "check whether"
+
+
+    "inverseOfMap -- Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational onto its image.
+    Synopsis"
+
+        This headline is too verbose.  The purpose of headlines is to give brief hints in lists of functions.
+        Try something like "inverse of a birational map".  Put the rest of the information in the body of the node.
+
+    "Given a map f : X →Y, this finds the inverse of your birational map f(X) →X (if it is birational onto its image). "
+
+        "this" is ambiguous, as mentioned above.
+        Never use "your" -- it makes no sense.  (Similarly in the list of inputs and many other places in the documentation.)
+        Try something like:
+
+        "Given a rational map f : X → Y, this function computes the inverse of the induced map X → f(X), provided it is birational."
+
+        Have you said somewhere that f(X) denotes the closure of the image??
+
+        I'm not sure it's sensible, from the point of view of category theory, to replace Y by the image of f here.
+        The inverse of a map f : X → Y should be a map Y → X.  Would doing so hurt applications?  If so, could you provide a way
+        to produce from a map f : X → Y the corresponding map a map X → f(X)?
+
+    "Note SimisStrategy will never terminate for non-birational maps. "
+
+        change to "Note that SimisStrategy will never terminate for non-birational maps."
+
+
+    "The option HybridLimit can weight the HybridStrategy between ReesStrategy and SimisStrategy"
+    "the default value is 15 and increasing it will weight towards SimisStrategy"
+
+        rephrase, because "weight" is a noun
+
+
+
+    "Notice that the leading minus signs do not change the projective map."
+
+        "change" is unclear.  How about this?:
+        "Notice that removal of the leading minus signs would not change the projective map."
+
+
+    "The target and source must be varieties, in particular their defining ideals must be prime."
+
+        change comma ot semicolon
+
+
+    "The next example, is a Birational map on ℙ^4."
+
+        remove comma
+
+
+    Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
+    inverseOfMapSimis: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant option if this is slow.
+    inverseOfMapSimis: Found the image of the map.
+    inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 1}.
+    inverseOfMapSimis: About to check rank, if this is very slow, you may try turning QuickRank=>false.
+    inverseOfMapSimis:  About to compute partial Groebner basis of rees ideal up to degree {1, 2}.
+    inverseOfMapSimis: About to check rank, if this is very slow, you may try turning QuickRank=>false.
+    inverseOfMapSimis: We computed enough of the Groebner basis.
+    inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  3 columns  and about  4 rows.
+    inverseOfMapSimis: Looking for a nonzero minor. If this fails, you may increase the attempts with MinorsCount => #
+    getSubmatrixOfRank: Trying to find a submatrix of rank at least: 2 with attempts = 10.  DetStrategy=>Rank
+    getSubmatrixOfRank: found one, in 1 attempts
+    inverseOfMapSimis: We found a nonzero minor.
+
+        This chatter is just noise, normally, and should be off.  You could let the user turn it on
+        by adding an option "Verbose", whose default value is false.  (You have true
+        as the default value, so that's the problem.)
+
+
+
+    "Only works for irreducible varieties right now. "
+
+        Sentences need subjects.  "Only" is in the wrong place.  "Right now" refers to time, but documentation
+        can be read in the future.
+
+        Try:
+        "The current implementation of this function works only for irreducible varieties. "
+
+
+    "Also see the function invertBirMap in the package Cremona,"
+
+        Make both of those links, so they can just click.
+
+        Similarly in "Also see the very fast probabilisitc birationality checking
+        of the Cremona package: isBirational"
+
+        And perhaps elsewhere.
+
+
+    "for certain types of maps from projective space is sometimes faster"
+
+        say which types, or change to
+
+        "for some maps from projective space is faster"
+
+
+
+    "isBirationalMap -- Checks if a map between projective varieties is birational"
+
+            "Checks" should not be capitalized.
+            "Checks" should be omitted
+            "if" should be "whether"
+            
+            Similarly for isBirationalOntoImage
+            
+
+    "the variables should be sent to elements of a single fixed degree"
+
+        Maybe the real criterion is that the ring map is homogeneous.  Such maps can
+        be made homogeneous with the option DegreeMap.  Maybe then you could allow
+        rings where the variables don't all have degree 1.  If this really is the criterion,
+        phrase it as :
+
+        "the variables should be sent to elements of the same degree"
+        
+        , because "fixed" is meaningless
+
+
+    "The target and source must be varieties"
+
+        Macaulay2 actually has things called varieties, of types Variety, AffineVariety,
+        and ProjectiveVariety, but none of your functions accept them.  That might be
+        really elegant to orient your implementation around them.
+
+
+
+    "Note the Frobenius map is not birational."
+
+        change to "Note that the Frobenius map is not birational."
+
+
+    "isBirationalOntoImage -- Checks if a map between projective varieties is birational onto its image."
+
+        This function would not be needed at all if you had a way to produce from a map f : X → Y
+        the corresponding map a map X → f(X).  I mentioned this above.  Why not just implement that?
+
+        Aha, you did implement it, as mapOntoImage.  So this function is not needed.
+
+
+    "Sub-Hankel matrices have homaloidal determinants."
+
+            say what "homaloidal" and "sub-Hankel" mean somewhere
+
+
+    "The source must be a variety, in particular its defining ideals must be prime."
+
+        "in particular"?  Isn't that the whole thing?  Also used elsehwere.
+
+        change "ideals" to "ideal"
+
+
+    "isEmbedding -- Checks whether a map of projective varieties is a closed embedding."
+
+            ... a *rational* map ...
+
+
+    " Note, this function, isEmbedding, will only behave properly if CheckBirational is set to true."
+
+        In that case, the function should not accept the option from the user.  Why let the
+        user break your code?  Change it.
+
+
+    "jacobianDualMatrix -- Computes the Jacobian Dual Matrix, a matrix whose kernel describing the syzygies of the inverse map."
+
+                too verbose
+                don't capitalize Dual Matrix
+                "describing" should be "describes" (but move that to the body of the documentation)
+                inverse rational maps don't have syzygies -- matrices have syzygies
+
+
+    "This is mostly an internal function which is used when checking"
+
+        add comma before "which"
+        Check for other uses of "which" that will need commas, too.
+
+
+    "this just returns S/kernel →R."
+
+        kernel of what?
+
+
+    "correspoing"
+
+        fix
+
+
+    "mapOntoImage -- Given a map of rings, correspoing to X mapping to Y, this returns the map of rings corresponding to X mapping to f(X)."
+
+            X and Y are undefined.  Better say:
+
+            "mapOntoImage -- the induced map from a variety to its image under a rational map"
+
+    "invovling"
+
+        fix
+
+        maybe run the documentation through a spell checker!
+
+
+    "the functions will try to make an educated guess as to how big to make this, depending on varieties you are working with."
+
+        wordy.  Also "try" is wrong, because they will always succeed in guessing (presumably).
+            
+            Try
+
+        "these functions will determine a value using a heuristic that depends on the varieties involved"
+
+
+    "MinorsCount -- An option controlling the behavior of isBirational and inverseOfMap (and other functions which call those)."
+
+            headlines should address the meat.  Try
+
+            "MinorsCount -- an option to limit the number of random minors computed"
+
+            Why not rename it to MinorsLimit?
+
+
+    " computed via the packageFastLinAlg"
+
+        add a space
+        add a period
+
+
+    "It is a valid value for the Strategy Option for inverseOfMap "
+
+        pronouns, such as "it", always need antecedents.  Don't use them otherwise.
+
+
+    "the equation of the ideal of definition of the Rees algebra are generated"
+
+                change "are" to "is" or change "equation" to "equations"
+
+
+    "E.g. Vasconcelos, Rees algebras, multiplicities, algorithms. Springer Monographs in Mathematics. Springer-Verlag, Berlin, 2005."
+
+        What are all those periods doing?  Make complete sentences.  Also you omitted the title of the book: "Integral closure".
+
+        Start like this: "This technique is described in the book "Integral closure" by Wolmer Vasconcelos ... "
+
+        Also give a precise page number for the algorithm.
+
+        Here is the info:
+
+            @book {MR2153889,
+                AUTHOR = {Vasconcelos, Wolmer},
+                TITLE = {Integral closure},
+                SERIES = {Springer Monographs in Mathematics},
+                NOTE = {Rees algebras, multiplicities, algorithms},
+            PUBLISHER = {Springer-Verlag, Berlin},
+                YEAR = {2005},
+                PAGES = {xii+519},
+                ISBN = {978-3-540-25540-6; 3-540-25540-0},
+            MRCLASS = {13A30 (13-02 13B22 13D40 13H15)},
+            MRNUMBER = {2153889},
+            MRREVIEWER = {Ngo Viet Trung},
+            }
+
+
+
+    "SaturateOutput -- If false, certain functions will not saturate their output."
+
+            headline to wordy.  Try
+
+            "SaturateOutput -- whether the value returned should be saturated"
+
+
+    "SaturationStrategy -- A strategy for inverseOfMap, isBirationalMap, isEmbedding."
+
+                don't mention the functions in the headline.  Instead say something
+                about the option itself, such as "the strategy for computing saturations"
+
+                Check all other headlines for names of functions and exterminate
+
+
+    "It is a valid value for the Strategy Option for inverseOfMap "
+
+        pronouns, as above, need antecedents
+
+        check all other nodes for descriptions starting with pronouns
+
+
+    "algerba"
+
+        fix
+
+
+    " only this part of the Rees ideal is enough to decide Birationality "
+
+        "only"?  What could it mean here?  Eliminate it.
+
+        "part of the Rees ideal" -- what could that mean?  The previous
+        sentence was about Groebner bases.
+
+        don't capitalize Birationality
+
+
+    "all Grobner basis"
+
+                the o in every Grobner needs an umlaut.  Documentation accepts Unicode.
+
+            "bases" instead of "basis" here
+
+
+    "looking for all Grobner basis with first degree 1."
+
+        what does "with first degree 1" mean?
+
+
+    "... ; so that this Strategy reduces the number of computations. "
+
+        "so"?
+
+        "number of computations" -- not relevant, if they're faster in toto
+
+        Rephrase, perhaps as
+
+        "... ; this strategy reduces computation time. "
+
+
+
+    "disadvatage"
+
+        fix
+
+
+    I got tired at SimisStrategy
+
+    INCOMPLETE
+
+    =============================================================================
+
+    comments on the code:
+
+    Version => "0.3"
+
+        if the package is good enough to be published, it's good enough
+        to be called version 1
+
+
+    "isSameMap -- Checks whether two maps to projective space are really the same"
+
+        The existence of this unnatural function suggests a rewrite of the code.
+        Introduce a new type called "RationalMap".  Maybe make source and target
+        be varieties instead of rings.  Then for two rational maps f and g,
+        you could check equality in a method installed for evaluating "f == g".
+
+        The use of this type throughout the code would add a lot of clarity, for
+        all those functions that take either ideals or rings with lists or ring
+        maps would now *just* take objects of type RationalMap.  Internally, your
+        implementation would store that data inside the object.
+
+    INCOMPLETE
+
+
+    =============================================================================
+
+    comments on the paper:
+
+    INCOMPLETE
+
+    =============================================================================
