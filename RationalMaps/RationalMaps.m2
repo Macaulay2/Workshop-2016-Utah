@@ -17,7 +17,7 @@ newPackage( "RationalMaps",
     }, --this file is in the public domain
     Keywords => {"Commutative Algebra"},
     Headline => "rational maps between varieties", 
-    PackageImports => {"FastMinors"},
+    PackageExports => {"FastMinors"},
     DebuggingMode => true
 )
 export{
@@ -90,7 +90,7 @@ source(RationalMapping) := myMap ->(
 )
 
 net RationalMapping := t -> (
-    toString(source t) | " - - - > " | toString(target t) | "   " | toString(first entries matrix map t)
+    net(source t) | " - - - > " | net(target t) | "   " | net(first entries matrix map t)
 )
 
 RationalMapping * RationalMapping := RationalMapping => (phi, psi) -> (
@@ -427,17 +427,7 @@ isBirationalMap = method(Options => {AssumeDominant=>false, Strategy=>HybridStra
 --Below we have defining ideal of X = di
 --defining ideal of Y = im
 --list of elements = bm
-isBirationalMap(Ideal,Ideal,BasicList) :=o->(di,im,bm)->(
-    R:=ring di;
-    R2 := R/di;
-    S:=ring im;
-    ff := map(R2, S/di, apply(bm, z -> sub(z, R2)));
-    isBirationalMap(ff, o)
-);
 
-isBirationalMap(Ring,Ring,BasicList) := o->(R1, S1, bm)->(
-    isBirationalMap(ideal R1, ideal S1, bm, o)
-);
 
 isBirationalMap(RationalMapping) := o-> (phi) -> (
     if (phi#cache#?isBirationalMap) then return phi#cache#isBirationalMap;
@@ -466,7 +456,9 @@ isBirationalMap(RingMap) :=o->(f)->(
             local rk;
             fSourceDim := dim source f;
             if (o.QuickRank == true) then (
-                l1 := getSubmatrixOfRank(fSourceDim, jac, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>2);
+                l1 := getSubmatrixOfRank(fSourceDim, jac, Strategy => LexSmallest, MaxMinors=>1);                
+                if (l1 === null) then l1 = getSubmatrixOfRank(fSourceDim, jac, Strategy => GRevLexSmallest, MaxMinors=>1);
+                if (l1 === null) then l1 = getSubmatrixOfRank(fSourceDim, jac, Strategy => GRevLexSmallestTerm, MaxMinors=>1);
                 if (l1 === null) then (
                     rk = rank jac;
                 )
@@ -608,7 +600,7 @@ isBirationalOntoImageRees(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
 
     --not(isSubset(minors(jdd,barJD),im1))
     if (o.QuickRank == true) then (
-        isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>2)
+        isRankAtLeast(jdd, barJD, Strategy => StrategyDefault, MaxMinors=>2)
     )
     else (
         rank barJD >= jdd
@@ -725,7 +717,7 @@ isBirationalOntoImageSimis(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
         if (giveUp == false) then(
             if (o.Verbose === true) then print "isBirationalOntoImageSimis: is computing the rank of the  Jacobian Dual Matrix- barJD";
             if (o.QuickRank == true) then (
-                if (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>minorsCt, Verbose=>o.Verbose)) then (
+                if (isRankAtLeast(jdd, barJD, Strategy => StrategyDefault, MaxMinors=>minorsCt, Verbose=>o.Verbose)) then (
                     flag=true;
                     giveUp=true;
                 );
@@ -742,7 +734,7 @@ isBirationalOntoImageSimis(Ideal,Ideal, BasicList) :=o->(di,im,bm)->(
                             );
             if (o.Verbose === true) then print "isBirationalOntoImageSimis: is computing the rank of the  Jacobian Dual Matrix- barJD";
             if (o.QuickRank == true) then (
-                if (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>minorsCt, Verbose=>o.Verbose)) then (
+                if (isRankAtLeast(jdd, barJD, Strategy => StrategyDefault, MaxMinors=>minorsCt, Verbose=>o.Verbose)) then (
                     flag = true;
                     giveUp=true;
                 );
@@ -867,7 +859,7 @@ inverseOfMapRees(RingMap) := o->(f)->(
     jdd:=(numgens ambient Rlin1)-1;
     if (o.CheckBirational== true) then (
         if (o.QuickRank) then (
-            if not (isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>2, Verbose=>o.Verbose)) then error "inverseOfMapRees: The map is not birational onto its image";
+            if not (isRankAtLeast(jdd, barJD, Strategy => StrategyDefault, MaxMinors=>2, Verbose=>o.Verbose)) then error "inverseOfMapRees: The map is not birational onto its image";
         )
         else (
             if not (rank barJD >= jdd) then error "inverseOfMapRees: The map is not birational onto its image";
@@ -885,7 +877,12 @@ inverseOfMapRees(RingMap) := o->(f)->(
     nonZMinor := null;
     if (o.MinorsCount > 0) then (
         if (o.Verbose == true) then print ("inverseOfMapRees: Looking for a nonzero minor. \r\n       If this fails, you may increase the attempts with MinorsCount => #");
-        nonZMinor = getSubmatrixOfRank(jdd, barJD, MaxMinors => o.MinorsCount, Verbose=>o.Verbose);
+        --nonZMinor = getSubmatrixOfRank(jdd, barJD, MaxMinors => o.MinorsCount, Verbose=>o.Verbose);
+        nonZMinor = getSubmatrixOfRank(jdd, barJD, Strategy=>LexSmallest, MaxMinors => 1, Verbose=>o.Verbose);
+        if (nonZMinor === null) then nonZMinor = getSubmatrixOfRank(jdd, barJD, Strategy=>GRevLexSmallest, MaxMinors => 1, Verbose=>o.Verbose);
+        if (nonZMinor === null) then nonZMinor = getSubmatrixOfRank(jdd, barJD, Strategy=>GRevLexSmallestTerm, MaxMinors => 1, Verbose=>o.Verbose);
+        if (nonZMinor === null) then nonZMinor = getSubmatrixOfRank(jdd, barJD, MaxMinors => o.MinorsCount-3, Verbose=>o.Verbose);
+        --1/0;
         --nonZeroMinor(barJD,jdd,o.MinorsCount, Verbose=>o.Verbose);
     );
     if (nonZMinor === null) then (
@@ -1001,7 +998,9 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
             --if (rank barJD >= jdd) then (
             if (o.QuickRank == true) then (
                 if (o.Verbose === true) then print("inverseOfMapSimis: About to check rank, if this is very slow, you may try turning QuickRank=>false." );
-                if (isRankAtLeast(jdd, barJD, MaxMinors=>min(2, o.MinorsCount), Strategy=>StrategyGRevLexSmallestTerm)) then (
+                if (isRankAtLeast(jdd, barJD, MaxMinors=>1, Strategy=>LexSmallest) or 
+                    isRankAtLeast(jdd, barJD, MaxMinors=>1, Strategy=>GRevLexSmallest) or 
+                    isRankAtLeast(jdd, barJD, MaxMinors=>1, Strategy=>GRevLexSmallestTerm) ) then (
                     if (o.Verbose === true) then print("inverseOfMapSimis: We computed enough of the Groebner basis." );
                     flag = true;
                 );
@@ -1016,7 +1015,7 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
             flag = true;
             if (o.CheckBirational == true) then (
                 if (o.QuickRank) then (
-                    if (not isRankAtLeast(jdd, barJD, Strategy => StrategyGRevLexSmallestTerm, MaxMinors=>min(2, o.MinorsCount), Verbose=>o.Verbose)) then error "inverseOfMapSimis: The map is not birational onto its image";
+                    if (not isRankAtLeast(jdd, barJD, Strategy => StrategyDefault, MaxMinors=>min(2, o.MinorsCount), Verbose=>o.Verbose)) then error "inverseOfMapSimis: The map is not birational onto its image";
                 )
                 else(
                     if (not (rank barJD >= jdd)) then error "inverseOfMapSimis: The map is not birational onto its image";
@@ -1040,7 +1039,11 @@ inverseOfMapSimis(RingMap) :=o->(f)->(
     nonZMinor := null;
     if (o.MinorsCount > 0) then (
         if (o.Verbose==true) then print "inverseOfMapSimis: Looking for a nonzero minor.\r\n        If this fails, you may increase the attempts with MinorsCount => #";
-        nonZMinor = getSubmatrixOfRank(jdd, barJD, MaxMinors => o.MinorsCount, Verbose=>o.Verbose);
+        nonZMinor = getSubmatrixOfRank(jdd, barJD, Strategy=>LexSmallest, MaxMinors => 1, Verbose=>o.Verbose);
+        if (nonZMinor === null) then nonZMinor = getSubmatrixOfRank(jdd, barJD, Strategy=>GRevLexSmallest, MaxMinors => 1, Verbose=>o.Verbose);
+        if (nonZMinor === null) then nonZMinor = getSubmatrixOfRank(jdd, barJD, Strategy=>GRevLexSmallestTerm, MaxMinors => 1, Verbose=>o.Verbose);
+        if (nonZMinor === null) then nonZMinor = getSubmatrixOfRank(jdd, barJD, MaxMinors => o.MinorsCount-3, Verbose=>o.Verbose);
+        --1/0;
         --nonZeroMinor(barJD,jdd,o.MinorsCount, Verbose=>o.Verbose);
     );
 
@@ -1093,15 +1096,9 @@ mapOntoImage(RingMap) := o -> (f)->(
     map(target f, (S1)/kk, matrix f)
 );
 
-mapOntoImage(Ring, Ring, BasicList) := o -> (R,S,l)->(
-        newMap := map(R, ambient S, l);
-        mapOntoImage(newMap, o)
-);
-
-mapOntoImage(Ideal, Ideal, BasicList) := o -> (a,b,l)->(
-        newMap := map((ring a)/a, (ring b)/b, l);
-        mapOntoImage(newMap, o)
-);
+mapOntoImage(RationalMapping) := o -> (phi) -> (
+    mapOntoImage(map phi, o)
+)
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1506,32 +1503,22 @@ doc ///
 doc ///
     Key
         isBirationalMap
-        (isBirationalMap, Ideal, Ideal, BasicList)
-        (isBirationalMap, Ring, Ring, BasicList)
         (isBirationalMap, RingMap)
+        (isBirationalMap, RationalMapping)
         [isBirationalMap, AssumeDominant]
         --[isBirationalMap, Strategy]
 	    [isBirationalMap,Verbose]
 	    --[isBirationalMap,HybridLimit]
     Headline
         whether a map between projective varieties is birational
-    Usage
-        val = isBirationalMap(a,b,f)
-        val = isBirationalMap(R,S,f)
+    Usage        
         val = isBirationalMap(Pi)        
-    Inputs
-        a:Ideal
-            defining equations for X
-        b:Ideal
-            defining equations for Y
-        f:BasicList
-            A list of where to send the variables in the ring of b, to in the ring of a.
-        R:Ring
-            the homogeneous coordinate ring of X
-        S:Ring
-            the homogeneous coordinate ring of Y
+        val = isBirationalMap(phi)        
+    Inputs        
         Pi:RingMap
             a ring map S to R corresponding to X mapping to Y    
+        phi:RationalMapping
+            a rational map between projective varieties X to Y
         Verbose => Boolean
             generate informative output which can be used to adjust strategies
         AssumeDominant => Boolean
@@ -1729,28 +1716,14 @@ doc ///
         Key
                 mapOntoImage
                 (mapOntoImage, RingMap)
-                (mapOntoImage, Ideal, Ideal, BasicList)
-                (mapOntoImage, Ring, Ring, BasicList)
+                (mapOntoImage, RationalMapping)
         Headline
                 Given a map of rings, correspoing to X mapping to Y, this returns the map of rings corresponding to X mapping to f(X).
         Usage
-                h = mapOntoImage(f)
-                h = mapOntoImage(a,b,l)
-                h = mapOntoImage(R,S,l)
-        Inputs
-                a:Ideal
-                        defining equations for X
-                b:Ideal
-                        defining equations for Y
-		l:BasicList
-                        projective rational map given by polynomial represenatives of the same degree
+                h = mapOntoImage(f)                
+        Inputs                
                 f:RingMap
-                        the ring map corresponding to $f : X \\to Y$
-                R:Ring
-                        coordinate ring for X
-                S:Ring
-                        coordinate ring for Y
-
+                        the ring map corresponding to $f : X \\to Y$              
         Outputs
                 h:RingMap
 			the map of rings corresponding to $f : X \\to f(X)$.
@@ -1761,8 +1734,7 @@ doc ///
 	                R = QQ[x,y];
 	                S = QQ[a,b,c];
 	                f = map(R, S, {x^2, x*y, y^2});
-	                mapOntoImage(f)
-	                mapOntoImage(R,S,{x^2,x*y,y^2})
+	                mapOntoImage(f)	                
 ///
 --***************************************************************
 
