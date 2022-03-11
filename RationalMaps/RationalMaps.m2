@@ -48,7 +48,7 @@ export{
     "HybridStrategy", --an option for controlling how inversion of maps is run. (This is the default)
     "MinorsCount", --an option for how many times we should randomly look for a minor before calling syz in inverseOfMap
     "HybridLimit", --an option for controlling inversion of maps (whether to do more simis or more rees strategies)
-    "CheckBirational", --an option for inverseOfMap, whether or not to check if something is birational
+    "CheckBirational", --an option for inverseOfMap, whether or not to check whether something is birational
     "SaturateOutput",  --option to turn off saturation of the output
     "AssumeDominant" --option to assume's that the map is dominant (ie, don't compute the kernel)
 }
@@ -721,8 +721,8 @@ isBirationalOntoImageSimis(RationalMapping) := o-> (phi1) -> (
     myt:=(gens tR)#0;
     J:=sub(di1,tR)+ideal apply(1..rs,j->(gens tR)_(n+j)-myt*F_(0,(j-1)));
 
-    flag := false;   --this boolian checks if it is birational
-    giveUp := false;  --this checks if we giveup checkin birationality or not yet
+    flag := false;   --this boolian checks whether it is birational
+    giveUp := false;  --this checks whether we giveup checkin birationality or not yet
     secdeg:=1;        --the second degree of rees equations
     jj := 1;
     M := null;
@@ -1167,14 +1167,14 @@ isEmbedding(RingMap):= o-> (f1)->(
     else (
 	    f2=f1;
 	);
-    if (o.Verbose === true) then print "isEmbedding: Checking to see if the map is a regular map";
+    if (o.Verbose === true) then print "isEmbedding: Checking to see wheter the map is a regular map";
         flag := isRegularMap(f2);
         if (flag == true) then (
 	        if (o.Verbose === true) then (print "isEmbedding: computing the inverse  map");
 
             try(h := (inverseOfMap(f2, AssumeDominant=>true, QuickRank=>o.QuickRank, Strategy=>o.Strategy,HybridLimit=>o.HybridLimit, Verbose=>o.Verbose, MinorsCount=>o.MinorsCount))#map; ) then
             (
-	            if (o.Verbose === true) then print "isEmbedding: checking if the inverse map is a regular map";
+	            if (o.Verbose === true) then print "isEmbedding: checking whether the inverse map is a regular map";
         	    flag = isRegularMap(h, Verbose=>o.Verbose);
 	        )
             else(
@@ -1325,7 +1325,7 @@ document {
     BOLD "Mathematical background:",BR{},
     UL {
 	  {"A. V. Dória, S. H. Hassanzadeh, A. Simis,  ",EM "  A characteristic free criterion of birationality", ", Advances in Mathematics, Volume 230, Issue 1, 1 May 2012, Pages 390-413."},
-	  {"A. Simis, ",EM "  Cremona Transformations and some Related Algebras", ", Journal of Algebra, Volume 280, Issue 1, 1 October 2004, Pages 162–179"},
+	  {"A. Simis, ",EM "  Cremona Transformations and some Related Algebras", ", Journal of Algebra, Volume 280, Issue 1, 1 October 2004, Pages 162--179"},
 	},
     BOLD "Functionality overlap with other packages:\n\n",BR{},BR{},
     EM "Parametrization",
@@ -1390,7 +1390,7 @@ document{
 document{
     Key=>{QuickRank},
     Headline=>" an option for controlling how rank is computed",
-            "If set to true, then checking if rank is at least a certain number will be computed via the package", TT "FastMinors",
+            "If set to true, then checking wheter rank is at least a certain number will be computed via the package", TT "FastMinors",
     SeeAlso=>
         inverseOfMap
 }
@@ -1455,7 +1455,7 @@ doc ///
                 MRCLASS = {13A30 (13-02 13B22 13D40 13H15)},
                 MRNUMBER = {2153889},
                 MRREVIEWER = {Ngo Viet Trung},
-            }
+            }@
     SeeAlso
         SaturationStrategy
         SimisStrategy
@@ -1507,18 +1507,79 @@ doc ///
         RationalMapping
         rationalMapping
         (rationalMapping, RingMap)
+        (rationalMapping, Ring, Ring, BasicList)
+        (rationalMapping, Ring, Ring, Matrix)
+        (rationalMapping, ProjectiveVariety, ProjectiveVariety, BasicList)
+        (rationalMapping, ProjectiveVariety, ProjectiveVariety, Matrix)
     Headline
         a rational mapping between projective varieties
     Description
         Text
-            A {\tt RationalMapping} is a Type that is used to treat maps between projective varieties  geometrically.  It stores essentially equivalent data to the corresponding map between the homogeneous coordinate rings.  For example, the following is the Cremona transformation on P2
+            A {\tt RationalMapping} is a Type that is used to treat maps between projective varieties  geometrically.  It stores essentially equivalent data to the corresponding map between the homogeneous coordinate rings.  The way to construct the object is to use the function {\tt rationalMapping}  For example, the following is the Cremona transformation on P2 constructed in various different ways.
+        Example
+            R = QQ[x,y,z]
+            P2 = Proj(R)
+            phi1 = rationalMapping (P2, P2, {y*z,x*z,x*y})
+            phi2 = rationalMapping(R, R, matrix{{y*z,x*z,x*y}})
+            phi3 = rationalMapping(map(R, R, {y*z,x*z,x*y}))
+    SeeAlso
+        (symbol *, RationalMapping, RationalMapping)
+        (symbol ==, RationalMapping, RationalMapping)
+///
+
+doc ///
+    Key
+        (symbol *, RationalMapping, RationalMapping)
+        (symbol ^, RationalMapping, ZZ)
+    Headline
+        compose rational maps between projective varieties
+    Description
+        Text
+            This allows one to compose two rational maps between projective varieties.
         Example
             R = QQ[x,y,z]
             P2 = Proj(R)
             phi = rationalMapping (P2, P2, {y*z,x*z,x*y})
-        Text
-            For more details on creating rational 
+            ident = rationalMapping (P2, P2, {x,y,z})
+            phi*phi == ident
+            phi^3 == phi
+            phi^2 == phi
+    SeeAlso
+        isSameMap
+///
 
+doc ///
+    Key
+        (map, RationalMapping)
+    Headline    
+        the ring map associated to a RationalMapping between projective varieties
+    Description
+        Text
+            Given a {\tt RationalMapping} between projective varieties, this returns the associated map between projective varietes.
+///
+
+doc ///
+    Key
+        (source, RationalMapping)
+        (target, RationalMapping)
+    Headline
+        returns the source or target of a RationalMapping between projective varietes.
+    Description
+        Text
+            Given a {\tt RationalMapping} between projective varietes these functions can be used to return the source or target.  
+        Example
+            R = QQ[a,b];
+            S = QQ[x,y,z];
+            P2 = Proj R;
+            P3 = Proj S;
+            f = map(R, S, {a,b,0});
+            phi = rationalMapping f;
+            source phi
+            target phi
+            source f
+            target f
+        Text
+            Note that the source of phi corresponds to the target of f and the target of phi corresponds to the source of f.
 ///
 
 --***************************************************************
@@ -1563,7 +1624,7 @@ doc ///
             true if the map is birational, false if otherwise
     Description
         Text
-            This checks if a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The target and source must be varieties, in particular their defining ideals must be prime.  Let's check that the plane quadratic cremona transformation is birational.
+            This checks wheter a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The target and source must be varieties, in particular their defining ideals must be prime.  Let's check that the plane quadratic cremona transformation is birational.
         Example
             R=QQ[x,y,z];
             S=QQ[a,b,c];
@@ -1692,7 +1753,7 @@ doc ///
             psi = rationalMapping(Proj(S/b), Proj(R/a), f)
             idealOfImageOfMap(psi)
         Text
-            This function frequently just calls {\tt ker} from Macaulay2.  However, if the target of the ring map is a polynomial ring, then it first tries to verify if the ring map is injective.  This is done by computing the rank of an appropriate jacobian matrix.
+            This function frequently just calls @TO2((kernel, RingMap), "ker")@ from Macaulay2.  However, if the target of the ring map is a polynomial ring, then it first tries to verify whether the ring map is injective.  This is done by computing the rank of an appropriate jacobian matrix.
 ///
 --***************************************************************
 
@@ -1726,7 +1787,7 @@ doc ///
             describes the syzygies of the inverse map, if it exists.
     Description
         Text
-            This is mostly an internal function which is used when checking if a map is birational and when computing the inverse map.  If the {\tt AssumeDominant} option is set to {\tt true}, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the {\tt Strategy} option are {\tt ReesStrategy} and {\tt SaturationStrategy}.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390--413.
+            This is mostly an internal function which is used when checking whether a map is birational and when computing the inverse map.  If the {\tt AssumeDominant} option is set to {\tt true}, it assumes that the kernel of the associated ring map is zero (default value is false).  Valid values for the {\tt Strategy} option are {\tt ReesStrategy} and {\tt SaturationStrategy}.  For more information, see Doria, Hassanzadeh, Simis, A characteristic-free criterion of birationality.  Adv. Math. 230 (2012), no. 1, 390--413.
         Example
             R=QQ[x,y];
             S=QQ[a,b,c,d];
@@ -1748,25 +1809,32 @@ doc ///
                 (mapOntoImage, RationalMapping)
                 [mapOntoImage, QuickRank]
         Headline
-                Given a map of rings, correspoing to X mapping to Y, this returns the map of rings corresponding to X mapping to f(X).
+                replace the target of a rational map making it dominant
         Usage
-                h = mapOntoImage(f)                
+                h = mapOntoImage(f)        
+                psi = mapOntoImage(phi)        
         Inputs                
                 f:RingMap
-                        the ring map corresponding to $f : X \\to Y$              
+                        the ring map corresponding to a rational map $\phi$ of projective varieties
+                phi:RationalMapping
+                        a rational map $\phi$ of projective varieties              
                 QuickRank => Boolean
                         whether to compute rank via the package FastMinors
         Outputs
                 h:RingMap
-                    the map of rings corresponding to $f : X \\to f(X)$.
+                    the map of rings corresponding to $X \to \overline{\phi(X)}$.
+                psi:RationalMapping
+                    the rational map 
         Description
                 Text
-                        This function is really simple, given $S \\to R$, this just returns $S/kernel \\to R$.  In the case that the kernel is zero it can do this computation more quickly however.
+                        Given $f : X \to Y$ this returns $X \to \overline{\phi(X)}$.  Alternately, given $S \to R$, this just returns $S/kernel \to R$.  It first checks whether the kernel is without calling @TO2((kernel, RingMap), "ker")@. 
                 Example
                         R = QQ[x,y];
                         S = QQ[a,b,c];
                         f = map(R, S, {x^2, x*y, y^2});
-                        mapOntoImage(f)	                
+                        mapOntoImage(f)	     
+                        phi = rationalMapping f
+                        mapOntoImage(phi)           
 ///
 --***************************************************************
 
@@ -1811,7 +1879,7 @@ doc ///
                     true if the map is an embedding, otherwise false.
         Description
                 Text
-                        Given a map of rings, correspoing to $f : X \\to Y$, this determines if this map embeds $X$ as a closed subscheme into $Y$.  The target and source must be varieties, in particular their defining ideals must be prime.  Consider the Veronese embedding.
+                        Given a map of rings, correspoing to $f : X \\to Y$, this determines whether this map embeds $X$ as a closed subscheme into $Y$.  The target and source must be varieties, in particular their defining ideals must be prime.  Consider the Veronese embedding.
                 Example
                         R = ZZ/7[x,y];
                         S = ZZ/7[a,b,c];
@@ -1853,6 +1921,7 @@ doc ///
         (baseLocusOfMap, RingMap)
         (baseLocusOfMap, RationalMapping)
         [baseLocusOfMap, SaturateOutput]
+        [baseLocusOfMap, Verbose]
     Headline
         the base locus of a map from a projective variety to projective space
     Usage        
@@ -1865,6 +1934,8 @@ doc ///
             a rational map between projective varieties
         SaturateOutput => Boolean
             if set to true then the output will be saturated
+        Verbose => Boolean
+            whether to generate informative output
     Outputs
         I: Ideal
             the saturated defining ideal of the base locus of the corresponding maps
@@ -1990,6 +2061,7 @@ doc ///
         isRegularMap        
         (isRegularMap, RingMap)
         (isRegularMap, RationalMapping)
+        [isRegularMap, Verbose]
     Headline
         whether a map to projective space is regular
     Usage        
@@ -1997,11 +2069,13 @@ doc ///
     Inputs
         f: RingMap
             a ring map corresponding to a map of projective varieties
+        Verbose => Boolean
+            whether to generate informative output
     Outputs
         b: Boolean
     Description
         Text
-            This function just runs baseLocusOfMap(f) and checks if the ideal defining the base locus is the whole ring.
+            This function just runs baseLocusOfMap(f) and checks whether the ideal defining the base locus is the whole ring.
         Example
             P5 = QQ[a..f];
             P2 = QQ[x,y,z];
@@ -2025,7 +2099,7 @@ doc ///
         [inverseOfMap, MinorsCount]
         [inverseOfMap, QuickRank]
     Headline
-        computes the inverse map of a given birational map between projective varieties
+        inverse of a birational map between projective varieties
     Usage
         psi = inverseOfMap(g)
         psi = inverseOfMap(phi)
@@ -2050,10 +2124,11 @@ doc ///
             whether to compute rank via the package FastMinors
     Outputs
         psi: RationalMapping
-            inverse function of your birational map, $f(X) \\to X$.
+            inverse function of your birational map, $\overline{f(X)} \\to X$.
     Description
         Text
-            Given a map $f : X \\to Y$, this finds the inverse of your birational map $f(X) \\to X$ (if it is birational onto its image).  The target and source must be varieties, in particular their defining ideals must be prime.
+            Given a rational map $f : X \\to Y$, this function computes the inverse of the induced map $X \\to \overline{f(X)}$, provided it is birational."
+            The target and source must be varieties, in particular their defining ideals must be prime.
         Text
             If {\tt AssumeDominant} is set to {\tt true} (default is {\tt false}) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of $f$.
         Text

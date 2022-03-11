@@ -168,7 +168,7 @@ Done
 
         make "ker" a link to the documentation of the function
 
-
+Done
 
     " it first tries to verify if the ring map is injective."
 
@@ -176,6 +176,8 @@ Done
 
         check the rest of the documentation, and whereever you see something like "check if", change it
         to "check whether"
+    
+Done
 
 
     "inverseOfMap -- Computes the inverse map of a given birational map between projective varieties. Returns an error if the map is not birational onto its image.
@@ -183,6 +185,9 @@ Done
 
         This headline is too verbose.  The purpose of headlines is to give brief hints in lists of functions.
         Try something like "inverse of a birational map".  Put the rest of the information in the body of the node.
+
+Done
+
 
     "Given a map f : X →Y, this finds the inverse of your birational map f(X) →X (if it is birational onto its image). "
 
