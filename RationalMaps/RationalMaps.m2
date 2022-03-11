@@ -1402,22 +1402,7 @@ document{
     SeeAlso=>
         inverseOfMap
 }
---***************************************************************
-document{
-    Key=>{[sourceInversionFactor, Strategy],
-	[isBirationalOntoImage,Strategy],
-	[jacobianDualMatrix,Strategy],
-	[isEmbedding, Strategy],
---	[relationType,Strategy],
-	[inverseOfMap, Strategy]
-	 },
-    Headline=>" determines the desired Strategy in each function.",
-       "In sourceInversionFactor, isBirationalMap, isBirationalOntoImage,
-	    isEmbeddinga and inverseOfMap, Strategy may assumed any of three options
-	    ReesStrategy, SimisStrategy or  HybridStrategy (default). These functions as well as 
-	    jacobianDualMatrix may also attain the Strategy=>SaturationStrategy or ReesStrategy (default).  ",
 
-}
 --***************************************************************
 document{
     Key=>{ SaturateOutput},
