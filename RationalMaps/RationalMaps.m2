@@ -1301,23 +1301,22 @@ document{
     Headline=> "whether to check birationality",
     Usage =>"  CheckBirational=>b",
       "If true, inverseOfMap, isEmbedding and sourceInversionFactor  will check whether the passed map is birational.
-      If it is not birational, it will throw an error."
-
+      If it is not birational, it will throw an error.",
+    SeeAlso =>
+        "inverseOfMap",
+        "isEmbedding",
+        "sourceInversionFactor"
 }
 --***************************************************************
 
 document{
-    Key=>{HybridLimit, [isBirationalMap,HybridLimit],
-       	  [inverseOfMap, HybridLimit],
-          [isBirationalOntoImage,HybridLimit],
-	  [isEmbedding, HybridLimit],
-	  [sourceInversionFactor, HybridLimit]},
+    Key=>{HybridLimit},
     Headline=>"an option to control HybridStrategy",
-       "By increasing the HybridLimit value (default 15), you can weight
+       "This controls behavior when using ", TT "Strategy=>HybridStrategy", ".  ", "By increasing the HybridLimit value (default 15), you can weight
        HybridStrategy more towards SimisStrategy.
 	     Infinity will behave just like SimisStrategy.",
     SeeAlso=>
-        HybridStrategy
+        "HybridStrategy"
 }
 --***************************************************************
 
@@ -1496,7 +1495,7 @@ doc ///
         [isBirationalMap, AssumeDominant]
         --[isBirationalMap, Strategy]
 	    [isBirationalMap,Verbose]
-	    --[isBirationalMap,HybridLimit]
+	    [isBirationalMap,HybridLimit]
     Headline
         whether a map between projective varieties is birational
     Usage        
@@ -1511,6 +1510,8 @@ doc ///
             generate informative output which can be used to adjust strategies
         AssumeDominant => Boolean
             whether to assume a map of schemes is dominant, if set to true it can speed up computation
+        HybridLimit => ZZ
+            within HybridStrategy, within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used
     Outputs
         val:Boolean
             true if the map is birational, false if otherwise
@@ -1550,6 +1551,7 @@ doc ///
             (isBirationalOntoImage, RationalMapping)
             [isBirationalOntoImage,Verbose]
             [isBirationalOntoImage, AssumeDominant]
+            [isBirationalOntoImage, HybridLimit]
         Headline
                 whether a map between projective varieties is birational onto its image
         Usage
@@ -1564,6 +1566,8 @@ doc ///
                     generate informative output which can be used to adjust strategies
                 AssumeDominant => Boolean
                     whether to assume a map of schemes is dominant, if true it can speed up computation as a kernel will not be computed                    
+                HybridLimit => ZZ
+                    within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used, larger numbers weight it towards SimisStrategy
         Outputs
                 val:Boolean
                         true if the map is birational onto its image, false if otherwise
@@ -1723,7 +1727,7 @@ doc ///
                 (isEmbedding, RationalMapping)
                 [isEmbedding, AssumeDominant]
                 [isEmbedding, CheckBirational]
-                --[isEmbedding, HybridLimit]
+                [isEmbedding, HybridLimit]
                -- [isEmbedding, Strategy]
                -- [isEmbedding, MinorsCount]
                 [isEmbedding, Verbose]
@@ -1743,6 +1747,8 @@ doc ///
                     whether to assume a map of schemes is dominant, if set to true it can speed up computation
                 CheckBirational => Boolean
                     whether to check birationality (if it is not birational, and this is set to true, then the function will throw an error).
+                HybridLimit => ZZ
+                    within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used,   larger numbers weight it towards SimisStrategy
         Outputs
                 val:Boolean
                     true if the map is an embedding, otherwise false.
@@ -1955,6 +1961,7 @@ doc ///
         --[inverseOfMap, Strategy]
 --               [inverseOfMap, CheckBirational]
 --               [inverseOfMap, HybridLimit, MinorsCount]
+        [inverseOfMap, HybridLimit]
         [inverseOfMap, Verbose]
 --      [inverseOfMap, MinorsCount]
     Headline
@@ -1971,6 +1978,8 @@ doc ///
             generate informative output which can be used to adjust strategies
         AssumeDominant => Boolean
             whether to assume a map of schemes is dominant, if set to true it can speed up computation
+        HybridLimit => ZZ
+            within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used, larger numbers weight it towards SimisStrategy
     Outputs
         psi: RationalMapping
             inverse function of your birational map, $f(X) \\to X$.
@@ -2028,7 +2037,7 @@ doc ///
         --     	[sourceInversionFactor, AssumeDominant]
         --       [sourceInversionFactor, Strategy]
         [sourceInversionFactor, CheckBirational]
-        --       [sourceInversionFactor, HybridLimit]
+        [sourceInversionFactor, HybridLimit]
         [sourceInversionFactor, Verbose]
         --	 [sourceInversionFactor,MinorsCount]
     Headline
@@ -2042,6 +2051,8 @@ doc ///
             generate informative output which can be used to adjust strategies
         CheckBirational => Boolean
             whether to check birationality (if it is not birational, and this is set to true, then the function will throw an error)
+        HybridLimit => ZZ
+            within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used, larger numbers weight it towards SimisStrategy
     Outputs
         s: RingElement
              an element of the coordinate ring of $X$ .
@@ -2298,19 +2309,20 @@ TEST /// --test #23
 TEST /// --test #24
     R =  QQ[a..d]/(a*d - b*c);
     S = QQ[x,y,z];
-    f = inverseOfMap(map(R, S, {a,b,c}));
-    g = inverseOfMap(map(R, S, {a,b,c}),Strategy=>ReesStrategy);
     h = rationalMapping(S, R, {x^2, x*y, x*z, y*z});
+    f = inverseOfMap(map(R, S, {a,b,c}));
+    g = inverseOfMap(map(R, S, {a,b,c}),Strategy=>ReesStrategy);    
     assert( (isSameMap(f, h)) and (isSameMap(g, h)) )
 ///
 
 TEST /// --test #25 (quadratic cremona)
     R = ZZ/11[x,y,z];
     S = ZZ/11[a,b,c];
-    h = map(R, S, {y*z, x*z, x*y});
+    h = rationalMapping(R, S, {y*z, x*z, x*y});
+    phi = rationalMapping(S, R, {b*c,a*c,a*b});
     g = inverseOfMap(h,AssumeDominant=>true);
     f = inverseOfMap(h,AssumeDominant=>true, Strategy=>ReesStrategy);
-    assert( (isSameMap(first entries matrix map g, {b*c, a*c, a*b})) and (isSameMap(first entries matrix map f, {b*c, a*c, a*b})) )
+    assert((g == phi) and (f == phi))
 ///
 
 -----------------------------------
