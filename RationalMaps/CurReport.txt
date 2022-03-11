@@ -225,16 +225,19 @@ We have rephrased this, and removed the term weight from the documentation.
         "change" is unclear.  How about this?:
         "Notice that removal of the leading minus signs would not change the projective map."
 
+Changed.
 
     "The target and source must be varieties, in particular their defining ideals must be prime."
 
         change comma ot semicolon
 
+Done.
 
     "The next example, is a Birational map on ℙ^4."
 
         remove comma
 
+Fixed.
 
     Starting inverseOfMapSimis(SimisStrategy or HybridStrategy)
     inverseOfMapSimis: About to find the image of the map.  If you know the image, you may want to use the AssumeDominant option if this is slow.
@@ -254,7 +257,9 @@ We have rephrased this, and removed the term weight from the documentation.
         by adding an option "Verbose", whose default value is false.  (You have true
         as the default value, so that's the problem.)
 
+When we created this we wanted to provide the user with hints as to what options they should change if the command is not terminating.
 
+TODO:  Discuss, should we change this behavior?  We could have Verbosity instead of Verbose.  If Verbosity >= 2 then we display everything, if Verbosity >= 1 then we only display hints.  If Verbosity == 0, then we display nothing.  What do you think?
 
     "Only works for irreducible varieties right now. "
 
@@ -264,6 +269,7 @@ We have rephrased this, and removed the term weight from the documentation.
         Try:
         "The current implementation of this function works only for irreducible varieties. "
 
+Changed as requested.
 
     "Also see the function invertBirMap in the package Cremona,"
 
@@ -274,6 +280,7 @@ We have rephrased this, and removed the term weight from the documentation.
 
         And perhaps elsewhere.
 
+We do not know how to do that.  In particular, we do not know how to build in such links if Cremona is not loaded.  We do not want to load Cremona as loading it is non-trivial.
 
     "for certain types of maps from projective space is sometimes faster"
 
@@ -281,6 +288,7 @@ We have rephrased this, and removed the term weight from the documentation.
 
         "for some maps from projective space is faster"
 
+Changed.
 
 
     "isBirationalMap -- Checks if a map between projective varieties is birational"
@@ -291,6 +299,7 @@ We have rephrased this, and removed the term weight from the documentation.
             
             Similarly for isBirationalOntoImage
             
+Changed.
 
     "the variables should be sent to elements of a single fixed degree"
 
@@ -303,6 +312,7 @@ We have rephrased this, and removed the term weight from the documentation.
         
         , because "fixed" is meaningless
 
+We have removed this sentence.  Such discussion has been moved to the RationalMapping constructor discussion.
 
     "The target and source must be varieties"
 
@@ -310,12 +320,13 @@ We have rephrased this, and removed the term weight from the documentation.
         and ProjectiveVariety, but none of your functions accept them.  That might be
         really elegant to orient your implementation around them.
 
-
+We have created a type RationalMapping which accepts projective varieties.  However, we have not removed the ring map style of implementation, since we believe that most people using Macaulay2 use the ring implementation (the variety support installed by default in Macaulay2 is quite limited)
 
     "Note the Frobenius map is not birational."
 
         change to "Note that the Frobenius map is not birational."
 
+Fixed.
 
     "isBirationalOntoImage -- Checks if a map between projective varieties is birational onto its image."
 
@@ -324,23 +335,29 @@ We have rephrased this, and removed the term weight from the documentation.
 
         Aha, you did implement it, as mapOntoImage.  So this function is not needed.
 
+We want to keep this function.  We believe having both functions helps avoid confusion as to what these functions do.
 
     "Sub-Hankel matrices have homaloidal determinants."
 
             say what "homaloidal" and "sub-Hankel" mean somewhere
 
+TODO:  Karl asked Hamid for some help with this.
 
     "The source must be a variety, in particular its defining ideals must be prime."
 
         "in particular"?  Isn't that the whole thing?  Also used elsehwere.
 
+We have removed "in particular" in the cases like this.
+
         change "ideals" to "ideal"
 
+Fixed
 
     "isEmbedding -- Checks whether a map of projective varieties is a closed embedding."
 
             ... a *rational* map ...
 
+This is fixed throughout.
 
     " Note, this function, isEmbedding, will only behave properly if CheckBirational is set to true."
 
