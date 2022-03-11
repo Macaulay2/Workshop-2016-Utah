@@ -1302,10 +1302,11 @@ document{
     Usage =>"  CheckBirational=>b",
       "If true, inverseOfMap, isEmbedding and sourceInversionFactor  will check whether the passed map is birational.
       If it is not birational, it will throw an error.",
-    SeeAlso =>
+    SeeAlso =>{
         "inverseOfMap",
         "isEmbedding",
         "sourceInversionFactor"
+    }
 }
 --***************************************************************
 
@@ -1315,8 +1316,9 @@ document{
        "This controls behavior when using ", TT "Strategy=>HybridStrategy", ".  ", "By increasing the HybridLimit value (default 15), you can weight
        HybridStrategy more towards SimisStrategy.
 	     Infinity will behave just like SimisStrategy.",
-    SeeAlso=>
-        "HybridStrategy"
+    SeeAlso=>{
+        "HybridStrategy"        
+    }
 }
 --***************************************************************
 
