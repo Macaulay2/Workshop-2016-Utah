@@ -123,14 +123,14 @@ Changed.
 
         There are probably a lot of other instances of this kind of thing.
 
-I have changed this behavior for:
+We have changed this behavior as requested for:
     Verbose
     AssumeDominant
     CheckBirational
     SaturateOutput
     HybridLimit
     Strategy
-    (I or someone else needs to finish this)
+    QuickRank
 
 
     "HybridStrategy -- A strategy for inverseOfMap, isBirationalMap and isEmbedding."

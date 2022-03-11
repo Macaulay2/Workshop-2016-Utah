@@ -1142,7 +1142,7 @@ mapOntoImage(RingMap) := o -> (f)->(
 );
 
 mapOntoImage(RationalMapping) := o -> (phi) -> (
-    mapOntoImage(map phi, o)
+    rationalMapping mapOntoImage(map phi, o)
 )
 
 --%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1388,15 +1388,7 @@ document{
 }
 
 document{
-    Key=>{QuickRank, [isEmbedding, QuickRank],
-	[inverseOfMap, QuickRank],
-	[isBirationalMap,QuickRank],
-    [isBirationalOntoImage, QuickRank],
-    [sourceInversionFactor, QuickRank],
-    [idealOfImageOfMap, QuickRank],
-    [jacobianDualMatrix, QuickRank],
-    [mapOntoImage, QuickRank]
-    },
+    Key=>{QuickRank},
     Headline=>" an option for controlling how rank is computed",
             "If set to true, then checking if rank is at least a certain number will be computed via the package", TT "FastMinors",
     SeeAlso=>
@@ -1543,6 +1535,7 @@ doc ///
 	    [isBirationalMap,Verbose]
 	    [isBirationalMap,HybridLimit]
         [isBirationalMap,MinorsCount]
+        [isBirationalMap, QuickRank]
     Headline
         whether a map between projective varieties is birational
     Usage        
@@ -1563,6 +1556,8 @@ doc ///
             within HybridStrategy, within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used
         MinorsCount => ZZ
             how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy       
+        QuickRank => Boolean
+            whether to compute rank via the package FastMinors
     Outputs
         val:Boolean
             true if the map is birational, false if otherwise
@@ -1608,6 +1603,7 @@ doc ///
             [isBirationalOntoImage, Strategy]
             [isBirationalOntoImage, HybridLimit]
             [isBirationalOntoImage, MinorsCount]
+            [isBirationalOntoImage, QuickRank]
         Headline
                 whether a map between projective varieties is birational onto its image
         Usage
@@ -1628,6 +1624,8 @@ doc ///
                     within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used, larger numbers weight it towards SimisStrategy
                 MinorsCount => ZZ
                     how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy
+                QuickRank => Boolean
+                    whether to compute rank via the package FastMinors
         Outputs
                 val:Boolean
                         true if the map is birational onto its image, false if otherwise
@@ -1664,32 +1662,22 @@ doc ///
         (idealOfImageOfMap, RingMap)
         (idealOfImageOfMap, RationalMapping)
         [idealOfImageOfMap, Verbose]
+        [idealOfImageOfMap, QuickRank]
     Headline
         finds defining equations for the image of a rational map between varieties or schemes
     Usage
-        im = idealOfImageOfMap(a,b,f)
-        im = idealOfImageOfMap(a,b,g)
-        im = idealOfImageOfMap(R,S,f)
-        im = idealOfImageOfMap(R,S,g)
         im = idealOfImageOfMap(p)
+        im = idealOfImageOfMap(phi)
     Inputs
-        a:Ideal
-            defining equations for X
-        b:Ideal
-            defining equations for Y
-        f:Matrix
-            projective rational map given by polynomial representatives
-        g:BasicList
-            projective rational map given by polynomial representatives
-        R:Ring
-            coordinate ring of X
-        S:Ring
-            coordinate ring of Y
         p:RingMap
-            projective rational map given by polynomial representatives
+            corresponding to a rational map of projective varieties
+        phi:RationalMapping
+            a rational map between projective varieties
+        QuickRank => Boolean
+            whether to compute rank via the package FastMinors
     Outputs
         im:Ideal
-            defining equations for the image of f
+            defining equations for the image
     Description
         Text
             Given a rational map $f : X \\to Y \subset P^N$, this returns the defining ideal of the image of $f$ in $P^N$. The rings provided implicitly in the inputs should be polynomial rings or quotients of polynomial rings. In particular, this function returns an ideal defining a subset of the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
@@ -1715,6 +1703,7 @@ doc ///
         (jacobianDualMatrix, RationalMapping)
         [jacobianDualMatrix,AssumeDominant]
         [jacobianDualMatrix,Strategy]
+        [jacobianDualMatrix, QuickRank]
     Headline
         computes the Jacobian Dual Matrix, a matrix whose kernel describing the syzygies of the inverse map
     Usage
@@ -1729,6 +1718,8 @@ doc ///
                 choose the strategy to use: ReesStrategy or SaturationStrategy
         AssumeDominant => Boolean
             whether to assume a map of schemes is dominant, if set to true it can speed up computation
+        QuickRank => Boolean
+            whether to compute rank via the package FastMinors
     Outputs
         M:Matrix
             a matrix over the coordinate ring of the image, the kernel of this matrix
@@ -1755,6 +1746,7 @@ doc ///
                 mapOntoImage
                 (mapOntoImage, RingMap)
                 (mapOntoImage, RationalMapping)
+                [mapOntoImage, QuickRank]
         Headline
                 Given a map of rings, correspoing to X mapping to Y, this returns the map of rings corresponding to X mapping to f(X).
         Usage
@@ -1762,17 +1754,19 @@ doc ///
         Inputs                
                 f:RingMap
                         the ring map corresponding to $f : X \\to Y$              
+                QuickRank => Boolean
+                        whether to compute rank via the package FastMinors
         Outputs
                 h:RingMap
-			the map of rings corresponding to $f : X \\to f(X)$.
-	Description
-	        Text
-	                This function is really simple, given $S \\to R$, this just returns $S/kernel \\to R$.
-	        Example
-	                R = QQ[x,y];
-	                S = QQ[a,b,c];
-	                f = map(R, S, {x^2, x*y, y^2});
-	                mapOntoImage(f)	                
+                    the map of rings corresponding to $f : X \\to f(X)$.
+        Description
+                Text
+                        This function is really simple, given $S \\to R$, this just returns $S/kernel \\to R$.  In the case that the kernel is zero it can do this computation more quickly however.
+                Example
+                        R = QQ[x,y];
+                        S = QQ[a,b,c];
+                        f = map(R, S, {x^2, x*y, y^2});
+                        mapOntoImage(f)	                
 ///
 --***************************************************************
 
@@ -1787,6 +1781,7 @@ doc ///
                 [isEmbedding, Strategy]
                 [isEmbedding, MinorsCount]
                 [isEmbedding, Verbose]
+                [isEmbedding, QuickRank]
         Headline
                 whether a map of projective varieties is a closed embedding
         Usage
@@ -1803,12 +1798,14 @@ doc ///
                     whether to assume a map of schemes is dominant, if set to true it can speed up computation
                 CheckBirational => Boolean
                     whether to check birationality (if it is not birational, and this is set to true, then the function will throw an error).
+                Strategy=>Symbol
+                    choose the strategy to use: HybridStrategy, SimisStrategy, or ReesStrategy
                 HybridLimit => ZZ
                     within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used,   larger numbers weight it towards SimisStrategy
                 MinorsCount => ZZ
-                    how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy
-                Strategy=>Symbol
-                    choose the strategy to use: HybridStrategy, SimisStrategy, or ReesStrategy
+                    how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy                
+                QuickRank => Boolean
+                    whether to compute rank via the package FastMinors
         Outputs
                 val:Boolean
                     true if the map is an embedding, otherwise false.
@@ -2022,11 +2019,11 @@ doc ///
         (inverseOfMap, RationalMapping)
         [inverseOfMap, AssumeDominant]
         [inverseOfMap, Strategy]
---               [inverseOfMap, CheckBirational]
---               [inverseOfMap, HybridLimit, MinorsCount]
+        [inverseOfMap, CheckBirational]
         [inverseOfMap, HybridLimit]
         [inverseOfMap, Verbose]
         [inverseOfMap, MinorsCount]
+        [inverseOfMap, QuickRank]
     Headline
         computes the inverse map of a given birational map between projective varieties
     Usage
@@ -2039,6 +2036,8 @@ doc ///
             a rational map between projective varieties $f : X \\to Y$
         Verbose => Boolean
             generate informative output which can be used to adjust strategies
+        CheckBirational => Boolean
+            whether to check birationality (if it is not birational, and this is set to true, then the function will throw an error)
         AssumeDominant => Boolean
             whether to assume a map of schemes is dominant, if set to true it can speed up computation
         Strategy=>Symbol
@@ -2047,6 +2046,8 @@ doc ///
             within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used, larger numbers weight it towards SimisStrategy
         MinorsCount => ZZ
             how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy
+        QuickRank => Boolean
+            whether to compute rank via the package FastMinors
     Outputs
         psi: RationalMapping
             inverse function of your birational map, $f(X) \\to X$.
@@ -2105,12 +2106,13 @@ doc ///
     Key
         sourceInversionFactor
         (sourceInversionFactor, RingMap)
-        --     	[sourceInversionFactor, AssumeDominant]
+        [sourceInversionFactor, AssumeDominant]
         [sourceInversionFactor, Strategy]
         [sourceInversionFactor, CheckBirational]
         [sourceInversionFactor, HybridLimit]
         [sourceInversionFactor, Verbose]
-        [sourceInversionFactor,MinorsCount]
+        [sourceInversionFactor, MinorsCount]
+        [sourceInversionFactor, QuickRank]
     Headline
         computes the the common factor among the the components of the composition of the inverse map and the original map
     Usage
@@ -2122,12 +2124,16 @@ doc ///
             generate informative output which can be used to adjust strategies
         CheckBirational => Boolean
             whether to check birationality (if it is not birational, and this is set to true, then the function will throw an error)
+        Strategy=>Symbol
+            choose the strategy to use: HybridStrategy, SimisStrategy, or ReesStrategy
         HybridLimit => ZZ
             within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used, larger numbers weight it towards SimisStrategy
         MinorsCount => ZZ
             how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy
-        Strategy=>Symbol
-            choose the strategy to use: HybridStrategy, SimisStrategy, or ReesStrategy
+        AssumeDominant => Boolean
+            whether to assume a map of schemes is dominant, if set to true it can speed up computation
+        QuickRank => Boolean
+            whether to compute rank via the package FastMinors
     Outputs
         s: RingElement
              an element of the coordinate ring of $X$ .
