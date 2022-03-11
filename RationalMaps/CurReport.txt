@@ -126,6 +126,8 @@ Changed.
 I have changed this behavior for:
     Verbose
     AssumeDominant
+    CheckBirational
+    SaturateOutput
     (I or someone else needs to finish this)
 
 
