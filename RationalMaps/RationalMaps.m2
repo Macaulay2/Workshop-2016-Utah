@@ -5,8 +5,8 @@ newPackage( "RationalMaps",
         HomePage=> "http://www.math.utah.edu/~schwede"
         }, --Karl Schwede was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102, and NSF grant #1801849
         {Name => "Daniel Smolkin",
-        Email=> "smolkin@math.utah.edu",
-        HomePage=> "http://www.math.utah.edu/~smolkin"
+        Email=> "smolkind@umich.edu",
+        HomePage=> "http://dan.smolk.in"
         },--Dan Smolkin was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102
         {Name => "S. Hamid Hassanzadeh",
         Email => "hassanzadeh.ufrj@gmail.com",
