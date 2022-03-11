@@ -75,7 +75,7 @@ Changed.  Made the analogous change to CheckBiraitonal.
 
         o5 = \to
 
-We have changed these throughout.
+When we tried to change these, the output in Macaulay2 did not appear correct.
 
     "Inputs:
         M, a matrix, Row matrix whose entries correspond to the coordinates of your map to projective space."
@@ -196,24 +196,29 @@ Done
         Try something like:
 
         "Given a rational map f : X → Y, this function computes the inverse of the induced map X → f(X), provided it is birational."
+Changed
 
         Have you said somewhere that f(X) denotes the closure of the image??
+
+We have replaced f(X) by \overline{f(x)}
 
         I'm not sure it's sensible, from the point of view of category theory, to replace Y by the image of f here.
         The inverse of a map f : X → Y should be a map Y → X.  Would doing so hurt applications?  If so, could you provide a way
         to produce from a map f : X → Y the corresponding map a map X → f(X)?
 
+This function already exists.  However, we believe that making this change would hurt applications, as many times implicitly we are referring to the image of a map.  However, if the user set CheckBirational => true, then it will behave in the way you expect.
+
     "Note SimisStrategy will never terminate for non-birational maps. "
 
         change to "Note that SimisStrategy will never terminate for non-birational maps."
-
+Done.
 
     "The option HybridLimit can weight the HybridStrategy between ReesStrategy and SimisStrategy"
     "the default value is 15 and increasing it will weight towards SimisStrategy"
 
         rephrase, because "weight" is a noun
 
-
+We have rephrased this, and removed the term weight from the documentation.
 
     "Notice that the leading minus signs do not change the projective map."
 
@@ -445,6 +450,7 @@ Done
 
 todo: find page number
 todo: i'm not sure how to use this bibtex code in the documentation.
+    Karl:  I just inserted it the way it appears on mathscinet.  That seems to be how Greg did some stuff with his packages.
 
 
     "SaturateOutput -- If false, certain functions will not saturate their output."

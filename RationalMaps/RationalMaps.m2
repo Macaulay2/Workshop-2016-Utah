@@ -1365,9 +1365,9 @@ document{
 document{
     Key=>{HybridLimit},
     Headline=>"an option to control HybridStrategy",
-       "This controls behavior when using ", TT "Strategy=>HybridStrategy", ".  ", "By increasing the HybridLimit value (default 15), you can weight
-       HybridStrategy more towards SimisStrategy.
-	     Infinity will behave just like SimisStrategy.",
+       "This controls behavior when using ", TT "Strategy=>HybridStrategy", ".  ", "By increasing the HybridLimit value (default 15), 
+       HybridStrategy will execte SimisStrategy longer. 
+	     Infinity will behave exactly like SimisStrategy.",
     SeeAlso=>{
         "HybridStrategy"        
     }
@@ -1442,19 +1442,10 @@ doc ///
     	Text
             ReesStrategy is a valid value for the Strategy Option for inverseOfMap, isBirationalMap, and isEmbedding. By choosing Strategy=>ReesStrategy, the ideal of
             definition of the Rees algebra is computed by the known elimination technique. 
-            This technique is described in the book "Integral closure" by Wolmer Vasconcelos, page ???.
-            @book {MR2153889,
-                AUTHOR = {Vasconcelos, Wolmer},
-                TITLE = {Integral closure},
-                SERIES = {Springer Monographs in Mathematics},
-                NOTE = {Rees algebras, multiplicities, algorithms},
-                PUBLISHER = {Springer-Verlag, Berlin},
-                YEAR = {2005},
-                PAGES = {xii+519},
-                ISBN = {978-3-540-25540-6; 3-540-25540-0},
-                MRCLASS = {13A30 (13-02 13B22 13D40 13H15)},
-                MRNUMBER = {2153889},
-                MRREVIEWER = {Ngo Viet Trung},
+            This technique is described in Proposition 1.5 on page 21 in the book
+        Text
+            @UL{
+                {BOLD "Integral closure. Rees algebras, multiplicities, algorithms.", " Springer Monographs in Mathematics. ", EM "Springer-Verlag, Berlin,", "2005. xii+519 pp."}
             }@
     SeeAlso
         SaturationStrategy
@@ -1614,7 +1605,7 @@ doc ///
         Strategy=>Symbol
             choose the strategy to use: HybridStrategy, SimisStrategy, or ReesStrategy
         HybridLimit => ZZ
-            within HybridStrategy, within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used
+            within HybridStrategy, within HybridStrategy, the option HybridLimit controls how often SimisStrategy and ReesStrategy are used
         MinorsCount => ZZ
             how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy       
         QuickRank => Boolean
@@ -1624,7 +1615,7 @@ doc ///
             true if the map is birational, false if otherwise
     Description
         Text
-            This checks wheter a map between projective varieties is birational.  There are a number of ways to call this.  A simple one is to pass the function a map between two graded rings.  In this case, the variables should be sent to elements of a single fixed degree.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The target and source must be varieties, in particular their defining ideals must be prime.  Let's check that the plane quadratic cremona transformation is birational.
+            The function {\tt isBirationalMap} computes whether a map between projective varieties is birational.   The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The target and source must be varieties, in particular their defining ideals must be prime.  Let's check that the plane quadratic cremona transformation is birational.
         Example
             R=QQ[x,y,z];
             S=QQ[a,b,c];
@@ -1682,7 +1673,7 @@ doc ///
                 Strategy=>Symbol
                     choose the strategy to use: HybridStrategy, SimisStrategy, or ReesStrategy  
                 HybridLimit => ZZ
-                    within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used, larger numbers weight it towards SimisStrategy
+                    within HybridStrategy, the option HybridLimit controls how often SimisStrategy and ReesStrategy are used, larger numbers means SimisStrategy will be executed longer
                 MinorsCount => ZZ
                     how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy
                 QuickRank => Boolean
@@ -1692,7 +1683,7 @@ doc ///
                         true if the map is birational onto its image, false if otherwise
         Description
             Text
-                This checks whether $f : X \\to Y$ is birational onto its image.  We do this by computing the image and then calling {\tt isBirationalOntoImage}.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its defining ideals must be prime.  In the following example, the map is not birational, but it is birational onto its image.
+                The function {\tt isBirationalOntoImage} computes whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling {\tt isBirationalOntoImage}.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety, in particular its defining ideals must be prime.  In the following example, the map is not birational, but it is birational onto its image.
             Example
                 R=QQ[x,y];
                 S=QQ[a,b,c,d];
@@ -1741,7 +1732,7 @@ doc ///
             defining equations for the image
     Description
         Text
-            Given a rational map $f : X \\to Y \subset P^N$, this returns the defining ideal of the image of $f$ in $P^N$. The rings provided implicitly in the inputs should be polynomial rings or quotients of polynomial rings. In particular, this function returns an ideal defining a subset of the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
+            Given a rational map $f : X \to Y \subset P^N$, {\tt idealOfImageOfMap} returns the defining ideal of the image of $f$ in $P^N$. The rings provided implicitly in the inputs should be polynomial rings or quotients of polynomial rings. In particular, {\tt idealOfImageOfMap} function returns an ideal defining a subset of the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
         Example
             S = QQ[x,y,z,w];
             b = ideal(x*y-z*w);
@@ -1783,7 +1774,7 @@ doc ///
             whether to compute rank via the package FastMinors
     Outputs
         M:Matrix
-            a matrix over the coordinate ring of the image, the kernel of this matrix
+            a matrix $M$ over the coordinate ring of the image, the kernel of $M$
             describes the syzygies of the inverse map, if it exists.
     Description
         Text
@@ -1827,7 +1818,7 @@ doc ///
                     the rational map 
         Description
                 Text
-                        Given $f : X \to Y$ this returns $X \to \overline{\phi(X)}$.  Alternately, given $S \to R$, this just returns $S/kernel \to R$.  It first checks whether the kernel is without calling @TO2((kernel, RingMap), "ker")@. 
+                        Given $f : X \to Y$ {\tt mapOntoImage} returns $X \to \overline{\phi(X)}$.  Alternately, given $S \to R$, {\tt mapOntoImage} just returns $S/kernel \to R$.  {\tt mapOntoImage} first commputes whether the kernel is $0$ without calling @TO2((kernel, RingMap), "ker")@, which can have speed advantages.
                 Example
                         R = QQ[x,y];
                         S = QQ[a,b,c];
@@ -1857,19 +1848,19 @@ doc ///
                 val = isEmbedding(phi)
         Inputs
                 f:RingMap
-                    the ring map corresponding to $f : X \\to Y$
+                    the ring map corresponding to $f : X \to Y$
                 phi:RationalMapping
-                    a rational map of projective varieties, $f : X \\to Y$.
+                    a rational map of projective varieties, $f : X \to Y$.
                 Verbose => Boolean
                     generate informative output which can be used to adjust strategies
                 AssumeDominant => Boolean
                     whether to assume a map of schemes is dominant, if set to true it can speed up computation
                 CheckBirational => Boolean
-                    whether to check birationality (if it is not birational, and this is set to true, then the function will throw an error).
+                    whether to check birationality (if it is not birational, and CheckBirational is set to true, then an error will be thrown).
                 Strategy=>Symbol
                     choose the strategy to use: HybridStrategy, SimisStrategy, or ReesStrategy
                 HybridLimit => ZZ
-                    within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used,   larger numbers weight it towards SimisStrategy
+                    within HybridStrategy, the option HybridLimit controls how often SimisStrategy and ReesStrategy are used,   larger numbers means SimisStrategy will be executed longer
                 MinorsCount => ZZ
                     how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy                
                 QuickRank => Boolean
@@ -1879,7 +1870,7 @@ doc ///
                     true if the map is an embedding, otherwise false.
         Description
                 Text
-                        Given a map of rings, correspoing to $f : X \\to Y$, this determines whether this map embeds $X$ as a closed subscheme into $Y$.  The target and source must be varieties, in particular their defining ideals must be prime.  Consider the Veronese embedding.
+                        Given a map of rings, correspoing to $f : X \to Y$, {\tt isEmbedding} determines whether $f$ map embeds $X$ as a closed subscheme into $Y$.  The target and source must be varieties, in particular their defining ideals must be prime.  Consider the Veronese embedding.
                 Example
                         R = ZZ/7[x,y];
                         S = ZZ/7[a,b,c];
@@ -1905,7 +1896,7 @@ doc ///
                 Text
                         If the option {\tt AssumeDominant} is set to {\tt true}, the function won't compute the kernel of the ring map.  Otherwise it will.
                 Text
-                        The remaining options, {\tt Strategy}, {\tt HybridLimit}, {\tt MinorsCount}, and {\tt CheckBirational} are simply passed when this function calls {\tt inverseOfMap}.  Note, this function, {\tt isEmbedding}, will only behave properly if {\tt CheckBirational} is set to {\tt true}.
+                        The remaining options, {\tt Strategy}, {\tt HybridLimit}, {\tt MinorsCount}, and {\tt CheckBirational} are simply passed when {\tt isEmbedding} calls {\tt inverseOfMap}.  Note, this function, {\tt isEmbedding}, will only behave properly if {\tt CheckBirational} is set to {\tt true}.
         SeeAlso
                 HybridStrategy
                 SimisStrategy
@@ -2075,7 +2066,7 @@ doc ///
         b: Boolean
     Description
         Text
-            This function just runs baseLocusOfMap(f) and checks whether the ideal defining the base locus is the whole ring.
+            This function runs baseLocusOfMap(f) and checks whether the ideal defining the base locus is the whole ring.
         Example
             P5 = QQ[a..f];
             P2 = QQ[x,y,z];
@@ -2105,34 +2096,34 @@ doc ///
         psi = inverseOfMap(phi)
     Inputs
         g: RingMap
-            corresponding to a birational map $f : X \\to Y$
+            corresponding to a birational map $f : X \to Y$
         phi: RationalMapping
-            a rational map between projective varieties $f : X \\to Y$
+            a rational map between projective varieties $f : X \to Y$
         Verbose => Boolean
             generate informative output which can be used to adjust strategies
         CheckBirational => Boolean
-            whether to check birationality (if it is not birational, and this is set to true, then the function will throw an error)
+            whether to check birationality (if it is not birational, and CheckBirational is set to true, then an error will be thrown)
         AssumeDominant => Boolean
             whether to assume a map of schemes is dominant, if set to true it can speed up computation
         Strategy=>Symbol
                 choose the strategy to use: HybridStrategy, SimisStrategy, or ReesStrategy
         HybridLimit => ZZ
-            within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used, larger numbers weight it towards SimisStrategy
+            within HybridStrategy, the option HybridLimit controls how often SimisStrategy and ReesStrategy are used, larger numbers means SimisStrategy will be executed longer
         MinorsCount => ZZ
             how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy
         QuickRank => Boolean
             whether to compute rank via the package FastMinors
     Outputs
         psi: RationalMapping
-            inverse function of your birational map, $\overline{f(X)} \\to X$.
+            inverse function of the birational map
     Description
         Text
-            Given a rational map $f : X \\to Y$, this function computes the inverse of the induced map $X \\to \overline{f(X)}$, provided it is birational."
+            Given a rational map $f : X \to Y$, {\tt inverseOfMap} computes the inverse of the induced map $X \to \overline{f(X)}$, provided it is birational."
             The target and source must be varieties, in particular their defining ideals must be prime.
         Text
             If {\tt AssumeDominant} is set to {\tt true} (default is {\tt false}) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of $f$.
         Text
-            The {\tt Strategy} option can be set to {\tt HybridStrategy} (default), {\tt SimisStrategy}, {\tt ReesStrategy}, or {\tt SaturationStrategy}.  Note {\tt SimisStrategy} will never terminate for non-birational maps. If {\tt CheckBirational} is set to {\tt false} (default is {\tt true}), then no check for birationality will be done.  If it is set to {\tt true} and the map is not birational, an error will be thrown if you are not using {\tt SimisStrategy}. The option {\tt HybridLimit} can weight the {\tt HybridStrategy} between {\tt ReesStrategy} and {\tt SimisStrategy}, the default value is {\tt 15} and increasing it will weight towards {\tt SimisStrategy}.
+            The {\tt Strategy} option can be set to {\tt HybridStrategy} (default), {\tt SimisStrategy}, {\tt ReesStrategy}, or {\tt SaturationStrategy}.  Note that {\tt SimisStrategy} will never terminate for non-birational maps. If {\tt CheckBirational} is set to {\tt false} (default is {\tt true}), then no check for birationality will be done.  If it is set to {\tt true} and the map is not birational, then an error will be thrown if you are not using {\tt SimisStrategy}. The option {\tt HybridLimit} controls {\tt HybridStrategy}.  Larger values of {\tt HybridLimit} (the default value is 15) will mean that {\tt SimisStrategy} is executed longer, smaller values will mean that {\tt ReesStrategy} will be switched to sooner.
         Example
             R = ZZ/7[x,y,z];
             S = ZZ/7[a,b,c];
@@ -2194,15 +2185,15 @@ doc ///
          s = sourceInversionFactor(g)
     Inputs
         g: RingMap
-            Your birational map $f : X \\to Y$.
+            a birational map $f : X \to Y$.
         Verbose => Boolean
             generate informative output which can be used to adjust strategies
         CheckBirational => Boolean
-            whether to check birationality (if it is not birational, and this is set to true, then the function will throw an error)
+            whether to check birationality (if it is not birational, and CheckBirational is set to true, then an error will be thrown)
         Strategy=>Symbol
             choose the strategy to use: HybridStrategy, SimisStrategy, or ReesStrategy
         HybridLimit => ZZ
-            within HybridStrategy, this controls how often SimisStrategy and ReesStrategy are used, larger numbers weight it towards SimisStrategy
+            within HybridStrategy, the option HybridLimit controls how often SimisStrategy and ReesStrategy are used, larger numbers means SimisStrategy will be executed longer
         MinorsCount => ZZ
             how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy
         AssumeDominant => Boolean
@@ -2214,11 +2205,11 @@ doc ///
              an element of the coordinate ring of $X$ .
     Description
         Text
-            Given a map $f : X \\to Y$, this finds common factor among the the components of, $f^{(-1)}$ composed with $f$, which is an element of the coordinate ring of $X$ .
+            Given a map $f : X \to Y$, sourceInversionFactor computes the common factor among the components of, $f^{(-1)}$ composed with $f$, which is an element of the coordinate ring of $X$.
         Text
             If {\tt AssumeDominant} is set to {\tt true} (default is {\tt false}) then it assumes that the map of varieties is dominant, otherwise the function will compute the image by finding the kernel of $f$.
         Text
-            The {\tt Strategy} option can be set to {\tt HybridStrategy} (default), {\tt SimisStrategy}, {\tt ReesStrategy}, or {\tt SaturationStrategy}.  Note {\tt SimisStrategy} will never terminate for non-birational maps. If {\tt CheckBirational} is set to {\tt false} (default is {\tt true}), then no check for birationality will be done.  If it is set to {\tt true} and the map is not birational, an error will be thrown if you are not using {\tt SimisStrategy}. The option {\tt HybridLimit} can weight the {\tt HybridStrategy} between {\tt ReesStrategy} and {\tt SimisStrategy}, the default value is {\tt 15} and increasing it will weight towards {\tt SimisStrategy}.
+            The {\tt Strategy} option can be set to {\tt HybridStrategy} (default), {\tt SimisStrategy}, {\tt ReesStrategy}, or {\tt SaturationStrategy}.  Note {\tt SimisStrategy} will never terminate for non-birational maps. If {\tt CheckBirational} is set to {\tt false} (default is {\tt true}), then no check for birationality will be done.  If it is set to {\tt true} and the map is not birational, then an error will be thrown if you are not using {\tt SimisStrategy}. The option {\tt HybridLimit} controls {\tt HybridStrategy}.  Larger values of {\tt HybridLimit} (the default value is 15) will mean that {\tt SimisStrategy} is executed longer, smaller values will mean that {\tt ReesStrategy} will be switched to sooner.
         Example
             R = ZZ/7[x,y,z];
             S = ZZ/7[a,b,c];
