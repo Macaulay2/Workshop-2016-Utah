@@ -5,8 +5,8 @@ newPackage( "RationalMaps",
         HomePage=> "http://www.math.utah.edu/~schwede"
         }, --Karl Schwede was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102, and NSF grant #1801849
         {Name => "Daniel Smolkin",
-        Email=> "smolkin@math.utah.edu",
-        HomePage=> "http://www.math.utah.edu/~smolkin"
+        Email=> "smolkind@umich.edu",
+        HomePage=> "http://dan.smolk.in"
         },--Dan Smolkin was partially supported by  NSF FRG Grant DMS #1265261/1501115, NSF CAREER Grant DMS #1252860/1501102
         {Name => "S. Hamid Hassanzadeh",
         Email => "hassanzadeh.ufrj@gmail.com",
@@ -1393,7 +1393,7 @@ doc ///
     Key
         HybridStrategy
     Headline
-        a strategy for inverseOfMap,  isBirationalMap and isEmbedding.
+        An option specifying an intermediate strategy
     Description
     	Text
             It is a valid value for the Strategy Option for inverseOfMap.
@@ -1614,7 +1614,7 @@ doc ///
         b:Ideal
             defining equations for Y
         f:Matrix
-                        projective rational map given by polynomial representatives
+            projective rational map given by polynomial representatives
         g:BasicList
             projective rational map given by polynomial representatives
         R:Ring
@@ -1628,7 +1628,7 @@ doc ///
             defining equations for the image of f
     Description
         Text
-            Given $f : X \\to Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$. It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these.  In particular, this function returns an ideal defining a subset of the  the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
+            Given a rational map $f : X \\to Y \subset P^N$, this returns the defining ideal of the image of $f$ in $P^N$. The rings provided implicitly in the inputs should be polynomial rings or quotients of polynomial rings. In particular, this function returns an ideal defining a subset of the ambient projective space of the image.  In the following example we consider the image of $P^1$ inside $P^1 \times P^1$.
         Example
             S = QQ[x,y,z,w];
             b = ideal(x*y-z*w);
