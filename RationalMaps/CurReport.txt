@@ -320,7 +320,7 @@ We have removed this sentence.  Such discussion has been moved to the RationalMa
         and ProjectiveVariety, but none of your functions accept them.  That might be
         really elegant to orient your implementation around them.
 
-We have created a type RationalMapping which accepts projective varieties.  However, we have not removed the ring map style of implementation, since we believe that most people using Macaulay2 use the ring implementation (the variety support installed by default in Macaulay2 is quite limited)
+We have created a type RationalMapping which accepts projective varieties.  However, we have not removed the ring map style of implementation, since we believe that most people using Macaulay2 use the ring implementation, since the ProjectiveVariety objects are not birational.
 
     "Note the Frobenius map is not birational."
 
@@ -364,6 +364,7 @@ This is fixed throughout.
         In that case, the function should not accept the option from the user.  Why let the
         user break your code?  Change it.
 
+Changed.
 
     "jacobianDualMatrix -- Computes the Jacobian Dual Matrix, a matrix whose kernel describing the syzygies of the inverse map."
 

@@ -322,7 +322,7 @@ The default value for {\tt HybridLimit} is $15$. The change from  {\tt SimisStra
 
 There is yet another method for computing the Rees ideal called {\tt SaturationStrategy}. In this option, the whole Rees ideal is computed by saturating the defining ideal of the symmetric algebra with respect to a non-zero element in $R$ (we assume $R$ to be a domain). This strategy appears to be slower in some examples, though one might be able to  improve this option in the future by stopping the computation of the saturation at a certain step.
 
-Computing inverse maps is the most important function of this package and is done by the function {\tt inverseOfMap}. According to \autoref{T birationality}, there are two ways to compute the inverse of a map: $(1)$ by finding any syzygy of the Jacobian dual matrix, and $(2)$ by finding a sub-matrix of $\psi$ of rank $\edim(R)-1$. Each way has its benefits. Method $(1)$ is quite fast in many cases, however, method $(2)$ is very useful if the rank of the Jacobian dual matrix  $\psi$ is relatively small compared to the degrees of the entries of $\psi$. Our function {\tt inverseOfMap} starts by using the second method and later switches to the first method if the second method didn't work.  The timing of this transition from the first method to the second method is controlled by the option {\tt MinorsCount}. Setting {\tt MinorsCount} to zero will mean that no minors are checked and the inverse map is computed just by looking at the syzygies of $\psi$.  If {\tt MinorsCount} is left as null (the default value), these functions will determine a value using a heuristic that depends on the varieties involved.
+Computing inverse maps is the most important function of this package and is done by the function {\tt inverseOfMap}. According to \autoref{T birationality}, there are two ways to compute the inverse of a map: $(1)$ by finding any syzygy of the Jacobian dual matrix, and $(2)$ by finding a sub-matrix of $\psi$ of rank $\edim(R)-1$. Each way has its benefits. Method $(1)$ is quite fast in many cases, however, method $(2)$ is very useful if the rank of the Jacobian dual matrix  $\psi$ is relatively small compared to the degrees of the entries of $\psi$. Our function {\tt inverseOfMap} starts by using the second method and later switches to the first method if the second method didn't work.  The timing of this transition from the first method to the second method is controlled by the option {\tt MinorsLimit}. Setting {\tt MinorsLimit} to zero will mean that no minors are checked and the inverse map is computed just by looking at the syzygies of $\psi$.  If {\tt MinorsLimit} is left as null (the default value), these functions will determine a value using a heuristic that depends on the varieties involved.
 
  In addition, to improve the speed of the function {\tt inverseOfMap}, we have two other options, {\tt AssumeDominant} and {\tt CheckBirational}. If {\tt AssumeDominant} is set  to be {\tt true},  then  {\tt inverseOfMap} assumes that the map from $X$ to $Y$ is dominant and does not compute the image of the map; this is time-consuming in certain cases as it computes the kernel of a ring map.  However, this function goes through a call to {\tt idealOfImageOfMap} which first checks whether the ring map is injective (at least if the target is a polynomial ring) using the method described in \cite[Proposition 1.1]{SimisTwoDifferentialThemes}.
  Similarly, if {\tt CheckBirational} sets {\tt false}, {\tt inverseOfMap} will  not check birationality although it still computes the Jacobian dual matrix.  The option {\tt QuickRank} is available to many functions.  At various points, the rank of a matrix is computed, and sometimes it is faster to compute the rank of an interesting-looking submatrix (using the tools of the package {\tt FastLinAlg}, \cite{FastLinAlgSource}).  Turning {\tt QuickRank} off will make showing that certain maps are birational slower, but will make showing that certain maps are \emph{not} birational faster.  There is a certain amount of randomness in the functions of {\tt FastLinAlg}, and so occasionally rerunning a slow example will result in a massive speedup.
@@ -350,7 +350,7 @@ inverseOfMapSimis:  We give up.  Using the previous computations, we compute the
         Gr{\"o}ber basis of the rees ideal.  Increase HybridLimit and rerun to avoid this.
 inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  5 columns  and about  20 rows.
 inverseOfMapSimis: Looking for a nonzero minor.
-        If this fails, you may increase the attempts with MinorsCount => #
+        If this fails, you may increase the attempts with MinorsLimit => #
 getSubmatrixOfRank: Trying to find a submatrix of rank at least: 4 with attempts = 10.  DetStrategy=>Rank
 getSubmatrixOfRank: found one, in 2 attempts
 inverseOfMapSimis: We found a nonzero minor.
@@ -393,8 +393,8 @@ inverseOfMapSimis:  About to compute partial Gr{\"o}ber basis of rees ideal up t
 inverseOfMapSimis: About to check rank, if this is very slow, you may try turning QuickRank=>false.
 inverseOfMapSimis: We computed enough of the Gr{\"o}ber basis.
 inverseOfMapSimis: Found Jacobian dual matrix (or a weak form of it), it has  3 columns  and about  17 rows.
-inverseOfMapSimis: MinorsCount => 0, so we now compute syzygies instead.
-                   If this doesn't terminate quickly, you may want to try increasing the option MinorsCount.
+inverseOfMapSimis: MinorsLimit => 0, so we now compute syzygies instead.
+                   If this doesn't terminate quickly, you may want to try increasing the option MinorsLimit.
 isEmbedding: checking whether the inverse map is a regular map
      -- used 0.265625 seconds
 o6 = true
@@ -402,7 +402,7 @@ o6 = true
 }
 {\color{black}\normalsize%
 \noindent
-Notice that {\tt MinorsCount => 0} by default for {\tt isEmbedding}.  This is because the expressions defining the inverse map obtained from
+Notice that {\tt MinorsLimit => 0} by default for {\tt isEmbedding}.  This is because the expressions defining the inverse map obtained from
 an appropriate minor frequently are more complicated than the expressions for the inverse map obtained via the syzygies.  Complicated expressions can sometimes slow down the checking of whether the inverse map is regular.
 
 \section{Functionality overlap with other packages}
@@ -449,7 +449,7 @@ However, sometimes the {\tt RationalMaps} function is faster, even in examples w
 }
 {\color{black}\normalsize
 %On the other hand, when the source and target are  not projective space, or the map does not have maximal linear rank.
-We now include an example where the map does not have the maximal linear rank.  %In this example, when we set {\tt MinorsCount=>0}, the {\tt RationalMaps} function is also much much slower.
+We now include an example where the map does not have the maximal linear rank.  %In this example, when we set {\tt MinorsLimit=>0}, the {\tt RationalMaps} function is also much much slower.
 }
 {\scriptsize
 \color{blue}\begin{verbatim}
@@ -460,7 +460,7 @@ o4 : RingMap Q <--- Q
 i5 : (time g = inverseOfMap(phi, Verbose=>false));
      -- Function from "RationalMaps"
      -- used 0.375 seconds
-i6 : (time f = inverseOfMap(phi, Verbose=>false, MinorsCount=>0));
+i6 : (time f = inverseOfMap(phi, Verbose=>false, MinorsLimit=>0));
      -- used 125.141 seconds
 i7 : (time h = inverseMap(phi)); -- Function from "Cremona"
     -- used 122.516 seconds
@@ -471,7 +471,7 @@ o9 = true
 \end{verbatim}
 }
 {\color{black}\normalsize
-In the previous example, setting {\tt MinorsCount=>0} makes {\tt inverseOfMap} much slower -- approximately the same speed as the  corresponding command from {\tt Cremona}.
+In the previous example, setting {\tt MinorsLimit=>0} makes {\tt inverseOfMap} much slower -- approximately the same speed as the  corresponding command from {\tt Cremona}.
 The takeaway for the user should be that changing the options {\tt Strategy}, {\tt HybridLimit}, {\tt MinorSize}, and {\tt QuickRank}, can make a large difference in performance.
 
 %\section{How big can we make our examples?}
