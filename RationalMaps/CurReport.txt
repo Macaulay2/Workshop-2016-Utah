@@ -136,6 +136,7 @@ I have changed this behavior for:
             It's too verbose to list the functions affected in the headline.  What about this?:
             "an option specifying an intermediate strategy"
 
+Done
 
     "Given $f : X \to Y \subset P^N$, this returns the defining ideal of $f(x) \subseteq P^N$."
 
@@ -144,21 +145,27 @@ I have changed this behavior for:
         Or maybe f(X-baselocus f).
         Also, if f is a rational map, then f(X) isn't closed, so it doesn't have a defining ideal.
 
+Done
+
     "It should be noted for inputs that all rings are quotients of polynomial rings, and all ideals and ring maps are of these. "
 
         Poorly phrased, since "are" is not the same as "should be".  Try something
         like: "The rings provided implicitly in the inputs should be polynomial
         rings or quotients of polynomial rings."
 
+Done
 
     "subset of the the ambient projective space"
 
         remove a word
 
+Done
+
 
     "This function frequently just calls ker from Macaulay2. "
 
         make "ker" a link to the documentation of the function
+
 
 
     " it first tries to verify if the ring map is injective."
