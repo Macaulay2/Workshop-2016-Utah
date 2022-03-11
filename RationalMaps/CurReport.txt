@@ -391,22 +391,27 @@ Done
 
             Why not rename it to MinorsLimit?
 
+Done
+todo: rename the option as suggested?
 
     " computed via the packageFastLinAlg"
 
         add a space
         add a period
 
+todo: I couldn't find the offending writing in the doucmentation
 
     "It is a valid value for the Strategy Option for inverseOfMap "
 
         pronouns, such as "it", always need antecedents.  Don't use them otherwise.
 
+Done
 
     "the equation of the ideal of definition of the Rees algebra are generated"
 
                 change "are" to "is" or change "equation" to "equations"
 
+Done
 
     "E.g. Vasconcelos, Rees algebras, multiplicities, algorithms. Springer Monographs in Mathematics. Springer-Verlag, Berlin, 2005."
 
@@ -432,6 +437,8 @@ Done
             MRREVIEWER = {Ngo Viet Trung},
             }
 
+todo: find page number
+todo: i'm not sure how to use this bibtex code in the documentation.
 
 
     "SaturateOutput -- If false, certain functions will not saturate their output."
@@ -440,6 +447,7 @@ Done
 
             "SaturateOutput -- whether the value returned should be saturated"
 
+Done
 
     "SaturationStrategy -- A strategy for inverseOfMap, isBirationalMap, isEmbedding."
 
@@ -448,6 +456,7 @@ Done
 
                 Check all other headlines for names of functions and exterminate
 
+Done
 
     "It is a valid value for the Strategy Option for inverseOfMap "
 
@@ -455,10 +464,13 @@ Done
 
         check all other nodes for descriptions starting with pronouns
 
+Done
 
     "algerba"
 
         fix
+
+Done
 
 
     " only this part of the Rees ideal is enough to decide Birationality "
@@ -470,6 +482,7 @@ Done
 
         don't capitalize Birationality
 
+Done
 
     "all Grobner basis"
 
@@ -477,11 +490,14 @@ Done
 
             "bases" instead of "basis" here
 
+Done
+
 
     "looking for all Grobner basis with first degree 1."
 
         what does "with first degree 1" mean?
 
+todo: someone should double-check the way I fixed this ( and the rest of the documentation for SimisStrategy)
 
     "... ; so that this Strategy reduces the number of computations. "
 
@@ -493,11 +509,14 @@ Done
 
         "... ; this strategy reduces computation time. "
 
+Done
 
 
     "disadvatage"
 
         fix
+
+Done
 
 
     I got tired at SimisStrategy
