@@ -334,40 +334,57 @@ Computing inverse maps is the most important function of this package and is don
 {
 {\scriptsize\color{blue}
 \begin{verbatim}
-i1 : loadPackage "RationalMaps";
-i2 : Q=QQ[x,y,z,t,u];
-i3 : f = map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
-o3 : RingMap
-i4 : phi=rationalMapping(f)
-                                5   4    5    4    5    4    5    4
-o3 = Proj Q - - - > Proj Q   {x , x y, y  + x z, z  + x t, t  + x u}
-o3 : RationalMapping
-i4 : time inverseOfMap(phi, CheckBirational=>false, Verbosity => 1);
-inverseOfMapSimis: About to find the image of the map.  If you know the image,
-        you may want to use the AssumeDominant option if this is slow.
-inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
-inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
-inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
-inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
-inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
-inverseOfMapSimis:  We give up.  Using the previous computations, we compute the whole
-        Groebner basis of the Rees ideal.  Increase HybridLimit and rerun to avoid this.
-inverseOfMapSimis: Looking for a nonzero minor.
-        If this fails, you may increase the attempts with MinorsLimit => #
-inverseOfMapSimis: We found a nonzero minor.
-        -- used 0.189563 seconds                                                                     
+    i1 : loadPackage "RationalMaps";
 
-o4 : RationalMapping
+    i2 : Q=QQ[x,y,z,t,u];
+
+    i3 : f = map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});
+
+    o3 : RingMap
+
+    i4 : phi=rationalMapping(f)
+                                    5   4    5    4    5    4    5    4
+    o4 = Proj Q - - - > Proj Q   {x , x y, y  + x z, z  + x t, t  + x u}
+
+    o4 : RationalMapping
+
+    i5 : time inverseOfMap(phi, CheckBirational=>false, Verbosity => 1);
+    inverseOfMapSimis: About to find the image of the map.  If you know the image,
+            you may want to use the AssumeDominant option if this is slow.
+    inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
+    inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
+    inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
+    inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
+    inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false.
+    inverseOfMapSimis:  We give up.  Using the previous computations, we compute the whole
+            Groebner basis of the Rees ideal.  Increase HybridLimit and rerun to avoid this.
+    inverseOfMapSimis: Looking for a nonzero minor.
+            If this fails, you may increase the attempts with MinorsLimit => #
+    inverseOfMapSimis: We found a nonzero minor.
+            -- used 0.189563 seconds                                                                     
+
+    o5 : RationalMapping
+
+    i6 : ident = rationalMapping map(Q,Q);
+
+    o6 : RationalMapping
+
+    i7 : o5*phi == ident
+
+    o7 = true
 \end{verbatim}
 }
 Using the {\tt RationalMap{{${}^\wedge$}}-1} syntax to compute inverses of maps will always suppress such output.
 {\scriptsize\color{blue}
 \begin{verbatim}
-i6 : time phi^-1;
-     -- used 0.192791 seconds                                                                     
-o6 : RationalMapping
-i7 : o4 == o7
-o7 = true
+    i6 : time phi^-1;
+        -- used 0.192791 seconds                                                                     
+
+    o6 : RationalMapping
+
+    i7 : o4 == o7
+
+    o7 = true
 \end{verbatim}
 }
 {\color{black}\normalsize
@@ -385,22 +402,30 @@ the divisor $12 Q$.  This map must be an embedding, which we now verify.
 }
 {\scriptsize
 \color{blue}\begin{verbatim}
-i1 : needsPackage "Divisor"; --used to quickly define a map                                           
-i2 : C = ZZ/101[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
-i3 : Q = ideal(y,x+z);
-o3 : Ideal of C
-i4 : f2 = mapToProjectiveSpace(12*divisor(Q));
-                        ZZ
-o4 : RingMap C <--- ---[YY ..YY  ]                                                                    
-                    101   1    10
-i5 : needsPackage "RationalMaps";
-i6 : time isEmbedding(f2)
-isEmbedding: About to find the image of the map.  If you know the image,
-        you may want to use the AssumeDominant option if this is slow.
-inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false
-inverseOfMapSimis: rank found, we computed enough of the Groebner basis.
-        -- used 0.140107 seconds                                                                         
-o6 = true    
+    i1 : needsPackage "Divisor"; --used to quickly define a map                                           
+
+    i2 : C = ZZ/101[x,y,z]/(x^4+x^2*y*z+y^4+z^3*x);
+
+    i3 : Q = ideal(y,x+z);
+
+    o3 : Ideal of C
+
+    i4 : f2 = mapToProjectiveSpace(12*divisor(Q));
+
+                            ZZ
+    o4 : RingMap C <--- ---[YY ..YY  ]                                                                    
+                        101   1    10
+
+    i5 : needsPackage "RationalMaps";
+
+    i6 : time isEmbedding(f2)    
+    isEmbedding: About to find the image of the map.  If you know the image,
+            you may want to use the AssumeDominant option if this is slow.
+    inverseOfMapSimis: About to check rank, if this is very slow, you may want to try turning QuickRank=>false
+    inverseOfMapSimis: rank found, we computed enough of the Groebner basis.
+            -- used 0.140107 seconds                                                                         
+
+    o6 = true    
 \end{verbatim}
 }
 {\color{black}\normalsize%
@@ -430,25 +455,33 @@ We begin with a comparison using examples with maximal linear rank where {\tt Cr
 Indeed, in this example (taken from {\tt Cremona}'s documentation), {\tt Cremona} is substantially faster.
 {\scriptsize
 \color{blue}\begin{verbatim}
-i1 : loadPackage "Cremona"; loadPackage "RationalMaps";
-i3 : ringP20=QQ[t_0..t_20];    
-i4 : phi=map(ringP20,ringP20,{t_10*t_15-t_9*t_16+t_6*t_20,t_10*t_14-t_8*t_16+t_5*t_20,t_9*t_14-t_8*t_$
-        t_6*t_14-t_5*t_15+t_4*t_16,t_11*t_13-t_16*t_17+t_15*t_18-t_14*t_19+t_12*t_20,t_3*t_13-t_10*t_17+$
-        +t_7*t_20,t_10*t_12-t_2*t_13-t_7*t_16-t_6*t_18+t_5*t_19,t_9*t_12-t_1*t_13-t_7*t_15-t_6*t_17+t_4*$
-        -t_0*t_13-t_7*t_14-t_5*t_17+t_4*t_18,t_10*t_11-t_3*t_16+t_2*t_20,t_9*t_11-t_3*t_15+t_1*t_20,t_8*$
-        +t_0*t_20,t_7*t_11-t_3*t_12+t_2*t_17-t_1*t_18+t_0*t_19,t_6*t_11-t_2*t_15+t_1*t_16,t_5*t_11-t_2*t$
-        t_4*t_11-t_1*t_14+t_0*t_15,t_6*t_8-t_5*t_9+t_4*t_10,t_3*t_6-t_2*t_9+t_1*t_10,t_3*t_5-t_2*t_8+t_0$
-        -t_1*t_8+t_0*t_9,t_2*t_4-t_1*t_5+t_0*t_6});    
-o4 : RingMap ringP20 <--- ringP20                                                                     
+    i1 : loadPackage "Cremona"; loadPackage "RationalMaps";
 
-i5 : time inverseOfMap(phi, Verbosity=>0);-- Function from "RationalMaps"                              
-        -- used 0.118508 seconds                                                                             
-o5 : RationalMapping
-i6 : time inverseMap phi;
-        -- used 0.0370978 seconds                                                                            
-o6 : RingMap ringP20 <--- ringP20                                                                         
-i7 : o5 == rationalMapping o6    
-o7 = true
+    i3 : ringP20=QQ[t_0..t_20];    
+
+    i4 : phi=map(ringP20,ringP20,{t_10*t_15-t_9*t_16+t_6*t_20,t_10*t_14-t_8*t_16+t_5*t_20,t_9*t_14-t_8*t_15+t_4*t_20,
+    t_6*t_14-t_5*t_15+t_4*t_16,t_11*t_13-t_16*t_17+t_15*t_18-t_14*t_19+t_12*t_20,t_3*t_13-t_10*t_17+t_9*t_18-t_8*t_19
+    +t_7*t_20,t_10*t_12-t_2*t_13-t_7*t_16-t_6*t_18+t_5*t_19,t_9*t_12-t_1*t_13-t_7*t_15-t_6*t_17+t_4*t_19,t_8*t_12
+    -t_0*t_13-t_7*t_14-t_5*t_17+t_4*t_18,t_10*t_11-t_3*t_16+t_2*t_20,t_9*t_11-t_3*t_15+t_1*t_20,t_8*t_11-t_3*t_14
+    +t_0*t_20,t_7*t_11-t_3*t_12+t_2*t_17-t_1*t_18+t_0*t_19,t_6*t_11-t_2*t_15+t_1*t_16,t_5*t_11-t_2*t_14+t_0*t_16,
+    t_4*t_11-t_1*t_14+t_0*t_15,t_6*t_8-t_5*t_9+t_4*t_10,t_3*t_6-t_2*t_9+t_1*t_10,t_3*t_5-t_2*t_8+t_0*t_10,t_3*t_4
+    -t_1*t_8+t_0*t_9,t_2*t_4-t_1*t_5+t_0*t_6});
+
+    o4 : RingMap ringP20 <--- ringP20                                                                     
+
+    i5 : time inverseOfMap(phi, Verbosity=>0);-- Function from "RationalMaps"                              
+            -- used 0.118508 seconds                                                                             
+    
+    o5 : RationalMapping
+
+    i6 : time inverseMap phi;
+            -- used 0.0370978 seconds                                                                            
+    
+    o6 : RingMap ringP20 <--- ringP20                                                                         
+    
+    i7 : o5 == rationalMapping o6    
+    
+    o7 = true
 \end{verbatim}
 }
 {\color{black}\normalsize}
@@ -461,19 +494,30 @@ We now include an example where the map does not have the maximal linear rank.  
 {\scriptsize
 \color{blue}\begin{verbatim}
     i1 : loadPackage "Cremona"; loadPackage "RationalMaps";
+
     i3 : Q=QQ[x,y,z,t,u];    
+
     i4 : phi=map(Q,Q,matrix{{x^5,y*x^4,z*x^4+y^5,t*x^4+z^5,u*x^4+t^5}});    
+
     o4 : RingMap Q <--- Q                                                                                     
+
     i5 : (time g = inverseOfMap(phi, Verbosity=>0));
          -- used 0.233111 seconds                                                                             
+
     i6 : (time f = inverseOfMap(phi, Verbosity=>0, MinorsLimit=>0));
          -- used 60.1969 seconds                                                                          
+
     i7 : (time h = inverseMap(phi)); -- Function from "Cremona"                                           
          -- used 49.2842 seconds                                                                              
+
     o7 : RingMap Q <--- Q                                                                                     
+
     i8 : f == rationalMapping h
+
     o8 = true
+
     i9 : g == rationalMapping h
+
     o9 = true
 \end{verbatim}
 }
@@ -493,10 +537,10 @@ A work of O.~Gabber shows that if $f : \bP^n \to \bP^n$ is defined by forms of d
 {\scriptsize
 \color{blue}
 \begin{verbatim}
-R = ZZ/101[x_0..x_n];
-L = {x_0^d, x_1*x_0^(d-1)} | toList(apply(2..n, i -> (x_i*x_0^(d-1) + x_(i-1)^d)));
-psi = map(R, R, L);
-time inv = inverseOfMap(psi, AssumeDominant=>true, CheckBirational=>false, Verbosity=>0);
+    R = ZZ/101[x_0..x_n];
+    L = {x_0^d, x_1*x_0^(d-1)} | toList(apply(2..n, i -> (x_i*x_0^(d-1) + x_(i-1)^d)));
+    psi = map(R, R, L);
+    time inv = inverseOfMap(psi, AssumeDominant=>true, CheckBirational=>false, Verbosity=>0);
 \end{verbatim}%
 }%
 {\color{black}\normalsize
