@@ -527,7 +527,7 @@ isBirationalMapInternal(RationalMapping) :=o->(phi1)->(
         )
     )
     else(
-        isBirationalOntoImageInternal(di,im1,bm,AssumeDominant=>true,Strategy=>o.Strategy,Verbosity=>o.Verbosity, MinorsLimit=>o.MinorsLimit, HybridLimit=>o.HybridLimit, QuickRank=>o.QuickRank)
+        isBirationalOntoImageInternal(phi1,AssumeDominant=>true,Strategy=>o.Strategy,Verbosity=>o.Verbosity, MinorsLimit=>o.MinorsLimit, HybridLimit=>o.HybridLimit, QuickRank=>o.QuickRank)
     )
 );
 
@@ -2690,12 +2690,31 @@ TEST /// --test #32, composition testing, birational and embedding testing
     assert isEmbedding(tauI*phi);  --the map of P1 to a cusp was not an embedding before but after we blow up the origin, it's fine.
 ///
 
-TEST /// --test #3, self composition testing
+TEST /// --test #33, self composition testing
     R = ZZ/59[x,y,z];
     P2 = Proj R;
     phi = rationalMapping(P2, P2, {y*z, x*z, x*y});
     ident = rationalMapping(P2, P2, {x,y,z});
     assert(phi^2 == ident and phi^-1 == phi and ident^-1 == ident and phi^-2 == ident and phi^3 == ident*phi^-1 and phi^0 == ident)
+///
+
+TEST /// --test #34, an interesting example based on a question of Abbas Nasrolanejad.
+    A=QQ[x,y,z,w];
+    S={y*z*w^2,x*z*w^2,x*y*w^2,y*z^2*w,x*z^2*w,y^2*z*w,x^2*z*w,x*y^2*w,x^2*y*w,x*y*z*w,x*y*z^2,x*y^2*z,x^2*y*z};
+    R=QQ[t_0..t_12];
+    phi=map(A,R,S);
+    J=ker phi;
+    S=QQ[s_0..s_5];
+    psi=map(A,S, {x*y,x*z,x*w,y*z,y*w,z*w});
+    I=ker psi;
+    R1=R/J;
+    identR1 = rationalMapping(map(R1, R1));
+    S1=S/I;
+    identS1 = rationalMapping(map(S1, S1));
+    rat=rationalMapping(S1,R1,{s_4*s_5,s_2*s_5,s_2*s_4,s_3*s_5,s_1*s_5,s_3*s_4,s_1*s_2,s_0*s_4,s_0*s_2,s_0*s_5,s_1*s_3,s_0*s_3,s_0*s_1});
+   assert( isBirationalMap(rat, AssumeDominant=>true) )
+   ratI = rat^-1;
+   assert(rat*ratI == identR1 and ratI*rat == identS1)
 ///
 
 
