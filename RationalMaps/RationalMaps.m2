@@ -842,10 +842,10 @@ inverseOfMap(RationalMapping) := o -> (phi) ->(
             minorsCt = 6;
         )
         else if (nn < 12) then (
-            minorsCt = 3;
+            minorsCt = 2;
         )
         else (
-            minorsCt = 1;
+            minorsCt = 0;
         );
     );
     if ((o.Strategy == ReesStrategy) or (o.Strategy == SaturationStrategy)) then (
@@ -1120,7 +1120,7 @@ inverseOfMapSimis(RationalMapping) :=o->(phi1)->(
     else (
         if (o.Verbosity >= 1) then print "inverseOfMapSimis: We found a nonzero minor.";
         Col = (nonZMinor)#1;
-        SbarJD=submatrix(barJD,,Col);
+        SbarJD=submatrix(barJD,,Col);        
         for i from 0 to jdd do Inv=append(Inv,(-1)^i*det(submatrix'(SbarJD,{i},)));
         psi=map(source f,Rlin1,matrix{Inv});
     );
