@@ -1394,7 +1394,7 @@ document{
 document{
     Key=>{QuickRank},
     Headline=>" an option for controlling how rank is computed",
-            "If set to true, then checking wheter rank is at least a certain number will be computed via the package", TT "FastMinors",
+            "If set to true, then checking wheter rank is at least a certain number will be computed via the package ", TO "FastMinors", ".",
     SeeAlso=>
         inverseOfMap
 }

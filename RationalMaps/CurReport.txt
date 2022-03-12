@@ -373,22 +373,26 @@ Changed.
                 "describing" should be "describes" (but move that to the body of the documentation)
                 inverse rational maps don't have syzygies -- matrices have syzygies
 
+This has been changed.
 
     "This is mostly an internal function which is used when checking"
 
         add comma before "which"
         Check for other uses of "which" that will need commas, too.
 
+We have broken this up into two sentences
 
     "this just returns S/kernel →R."
 
         kernel of what?
 
+This has been fixed.
 
     "correspoing"
 
         fix
 
+Fixed.
 
     "mapOntoImage -- Given a map of rings, correspoing to X mapping to Y, this returns the map of rings corresponding to X mapping to f(X)."
 
@@ -396,12 +400,17 @@ Changed.
 
             "mapOntoImage -- the induced map from a variety to its image under a rational map"
 
+Changed
+
     "invovling"
 
         fix
 
+fixed
+
         maybe run the documentation through a spell checker!
 
+Done.  
 
     "the functions will try to make an educated guess as to how big to make this, depending on varieties you are working with."
 
@@ -411,6 +420,7 @@ Changed.
 
         "these functions will determine a value using a heuristic that depends on the varieties involved"
 
+Changed as suggested.
 
     "MinorsCount -- An option controlling the behavior of isBirational and inverseOfMap (and other functions which call those)."
 
@@ -421,14 +431,13 @@ Changed.
             Why not rename it to MinorsLimit?
 
 Done
-todo: rename the option as suggested?
 
     " computed via the packageFastLinAlg"
 
         add a space
         add a period
 
-todo: I couldn't find the offending writing in the doucmentation
+Fixed (note FastLinAlg is now FastMinors)
 
     "It is a valid value for the Strategy Option for inverseOfMap "
 
