@@ -1423,7 +1423,7 @@ document{
 --***************************************************************
 document{
     Key=>{ AssumeDominant},
-    Headline =>"an option used to control whether a map a rational map between projective varieties is dominant",
+    Headline =>"whether to assume a rational map between projective varieties is dominant",
     Usage =>"AssumeDominant=>b",
     "  If ", TT "AssumeDominant"," is ", TT "true",", it can speed up computation as a kernel will not be computed.",
 }
@@ -1439,7 +1439,7 @@ doc ///
     	Text
             HybridStrategy is a valid value for the Strategy Option for inverseOfMap, isBirationalMap, and isEmbedding.
 	    This is currently the default strategy.  It is a combination of ReesStrategy and SimisStrategy.
-	    By increasing the HybridLimit value (default 15), you can encourage the method in question towards using SimisStrategy.
+	    Increasing the HybridLimit value (default 15) will force SimisStrategy to be executed longer.
     SeeAlso
         ReesStrategy
         SaturationStrategy
@@ -1462,7 +1462,7 @@ doc ///
             This technique is described in Proposition 1.5 on page 21 in the book
         Text
             @UL{
-                {"Vasconcelos, Wolmer", BOLD "Integral closure. Rees algebras, multiplicities, algorithms.", " Springer Monographs in Mathematics. ", EM "Springer-Verlag, Berlin,", "2005. xii+519 pp."}
+                {"Vasconcelos, Wolmer.  ", BOLD "Integral closure. Rees algebras, multiplicities, algorithms.", " Springer Monographs in Mathematics. ", EM "Springer-Verlag, Berlin,", "2005. xii+519 pp."}
             }@
     SeeAlso
         SaturationStrategy
@@ -1755,7 +1755,7 @@ doc ///
                         true if the map is birational onto its image, false if otherwise
         Description
             Text
-                The function {\tt isBirationalOntoImage} computes whether $f : X \to Y$ is birational onto its image.  We do this by computing the image and then calling {\tt isBirationalOntoImage}.  The option {\tt AssumeDominant} being true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety; its defining ideal must be prime.  In the following example, the map is not birational, but it is birational onto its image.
+                The function {\tt isBirationalOntoImage} computes whether $f : X \to Y$ is birational onto its image.  It is essentially a combination of {\tt mapOntoImage} with {\tt isBirationalOntoImage}.  Setting option {\tt AssumeDominant} to true will cause the function to assume that the kernel of the associated ring map is zero (default value is false).  The source must be a variety; its defining ideal must be prime.  In the following example, the map is not birational, but it is birational onto its image.
             Example
                 R=QQ[x,y];
                 S=QQ[a,b,c,d];
@@ -1959,7 +1959,8 @@ doc ///
                         S = ZZ/7[a,b,c];
                         h = map(R, S, {x^2, x*y, y^2});
                         isEmbedding(h, Verbosity=>1)
-                Text
+                Text                        
+                        If the option {\tt Verbosity} is set to {\tt 2}, the function will produce very detailed output.  Setting it to {\tt 0} will suppress output such output.
                         Now consider the projection from a point on the plane to the line at infinity.
                 Example
                         R=QQ[x,y,z];
@@ -1973,9 +1974,7 @@ doc ///
                         S=QQ[a,b];
                         h=map(R,S, {y,z});
                         isRegularMap(h)
-                        isEmbedding(h, Verbosity=>0)
-                Text
-                        If the option {\tt Verbosity} is set to {\tt true}, the function will describe what it is doing at each step.
+                        isEmbedding(h, Verbosity=>0)                
                 Text
                         If the option {\tt AssumeDominant} is set to {\tt true}, the function won't compute the kernel of the ring map.  Otherwise it will.
                 Text
