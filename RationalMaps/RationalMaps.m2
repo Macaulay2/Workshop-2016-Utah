@@ -1682,7 +1682,7 @@ doc ///
         SimisStrategy
         ReesStrategy
     Caveat
-        Also see the very fast probabilisitc birationality checking of the Cremona package: isBirational
+        Also see the very fast probabilistic birationality checking of the Cremona package: isBirational
 ///
 --***************************************************************
 

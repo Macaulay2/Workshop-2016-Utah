@@ -47,7 +47,7 @@ Done.
 
         fix
 
-Fixed.
+Fixed, changed to probabilistic.
 
 
     "degreeOfRationalMap with MathMode=>true can give a deterministic answer."
