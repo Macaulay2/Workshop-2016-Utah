@@ -257,9 +257,8 @@ Fixed.
         by adding an option "Verbose", whose default value is false.  (You have true
         as the default value, so that's the problem.)
 
-When we created this we wanted to provide the user with hints as to what options they should change if the command is not terminating.
+We have replaced Verbose with Verbosity. For some functions, the default Verbosity is 1.  In this case, it will only provide hints as to changes in strategies you could use to speed things up.  If you set it to >= 2 it will provide the full output as above.  0 will silence the functions.
 
-TODO:  Discuss, should we change this behavior?  We could have Verbosity instead of Verbose.  If Verbosity >= 2 then we display everything, if Verbosity >= 1 then we only display hints.  If Verbosity == 0, then we display nothing.  What do you think?
 
     "Only works for irreducible varieties right now. "
 
