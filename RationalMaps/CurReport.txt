@@ -475,10 +475,8 @@ Done
             MRREVIEWER = {Ngo Viet Trung},
             }
 
-todo: find page number
-todo: i'm not sure how to use this bibtex code in the documentation.
-    Karl:  I just inserted it the way it appears on mathscinet.  That seems to be how Greg did some stuff with his packages.
 
+We have inserted the requested references.
 
     "SaturateOutput -- If false, certain functions will not saturate their output."
 
@@ -537,6 +535,7 @@ Done
         what does "with first degree 1" mean?
 
 todo: someone should double-check the way I fixed this ( and the rest of the documentation for SimisStrategy)
+todo:  Karl, I emailed you and Hamid.
 
     "... ; so that this Strategy reduces the number of computations. "
 
@@ -571,6 +570,7 @@ Done
         if the package is good enough to be published, it's good enough
         to be called version 1
 
+This has been changed.
 
     "isSameMap -- Checks whether two maps to projective space are really the same"
 
@@ -583,6 +583,8 @@ Done
         all those functions that take either ideals or rings with lists or ring
         maps would now *just* take objects of type RationalMap.  Internally, your
         implementation would store that data inside the object.
+
+We created this type and functionality and it did simplify a lot of code.  However, we would like to keep the isSameMap functionality for RingMap's.  The point is we do not want to force people to use our new type, especially since using the ProjectiveVariety object in M2 is not widespread.
 
     INCOMPLETE
 

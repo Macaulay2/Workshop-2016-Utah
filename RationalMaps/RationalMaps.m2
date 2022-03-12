@@ -1,5 +1,5 @@
 newPackage( "RationalMaps",
-    Version => "1.0", Date => "March 9th, 2022", Authors => {
+    Version => "1.0", Date => "March 11th, 2022", Authors => {
         {Name => "Karl Schwede",
         Email=> "kschwede@gmail.com",
         HomePage=> "http://www.math.utah.edu/~schwede"
@@ -1384,7 +1384,7 @@ document{
     Key=>{MinorsLimit},
     Headline=>"an option to limit the number of random minors computed",
             "One of the ways to invert a map is to find a nonzero minor of a variant of the jacobianDualMatrix.
-	     This function controls how many minors (heuristically chosen via FastMinors) to check before switching to another strategy (involving computing a syzygy).
+	     This function controls how many minors (heuristically chosen via ", TO "FastMinors", ") to check before switching to another strategy (involving computing a syzygy).
 	     Setting it to zero will mean no minors are checked.
 	     If it is left as null (the default), these functions will determine a value using a heuristic that depends on the varieties involved.",
     SeeAlso=>
@@ -1485,10 +1485,10 @@ doc ///
     Description
     	Text
             SimisStrategy is a valid value for the Strategy Option of inverseOfMap, isBirationalMap, and isEmbedding. Considering the bigraded structure of the
-            equations of the ideal of definition of a Rees algebra, SimisStrategy looks for all Gröbner bases where the degree is (1, n) for some n in NN. The advantage
+            equations of the ideal of definition of a Rees algebra, SimisStrategy looks for all Gröbner bases where the degree is (1, n) for some natural number n. The advantage
             of this restriction is that this part of the Rees ideal is enough to decide birationality and to compute the inverse map; this strategy reduces 
             computation time. A disadvantage of this Strategy is that if the given map is not birational this Strategy may never
-            end because the jacobianDualMatrix will not attain its maximum rank. To circumvent this problem we consider  HybridStrategy.
+            end because the jacobianDualMatrix will not attain its maximum rank. To circumvent this problem we implemented HybridStrategy.
     SeeAlso
         ReesStrategy
         SaturationStrategy
@@ -1650,7 +1650,7 @@ doc ///
         MinorsLimit => ZZ
             how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy       
         QuickRank => Boolean
-            whether to compute rank via the package FastMinors
+            whether to compute rank via the package @TO2(FastMinors, "FastMinors")@
     Outputs
         val:Boolean
             true if the map is birational, false if otherwise
@@ -1718,7 +1718,7 @@ doc ///
                 MinorsLimit => ZZ
                     how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy
                 QuickRank => Boolean
-                    whether to compute rank via the package FastMinors
+                    whether to compute rank via the package @TO2(FastMinors, "FastMinors")@
         Outputs
                 val:Boolean
                         true if the map is birational onto its image, false if otherwise
@@ -1774,7 +1774,7 @@ doc ///
         phi:RationalMapping
             a rational map between projective varieties
         QuickRank => Boolean
-            whether to compute rank via the package FastMinors
+            whether to compute rank via the package @TO2(FastMinors, "FastMinors")@
     Outputs
         im:Ideal
             defining equations for the image
@@ -1819,7 +1819,7 @@ doc ///
         AssumeDominant => Boolean
             whether to assume the provided rational map of projective varieties is dominant, if set to true it can speed up computation
         QuickRank => Boolean
-            whether to compute rank via the package FastMinors
+            whether to compute rank via the package @TO2(FastMinors, "FastMinors")@
     Outputs
         M:Matrix
             a matrix $M$ over the coordinate ring of the image, the kernel of $M$
@@ -1865,7 +1865,7 @@ doc ///
                 phi:RationalMapping
                         a rational map $\phi$ of projective varieties              
                 QuickRank => Boolean
-                        whether to compute rank via the package FastMinors
+                        whether to compute rank via the package @TO2(FastMinors, "FastMinors")@
         Outputs
                 h:RingMap
                     the map of rings corresponding to $X \to \overline{\phi(X)}$.
@@ -1916,7 +1916,7 @@ doc ///
                 MinorsLimit => ZZ
                     how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy                
                 QuickRank => Boolean
-                    whether to compute rank via the package FastMinors
+                    whether to compute rank via the package @TO2(FastMinors, "FastMinors")@
         Outputs
                 val:Boolean
                     true if the map is an embedding, otherwise false.
@@ -2164,7 +2164,7 @@ doc ///
         MinorsLimit => ZZ
             how many submatrices of a variant of the Jacobian dual matrix to consider before switching to a different strategy
         QuickRank => Boolean
-            whether to compute rank via the package FastMinors
+            whether to compute rank via the package @TO2(FastMinors, "FastMinors")@
     Outputs
         psi: RationalMapping
             inverse function of the birational map
@@ -2251,7 +2251,7 @@ doc ///
         AssumeDominant => Boolean
             whether to assume a rational map of schemes is dominant, if set to true it can speed up computation
         QuickRank => Boolean
-            whether to compute rank via the package FastMinors
+            whether to compute rank via the package @TO2(FastMinors, "FastMinors")@
     Outputs
         s: RingElement
              an element of the coordinate ring of $X$ .
