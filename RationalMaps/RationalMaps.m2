@@ -133,7 +133,21 @@ map(RationalMapping) := o -> phi -> (
 );
 
 RationalMapping ^ ZZ := RationalMapping => (myphi, n1) -> (
-    fold((a,b)->a*b, apply(n1, i->myphi))
+    if (n1 == 1) then return myphi;
+    if (n1 == -1) then return inverseOfMap(myphi, Verbosity => 0);
+    if not (source myphi === target myphi) then error "RationalMapping^ZZ : expected a RationalMapping with the same target and source.";
+    if (n1 == 0) then (
+        --map to the zero should be the identity
+        return rationalMapping map(ring source myphi, ring source myphi);
+    )
+    else if (n1 > 0) then (
+        return fold((a,b)->a*b, apply(n1, i->myphi));
+    )
+    else if (n1 < 0) then (
+        inverseOfMyPhi := inverseOfMap(myphi, Verbosity=>0);
+        m1 := abs(n1);
+        return fold((a,b)->a*b, apply(m1, i->inverseOfMyPhi));
+    );    
 );
 -------------------------------------------------------
 
@@ -243,7 +257,8 @@ isRegularMap(RingMap) := o->(ff) ->(
     I:=baseLocusOfMap(ff, SaturateOutput=>false, Verbosity=>o.Verbosity);
     --(dim I <= 0)
     if (o.Verbosity >= 2) then print "isRegularMap: computed base locus, now checking its dimension.";
-    b := isDimAtMost(0, I);
+    b := null;
+    b = isDimAtMost(0, I);
     if (b === null) then b = dim I <= 0;
     b
 );
@@ -446,7 +461,7 @@ isBirationalMapInternal = method(Options => {AssumeDominant=>false, Strategy=>Hy
 
 isBirationalMap(RationalMapping) := o-> (phi) -> (
     if (phi#cache#?isBirationalMap) then return phi#cache#isBirationalMap;
-    b := isBirationalMapInternal(phi#map, o);
+    b := isBirationalMapInternal(phi, o);
     phi#cache#isBirationalMap = b;
     b
 );
@@ -1137,7 +1152,7 @@ mapOntoImage(RingMap) := o -> (f)->(
         return f;
     )
     else (
-        kk = JJ + I1;
+        kk = sub(JJ, S1) + I1;
     );
 --        newMap := map(target f, ambient source f, matrix f);        
     map(target f, (S1)/kk, matrix f)
@@ -1169,8 +1184,8 @@ isEmbedding(RingMap):= o-> (f1)->(
     else (
 	    f2=f1;
 	);
-    if (o.Verbosity >= 2) then print "isEmbedding: Checking to see wheter the map is a regular map";
-        flag := isRegularMap(f2);
+    if (o.Verbosity >= 2) then print "isEmbedding: Checking to see whether the map is a regular map";
+        flag := isRegularMap(f2, Verbosity => o.Verbosity);
         if (flag == true) then (
 	        if (o.Verbosity >= 2) then (print "isEmbedding: computing the inverse  map");
 
@@ -1392,7 +1407,7 @@ document{
 document{
     Key=>{QuickRank},
     Headline=>" an option for controlling how rank is computed",
-            "If set to true, then checking wheter rank is at least a certain number will be computed via the package ", TO "FastMinors", ".",
+            "If set to true, then checking whether rank is at least a certain number will be computed via the package ", TO "FastMinors", ".",
     SeeAlso=>
         inverseOfMap
 }
@@ -1565,15 +1580,33 @@ doc ///
         compose rational maps between projective varieties
     Description
         Text
-            This allows one to compose two rational maps between projective varieties.
+            This allows one to compose two rational maps between projective varieties.  
         Example
             R = QQ[x,y,z]
             P2 = Proj(R)
             phi = rationalMapping (P2, P2, {y*z,x*z,x*y})
             ident = rationalMapping (P2, P2, {x,y,z})
-            phi*phi == ident
-            phi^3 == phi
-            phi^2 == phi
+            phi*phi == ident        
+        Text
+            Raising a map to the negative first power means computing the inverse birational map.  Raising a map to the first power simply returns the map itself.  In the next example we compute the blowup of a point on P2 and its inverse.
+        Example
+            P5ring = ZZ/103[a..f];
+            R = ZZ/103[x,y,z];        
+            P2 = Proj R;
+            identP2 = rationalMapping(P2, P2, {x,y,z});
+            M = matrix{{a,b,c},{d,e,f}};
+            blowUp = Proj(P5ring/(minors(2, M)+ideal(b - d)));
+            identBlowUp = rationalMapping(blowUp, blowUp, {a,b,c,d,e,f});
+            tau = rationalMapping(P2, blowUp,{a, b, c});
+            tauInverse = tau^-1;
+            tau*tauInverse == identP2 --a map composed with its inverse is the identity
+            tauInverse*tau == identBlowUp
+        Text
+            Note that one can only raise maps to powers (besides 1 and -1) if the source and target of the the same.  In that case, raising a map to a negative power means compose the inverse of a map with itself.  This we illustrate this with the quadratic transformation on P2 that we started with (an transformation of order 2 in the Cremona group).
+        Example
+            phi^3 == phi^-1 
+            phi^-2 == ident
+            phi^1 == ident
     SeeAlso
         isSameMap
 ///
@@ -1924,29 +1957,44 @@ doc ///
                 Example
                         R = ZZ/7[x,y];
                         S = ZZ/7[a,b,c];
-                        f = map(R, S, {x^2, x*y, y^2});
-                        isEmbedding(f, Verbosity=>1)
+                        h = map(R, S, {x^2, x*y, y^2});
+                        isEmbedding(h, Verbosity=>1)
                 Text
                         Now consider the projection from a point on the plane to the line at infinity.
                 Example
                         R=QQ[x,y,z];
                         S=QQ[a,b];
-                        f=map(R, S, {y,z});
-                        isEmbedding(f, Verbosity=>0)
+                        h=rationalMapping(R, S, {y,z});
+                        isEmbedding(h, Verbosity=>0)
                 Text
                         That is obviously not an embedding.  It is even not an embedding when we restrict to a quadratic curve, even though it is a regular map.
                 Example
                         R=QQ[x,y,z]/(x^2+y^2-z^2);
                         S=QQ[a,b];
-                        f=map(R,S, {y,z});
-                        isRegularMap(f)
-                        isEmbedding(f, Verbosity=>0)
+                        h=map(R,S, {y,z});
+                        isRegularMap(h)
+                        isEmbedding(h, Verbosity=>0)
                 Text
                         If the option {\tt Verbosity} is set to {\tt true}, the function will describe what it is doing at each step.
                 Text
                         If the option {\tt AssumeDominant} is set to {\tt true}, the function won't compute the kernel of the ring map.  Otherwise it will.
                 Text
                         The remaining options, {\tt Strategy}, {\tt HybridLimit}, {\tt MinorsLimit}, and {\tt CheckBirational} are simply passed when {\tt isEmbedding} calls {\tt inverseOfMap}.  Note, this function, {\tt isEmbedding}, will only behave properly if {\tt CheckBirational} is set to {\tt true}.
+                Text
+                        We conclude by considering the map from $P^1$ to a cuspidal curve in $P^2$.  This is not an embedding, but if we take the strict transform in the blowup of $P^2$, it is an embedding.
+                Example
+                        R = ZZ/103[x,y,z];    
+                        T = ZZ/103[u,v];
+                        P2 = Proj R;    
+                        P1 = Proj T;
+                        phi = rationalMapping(P2, P1, {u^3, u^2*v, v^3});                            
+                        isEmbedding(phi, Verbosity=>0)
+                        P5ring = ZZ/103[a..f];
+                        M = matrix{{a,b,c},{d,e,f}};
+                        blowUpSubvar = Proj(P5ring/(minors(2, M)+ideal(b - d)));
+                        tau = rationalMapping(P2, blowUpSubvar,{a, b, c}); --the blowup
+                        tauInverse = tau^-1; --the inverse blowup
+                        isEmbedding(tauInverse*phi, Verbosity => 0)
         SeeAlso
                 HybridStrategy
                 SimisStrategy
@@ -2581,10 +2629,82 @@ TEST /// --test #30, maps between cones over elliptic curves and their blowups
     gg = inverseOfMap g;
     assert( b and ( isRegularMap gg == false))
 ///
+
+
+------------------------------------------
+------- Testing RationalMapping Type------
+------------------------------------------
+
+TEST /// --test #31, constructor testing, equality testing, source target testing
+    R = ZZ/101[x,y,z];
+    S = ZZ/101[u,v,w];
+    PR = Proj R;
+    PS = Proj S;
+    L = {random(3, R), random(3,R), random(3,R)};    
+    M = matrix{L};
+    p1 = rationalMapping map(R, S, L);
+    p2 = rationalMapping map(R, S, M);
+    p3 = rationalMapping(R, S, L);
+    p4 = rationalMapping(R, S, M);    
+    p5 = rationalMapping(PS, PR, L);
+    p6 = rationalMapping(PS, PR, M);
+    assert (source p1 === PR and source p2 === PR and source p3 === PR and source p4 === PR and source p5 === PR and source p6 === PR)
+    assert (target p1 === PS and target p2 === PS and target p3 === PS and target p4 === PS and target p5 === PS and target p6 === PS)
+    assert( p1 == p2 and p1 == p3 and p1 == p4 and p1 == p5 and p1 == p6);
+    L1 = {L#0 + x^3, L#1, L#2}
+    M1 = matrix{L1};
+    q1 = rationalMapping map(R, S, L1);
+    q2 = rationalMapping map(R, S, M1);
+    q3 = rationalMapping(R, S, L1);
+    q4 = rationalMapping(R, S, M1);
+    q5 = rationalMapping(PS, PR, L1);
+    q6 = rationalMapping(PS, PR, M1);
+    assert( p1 != q1 and p2 != q2 and p3 != q3 and p4 != q4 and p5 != q5 and p6 != q6)
+///
+
+TEST /// --test #32, composition testing, birational and embedding testing
+    R = ZZ/103[x,y,z];    
+    T = ZZ/103[u,v];
+    P2 = Proj R;    
+    P1 = Proj T;
+    phi = rationalMapping(P2, P1, {u^3, u^2*v, v^3});
+    psi = rationalMapping(P2, P2, {y*z,x*z,x*y});
+    assert isBirationalOntoImage(phi);
+    assert not isEmbedding(phi);
+    assert not isBirationalMap(phi);    
+    assert not isRegularMap(inverseOfMap phi);
+    rho = psi*phi;
+    assert isBirationalOntoImage(rho);
+    assert not isBirationalMap(rho);    
+    S = ZZ/103[m,n,l]/ideal(m^3 - n^2*l); --a cusp
+    cusp = Proj S;
+    kappa = rationalMapping(P2, cusp, {m,n,l});
+    assert isBirationalOntoImage(kappa);
+    assert isEmbedding(kappa); --this should be an embedding by definition
+    assert isBirationalOntoImage(psi*kappa);
+    P5 = ZZ/103[a..f];
+    M = matrix{{a,b,c},{d,e,f}};
+    blowUpSubvar = Proj(P5/(minors(2, M)+ideal(b - d)));
+    tau = rationalMapping(P2, blowUpSubvar,{a, b, c});
+    tauI = inverseOfMap tau;
+    assert isEmbedding(tauI*phi);  --the map of P1 to a cusp was not an embedding before but after we blow up the origin, it's fine.
+///
+
+TEST /// --test #3, self composition testing
+    R = ZZ/59[x,y,z];
+    P2 = Proj R;
+    phi = rationalMapping(P2, P2, {y*z, x*z, x*y});
+    ident = rationalMapping(P2, P2, {x,y,z});
+    assert(phi^2 == ident and phi^-1 == phi and ident^-1 == ident and phi^-2 == ident and phi^3 == ident*phi^-1 and phi^0 == ident)
+///
+
+
 ----Version information----
 --0.1  First version.
 --0.2  Substantial improvements in speed and documentation.
 --0.21 Minor changes especially to documentation.
+--1.0  added new Type RationalMapping, various rewrites, numerous small improvements, improved documentation
+
 
 ----FUTURE PLANS------
 --1.  Handle multi-graded rings (multi-graded maps etc.)
