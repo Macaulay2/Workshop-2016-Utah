@@ -2099,7 +2099,7 @@ doc ///
         (isSameMap, RingMap,RingMap)
         (isSameMap, RationalMapping, RationalMapping)
     Headline
-        whether two maps to projective space are really the same
+        whether two rational maps to between projective varieties are really the same
     Usage
         b = isSameMap(f1, f2)
         phi == psi
