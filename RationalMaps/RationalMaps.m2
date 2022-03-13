@@ -13,13 +13,17 @@ newPackage( "RationalMaps",
         HomePage=>"https://www.researchgate.net/profile/Seyed_Hassanzadeh"
         }, --S. Hamid Hassanzadeh was supported by CNPq-bolsa de Produtividade
         {Name => "C.J. Bott",
-        Email => "cjamesbott@gmail.com"}
+        Email => "cjamesbott@gmail.com",
+        HomePage=>"https://www.math.tamu.edu/directory/formalpg.php?user=cbott2"}
     }, --this file is in the public domain
     Keywords => {"Commutative Algebra"},
     Headline => "rational maps between varieties", 
     PackageExports => {"FastMinors"},
     DebuggingMode => true
 )
+--Hassanzadeh was supported by CNPq-bolsa de Produtividade and by the MathAmSud project ``ALGEO''
+--Schwede was supported in part by the NSF FRG Grant DMS \#1265261/1501115, NSF CAREER Grant DMS \#1252860/1501102, NSF Grants DMS \#1840190 and DMS \#2101800.
+--Smolkin was supported in part by the NSF FRG Grant DMS \#1265261/1501115, NSF CAREER Grant DMS \#1252860/1501102 and NSF Grant DMS \#1801849.
 export{
     "RationalMapping", --a new type
     "rationalMapping", --constructor
@@ -1345,20 +1349,20 @@ document {
 	  {"A. Simis, ",EM "  Cremona Transformations and some Related Algebras", ", Journal of Algebra, Volume 280, Issue 1, 1 October 2004, Pages 162--179"},
 	},
     BOLD "Functionality overlap with other packages:\n\n",BR{},BR{},
-    EM "Parametrization",
-      ":  While the package ", TT "Parametrization", " focuses mostly on curves, it also includes a function ", TT "invertBirationalMap", "
+    EM HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Parametrization/html/index.html", "Parametrization"},
+      ":  While the package ", HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Parametrization/html/index.html", "Parametrization"}, " focuses mostly on curves, it also includes a function ", HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Parametrization/html/_invert__Birational__Map.html", "invertBirationalMap"}, "
       that has the same functionality as ", TO "inverseOfMap", ".  On the other hand, these two functions were implemented differently and so sometimes one function can be substantially faster than the other.\n", BR{}, BR{},
-    EM "Cremona",
-    ":  The package ", TT "Cremona", " focuses on  fast probabilistic computations in general cases and  deterministic computations for special
+    EM HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/index.html", "Cremona"},
+    ":  The package ", HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/index.html", "Cremona"}, " focuses on  fast probabilistic computations in general cases and  deterministic computations for special
      kinds of maps from projective space.  More precisely, ",BR{},
     UL {
-        {TT "isBirational", " gives a probabilistic answer to the question of whether a map between varieties is birational.  Furthermore, if the
+        {HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/_is__Birational.html","isBirational"}, " gives a probabilistic answer to the question of whether a map between varieties is birational.  Furthermore, if the
 	     source is projective space, then ", TT "degreeOfRationalMap", " with ", TT   "MathMode=>true", " gives a deterministic correct answer.
 	      In some cases, the speed of the latter  is comparable with ", TO "isBirationalMap", " with ", TT   "AssumeDominant=>true." },
-        {TT "inverseMap", " gives a  fast computation of the inverse of a birational map if the source is projective space ", EM " and ",
+        {HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/_inverse__Map.html","inverseMap"}, " gives a  fast computation of the inverse of a birational map if the source is projective space ", EM " and ",
 	     "the map has maximal linear rank.   In some cases, even if the map has maximal linear rank, our function ", TO "inverseOfMap",
-	       " appears to be competitive however.  If you pass inverseMap a map not from projective space, then it calls a modified version ",
-	      TT "invertBirationalMap", " from ", TT "Parametrization", "."},
+	       " appears to be competitive however.  If you pass inverseMap a map not from projective space, then it calls a modified and improved version of ",
+	      HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Parametrization/html/_invert__Birational__Map.html", "invertBirationalMap"}, " from ", HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Parametrization/html/index.html", "Parametrization"}, "."},
     },
 }
 
@@ -1713,7 +1717,7 @@ doc ///
         SimisStrategy
         ReesStrategy
     Caveat
-        Also see the very fast probabilistic birationality checking of the Cremona package: isBirational
+        Also see the very fast probabilistic birationality checking of the @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/index.html", "Cremona"}@ package: @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/_is__Birational.html","isBirational"}@.
 ///
 --***************************************************************
 
@@ -2257,7 +2261,7 @@ doc ///
         SimisStrategy
         ReesStrategy
     Caveat
-        The current implementation of this function works only for irreducible varieties.  Also see the function inverseMap in the package Cremona, which for some maps from projective space is faster.  Additionally, also compare with the function invertBirationalMap of the package Parametrization.
+        The current implementation of this function works only for irreducible varieties.  Also see the function @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/_inverse__Map.html","inverseMap"}@ in the package @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/index.html", "Cremona"}@, which for some maps from projective space is faster.  Additionally, also compare with the function @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Parametrization/html/_invert__Birational__Map.html", "invertBirationalMap"}@ of the package @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Parametrization/html/index.html", "Parametrization"}@.
 ///
 --***************************************************************
 
@@ -2314,7 +2318,7 @@ doc ///
              phi=map(S,S,transpose jacobian ideal g);
              sourceInversionFactor(phi, Verbosity=>0)
     Caveat
-        The current implementation of this function works only for irreducible varieties..  Also see the function inverseMap in the package Cremona, which for some maps from projective space is faster.  Additionally, also compare with the function invertBirationalMap of the package Parametrization.
+        The current implementation of this function works only for irreducible varieties..  Also see the function @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/_inverse__Map.html","inverseMap"}@ in the package @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Cremona/html/index.html", "Cremona"}@, which for some maps from projective space is faster.  Additionally, also compare with the function @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Parametrization/html/_invert__Birational__Map.html", "invertBirationalMap"}@ of the package @HREF{"https://faculty.math.illinois.edu/Macaulay2/doc/Macaulay2/share/doc/Macaulay2/Parametrization/html/index.html", "Parametrization"}@.
     SeeAlso
         HybridStrategy
         SimisStrategy
