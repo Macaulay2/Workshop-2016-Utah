@@ -1,8 +1,8 @@
-This is BibTeX, Version 0.99d (TeX Live 2017/Debian)
-Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: RationalMapsPaper.aux
 The style file: skalpha.bst
-Database file #1: MainBib.bib.bib
+Database file #1: MainBib.bib
 Warning--missing journal name in ParametrizationPackage
 Warning--missing journal, volume, and year in ParametrizationPackage
 Warning--missing pages in ParametrizationPackage
@@ -11,47 +11,50 @@ Warning--missing pages in ReesAlgebraArticle
 Warning--missing journal name in HeYangTheMoriDreamSpacePropertyOfBlowups
 Warning--missing journal, volume, and year in HeYangTheMoriDreamSpacePropertyOfBlowups
 Warning--missing pages in HeYangTheMoriDreamSpacePropertyOfBlowups
+Warning--missing journal name in FastMinorsArticle
+Warning--missing journal, volume, and year in FastMinorsArticle
+Warning--missing pages in FastMinorsArticle
 Warning--missing note in CremonaSource
 Warning--missing pages in CremonaArticle
-You've used 15 entries,
+You've used 16 entries,
             2709 wiz_defined-function locations,
-            681 strings with 7513 characters,
-and the built_in function-call counts, 5766 in all, are:
-= -- 511
-> -- 284
-< -- 6
-+ -- 101
-- -- 97
-* -- 551
-:= -- 942
-add.period$ -- 15
-call.type$ -- 15
-change.case$ -- 94
-chr.to.int$ -- 15
-cite$ -- 25
-duplicate$ -- 237
-empty$ -- 414
-format.name$ -- 117
-if$ -- 1101
+            692 strings with 7595 characters,
+and the built_in function-call counts, 6074 in all, are:
+= -- 531
+> -- 292
+< -- 7
++ -- 103
+- -- 99
+* -- 583
+:= -- 984
+add.period$ -- 16
+call.type$ -- 16
+change.case$ -- 99
+chr.to.int$ -- 16
+cite$ -- 29
+duplicate$ -- 256
+empty$ -- 446
+format.name$ -- 121
+if$ -- 1162
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 27
-newline$ -- 56
-num.names$ -- 45
-pop$ -- 91
+missing$ -- 31
+newline$ -- 59
+num.names$ -- 48
+pop$ -- 95
 preamble$ -- 2
-purify$ -- 109
+purify$ -- 115
 quote$ -- 0
-skip$ -- 157
+skip$ -- 174
 stack$ -- 0
-substring$ -- 310
-swap$ -- 58
-text.length$ -- 6
-text.prefix$ -- 5
+substring$ -- 317
+swap$ -- 64
+text.length$ -- 7
+text.prefix$ -- 6
 top$ -- 0
-type$ -- 120
-warning$ -- 10
-while$ -- 57
-width$ -- 20
-write$ -- 167
-(There were 10 warnings)
+type$ -- 124
+warning$ -- 13
+while$ -- 59
+width$ -- 19
+write$ -- 180
+(There were 13 warnings)
