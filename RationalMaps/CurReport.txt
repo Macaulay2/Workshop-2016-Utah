@@ -9,7 +9,7 @@
     the authors a chance to fix it, using my remarks as a guide for the part I didn't look at.  I also
     recommend introducing a new type, "RationalMap", and using it to organize the code more cleanly.
 
-We have created a new type, RationalMapping.  We called it this to avoid conflict with the RationalMap type in the Cremona package.
+We have created a new type, RationalMapping.  We called it this to avoid conflict with the RationalMap type in the Cremona package.  It has new functionality such as composition, raising it to a power, etc.  These have been documented and tests have been added to it.  This type now also appears in the associated paper.
         
 
     =============================================================================

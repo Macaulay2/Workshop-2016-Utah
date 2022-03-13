@@ -1549,9 +1549,8 @@ doc ///
     Description
         Text
             A {\tt RationalMapping} is a Type that is used to treat maps between projective varieties  geometrically.  It stores essentially equivalent data to the corresponding map between the homogeneous coordinate rings.  The way to construct the object is to use the function {\tt rationalMapping}.  
-        Text
-            Warning, the list or matrix describing the map needs every entry to have the same degree.  
-            For example, the following is a Cremona transformation on P2 constructed in multiple ways (in this case, the entries describing the map all have degree 2).
+        Text             
+            For example, the following is a Cremona transformation on $P^2$ constructed in multiple ways (in this case, the entries describing the map all have degree 2).
         Example
             R = QQ[x,y,z]
             P2 = Proj(R)
@@ -1571,6 +1570,8 @@ doc ///
             phi == psi
         Text
             Notice that when defining a map between projective varieties, we keep the target then source input convention.
+        Text
+            Warning, the list or matrix describing the map needs every entry to have the same degree. 
     SeeAlso
         (symbol *, RationalMapping, RationalMapping)
         (symbol ==, RationalMapping, RationalMapping)
@@ -1592,7 +1593,7 @@ doc ///
             ident = rationalMapping (P2, P2, {x,y,z})
             phi*phi == ident        
         Text
-            Raising a map to the negative first power means computing the inverse birational map.  Raising a map to the first power simply returns the map itself.  In the next example we compute the blowup of a point on P2 and its inverse.
+            Raising a map to the negative first power means computing the inverse birational map.  Raising a map to the first power simply returns the map itself.  In the next example we compute the blowup of a point on $P^2$ and its inverse.
         Example
             P5ring = ZZ/103[a..f];
             R = ZZ/103[x,y,z];        
@@ -1606,7 +1607,7 @@ doc ///
             tau*tauInverse == identP2 --a map composed with its inverse is the identity
             tauInverse*tau == identBlowUp
         Text
-            Note that one can only raise maps to powers (besides 1 and -1) if the source and target of the the same.  In that case, raising a map to a negative power means compose the inverse of a map with itself.  This we illustrate this with the quadratic transformation on P2 that we started with (an transformation of order 2 in the Cremona group).
+            Note that one can only raise maps to powers (with the exception of 1 and -1) if the source and target of the the same.  In that case, raising a map to a negative power means compose the inverse of a map with itself.  We illustrate this with the quadratic transformation on $P^2$ that we started with (an transformation of order 2 in the Cremona group).
         Example
             phi^3 == phi^-1 
             phi^-2 == ident
@@ -1908,7 +1909,7 @@ doc ///
                     the rational map 
         Description
                 Text
-                        Given $f : X \to Y$ {\tt mapOntoImage} returns $X \to \overline{\phi(X)}$.  Alternately, given $f: S \to R$, {\tt mapOntoImage} just returns $S/(kernel f) \to R$.  {\tt mapOntoImage} first commputes whether the kernel is $0$ without calling @TO2((kernel, RingMap), "ker")@, which can have speed advantages.
+                        Given $f : X \to Y$ {\tt mapOntoImage} returns $X \to \overline{\phi(X)}$.  Alternately, given $f: S \to R$, {\tt mapOntoImage} just returns $S/(kernel f) \to R$.  {\tt mapOntoImage} first computes whether the kernel is $0$ without calling @TO2((kernel, RingMap), "ker")@, which can have speed advantages.
                 Example
                         R = QQ[x,y];
                         S = QQ[a,b,c];
