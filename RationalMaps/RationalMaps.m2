@@ -1338,7 +1338,7 @@ beginDocumentation();
 
 document {
     Key => RationalMaps,
-    Headline => "rational maps between varieties",
+    Headline => "rational maps between projective varieties",
     EM "RationalMaps", " is a package for computing things related to maps between projective varieties.",
     BR{},BR{},
     "It focuses on finding where a birational map is undefined, checking whether a map is a closed embedding, checking birationality and computing inverse maps",
