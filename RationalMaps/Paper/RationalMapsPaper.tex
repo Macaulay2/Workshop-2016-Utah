@@ -177,7 +177,7 @@ This package aims to compute several things about rational maps between varietie
 \item{} Whether a map is a closed embedding.
 \item{} And more!
 \end{itemize}
-Our functions have numerous options which allow them to run much more quickly in certain examples if configured correctly.  The {\tt Verbose} option gives hints as to the best way to apply these.
+Our functions have numerous options which allow them to run much more quickly in certain examples if configured correctly.  Setting the option {\tt Verbosity} to a value $\geq 1$ will mean that functions will provide hints as to the best ways to run them.
 
 A rational map $\mathfrak{F}:X\subseteq \P^n\dasharrow Y \subseteq \P^m$ between projective varieties is presented by $m+1$ forms $\ff=\{f_0,\ldots f_m\}$ of the same degree in the coordinate ring of $X$, denoted by  $R$.
 The idea of looking at the syzygies of the forms $\ff$ to detect the geometric properties of  $\mathfrak{F}$ goes
@@ -265,9 +265,9 @@ If the \verb=SaturateOutput= option is set  to {\tt false}, our function {\tt ba
 
 \section{Birationality and Inverse Maps}
 
-Again, a rational map $\mathfrak{F}:X\subseteq \P^n\dasharrow Y \subseteq \P^m$ between projective spaces is defined by $m+1$ forms $\ff=\{f_0,\ldots f_m\}$ of the same degree in the coordinate ring of $X$, denoted by  $R$. $R$ is a standard graded ring in $n+1$ variables. Here we assumed the varieties over a field $k$ and  $\dim R\geq 1$.
-The idea to find a ring theoretic criterion for birationality and on top of that to find the inverse of a rational map is to study the Rees algebra of the ideal $I=(\ff)$ in $R$.
-So that let  $R\simeq k[x_0,\ldots, x_n]=k[\XX]/\mathfrak{a}$ with $k[\XX]=k[X_0,\ldots, X_n]$ and $\mathfrak{a}$ a homogeneous ideal. The Rees algebra is defined by the polynomial relations among $\{f_0,\ldots f_m\}$ in $R$. To this end, we consider the polynomial extension $R[\YY]=R[Y_0,\ldots,Y_m]$. To keep track of the variables by degrees, we set the standard  bigrading $\deg(X_i)=(1,0)$ and $\deg(Y_j)=(0,1)$. Mapping $Y_j\mapsto f_jt$ yields
+Again, a rational map $\mathfrak{F}:X\subseteq \P^n\dasharrow Y \subseteq \P^m$ between projective spaces is defined by $m+1$ forms $\ff=\{f_0,\ldots f_m\}$ of the same degree in the coordinate ring of $X$, denoted by  $R$. $R$ is a standard graded ring in $n+1$ variables. Here we assumed the varieties are defined over a field $k$ and  $\dim R\geq 1$.
+Our goal is to find a ring theoretic criterion for birationality and, on top of that, to find the inverse of a rational map.  To do this, we study the Rees algebra of the ideal $I=(\ff)$ in $R$.
+To that end set $R\simeq k[x_0,\ldots, x_n]=k[\XX]/\mathfrak{a}$ with $k[\XX]=k[X_0,\ldots, X_n]$ and $\mathfrak{a}$ a homogeneous ideal. The Rees algebra is defined by the polynomial relations among $\{f_0,\ldots f_m\}$ in $R$. To this end, we consider the polynomial extension $R[\YY]=R[Y_0,\ldots,Y_m]$. To keep track of the variables by degrees, we set the standard  bigrading $\deg(X_i)=(1,0)$ and $\deg(Y_j)=(0,1)$. Mapping $Y_j\mapsto f_jt$ yields
 a presentation $R[\YY]/\mathcal{J}\simeq {\mathcal R}_R((\ff))$, with $\mathcal{J}$ a bihomogeneous {\em presentation
 ideal}.
 $\mathcal{J}$ is a bigraded ideal that depends only on the rational map defined by $\ff$
@@ -281,7 +281,9 @@ $${\mathcal J}=\bigoplus_{(p,q)\in \mathbb{N}^2} {\mathcal J}_{(p,q)},$$
 where ${\mathcal J}_{(p,q)}$ denotes the $k$-vector space of forms of bidegree $(p,q)$.
 Every piece of this ideal contains information about the rational map. For example ${\mathcal J}_{0,*}$ determines the dimension of the image of the map.
 For birationality, the following bihomogeneous piece is  important:
-$${\mathcal J}_{1,*}:=\bigoplus_{r\in\mathbb{N}} {\mathcal J}_{1,q}$$
+\[
+    {\mathcal J}_{1,*}:=\bigoplus_{q\in\mathbb{N}} {\mathcal J}_{1,q}
+\]
 with ${\mathcal J}_{1,q}$ denoting the bigraded piece of ${\mathcal J}$ spanned by the forms of bidegree
  $(1,q)$ for all $q\geq 0$. Now, a form of bidegree $(1,*)$ can be written as $\sum_{i=0}^n Q_i(\YY)\,x_i$, for suitable homogeneous $Q_i(\YY)\in  R[\YY]$
 of the same degree.
@@ -404,8 +406,7 @@ Our package also checks whether a rational map $\mathfrak{F} : X \to Y$ is a clo
 \item  Finally, we check whether the inverse map is also regular.
 \end{enumerate}
 If all three conditions are met, then the map is a closed embedding and the function returns {\tt true}.  Otherwise, {\tt isEmbedding} returns false.
-The following exam illustrates this.  We begin with an example where we take a plane quartic, choose a point $Q$ on it, and take the map associated with 
-the divisor $12 Q$.  This map must be an embedding, which we now verify.
+In the following example which illustrates this, we take a plane quartic, choose a point $Q$ on it, and take the map associated with the divisor $12 Q$.  This map is an embedding by \cite[Chapter IV, Corollary 3.2]{Hartshorne}, which we now verify.
 }
 {\scriptsize
 \color{blue}\begin{verbatim}
@@ -444,20 +445,20 @@ an appropriate minor frequently are more complicated than the expressions for th
 
 We note that our package has some overlaps in functionality with other packages.
 
-While the {\tt Parametrization} package \cite{ParametrizationPackage} focuses mostly on curves, it also includes a function called {\tt invertBirationalMap} that has the same functionality as {\tt inverseOfMap}. On the other hand, these two functions were implemented probabilistic differently and so sometimes one function can be substantially faster than the other.
+While the {\tt Parametrization} package \cite{ParametrizationPackage} focuses mostly on curves, it also includes a function called {\tt invertBirationalMap} that has the same functionality as {\tt inverseOfMap}. On the other hand, these two functions were implemented differently and so sometimes one function can be substantially faster than the other.
 
 The package {\tt Cremona} \cite{CremonaSource,CremonaArticle} focuses on very fast probabilistic computation in general cases and very fast deterministic computation for special kinds of maps from projective space. In particular, in {\tt Cremona},
 
 \begin{itemize}
 \item{}     {\tt isBirational} gives a probabilistic answer to the question of whether a map between varieties is birational. Furthermore, if the source is projective space, then {\tt degreeOfRationalMap} with {\tt MathMode=>true}  gives a deterministic answer that can be faster than what our package  provides with {\tt isBirationalMap}.
-\item{}  {\tt inverseMap} gives a very fast computation of the inverse of a birational map if the source is projective space and the map has maximal linear rank. If you pass this function a map, not from projective space, then it calls a modified, faster version of {\tt invertBirationalMap} originally from {\tt Parametrization}. Even in some cases with maximal linear rank, our {\tt inverseOfMap} function appears to be quite competitive, however.
+\item{}  {\tt inverseMap} gives a very fast computation of the inverse of a birational map if the source is projective space and the map has maximal linear rank. If this function is passed a map where the domain is not projective space, then it calls a modified, improved version of {\tt invertBirationalMap} originally from {\tt Parametrization}. Even in some cases with maximal linear rank, our {\tt inverseOfMap} function appears to be quite competitive, however.
 \end{itemize}
 
 The package {\tt ReesAlgebra} \cite{ReesAlgebraSource, ReesAlgebraArticle} includes a function {\tt jacobianDual} which computes the jacobian dual matrix.  We also have a function {\tt jacobianDualMatrix} which computes a weak form of this same matrix.
 
 \section{Comments and comparisons on function speeds}
 \noindent
-We begin with a comparison using examples with maximal linear rank where {\tt Cremona} excels.  These examples were run using version 5.1 of {\tt Cremona} and version 1.0 of {\tt RationalMaps} running Macaulay2 1.19.1.1 on Ubuntu 20.04 with an AMD 5900x.
+We begin with a comparison using examples with maximal linear rank where {\tt Cremona} excels.  These examples were executed using version 5.1 of {\tt Cremona} and version 1.0 of {\tt RationalMaps} running Macaulay2 1.19.1.1 on Ubuntu 20.04.
 
 Indeed, in this example (taken from {\tt Cremona}'s documentation), {\tt Cremona} is substantially faster.
 {\scriptsize
@@ -551,7 +552,7 @@ A work of O.~Gabber shows that if $f : \bP^n \to \bP^n$ is defined by forms of d
 \end{verbatim}%
 }%
 {\color{black}\normalsize
-When $n = 3$ (we are working on $\bP^3$) here is a table showing the computation time for the inverse for various $d$ at least one  system.  The degrees are those we would expect in this example (when $d = 100$, the degree of the forms in the inverse is $10000$).  Note that  {\tt Cremona} has very similar performance for these examples in $\bP^3$ ($n = 3$), but seems slower than {\tt RationalMaps} as we increase the dimension.
+When $n = 3$ (we are working on $\bP^3$) here is a table showing the computation time, in seconds, to find the inverse map for various values of $d$.  The degrees are those we would expect in this example (when $d = 100$, the degree of the forms in the inverse is $10000$).  Note that  {\tt Cremona} has very similar performance for these examples in $\bP^3$ ($n = 3$), but seems substantially slower than {\tt RationalMaps} as we increase the dimension.
 \begin{center}
 \begin{tabular}{c|c|c|c|c|c|c|c}
   $d$ & 5 & 10 & 20 & 40 & 60 & 80 & 100 \\ \hline
